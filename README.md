@@ -1,5 +1,8 @@
 # Getting Started
 
+SK C&C 프로젝트 참여 전
+개발 연습 프로젝트
+
 Welcome to your new project.
 
 It contains these folders and files, following our recommended project layout:
