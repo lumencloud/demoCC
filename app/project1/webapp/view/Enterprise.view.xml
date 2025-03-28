@@ -1,0 +1,384 @@
+<mvc:View controllerName="project1.controller.Enterprise"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:table="sap.ui.table"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:core="sap.ui.core" displayBlock="true" height="100%" busyIndicatorDelay="0">
+    <Page class="sapUiContentPadding" showNavButton="true" title="전사PL" titleLevel="H2" navButtonPress="onBack">
+        <headerContent>
+            <!-- <Title text="전사PL" width="65px"/>
+            <ToolbarSpacer /> -->
+            <Button text="전사PL" type="Emphasized" />
+            <core:Icon src="sap-icon://navigation-right-arrow"></core:Icon>
+            <Button text="Chart 뷰" type="Ghost" />
+        </headerContent>
+        <subHeader>
+            <OverflowToolbar design="Transparent" class="sapUiTinyMarginTop sapUiTinyMarginBottom">
+                <SegmentedButton width="7%">
+                    <items>
+                        <SegmentedButtonItem text="PL" press="handleNav">
+                            <customData>
+                                <core:CustomData key="target" value="page1"/>
+                            </customData>
+                        </SegmentedButtonItem>
+                        <SegmentedButtonItem text="장판지" press="handleNav">
+                            <customData>
+                                <core:CustomData key="target" value="page2"/>
+                            </customData>
+                        </SegmentedButtonItem>
+                    </items>
+                </SegmentedButton>
+                <ToolbarSeparator />
+                <Label text="연월" required="true" showColon="true" class="sapUiTinyMarginEnd"/>
+                <DatePicker width="10%"/>
+                <Label text="조직" required="true" showColon="true" class="sapUiTinyMarginEnd"/>
+                <Input showValueHelp="true" width="15%" valueHelpRequest="onDialogOrgaOpen"/>
+                <Button text="조회" type="Emphasized"/>
+                <ToolbarSpacer />
+            </OverflowToolbar>
+        </subHeader>
+        <NavContainer id="navCon">
+            <Page id="page1" showHeader="false" backgroundDesign="Transparent">
+                <content>
+                    <form:SimpleForm class="sapUiMediumMarginBottom">
+                        <Panel expandable="true" headerText="PL" expanded="true">
+                            <table:Table selectionMode="None">
+                                <table:columns>
+                                    <table:Column hAlign="Center" width="7rem">
+                                        <Text text="조직" tooltip="조직" wrapping="false" />
+                                        <table:template>
+                                            <HBox justifyContent="End">
+                                                <Text text="{organization_name}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column headerSpan="1" hAlign="Center" width="10rem">
+                                        <table:multiLabels>
+                                            <Text text="24년" tooltip="24년" wrapping="false" />
+                                            <Text text="연간목표" tooltip="연간목표" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="End">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column headerSpan="3" width="10rem">
+                                        <table:multiLabels>
+                                            <Text text="당월실적" tooltip="당월실적" wrapping="false" />
+                                            <Text text="" tooltip="" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="End">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" width="10rem">
+                                        <table:multiLabels >
+                                            <Text text="당월실적" tooltip="당월실적" wrapping="false" />
+                                            <Text text="전년동기" tooltip="전년동기" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="Center">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" width="10rem">
+                                        <table:multiLabels>
+                                            <Text text="당월실적" tooltip="당월실적" wrapping="false" />
+                                            <Text text="GAP" tooltip="GAP" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="Center">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column headerSpan="3" width="8rem">
+                                        <table:multiLabels>
+                                            <Text text="진척도" tooltip="진척도" wrapping="false" />
+                                            <Text text="" tooltip="" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="End">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" width="8rem">
+                                        <table:multiLabels>
+                                            <Text text="진척도" tooltip="진척도" wrapping="false" />
+                                            <Text text="전년동기" tooltip="전년동기" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="Center">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" width="8rem">
+                                        <table:multiLabels>
+                                            <Text text="진척도" tooltip="진척도" wrapping="false" />
+                                            <Text text="GAP" tooltip="GAP" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="Center">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                </table:columns>
+                            </table:Table>
+                        </Panel>
+                    </form:SimpleForm>
+                    <form:SimpleForm >
+                        <Panel expandable="true" headerText="PL" expanded="true">
+                            <table:Table selectionMode="None">
+                                <table:columns>
+                                    <table:Column hAlign="Center" width="7rem">
+                                        <Text text="구분" tooltip="구분" wrapping="false" />
+                                        <table:template>
+                                            <HBox justifyContent="End">
+                                                <Text text="{organization_name}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column headerSpan="1" hAlign="Center" >
+                                        <table:multiLabels>
+                                            <Text text="24년" tooltip="24년" wrapping="false" />
+                                            <Text text="연간목표" tooltip="연간목표" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="End">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column headerSpan="3" >
+                                        <table:multiLabels>
+                                            <Text text="당월실적" tooltip="당월실적" wrapping="false" />
+                                            <Text text="" tooltip="" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="End">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" >
+                                        <table:multiLabels >
+                                            <Text text="당월실적" tooltip="당월실적" wrapping="false" />
+                                            <Text text="전년동기" tooltip="전년동기" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="Center">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" >
+                                        <table:multiLabels>
+                                            <Text text="당월실적" tooltip="당월실적" wrapping="false" />
+                                            <Text text="GAP" tooltip="GAP" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="Center">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column headerSpan="3" >
+                                        <table:multiLabels>
+                                            <Text text="진척도" tooltip="진척도" wrapping="false" />
+                                            <Text text="" tooltip="" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="End">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" >
+                                        <table:multiLabels>
+                                            <Text text="진척도" tooltip="진척도" wrapping="false" />
+                                            <Text text="전년동기" tooltip="전년동기" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="Center">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" >
+                                        <table:multiLabels>
+                                            <Text text="진척도" tooltip="진척도" wrapping="false" />
+                                            <Text text="GAP" tooltip="GAP" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="Center">
+                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                </table:columns>
+                            </table:Table>
+                        </Panel>
+                    </form:SimpleForm>
+                </content>
+            </Page>
+            <f:DynamicPage id="page2">
+                <f:content>
+                    <Panel expandable="true" headerText="장판지" expanded="true">
+                        <table:Table id="resultTable" rows="{
+                                    path: '/Project_tableView', parameters: {
+                                        $filter: 'year eq 2024',
+                                        $orderby: 'rank'
+                                    }
+                                }" selectionMode="None" noData="검색 조건을 선택 후 검색 해주세요." visibleRowCount="15">
+                            <table:extension>
+                                <OverflowToolbar>
+                                    <ToolbarSpacer />
+                                    <Button text="양식다운로드" icon="sap-icon://download" />
+                                </OverflowToolbar>
+                            </table:extension>
+                            <table:columns>
+                                <table:Column hAlign="Center" width="10rem">
+                                    <Text text="번호" tooltip="번호" wrapping="false" />
+                                    <table:template>
+                                        <HBox justifyContent="End">
+                                            <Text text="{organization_name}" wrapping="false" />
+                                        </HBox>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column headerSpan="3" hAlign="Center">
+                                    <table:multiLabels>
+                                        <Text text="금년 목표" tooltip="금년 목표" wrapping="false" />
+                                        <Text text="매출" tooltip="매출" wrapping="false" />
+                                    </table:multiLabels>
+                                    <table:template>
+                                        <HBox justifyContent="End">
+                                            <Text text="{totalTargetRevenue}" wrapping="false" />
+                                        </HBox>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center">
+                                    <table:multiLabels>
+                                        <Text text="금년 목표" tooltip="금년 목표" wrapping="false" />
+                                        <Text text="마진" tooltip="마진" wrapping="false" />
+                                    </table:multiLabels>
+                                    <table:template>
+                                        <HBox justifyContent="End">
+                                            <Text text="{year}" wrapping="false" />
+                                        </HBox>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center" width="6rem">
+                                    <table:multiLabels>
+                                        <Text text="금년 목표" tooltip="금년 목표" wrapping="false" />
+                                        <Text text="마진율" tooltip="마진율" wrapping="false" />
+                                    </table:multiLabels>
+                                    <table:template>
+                                        <HBox justifyContent="End">
+                                            <Text text="{year}" wrapping="false" />
+                                        </HBox>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column headerSpan="3" hAlign="Center">
+                                    <table:multiLabels>
+                                        <Text text="전년 목표" tooltip="전년 목표" wrapping="false" />
+                                        <Text text="매출" tooltip="매출" wrapping="false" />
+                                    </table:multiLabels>
+                                    <table:template>
+                                        <HBox justifyContent="End">
+                                            <Text text="{month}" wrapping="false" />
+                                        </HBox>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center">
+                                    <table:multiLabels>
+                                        <Text text="전년 목표" tooltip="전년 목표" wrapping="false" />
+                                        <Text text="마진" tooltip="마진" wrapping="false" />
+                                    </table:multiLabels>
+                                    <table:template>
+                                        <HBox justifyContent="End">
+                                            <Text text="{totalTargetRevenue}" wrapping="false" />
+                                        </HBox>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center" width="6rem">
+                                    <table:multiLabels>
+                                        <Text text="전년 목표" tooltip="전년 목표" wrapping="false" />
+                                        <Text text="마진율" tooltip="마진율" wrapping="false" />
+                                    </table:multiLabels>
+                                    <table:template>
+                                        <HBox justifyContent="End">
+                                            <Text wrapping="false" />
+                                        </HBox>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column headerSpan="3" hAlign="Center">
+                                    <table:multiLabels>
+                                        <Text text="전년 실적" tooltip="전년 실적" wrapping="false" />
+                                        <Text text="매출" tooltip="매출" wrapping="false" />
+                                    </table:multiLabels>
+                                    <table:template>
+                                        <HBox justifyContent="End">
+                                            <Text wrapping="false" />
+                                        </HBox>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center">
+                                    <table:multiLabels>
+                                        <Text text="전년 실적" tooltip="전년 실적" wrapping="false" />
+                                        <Text text="마진" tooltip="마진" wrapping="false" />
+                                    </table:multiLabels>
+                                    <table:template>
+                                        <HBox justifyContent="End">
+                                            <Text wrapping="false" />
+                                        </HBox>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center" width="6rem">
+                                    <table:multiLabels>
+                                        <Text text="전년 실적" tooltip="전년 실적" wrapping="false" />
+                                        <Text text="마진율" tooltip="마진율" wrapping="false" />
+                                    </table:multiLabels>
+                                    <table:template>
+                                        <HBox justifyContent="End">
+                                            <Text wrapping="false" />
+                                        </HBox>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column headerSpan="2" hAlign="Center">
+                                    <table:multiLabels>
+                                        <Text text="기대 매출 성장률" tooltip="기대 매출 성장률" wrapping="false" />
+                                        <Text text="전년 목표 대비" tooltip="전년 목표 대비" wrapping="false" />
+                                    </table:multiLabels>
+                                    <table:template>
+                                        <HBox justifyContent="End">
+                                            <Text wrapping="false" />
+                                        </HBox>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center">
+                                    <table:multiLabels>
+                                        <Text text="기대 매출 성장률" tooltip="기대 매출 성장률" wrapping="false" />
+                                        <Text text="전년 실적 대비" tooltip="전년 실적 대비" wrapping="false" />
+                                    </table:multiLabels>
+                                    <table:template>
+                                        <HBox justifyContent="End">
+                                            <Text wrapping="false" />
+                                        </HBox>
+                                    </table:template>
+                                </table:Column>
+                            </table:columns>
+                        </table:Table>
+                    </Panel>
+                </f:content>
+            </f:DynamicPage>
+        </NavContainer>
+    </Page>
+</mvc:View>

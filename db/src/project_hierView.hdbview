@@ -1,0 +1,35 @@
+VIEW "PROJECT_PROJECT_HIERVIEW" AS
+SELECT 
+  H.hierarchy_rank          AS rank,
+  H.hierarchy_level         AS level,
+  H.parent_id               AS parent_id,       
+  H.NODE_ID                 AS node_id,         
+  H.organization_name       AS organization_name,
+
+  SUM(P.REVENUE)            AS totalRevenue,
+  SUM(P.MARGIN)             AS totalMargin,
+  SUM(P.REVENUE - P.MARGIN) AS totalCost
+
+FROM hierarchy (
+  source (
+    SELECT 
+      parent_id,
+      id     AS NODE_ID,
+      name   AS organization_name
+    FROM PROJECT_ORGANIZATION
+  )
+  sibling order by parent_id, NODE_ID
+) AS H
+
+LEFT JOIN PROJECT_PROJECT AS P
+  ON H.NODE_ID = P.ORGANIZATION_ID
+
+GROUP BY 
+  H.hierarchy_rank,
+  H.hierarchy_level,
+  H.parent_id,
+  H.NODE_ID,
+  H.organization_name
+
+ORDER BY 
+  H.hierarchy_rank;

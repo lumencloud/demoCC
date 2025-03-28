@@ -1,0 +1,204 @@
+<mvc:View controllerName="project1.controller.View"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:m="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:layout="sap.ui.layout"
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.ui.table">
+    <f:DynamicPage>
+        <!-- <f:header>
+            <f:DynamicPageHeader pinnable="false">
+                <form:SimpleForm >
+                    <form:content>
+                        <m:VBox >
+                            <m:Label text="기준년월" required="true"/>
+                            <m:DynamicDateRange placeholder="Choose date range" id="dynamic-range" change="onChange" width="{env>/filterInputWidth}" standardOptions="SPECIFICMONTHINYEAR" />
+                            <m:layoutData>
+                                <layout:GridData span="XL3 L3 M3 S12" />
+                            </m:layoutData>
+                        </m:VBox>
+                        <m:VBox >
+                            <m:Label text="조직명" required="true"/>
+                            <m:Input id="inputOrganization" valueHelpRequest="onDialogOrgaOpen" submit="onSearchPress" showValueHelp="true"/>
+                            <m:layoutData>
+                                <layout:GridData span="XL3 L3 M3 S12" />
+                            </m:layoutData>
+                        </m:VBox>
+                        <m:HBox justifyContent="End">
+                            <m:Button text="초기화" press="onReset" class="sapUiTinyMarginEnd"/>
+                            <m:Button text="검색" press="onSearchPress" type="Emphasized"/>
+                            <m:layoutData>
+                                <layout:GridData span="XL12 L12 M12 S12" />
+                            </m:layoutData>
+                        </m:HBox>
+                    </form:content>
+                </form:SimpleForm>
+            </f:DynamicPageHeader>
+        </f:header> -->
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <m:Title text="목표 실적" />
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:content>
+            <form:SimpleForm>
+                <Table id="resultTable" rows="{
+                        path: '/Project_hierView' 
+                    }" selectionMode="None" noData="검색 조건을 선택 후 검색 해주세요." fixedColumnCount="1" visibleRowCount="20">
+                    <extension>
+                        <m:OverflowToolbar>
+                            <!-- <m:Title id="title" text="" /> -->
+                            <m:Button text="이동" press="onButtonPress" />
+                            <m:ToolbarSpacer />
+                            <m:Button text="양식다운로드" icon="sap-icon://download" />
+                            <m:Button text="엑셀 업로드" icon="sap-icon://upload" />
+                            <m:Button text="저장" icon="sap-icon://save" />
+                        </m:OverflowToolbar>
+                    </extension>
+                    <columns>
+                        <!-- <Column hAlign="Center" width="6rem">
+                                        <m:Text text="연도" tooltip="연도" wrapping="false" />
+                                    <template>
+                                        <m:HBox justifyContent="Center">
+                                            <m:Text text="{year}년" wrapping="false" />
+                                        </m:HBox>
+                                    </template>
+                                </Column> -->
+                        <Column hAlign="Center" width="16rem">
+                            <m:Text text="본부" tooltip="본부" wrapping="false" />
+                            <template>
+                                <m:HBox justifyContent="End">
+                                    <m:Text text="{organization_name}" wrapping="false" />
+                                </m:HBox>
+                            </template>
+                        </Column>
+                        <Column headerSpan="3" hAlign="Center">
+                            <multiLabels>
+                                <m:Text text="금년 목표" tooltip="금년 목표" wrapping="false" />
+                                <m:Text text="매출" tooltip="매출" wrapping="false" />
+                            </multiLabels>
+                            <template>
+                                <m:HBox justifyContent="End">
+                                    <m:Text text="{rank}" wrapping="false" />
+                                </m:HBox>
+                            </template>
+                        </Column>
+                        <Column hAlign="Center">
+                            <multiLabels>
+                                <m:Text text="금년 목표" tooltip="금년 목표" wrapping="false" />
+                                <m:Text text="마진" tooltip="마진" wrapping="false" />
+                            </multiLabels>
+                            <template>
+                                <m:HBox justifyContent="End">
+                                    <m:Text text="{year}" wrapping="false" />
+                                </m:HBox>
+                            </template>
+                        </Column>
+                        <Column hAlign="Center" width="6rem">
+                            <multiLabels>
+                                <m:Text text="금년 목표" tooltip="금년 목표" wrapping="false" />
+                                <m:Text text="마진율" tooltip="마진율" wrapping="false" />
+                            </multiLabels>
+                            <template>
+                                <m:HBox justifyContent="End">
+                                    <m:Text text="{year}" wrapping="false" />
+                                </m:HBox>
+                            </template>
+                        </Column>
+                        <Column headerSpan="3" hAlign="Center">
+                            <multiLabels>
+                                <m:Text text="전년 목표" tooltip="전년 목표" wrapping="false" />
+                                <m:Text text="매출" tooltip="매출" wrapping="false" />
+                            </multiLabels>
+                            <template>
+                                <m:HBox justifyContent="End">
+                                    <m:Text text="{month}" wrapping="false" />
+                                </m:HBox>
+                            </template>
+                        </Column>
+                        <Column hAlign="Center">
+                            <multiLabels>
+                                <m:Text text="전년 목표" tooltip="전년 목표" wrapping="false" />
+                                <m:Text text="마진" tooltip="마진" wrapping="false" />
+                            </multiLabels>
+                            <template>
+                                <m:HBox justifyContent="End">
+                                    <m:Text text="{totalTargetRevenue}" wrapping="false" />
+                                </m:HBox>
+                            </template>
+                        </Column>
+                        <Column hAlign="Center" width="6rem">
+                            <multiLabels>
+                                <m:Text text="전년 목표" tooltip="전년 목표" wrapping="false" />
+                                <m:Text text="마진율" tooltip="마진율" wrapping="false" />
+                            </multiLabels>
+                            <template>
+                                <m:HBox justifyContent="End">
+                                    <m:Text wrapping="false" />
+                                </m:HBox>
+                            </template>
+                        </Column>
+                        <Column headerSpan="3" hAlign="Center">
+                            <multiLabels>
+                                <m:Text text="전년 실적" tooltip="전년 실적" wrapping="false" />
+                                <m:Text text="매출" tooltip="매출" wrapping="false" />
+                            </multiLabels>
+                            <template>
+                                <m:HBox justifyContent="End">
+                                    <m:Text wrapping="false" />
+                                </m:HBox>
+                            </template>
+                        </Column>
+                        <Column hAlign="Center">
+                            <multiLabels>
+                                <m:Text text="전년 실적" tooltip="전년 실적" wrapping="false" />
+                                <m:Text text="마진" tooltip="마진" wrapping="false" />
+                            </multiLabels>
+                            <template>
+                                <m:HBox justifyContent="End">
+                                    <m:Text wrapping="false" />
+                                </m:HBox>
+                            </template>
+                        </Column>
+                        <Column hAlign="Center" width="6rem">
+                            <multiLabels>
+                                <m:Text text="전년 실적" tooltip="전년 실적" wrapping="false" />
+                                <m:Text text="마진율" tooltip="마진율" wrapping="false" />
+                            </multiLabels>
+                            <template>
+                                <m:HBox justifyContent="End">
+                                    <m:Text wrapping="false" />
+                                </m:HBox>
+                            </template>
+                        </Column>
+                        <Column headerSpan="2" hAlign="Center">
+                            <multiLabels>
+                                <m:Text text="기대 매출 성장률" tooltip="기대 매출 성장률" wrapping="false" />
+                                <m:Text text="전년 목표 대비" tooltip="전년 목표 대비" wrapping="false" />
+                            </multiLabels>
+                            <template>
+                                <m:HBox justifyContent="End">
+                                    <m:Text  wrapping="false" />
+                                </m:HBox>
+                            </template>
+                        </Column>
+                        <Column hAlign="Center">
+                            <multiLabels>
+                                <m:Text text="기대 매출 성장률" tooltip="기대 매출 성장률" wrapping="false" />
+                                <m:Text text="전년 실적 대비" tooltip="전년 실적 대비" wrapping="false" />
+                            </multiLabels>
+                            <template>
+                                <m:HBox justifyContent="End">
+                                    <m:Text wrapping="false" />
+                                </m:HBox>
+                            </template>
+                        </Column>
+                    </columns>
+                </Table>
+            </form:SimpleForm>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

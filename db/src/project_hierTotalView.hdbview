@@ -1,0 +1,68 @@
+VIEW PROJECT_PROJECT_HIERTOTALVIEW AS 
+WITH hierarchy_data AS (
+  SELECT H.hierarchy_level AS level,
+    H.hierarchy_rank AS rank,
+    H.parent_id AS parent_id,
+    H.node_id AS node_id,
+    H.organization_name AS organization_name,
+    COALESCE(SUM(P.revenue), 0) AS NODE_REVENUE
+  FROM HIERARCHY(
+      SOURCE (
+        SELECT parent_id,
+          id AS node_id,
+          name AS organization_name
+        FROM PROJECT_ORGANIZATION
+      ) SIBLING
+      ORDER BY node_id
+    ) AS H
+    LEFT JOIN PROJECT_PROJECT AS P
+      ON H.node_id = P.organization_id
+  GROUP BY H.hierarchy_level,
+    H.hierarchy_rank,
+    H.parent_id,
+    H.node_id,
+    H.organization_name
+),
+hierarchy_paths AS (
+  SELECT h1.node_id AS START_NODE,
+    h2.node_id AS DESCENDANT_NODE,
+    h2.NODE_REVENUE
+  FROM hierarchy_data h1
+    CROSS JOIN hierarchy_data h2
+  WHERE h2.level >= h1.level
+    AND (
+      h2.node_id = h1.node_id 
+      OR h2.parent_id = h1.node_id 
+      OR EXISTS (
+        SELECT 1
+        FROM hierarchy_data h3
+        WHERE h3.node_id = h2.node_id
+          AND h3.level > h1.level
+          AND h3.parent_id IN (
+            SELECT h4.node_id
+            FROM hierarchy_data h4
+            WHERE h4.parent_id = h1.node_id
+              OR h4.parent_id IN (
+                SELECT h5.node_id
+                FROM hierarchy_data h5
+                WHERE h5.parent_id = h1.node_id
+              )
+          )
+      )
+    )
+)
+SELECT hd.rank AS rank,
+  hd.level AS level,
+  hd.parent_id AS parent_id,
+  hd.node_id AS node_id,
+  hd.organization_name AS organization_name,
+  SUM(hp.NODE_REVENUE) AS totalRevenue
+FROM hierarchy_data hd
+  LEFT JOIN hierarchy_paths hp
+    ON hd.node_id = hp.START_NODE
+GROUP BY hd.rank,
+  hd.level,
+  hd.parent_id,
+  hd.node_id,
+  hd.organization_name
+ORDER BY hd.rank;

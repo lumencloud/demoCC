@@ -1,0 +1,181 @@
+VIEW PROJECT_PROJECT_TABLEVIEW AS 
+
+WITH project_data AS (
+  SELECT 
+    organization_id,
+    year,
+    month,
+    SUM(revenue) AS revenue,
+    0 AS targetrevenue
+  FROM PROJECT_PROJECT
+  GROUP BY organization_id, year, month
+  UNION ALL
+  SELECT 
+    organization_id,
+    year,
+    month,
+    0 AS revenue,
+    SUM(targetrevenue)
+  FROM PROJECT_TARGET
+  GROUP BY organization_id, year, month
+),
+project_aggregated AS (
+  SELECT 
+    organization_id,
+    year,
+    month,
+    SUM(revenue) AS NODE_REVENUE,
+    SUM(targetrevenue) AS NODE_TARGET_REVENUE
+  FROM project_data
+  GROUP BY organization_id, year, month
+),
+-- Level 1 ~ 4 구성
+level_1 AS (
+  SELECT 1 AS LEVEL,
+    ROW_NUMBER() OVER (ORDER BY o1.id) AS rank,
+    NULL AS parent_id,
+    o1.id AS node_id,
+    o1.name AS organization_name,
+    pa.year,
+    pa.month,
+    COALESCE(SUM(pa.NODE_REVENUE), 0) AS NODE_REVENUE,
+    COALESCE(SUM(pa.NODE_TARGET_REVENUE), 0) AS NODE_TARGET_REVENUE
+  FROM PROJECT_ORGANIZATION o1
+  LEFT JOIN project_aggregated pa ON o1.id = pa.organization_id
+  WHERE o1.parent_id IS NULL
+  GROUP BY o1.id, o1.name, pa.year, pa.month
+),
+level_2 AS (
+  SELECT 2 AS LEVEL,
+    ROW_NUMBER() OVER (ORDER BY o2.id) + (SELECT MAX(rank) FROM level_1) AS rank,
+    o2.parent_id,
+    o2.id AS node_id,
+    o2.name AS organization_name,
+    pa.year,
+    pa.month,
+    COALESCE(SUM(pa.NODE_REVENUE), 0),
+    COALESCE(SUM(pa.NODE_TARGET_REVENUE), 0)
+  FROM PROJECT_ORGANIZATION o2
+  LEFT JOIN project_aggregated pa ON o2.id = pa.organization_id
+  WHERE o2.parent_id IN (SELECT node_id FROM level_1)
+  GROUP BY o2.parent_id, o2.id, o2.name, pa.year, pa.month
+),
+level_3 AS (
+  SELECT 3 AS LEVEL,
+    ROW_NUMBER() OVER (ORDER BY o3.id) + (SELECT MAX(rank) FROM level_2) AS rank,
+    o3.parent_id,
+    o3.id AS node_id,
+    o3.name AS organization_name,
+    pa.year,
+    pa.month,
+    COALESCE(SUM(pa.NODE_REVENUE), 0),
+    COALESCE(SUM(pa.NODE_TARGET_REVENUE), 0)
+  FROM PROJECT_ORGANIZATION o3
+  LEFT JOIN project_aggregated pa ON o3.id = pa.organization_id
+  WHERE o3.parent_id IN (SELECT node_id FROM level_2)
+  GROUP BY o3.parent_id, o3.id, o3.name, pa.year, pa.month
+),
+level_4 AS (
+  SELECT 4 AS LEVEL,
+    ROW_NUMBER() OVER (ORDER BY o4.id) + (SELECT MAX(rank) FROM level_3) AS rank,
+    o4.parent_id,
+    o4.id AS node_id,
+    o4.name AS organization_name,
+    pa.year,
+    pa.month,
+    COALESCE(SUM(pa.NODE_REVENUE), 0),
+    COALESCE(SUM(pa.NODE_TARGET_REVENUE), 0)
+  FROM PROJECT_ORGANIZATION o4
+  LEFT JOIN project_aggregated pa ON o4.id = pa.organization_id
+  WHERE o4.parent_id IN (SELECT node_id FROM level_3)
+  GROUP BY o4.parent_id, o4.id, o4.name, pa.year, pa.month
+),
+all_levels AS (
+  SELECT * FROM level_1
+  UNION ALL SELECT * FROM level_2
+  UNION ALL SELECT * FROM level_3
+  UNION ALL SELECT * FROM level_4
+),
+all_years AS (
+  SELECT DISTINCT year, month FROM all_levels
+  WHERE year IS NOT NULL AND month IS NOT NULL
+),
+all_nodes AS (
+  SELECT 
+    al.LEVEL,
+    al.rank,
+    al.parent_id,
+    al.node_id,
+    al.organization_name,
+    ay.year,
+    ay.month,
+    COALESCE(al.NODE_REVENUE, 0) AS NODE_REVENUE,
+    COALESCE(al.NODE_TARGET_REVENUE, 0) AS NODE_TARGET_REVENUE
+  FROM all_levels al
+  CROSS JOIN all_years ay
+  WHERE al.year IS NULL OR (al.year = ay.year AND al.month = ay.month)
+),
+aggregated_data AS (
+  SELECT 
+    a1.node_id AS START_NODE,
+    a2.node_id AS DESCENDANT_NODE,
+    a2.year,
+    a2.month,
+    a2.NODE_REVENUE,
+    a2.NODE_TARGET_REVENUE
+  FROM all_nodes a1
+  JOIN all_nodes a2
+    ON a2.year = a1.year AND a2.month = a1.month
+  WHERE a2.node_id = a1.node_id
+     OR a2.parent_id = a1.node_id
+     OR a2.parent_id IN (
+        SELECT node_id FROM all_nodes a3 WHERE a3.parent_id = a1.node_id
+     )
+     OR a2.parent_id IN (
+        SELECT node_id FROM all_nodes a4
+        WHERE a4.parent_id IN (
+          SELECT node_id FROM all_nodes a5
+          WHERE a5.parent_id = a1.node_id
+        )
+     )
+),
+final_aggregation AS (
+  SELECT 
+    al.rank,
+    al.LEVEL,
+    al.parent_id,
+    al.node_id,
+    al.organization_name,
+    al.year,
+    al.month,
+    SUM(ad.NODE_REVENUE) AS totalRevenue,
+    SUM(ad.NODE_TARGET_REVENUE) AS totalTargetRevenue
+  FROM all_nodes al
+  LEFT JOIN aggregated_data ad
+    ON al.node_id = ad.START_NODE
+   AND al.year = ad.year
+   AND al.month = ad.month
+  WHERE al.year IS NOT NULL AND al.month IS NOT NULL
+  GROUP BY 
+    al.rank,
+    al.LEVEL,
+    al.parent_id,
+    al.node_id,
+    al.organization_name,
+    al.year,
+    al.month
+)
+
+SELECT 
+  TO_NVARCHAR(SYSUUID) AS id,
+  rank,
+  LEVEL,
+  parent_id,
+  node_id,
+  organization_name,
+  year,
+  month,
+  totalRevenue,
+  totalTargetRevenue
+FROM final_aggregation
+ORDER BY rank, year, month;
