@@ -17,15 +17,19 @@ sap.ui.define([
         },
 
         onMyRoutePatternMatched: function () {
-            let oData = new ODataModel({
-                serviceUrl: "/project/", 
-                synchronizationMode: "None",
-                operationMode: "Server",
-                autoExpandSelect: true
-            })
-            this.getView().setModel(oData, "odataModel")
+            this._setModel()
+            // let oData = new ODataModel({
+            //     serviceUrl: "/project/", 
+            //     synchronizationMode: "None",
+            //     operationMode: "Server"
+            // })
+            // this.getView().setModel(oData)
 
-            debugger;
+            // oData.getMetaModel().requestObject("/").then(function () {
+            //     sap.m.MessageToast.show("OData 모델이 성공적으로 로드되었습니다.");
+            // }).catch(function (oError) {
+            //     sap.m.MessageToast.show("OData 모델 로드 실패: " + oError.message);
+            // });
 
             // let oDataModel = this.getView().getModel();
 
@@ -48,11 +52,58 @@ sap.ui.define([
             // });
         },
 
+        _setModel: function () {
+            this.getHieracyTree("/project/Project_tableView").then((result) => {
+
+                this.getView().setModel(new JSONModel(result), "tableModel");
+            })
+            const oViewModel = new JSONModel({
+                editMode: true
+            });
+            this.getView().setModel(oViewModel, "view");
+        },
+
+        mergeData: function (result) {
+            const mergedMap = {};
+
+            result.forEach(entry => {
+                const {
+                    node_id,
+                    organization_name,
+                    parent_id,
+                    year,
+                    totalMargin,
+                    totalRevenue,
+                    totalTargetMargin,
+                    totalTargetRevenue
+                } = entry;
+
+                const key = node_id;
+
+                if (!mergedMap[key]) {
+                    mergedMap[key] = {
+                        node_id,
+                        parent_id,
+                        organization_name
+                    };
+                }
+
+                const yearKey = `year${year}`;
+
+                mergedMap[key][`${yearKey}marginTotal`] = parseFloat(totalMargin || "0");
+                mergedMap[key][`${yearKey}revenueTotal`] = parseFloat(totalRevenue || "0");
+                mergedMap[key][`${yearKey}marginTargetTotal`] = parseFloat(totalTargetMargin || "0");
+                mergedMap[key][`${yearKey}revenueTargetTotal`] = parseFloat(totalTargetRevenue || "0");
+            });
+            return Object.values(mergedMap)
+
+        },
+
         onButtonPress: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("EnterpriseView")
         },
         onDialogOrgaOpen: function () {
-            this.getHierachyTree("/project/Project_view").then((result) => {
+            this.getHieracyTree("/project/Project_view").then((result) => {
                 this.getView().setModel(new JSONModel(result), "OrganizationModel")
                 this.onDialogOpen();
             })
@@ -107,39 +158,56 @@ sap.ui.define([
                 this._oDialog.close();
             }
         },
-        getHierachyTree: function (sUrl) {
+        getHieracyTree: function (sUrl) {
             let settings = {
                 type: "get",
                 async: false,
                 url: sUrl,
             };
+
             return new Promise((resolve) => {
                 $.ajax(settings).done((result) => {
-                    let data = result.value
+                    // 1. 원본 데이터
+                    let rawData = result.value;
+
+                    // 2. 먼저 데이터 머지 (연도별로 컬럼 생성)
+                    let mergedData = this.mergeData(rawData); //
+
+                    // 3. 리프 노드 판단
+                    let oData = markLeafNodes(mergedData);
+
+                    // 4. 트리 구조로 변환
                     let nodeMap = {};
-                    data.forEach(item => {
+                    oData.forEach(item => {
                         nodeMap[item.node_id] = {
                             ...item,
                             children: []
-                        }
+                        };
                     });
 
                     let rootNodes = [];
-                    data.forEach(item => {
+                    oData.forEach(item => {
                         if (!item.parent_id) {
-                            // 부모가 없는 노드는 루트 노드
                             rootNodes.push(nodeMap[item.node_id]);
                         } else if (nodeMap[item.parent_id]) {
-                            // 부모가 있는 노드는 해당 부모의 children에 추가
                             nodeMap[item.parent_id].children.push(nodeMap[item.node_id]);
                         }
                     });
-                    resolve(rootNodes); // 계층화된 데이터 반환  
 
+                    resolve(rootNodes); // 계층 구조 반환
+
+                    // 내부 함수들 ------------------
+                    function markLeafNodes(data) {
+                        const parentSet = new Set(data.map(d => d.parent_id).filter(Boolean));
+                        return data.map(d => {
+                            d.isLeaf = !parentSet.has(d.node_id);
+                            return d;
+                        });
+                    }
                 }).fail((xhr) => {
                     resolve(xhr);
-                })
-            })
+                });
+            });
         },
         onSearchPress: async function () {
             const oView = this.getView();
@@ -195,6 +263,10 @@ sap.ui.define([
             oView.byId("title").setText("프로젝트");
             const oOrgInput = oView.byId("inputOrganization");
             oOrgInput.setValue(""); // 값 제거
+        },
+
+        onCreate: function (oEvent) {
+
         }
     });
 });

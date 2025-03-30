@@ -82,5 +82,6 @@ entity Project_tableView {
         month              : Integer;
         totalRevenue       : Decimal(15, 2);
         totalTargetRevenue : Decimal(15, 2); // 매출 목표
-
+        totalMargin        : Decimal(15, 2); // 마진 (원)
+        totalTargetMargin  : Decimal(15, 2); // 마진 (원)
 }

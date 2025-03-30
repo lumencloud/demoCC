@@ -3,6 +3,7 @@
     xmlns="sap.m"
     xmlns:f="sap.f"
     xmlns:table="sap.ui.table"
+    xmlns:mdc="sap.ui.mdc"
     xmlns:form="sap.ui.layout.form"
     xmlns:core="sap.ui.core" displayBlock="true" height="100%" busyIndicatorDelay="0">
     <Page class="sapUiContentPadding" showNavButton="true" title="전사PL" titleLevel="H2" navButtonPress="onBack">
@@ -43,7 +44,7 @@
                 <content>
                     <form:SimpleForm class="sapUiMediumMarginBottom">
                         <Panel expandable="true" headerText="PL" expanded="true">
-                            <table:Table selectionMode="None">
+                            <table:Table selectionMode="None" rows="{path:'/Project_tableView', parameters:{$filter:'year eq 2024', $orderby: 'rank'}}">
                                 <table:columns>
                                     <table:Column hAlign="Center" width="7rem">
                                         <Text text="조직" tooltip="조직" wrapping="false" />
@@ -60,7 +61,11 @@
                                         </table:multiLabels>
                                         <table:template>
                                             <HBox justifyContent="End">
-                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                                <mdc:Field
+                                                textAlign="End"
+                                                value="{path: 'totalTargetRevenue', type: 'sap.ui.model.type.Integer', formatOptions: {groupingEnabled: true}}"
+                                                editMode="{= ${totalTargetRevenue} ? 'Editable' : 'Display' }"
+                                            />
                                             </HBox>
                                         </table:template>
                                     </table:Column>
@@ -146,7 +151,7 @@
                                             </HBox>
                                         </table:template>
                                     </table:Column>
-                                    <table:Column headerSpan="1" hAlign="Center" >
+                                    <table:Column headerSpan="1" hAlign="Center">
                                         <table:multiLabels>
                                             <Text text="24년" tooltip="24년" wrapping="false" />
                                             <Text text="연간목표" tooltip="연간목표" wrapping="false" />
@@ -157,7 +162,7 @@
                                             </HBox>
                                         </table:template>
                                     </table:Column>
-                                    <table:Column headerSpan="3" >
+                                    <table:Column headerSpan="3">
                                         <table:multiLabels>
                                             <Text text="당월실적" tooltip="당월실적" wrapping="false" />
                                             <Text text="" tooltip="" wrapping="false" />
@@ -168,7 +173,7 @@
                                             </HBox>
                                         </table:template>
                                     </table:Column>
-                                    <table:Column hAlign="Center" >
+                                    <table:Column hAlign="Center">
                                         <table:multiLabels >
                                             <Text text="당월실적" tooltip="당월실적" wrapping="false" />
                                             <Text text="전년동기" tooltip="전년동기" wrapping="false" />
@@ -179,7 +184,7 @@
                                             </HBox>
                                         </table:template>
                                     </table:Column>
-                                    <table:Column hAlign="Center" >
+                                    <table:Column hAlign="Center">
                                         <table:multiLabels>
                                             <Text text="당월실적" tooltip="당월실적" wrapping="false" />
                                             <Text text="GAP" tooltip="GAP" wrapping="false" />
@@ -190,7 +195,7 @@
                                             </HBox>
                                         </table:template>
                                     </table:Column>
-                                    <table:Column headerSpan="3" >
+                                    <table:Column headerSpan="3">
                                         <table:multiLabels>
                                             <Text text="진척도" tooltip="진척도" wrapping="false" />
                                             <Text text="" tooltip="" wrapping="false" />
@@ -201,7 +206,7 @@
                                             </HBox>
                                         </table:template>
                                     </table:Column>
-                                    <table:Column hAlign="Center" >
+                                    <table:Column hAlign="Center">
                                         <table:multiLabels>
                                             <Text text="진척도" tooltip="진척도" wrapping="false" />
                                             <Text text="전년동기" tooltip="전년동기" wrapping="false" />
@@ -212,7 +217,7 @@
                                             </HBox>
                                         </table:template>
                                     </table:Column>
-                                    <table:Column hAlign="Center" >
+                                    <table:Column hAlign="Center">
                                         <table:multiLabels>
                                             <Text text="진척도" tooltip="진척도" wrapping="false" />
                                             <Text text="GAP" tooltip="GAP" wrapping="false" />

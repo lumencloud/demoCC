@@ -6,7 +6,9 @@ WITH project_data AS (
     year,
     month,
     SUM(revenue) AS revenue,
-    0 AS targetrevenue
+    SUM(margin) AS margin,
+    0 AS targetrevenue,
+    0 AS targetmargin
   FROM PROJECT_PROJECT
   GROUP BY organization_id, year, month
   UNION ALL
@@ -15,7 +17,9 @@ WITH project_data AS (
     year,
     month,
     0 AS revenue,
-    SUM(targetrevenue)
+    0 AS margin,
+    SUM(targetrevenue),
+    SUM(targetmargin)
   FROM PROJECT_TARGET
   GROUP BY organization_id, year, month
 ),
@@ -25,7 +29,9 @@ project_aggregated AS (
     year,
     month,
     SUM(revenue) AS NODE_REVENUE,
-    SUM(targetrevenue) AS NODE_TARGET_REVENUE
+    SUM(targetrevenue) AS NODE_TARGET_REVENUE,
+    SUM(margin) AS NODE_MARGIN,
+    SUM(targetmargin) AS NODE_TARGET_MARGIN
   FROM project_data
   GROUP BY organization_id, year, month
 ),
@@ -39,7 +45,9 @@ level_1 AS (
     pa.year,
     pa.month,
     COALESCE(SUM(pa.NODE_REVENUE), 0) AS NODE_REVENUE,
-    COALESCE(SUM(pa.NODE_TARGET_REVENUE), 0) AS NODE_TARGET_REVENUE
+    COALESCE(SUM(pa.NODE_TARGET_REVENUE), 0) AS NODE_TARGET_REVENUE,
+    COALESCE(SUM(pa.NODE_MARGIN), 0) AS NODE_MARGIN,
+    COALESCE(SUM(pa.NODE_TARGET_MARGIN), 0) AS NODE_TARGET_MARGIN
   FROM PROJECT_ORGANIZATION o1
   LEFT JOIN project_aggregated pa ON o1.id = pa.organization_id
   WHERE o1.parent_id IS NULL
@@ -54,7 +62,9 @@ level_2 AS (
     pa.year,
     pa.month,
     COALESCE(SUM(pa.NODE_REVENUE), 0),
-    COALESCE(SUM(pa.NODE_TARGET_REVENUE), 0)
+    COALESCE(SUM(pa.NODE_TARGET_REVENUE), 0),
+    COALESCE(SUM(pa.NODE_MARGIN), 0),
+    COALESCE(SUM(pa.NODE_TARGET_MARGIN), 0)
   FROM PROJECT_ORGANIZATION o2
   LEFT JOIN project_aggregated pa ON o2.id = pa.organization_id
   WHERE o2.parent_id IN (SELECT node_id FROM level_1)
@@ -69,7 +79,9 @@ level_3 AS (
     pa.year,
     pa.month,
     COALESCE(SUM(pa.NODE_REVENUE), 0),
-    COALESCE(SUM(pa.NODE_TARGET_REVENUE), 0)
+    COALESCE(SUM(pa.NODE_TARGET_REVENUE), 0),
+    COALESCE(SUM(pa.NODE_MARGIN), 0),
+    COALESCE(SUM(pa.NODE_TARGET_MARGIN), 0)
   FROM PROJECT_ORGANIZATION o3
   LEFT JOIN project_aggregated pa ON o3.id = pa.organization_id
   WHERE o3.parent_id IN (SELECT node_id FROM level_2)
@@ -84,7 +96,9 @@ level_4 AS (
     pa.year,
     pa.month,
     COALESCE(SUM(pa.NODE_REVENUE), 0),
-    COALESCE(SUM(pa.NODE_TARGET_REVENUE), 0)
+    COALESCE(SUM(pa.NODE_TARGET_REVENUE), 0),
+    COALESCE(SUM(pa.NODE_MARGIN), 0),
+    COALESCE(SUM(pa.NODE_TARGET_MARGIN), 0)
   FROM PROJECT_ORGANIZATION o4
   LEFT JOIN project_aggregated pa ON o4.id = pa.organization_id
   WHERE o4.parent_id IN (SELECT node_id FROM level_3)
@@ -110,7 +124,9 @@ all_nodes AS (
     ay.year,
     ay.month,
     COALESCE(al.NODE_REVENUE, 0) AS NODE_REVENUE,
-    COALESCE(al.NODE_TARGET_REVENUE, 0) AS NODE_TARGET_REVENUE
+    COALESCE(al.NODE_TARGET_REVENUE, 0) AS NODE_TARGET_REVENUE,
+    COALESCE(al.NODE_MARGIN, 0) AS NODE_MARGIN,
+    COALESCE(al.NODE_TARGET_MARGIN, 0) AS NODE_TARGET_MARGIN
   FROM all_levels al
   CROSS JOIN all_years ay
   WHERE al.year IS NULL OR (al.year = ay.year AND al.month = ay.month)
@@ -122,7 +138,9 @@ aggregated_data AS (
     a2.year,
     a2.month,
     a2.NODE_REVENUE,
-    a2.NODE_TARGET_REVENUE
+    a2.NODE_TARGET_REVENUE,
+    a2.NODE_MARGIN,
+    a2.NODE_TARGET_MARGIN
   FROM all_nodes a1
   JOIN all_nodes a2
     ON a2.year = a1.year AND a2.month = a1.month
@@ -149,7 +167,9 @@ final_aggregation AS (
     al.year,
     al.month,
     SUM(ad.NODE_REVENUE) AS totalRevenue,
-    SUM(ad.NODE_TARGET_REVENUE) AS totalTargetRevenue
+    SUM(ad.NODE_TARGET_REVENUE) AS totalTargetRevenue,
+    SUM(ad.NODE_MARGIN) AS totalMargin,
+    SUM(ad.NODE_TARGET_MARGIN) AS totalTargetMargin
   FROM all_nodes al
   LEFT JOIN aggregated_data ad
     ON al.node_id = ad.START_NODE
@@ -176,6 +196,8 @@ SELECT
   year,
   month,
   totalRevenue,
-  totalTargetRevenue
+  totalTargetRevenue,
+  totalMargin,
+  totalTargetMargin
 FROM final_aggregation
 ORDER BY rank, year, month;

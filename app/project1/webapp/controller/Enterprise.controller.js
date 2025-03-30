@@ -2,9 +2,10 @@ sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
     "project1/model/formatter",
-     "sap/ui/core/Fragment"
+    "sap/ui/core/Fragment",
+    "sap/ui/model/odata/v4/ODataModel"
 ], function (
-    Controller, JSONModel, formatter, Fragment
+    Controller, JSONModel, formatter, Fragment, ODataModel
 ) {
     "use strict";
 
@@ -19,7 +20,35 @@ sap.ui.define([
         onMyRoutePatternMatched: async function () {
             this.getHierachyTree("/project/Project_hierView").then((result) => {
                 this.getView().setModel(new JSONModel(result), "organizModel")
+            }) // 프래그먼트 모델
+
+            this._setOdataModel()
+            const oViewModel = new JSONModel({
+                editMode: true
+            });
+            this.getView().setModel(oViewModel, "view");
+        },
+
+        _setOdataModel: function () {
+            const oData = new ODataModel({
+                serviceUrl: "/project/",
+                synchronizationMode: "None"
             })
+            this.getView().setModel(oData);
+
+            let oDataModel = this.getView().getModel()
+
+            let oBinding = oDataModel.bindList("/Project_tableView")
+            oBinding.requestContexts().then((aContext) => {
+                const aData = aContext.map(ctx => ctx.getObject());
+                console.log("Data:", aData);
+            })
+
+            let oContextBinding = oData.bindContext("/Project_tableView")
+            let oPropertyBinding = oData.bindProperty("year", oContextBinding.getBoundContext());
+
+            console.log("oContextBinding:", oContextBinding);
+            console.log("oPropertyBinding:", oPropertyBinding);
         },
 
         handleNav: function (oEvent) {
@@ -48,7 +77,6 @@ sap.ui.define([
                             children: []
                         }
                     });
-
                     let rootNodes = [];
                     data.forEach(item => {
                         if (!item.parent_id) {
@@ -123,8 +151,8 @@ sap.ui.define([
             }
         },
 
-		onBack: function(oEvent) {
-			this.getOwnerComponent().getRouter().navTo("RouteView1")
-		}
+        onBack: function (oEvent) {
+            this.getOwnerComponent().getRouter().navTo("RouteView1")
+        }
     });
 });
