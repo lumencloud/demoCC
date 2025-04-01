@@ -44,28 +44,54 @@
                 <content>
                     <form:SimpleForm class="sapUiMediumMarginBottom">
                         <Panel expandable="true" headerText="PL" expanded="true">
-                            <table:Table selectionMode="None" rows="{path:'/Project_tableView', parameters:{$filter:'year eq 2024', $orderby: 'rank'}}">
+                            <table:Table selectionMode="Single" rows="{TableModel>/}" id="tableId" selectionBehavior="RowOnly">
+                                <table:extension>
+                                    <OverflowToolbar >
+                                        <ToolbarSpacer />
+                                        <Button icon="sap-icon://add" press="addRow"/>
+                                        <Button id="deleteUserButton" icon="sap-icon://delete" press=".onDelete"/>
+                                        <Button icon="sap-icon://refresh" press=".onRefresh"/>
+                                    </OverflowToolbar>
+                                </table:extension>
                                 <table:columns>
                                     <table:Column hAlign="Center" width="7rem">
                                         <Text text="조직" tooltip="조직" wrapping="false" />
                                         <table:template>
                                             <HBox justifyContent="End">
-                                                <Text text="{organization_name}" wrapping="false" />
+                                                <Text text="{TableModel>organization_name}" wrapping="false" />
                                             </HBox>
                                         </table:template>
                                     </table:Column>
-                                    <table:Column headerSpan="1" hAlign="Center" width="10rem">
+                                    <table:Column headerSpan="2" hAlign="Center" width="10rem">
                                         <table:multiLabels>
                                             <Text text="24년" tooltip="24년" wrapping="false" />
                                             <Text text="연간목표" tooltip="연간목표" wrapping="false" />
                                         </table:multiLabels>
                                         <table:template>
                                             <HBox justifyContent="End">
-                                                <mdc:Field
-                                                textAlign="End"
-                                                value="{path: 'totalTargetRevenue', type: 'sap.ui.model.type.Integer', formatOptions: {groupingEnabled: true}}"
-                                                editMode="{= ${totalTargetRevenue} ? 'Editable' : 'Display' }"
-                                            />
+                                                <mdc:Field change="onInputChange" textAlign="End" value="{path: 'TableModel>totalTargetRevenue', type: 'sap.ui.model.type.Integer', formatOptions: {groupingEnabled: true}}" editMode="{= ${TableModel>isLeaf} ? 'Editable' : 'Display' }" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" width="10rem">
+                                        <table:multiLabels>
+                                            <Text text="24년" tooltip="24년" wrapping="false" />
+                                            <Text text="목표마진" tooltip="목표마진" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="End">
+                                                <mdc:Field textAlign="End" value="{path: 'TableModel>totalTargetMargin', type: 'sap.ui.model.type.Integer', formatOptions: {groupingEnabled: true}}" editMode="{= ${TableModel>isLeaf} ? 'Editable' : 'Display' }" />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" width="10rem">
+                                        <table:multiLabels>
+                                            <Text text="24년" tooltip="24년" wrapping="false" />
+                                            <Text text="조직" tooltip="조직" wrapping="false" />
+                                        </table:multiLabels>
+                                        <table:template>
+                                            <HBox justifyContent="End">
+                                                <mdc:Field textAlign="End" value="{path: 'TableModel>organization_name', type: 'sap.ui.model.type.String', formatOptions: {groupingEnabled: true}}" editMode="{= ${TableModel>isLeaf} ? 'Editable' : 'Display' }" />
                                             </HBox>
                                         </table:template>
                                     </table:Column>
@@ -76,7 +102,7 @@
                                         </table:multiLabels>
                                         <table:template>
                                             <HBox justifyContent="End">
-                                                <Text text="{totalTargetRevenue}" wrapping="false" />
+                                                <Text text="{TableModel>totalTargetRevenue}" wrapping="false" />
                                             </HBox>
                                         </table:template>
                                     </table:Column>
@@ -140,7 +166,7 @@
                         </Panel>
                     </form:SimpleForm>
                     <form:SimpleForm >
-                        <Panel expandable="true" headerText="PL" expanded="true">
+                        <Panel expandable="true" headerText="OI" expanded="true">
                             <table:Table selectionMode="None">
                                 <table:columns>
                                     <table:Column hAlign="Center" width="7rem">
@@ -385,5 +411,12 @@
                 </f:content>
             </f:DynamicPage>
         </NavContainer>
+        <footer>
+            <Toolbar >
+                <ToolbarSpacer/>
+                <Button type="Emphasized" text="Save" press="onSave"/>
+                <Button text="Cancel" press="onCancel"/>
+            </Toolbar>
+        </footer>
     </Page>
 </mvc:View>

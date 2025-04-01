@@ -1,14 +1,12 @@
-<mvc:View
-    controllerName="project1.controller.View"
+<mvc:View controllerName="project1.controller.View"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:m="sap.m"
     xmlns:f="sap.f"
     xmlns:layout="sap.ui.layout"
     xmlns:form="sap.ui.layout.form"
     xmlns="sap.ui.table"
-    xmlns:mdc="sap.ui.mdc"
->
-    <f:DynamicPage>
+    xmlns:mdc="sap.ui.mdc">
+    <f:DynamicPage showFooter="true">
         <!-- <f:header>
             <f:DynamicPageHeader pinnable="false">
                 <form:SimpleForm >
@@ -47,40 +45,20 @@
         </f:title>
         <f:content>
             <form:SimpleForm>
-                <TreeTable
-                    id="resultTreeTable"
-                    rows="{
+                <TreeTable id="resultTreeTable" rows="{
                         path: 'tableModel>/',
                         parameters: {
                             numberOfExpandedLevels: 4
                         }
-                    }"
-                    selectionMode="None"
-                    noData="검색 조건을 선택 후 검색 해주세요."
-                    fixedColumnCount="1"
-                    visibleRowCount="20"
-                >
+                    }" selectionMode="None" noData="검색 조건을 선택 후 검색 해주세요." fixedColumnCount="1" visibleRowCount="20">
                     <extension>
                         <m:OverflowToolbar>
                             <!-- <m:Title id="title" text="" /> -->
-                            <m:Button
-                                text="이동"
-                                press="onButtonPress"
-                            />
+                            <m:Button text="이동" press="onButtonPress" />
                             <m:ToolbarSpacer />
-                            <m:Button
-                                text="양식다운로드"
-                                icon="sap-icon://download"
-                            />
-                            <m:Button
-                                text="엑셀 업로드"
-                                icon="sap-icon://upload"
-                            />
-                            <m:Button
-                                text="저장"
-                                icon="sap-icon://save"
-                                press="onCreate"
-                            />
+                            <m:Button text="양식다운로드" icon="sap-icon://download" />
+                            <m:Button text="엑셀 업로드" icon="sap-icon://upload" />
+                            <m:Button text="저장" icon="sap-icon://save" press="onCreate" />
                         </m:OverflowToolbar>
                     </extension>
                     <columns>
@@ -92,278 +70,139 @@
                                         </m:HBox>
                                     </template>
                                 </Column> -->
-                        <Column
-                            hAlign="Center"
-                            width="16rem"
-                        >
-                            <m:Text
-                                text="본부"
-                                tooltip="본부"
-                                wrapping="false"
-                            />
+                        <Column hAlign="Center" width="16rem">
+                            <m:Text text="본부" tooltip="본부" wrapping="false" />
                             <template>
                                 <m:HBox justifyContent="End">
-                                    <m:Text
-                                        text="{tableModel>organization_name}"
-                                        wrapping="false"
-                                    />
+                                    <m:Text text="{tableModel>organization_name}" wrapping="false" />
                                 </m:HBox>
                             </template>
                         </Column>
-                        <Column
-                            headerSpan="3"
-                            hAlign="Center"
-                        >
+                        <Column headerSpan="3" hAlign="Center">
                             <multiLabels>
-                                <m:Text
-                                    text="금년 목표"
-                                    tooltip="금년 목표"
-                                    wrapping="false"
-                                />
-                                <m:Text
-                                    text="매출"
-                                    tooltip="매출"
-                                    wrapping="false"
-                                />
+                                <m:Text text="금년 목표" tooltip="금년 목표" wrapping="false" />
+                                <m:Text text="매출" tooltip="매출" wrapping="false" />
                             </multiLabels>
                             <template>
                                 <m:HBox justifyContent="End">
-                                    <mdc:Field
-                                        textAlign="End"
-                                        value="{path: 'tableModel>year2025revenueTargetTotal', type: 'sap.ui.model.type.Integer', formatOptions: {groupingEnabled: true}}"
-                                        editMode="{= ${tableModel>isLeaf} ? 'Editable' : 'Display' }"
-                                    />
+                                    <mdc:Field textAlign="End" value="{path: 'tableModel>year2025revenueTargetTotal', type: 'sap.ui.model.type.Integer', formatOptions: {groupingEnabled: true}}" editMode="{= ${tableModel>isLeaf} ? 'Editable' : 'Display' }" />
                                 </m:HBox>
                             </template>
                         </Column>
                         <Column hAlign="Center">
                             <multiLabels>
-                                <m:Text
-                                    text="금년 목표"
-                                    tooltip="금년 목표"
-                                    wrapping="false"
-                                />
-                                <m:Text
-                                    text="마진"
-                                    tooltip="마진"
-                                    wrapping="false"
-                                />
+                                <m:Text text="금년 목표" tooltip="금년 목표" wrapping="false" />
+                                <m:Text text="마진" tooltip="마진" wrapping="false" />
                             </multiLabels>
                             <template>
                                 <m:HBox justifyContent="End">
-                                    <mdc:Field
-                                        textAlign="End"
-                                        value="{path: 'tableModel>year2025marginTargetTotal', type: 'sap.ui.model.type.Integer', formatOptions: {groupingEnabled: true}}"
-                                        editMode="{= ${tableModel>isLeaf} ? 'Editable' : 'Display' }"
-                                    />
+                                    <mdc:Field textAlign="End" value="{path: 'tableModel>year2025marginTargetTotal', type: 'sap.ui.model.type.Integer', formatOptions: {groupingEnabled: true}}" editMode="{= ${tableModel>isLeaf} ? 'Editable' : 'Display' }" />
                                     <!-- <m:Text text="{tableModel>totalTargetMargin}" wrapping="false" /> -->
                                 </m:HBox>
                             </template>
                         </Column>
-                        <Column
-                            hAlign="Center"
-                            width="6rem"
-                        >
+                        <Column hAlign="Center" width="6rem">
                             <multiLabels>
-                                <m:Text
-                                    text="금년 목표"
-                                    tooltip="금년 목표"
-                                    wrapping="false"
-                                />
-                                <m:Text
-                                    text="마진율"
-                                    tooltip="마진율"
-                                    wrapping="false"
-                                />
+                                <m:Text text="금년 목표" tooltip="금년 목표" wrapping="false" />
+                                <m:Text text="마진율" tooltip="마진율" wrapping="false" />
                             </multiLabels>
                             <template>
                                 <m:HBox justifyContent="End">
-                                    <m:Text
-                                        text="{= (
+                                    <m:Text text="{= (
                                                 (Number(%{tableModel>year2025marginTargetTotal} || 0) / Number(%{tableModel>year2025revenueTargetTotal} || 0)
                                                           ) * 100)
-                                                        .toFixed(2) +'%' }"
-                                        wrapping="false"
-                                    />
+                                                        .toFixed(2) +'%' }" wrapping="false" />
                                 </m:HBox>
                             </template>
                         </Column>
-                        <Column
-                            headerSpan="3"
-                            hAlign="Center"
-                        >
+                        <Column headerSpan="3" hAlign="Center">
                             <multiLabels>
-                                <m:Text
-                                    text="전년 목표"
-                                    tooltip="전년 목표"
-                                    wrapping="false"
-                                />
-                                <m:Text
-                                    text="매출"
-                                    tooltip="매출"
-                                    wrapping="false"
-                                />
+                                <m:Text text="전년 목표" tooltip="전년 목표" wrapping="false" />
+                                <m:Text text="매출" tooltip="매출" wrapping="false" />
                             </multiLabels>
                             <template>
                                 <m:HBox justifyContent="End">
-                                    <m:Text
-                                        text="{
+                                    <m:Text text="{
                                             path: 'tableModel>year2024revenueTargetTotal',
                                             formatter: '.formatter.formatCurrencyNoDecimal'
-                                        }"
-                                        wrapping="false"
-                                    />
+                                        }" wrapping="false" />
                                 </m:HBox>
                             </template>
                         </Column>
                         <Column hAlign="Center">
                             <multiLabels>
-                                <m:Text
-                                    text="전년 목표"
-                                    tooltip="전년 목표"
-                                    wrapping="false"
-                                />
-                                <m:Text
-                                    text="마진"
-                                    tooltip="마진"
-                                    wrapping="false"
-                                />
+                                <m:Text text="전년 목표" tooltip="전년 목표" wrapping="false" />
+                                <m:Text text="마진" tooltip="마진" wrapping="false" />
                             </multiLabels>
                             <template>
                                 <m:HBox justifyContent="End">
-                                    <m:Text
-                                        text="{
+                                    <m:Text text="{
                                             path: 'tableModel>year2024marginTargetTotal',
                                             formatter: '.formatter.formatCurrencyNoDecimal'
-                                        }"
-                                        wrapping="false"
-                                    />
+                                        }" wrapping="false" />
                                 </m:HBox>
                             </template>
                         </Column>
-                        <Column
-                            hAlign="Center"
-                            width="6rem"
-                        >
+                        <Column hAlign="Center" width="6rem">
                             <multiLabels>
-                                <m:Text
-                                    text="전년 목표"
-                                    tooltip="전년 목표"
-                                    wrapping="false"
-                                />
-                                <m:Text
-                                    text="마진율"
-                                    tooltip="마진율"
-                                />
+                                <m:Text text="전년 목표" tooltip="전년 목표" wrapping="false" />
+                                <m:Text text="마진율" tooltip="마진율" />
                             </multiLabels>
                             <template>
                                 <m:HBox justifyContent="End">
-                                    <m:Text
-                                        text="{= (
+                                    <m:Text text="{= (
                                                 (Number(%{tableModel>year2024marginTargetTotal} || 0) / Number(%{tableModel>year2024revenueTargetTotal} || 0)
                                                           ) * 100)
-                                                        .toFixed(2) +'%' }"
-                                        wrapping="false"
-                                    />
+                                                        .toFixed(2) +'%' }" wrapping="false" />
                                 </m:HBox>
                             </template>
                         </Column>
-                        <Column
-                            headerSpan="3"
-                            hAlign="Center"
-                        >
+                        <Column headerSpan="3" hAlign="Center">
                             <multiLabels>
-                                <m:Text
-                                    text="전년 실적"
-                                    tooltip="전년 실적"
-                                    wrapping="false"
-                                />
-                                <m:Text
-                                    text="매출"
-                                    tooltip="매출"
-                                    wrapping="false"
-                                />
+                                <m:Text text="전년 실적" tooltip="전년 실적" wrapping="false" />
+                                <m:Text text="매출" tooltip="매출" wrapping="false" />
                             </multiLabels>
                             <template>
                                 <m:HBox justifyContent="End">
-                                    <m:Text
-                                        text="{
+                                    <m:Text text="{
                                             path: 'tableModel>year2024revenueTotal',
                                             formatter: '.formatter.formatCurrencyNoDecimal'
-                                        }"
-                                        wrapping="false"
-                                    />
+                                        }" wrapping="false" />
                                 </m:HBox>
                             </template>
                         </Column>
                         <Column hAlign="Center">
                             <multiLabels>
-                                <m:Text
-                                    text="전년 실적"
-                                    tooltip="전년 실적"
-                                    wrapping="false"
-                                />
-                                <m:Text
-                                    text="마진"
-                                    tooltip="마진"
-                                    wrapping="false"
-                                />
+                                <m:Text text="전년 실적" tooltip="전년 실적" wrapping="false" />
+                                <m:Text text="마진" tooltip="마진" wrapping="false" />
                             </multiLabels>
                             <template>
                                 <m:HBox justifyContent="End">
-                                    <m:Text
-                                        text="{
+                                    <m:Text text="{
                                             path: 'tableModel>year2024marginTotal',
                                             formatter: '.formatter.formatCurrencyNoDecimal'
-                                        }"
-                                        wrapping="false"
-                                    />
+                                        }" wrapping="false" />
                                 </m:HBox>
                             </template>
                         </Column>
-                        <Column
-                            hAlign="Center"
-                            width="6rem"
-                        >
+                        <Column hAlign="Center" width="6rem">
                             <multiLabels>
-                                <m:Text
-                                    text="전년 실적"
-                                    tooltip="전년 실적"
-                                    wrapping="false"
-                                />
-                                <m:Text
-                                    text="마진율"
-                                    tooltip="마진율"
-                                    wrapping="false"
-                                />
+                                <m:Text text="전년 실적" tooltip="전년 실적" wrapping="false" />
+                                <m:Text text="마진율" tooltip="마진율" wrapping="false" />
                             </multiLabels>
                             <template>
                                 <m:HBox justifyContent="End">
-                                    <m:Text
-                                        text="{= (
+                                    <m:Text text="{= (
                                                 (Number(%{tableModel>year2024marginTotal} || 0) / Number(%{tableModel>year2024revenueTotal} || 0)
                                                           ) * 100)
-                                                        .toFixed(2) +'%' }"
-                                        wrapping="false"
-                                    />
+                                                        .toFixed(2) +'%' }" wrapping="false" />
                                 </m:HBox>
                             </template>
                         </Column>
-                        <Column
-                            headerSpan="2"
-                            hAlign="Center"
-                        >
+                        <Column headerSpan="2" hAlign="Center">
                             <multiLabels>
-                                <m:Text
-                                    text="기대 매출 성장률"
-                                    tooltip="기대 매출 성장률"
-                                    wrapping="false"
-                                />
-                                <m:Text
-                                    text="전년 목표 대비"
-                                    tooltip="전년 목표 대비"
-                                    wrapping="false"
-                                />
+                                <m:Text text="기대 매출 성장률" tooltip="기대 매출 성장률" wrapping="false" />
+                                <m:Text text="전년 목표 대비" tooltip="전년 목표 대비" wrapping="false" />
                             </multiLabels>
                             <template>
                                 <m:HBox justifyContent="End">
@@ -373,16 +212,8 @@
                         </Column>
                         <Column hAlign="Center">
                             <multiLabels>
-                                <m:Text
-                                    text="기대 매출 성장률"
-                                    tooltip="기대 매출 성장률"
-                                    wrapping="false"
-                                />
-                                <m:Text
-                                    text="전년 실적 대비"
-                                    tooltip="전년 실적 대비"
-                                    wrapping="false"
-                                />
+                                <m:Text text="기대 매출 성장률" tooltip="기대 매출 성장률" wrapping="false" />
+                                <m:Text text="전년 실적 대비" tooltip="전년 실적 대비" wrapping="false" />
                             </multiLabels>
                             <template>
                                 <m:HBox justifyContent="End">
@@ -394,5 +225,6 @@
                 </TreeTable>
             </form:SimpleForm>
         </f:content>
+
     </f:DynamicPage>
 </mvc:View>

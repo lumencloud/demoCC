@@ -12,7 +12,7 @@ service ProjectService {
         UpdateRestrictions.Updatable : true,
         DeleteRestrictions.Deletable : true
     }
-    entity Project      as projection on project.Organization;
+    entity Project      as projection on project.Project;
 
     @cds.redirection.target
     @Capabilities: {
@@ -21,7 +21,7 @@ service ProjectService {
         UpdateRestrictions.Updatable : true,
         DeleteRestrictions.Deletable : true
     }
-    entity Organization as projection on project.Project;
+    entity Organization as projection on project.Organization;
 
     @cds.redirection.target
     @Capabilities: {

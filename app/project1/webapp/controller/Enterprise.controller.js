@@ -24,7 +24,8 @@ sap.ui.define([
 
             this._setOdataModel()
             const oViewModel = new JSONModel({
-                editMode: true
+                editMode: true,
+                hasUIChanges: false
             });
             this.getView().setModel(oViewModel, "view");
         },
@@ -32,17 +33,28 @@ sap.ui.define([
         _setOdataModel: function () {
             const oData = new ODataModel({
                 serviceUrl: "/project/",
-                synchronizationMode: "None"
+                synchronizationMode: "None",
+                operationMode: "Server"
             })
             this.getView().setModel(oData);
 
             let oDataModel = this.getView().getModel()
 
-            let oBinding = oDataModel.bindList("/Project_tableView")
+            let oBinding = oDataModel.bindList("/Project_tableView", undefined, [new sap.ui.model.Sorter("rank")], [new sap.ui.model.Filter("year", "EQ", "2024")])
             oBinding.requestContexts().then((aContext) => {
                 const aData = aContext.map(ctx => ctx.getObject());
-                console.log("Data:", aData);
+                console.log("aData:", aData);
+                const oTalbeModel = this._findChildNode(aData)
+                console.log("oTalbeModel:", oTalbeModel)
+
+                this.getView().setModel(new JSONModel(oTalbeModel), "TableModel")
+                
+                const oData = this.getView().getModel("TableModel").getProperty("/");
+                const oBackupModel = new JSONModel(JSON.parse(JSON.stringify(oData)));
+
+                this.getView().setModel(oBackupModel, "BackupTableModel");
             })
+
 
             let oContextBinding = oData.bindContext("/Project_tableView")
             let oPropertyBinding = oData.bindProperty("year", oContextBinding.getBoundContext());
@@ -59,6 +71,14 @@ sap.ui.define([
             } else {
                 navCon.back();
             }
+        },
+
+        _findChildNode: function markLeafNodes(data) {
+            const parentSet = new Set(data.map(d => d.parent_id).filter(Boolean));
+            return data.map(d => {
+                d.isLeaf = !parentSet.has(d.node_id);
+                return d;
+            });
         },
 
         getHierachyTree: function (sUrl) {
@@ -153,6 +173,195 @@ sap.ui.define([
 
         onBack: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("RouteView1")
-        }
+        },
+
+        onSave: async function () {
+            const oView = this.getView();
+            const oModel = oView.getModel();
+            const aCurrentData = oView.getModel("TableModel").getProperty("/");
+            const aOriginalData = oView.getModel("BackupTableModel").getProperty("/");
+
+            const oOrgBinding = oModel.bindList("/Organization", null, [], [], {
+                $$updateGroupId: "OrganizationUpdateGroup"
+            });
+
+            let bHasChanges = false;
+
+            // 변경 감지 (isNew || 필드 비교)
+            const aChangedRows = aCurrentData.filter(row => {
+                if (row.isNew) return true;
+
+                const oOriginal = aOriginalData.find(orig =>
+                    orig.totalTargetMargin === row.totalTargetMargin &&
+                    orig.organization_name === row.organization_name &&
+                    orig.totalTargetRevenue === row.totalTargetRevenue
+                );
+
+                if (!oOriginal) return true; // 혹시 원본에 없으면 무조건 변경된 것으로 간주
+
+                return (
+                    oOriginal.totalTargetRevenue !== row.totalTargetRevenue ||
+                    oOriginal.totalTargetMargin !== row.totalTargetMargin ||
+                    oOriginal.organization_name !== row.organization_name
+                );
+            });
+
+            if (aChangedRows.length === 0) {
+                sap.m.MessageToast.show("변경된 데이터가 없습니다.");
+                return;
+            }
+
+            for (const row of aChangedRows) {
+                if (row.isNew) {
+                    // 신규 Organization 생성
+                    if (row.organization_name) {
+                        const oContext = oOrgBinding.create({
+                            id: row.node_id,
+                            name: row.organization_name
+                        });
+
+                        try {
+                            await oContext.created();
+                            bHasChanges = true;
+                        } catch (err) {
+                            sap.m.MessageBox.error("Organization 생성 실패: " + err.message);
+                        }
+                    }
+
+                    row.isNew = false;
+                } else {
+                    // 기존 Organization 수정
+                    if (row.organization_name) {
+                        const oOrgContextBinding = oModel.bindContext(
+                            `/Organization(id='${row.node_id}')`,
+                            null,
+                            { $$updateGroupId: "OrganizationUpdateGroup" }
+                        );
+
+                        try {
+                            const oOrgData = await oOrgContextBinding.requestObject();
+                            if (oOrgData) {
+                                const oOrgContext = oOrgContextBinding.getBoundContext();
+                                oOrgContext.setProperty("name", row.organization_name);
+                                bHasChanges = true;
+                            }
+                        } catch (err) {
+                            if (err.message.includes("404")) {
+                                console.log(`Organization 없음 → 생략: ${row.node_id}`);
+                            } else {
+                                console.error("Organization 체크 실패:", err);
+                            }
+                        }
+                    }
+
+                    // 기존 Target 수정 (존재하는 경우에만)
+                    if (row.totalTargetRevenue != null && row.totalTargetMargin != null) {
+                        const oTargetBinding = oModel.bindContext(
+                            `/Targets(organization_id='${row.node_id}',year=${row.year},month=${row.month})`,
+                            null,
+                            { $$updateGroupId: "TargetUpdateGroup" }
+                        );
+
+                        try {
+                            const oTargetData = await oTargetBinding.requestObject();
+                            if (oTargetData) {
+                                const oTargetContext = oTargetBinding.getBoundContext();
+                                oTargetContext.setProperty("targetRevenue", row.totalTargetRevenue);
+                                oTargetContext.setProperty("targetMargin", row.totalTargetMargin);
+                                bHasChanges = true;
+                            }
+                        } catch (err) {
+                            if (err.message.includes("404")) {
+                                console.log(`Target 없음 → 생략: ${row.node_id} (${row.year}/${row.month})`);
+                            } else {
+                                console.error("Target 체크 실패:", err);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!bHasChanges) {
+                sap.m.MessageToast.show("변경된 데이터가 없습니다.");
+                return;
+            }
+
+            try {
+                await Promise.all([
+                    oModel.submitBatch("TargetUpdateGroup"),
+                    oModel.submitBatch("OrganizationUpdateGroup")
+                ]);
+
+                sap.m.MessageToast.show("저장 완료!");
+
+                // 최신 상태로 원본 백업 다시 업데이트
+                const aCloned = JSON.parse(JSON.stringify(aCurrentData));
+                oView.getModel("BackupTableModel").setProperty("/", aCloned);
+            } catch (err) {
+                sap.m.MessageBox.error("저장 실패: " + err.message);
+            }
+        },
+
+        addRow: function () {
+            const oModel = this.getView().getModel("TableModel");
+            const aData = oModel.getProperty("/") || [];
+
+            aData.push({
+                node_id: "",
+                organization_name: "",
+                totalTargetRevenue: 0,
+                totalTargetMargin: 0,
+                isLeaf: true,
+                isNew: true
+            });
+
+            oModel.setProperty("/", aData);
+        },
+
+        onCancel: function (oEvent) {
+            this.getView().getModel("view").setProperty("/hasUIChanges", false);
+        },
+
+        onDelete: function () {
+            const oTable = this.byId("tableId");
+            const aIndices = oTable.getSelectedIndices();
+
+            if (!aIndices.length) {
+                sap.m.MessageToast.show("삭제할 행을 선택해주세요.");
+                return;
+            }
+            const iIndex = aIndices[0];
+            const oContext = oTable.getContextByIndex(iIndex);
+            const oRowData = oContext.getObject();
+            const oModel = this.getView().getModel();
+
+            const sPath = `/Organization(id='${oRowData.node_id}')`;
+
+            const oDeleteContext = oModel.bindContext(sPath, null, {
+                $$updateGroupId: "OrganizationUpdateGroup"
+            }).getBoundContext();
+
+            oDeleteContext.requestObject().then(() => {
+                oDeleteContext.delete();
+
+                return oModel.submitBatch("OrganizationUpdateGroup");
+            }).then(() => {
+                sap.m.MessageToast.show("삭제 완료!");
+
+                // 선택 해제 및 테이블 리프레시
+                oTable.clearSelection();
+
+                // 또는 ViewModel 사용 중이면 직접 갱신
+                const aData = this.getView().getModel("TableModel").getProperty("/");
+                const aNewData = aData.filter(row => row.node_id !== oRowData.node_id);
+                this.getView().getModel("TableModel").setProperty("/", aNewData);
+            }).catch((oError) => {
+                sap.m.MessageBox.error("삭제 실패: " + oError.message);
+            });
+        },
+        onRefresh: function () {
+            this._setOdataModel();
+            sap.m.MessageToast.show("초기화 완료")
+        },
     });
 });
