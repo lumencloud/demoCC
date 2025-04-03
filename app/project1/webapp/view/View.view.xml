@@ -55,6 +55,7 @@
                         <m:OverflowToolbar>
                             <!-- <m:Title id="title" text="" /> -->
                             <m:Button text="이동" press="onButtonPress" />
+                            <m:Button text="예제" press="onButtonPress2" />
                             <m:ToolbarSpacer />
                             <m:Button text="양식다운로드" icon="sap-icon://download" />
                             <m:Button text="엑셀 업로드" icon="sap-icon://upload" />

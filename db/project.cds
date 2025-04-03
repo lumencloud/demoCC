@@ -1,11 +1,13 @@
 namespace project;
 
 entity Organization {
-    key id      : UUID; //조직 ID
-        name    : String(50); //조직 이름
-        parent  : Association to Organization; //상위 조직 ID
+    key id             : UUID; //조직 ID
+        name           : String(50); //조직 이름
+        parent         : Association to Organization; //상위 조직 ID
+        project        : Association to Project;
 
-        project : Association to Project;
+        detail_project : Association to many Project
+                             on detail_project.organization = $self;
 }
 
 entity Project {
@@ -23,6 +25,26 @@ entity Target {
     key month         : Integer;
         targetRevenue : Decimal(15, 2); // 매출 목표
         targetMargin  : Decimal(15, 2); // 마진 목표
+}
+
+entity Books {
+    key ID    : UUID;
+        title : localized String;
+        descr : localized String;
+        price : Decimal;
+}
+
+entity Account {
+    key code            : String;
+        name            : String;
+        detail_customer : Association to many Customer
+                              on detail_customer.account_cd = $self;
+}
+
+entity Customer {
+    key id         : String;
+        name       : String;
+        account_cd : Association to Account;
 }
 
 @cds.persistence.exists

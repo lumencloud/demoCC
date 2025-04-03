@@ -1,0 +1,29 @@
+<mvc:View controllerName="project1.controller.DemoView"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:layout="sap.ui.layout"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:mdc="sap.ui.mdc">
+    <f:DynamicPage showFooter="true">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="예제" />
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:content>
+            <!-- <form:SimpleForm binding="{/Organization('10001')}"> -->
+            <form:SimpleForm id="formId">
+                <Toolbar >
+                    <Button text="생성" press="onButtonCreate"/>
+                </Toolbar>
+                <VBox>
+                    <Text text="조직명"/>
+                    <mdc:Field value="{name}"></mdc:Field>
+                </VBox>
+            </form:SimpleForm>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

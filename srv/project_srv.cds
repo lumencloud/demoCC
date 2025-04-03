@@ -32,6 +32,19 @@ service ProjectService {
     }
     entity Targets      as projection on project.Target;
 
+    @cds.redirection.target
+    @Capabilities: {
+        ReadRestrictions.Readable    : true,
+        InsertRestrictions.Insertable: true,
+        UpdateRestrictions.Updatable : true,
+        DeleteRestrictions.Deletable : true
+    }
+    entity Books        as projection on project.Books;
+    entity Books_texts  as projection on project.Books.texts;
+    
+    entity Account      as projection on project.Account;
+    entity Customer     as projection on project.Customer;
+
     view Project_year as select from project.Project_year;
     view Project_view as select from project.Project_view;
     view Project_hierView as select from project.Project_hierView;

@@ -14,6 +14,27 @@
       "id": "@sap/generator-fiori:basic",
       "version": "1.17.0",
       "toolsId": "2b275d06-f738-4f5b-ae2c-cc920d7c2499"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/project/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "4.0"
+        }
+      },
+      "models": {
+        "": {
+          "dataSource": "mainService",
+          "settings": {
+            "synchronizationMode": "None",
+            "operationMode": "Server",
+            "autoExpandSelect": true
+          },
+          "type": "sap.ui.model.odata.v4.ODataModel"
+        }
+      }
     }
   },
   "sap.ui": {
@@ -47,6 +68,15 @@
       "cozy": true
     },
     "models": {
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      },
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
@@ -85,6 +115,11 @@
           "name": "EnterpriseView",
           "pattern": "EnterpriseView",
           "target": "EnterpriseView"
+        },
+        {
+          "name": "DemoView",
+          "pattern": "DemoView",
+          "target": "DemoView"
         }
       ],
       "targets": {
@@ -95,6 +130,10 @@
         "EnterpriseView": {
           "id": "Enterprise",
           "name": "Enterprise"
+        },
+        "DemoView": {
+          "id": "DemoView",
+          "name": "DemoView"
         }
       }
     },

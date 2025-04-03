@@ -15,6 +15,7 @@ sap.ui.define([
         onInit: function () {
             const myRoute = this.getOwnerComponent().getRouter().getRoute("EnterpriseView");
             myRoute.attachPatternMatched(this.onMyRoutePatternMatched, this);
+            
         },
 
         onMyRoutePatternMatched: async function () {
@@ -31,24 +32,24 @@ sap.ui.define([
         },
 
         _setOdataModel: function () {
-            const oData = new ODataModel({
-                serviceUrl: "/project/",
-                synchronizationMode: "None",
-                operationMode: "Server"
-            })
-            this.getView().setModel(oData);
+            // const oData = new ODataModel({
+            //     serviceUrl: "/project/",
+            //     synchronizationMode: "None",
+            //     operationMode: "Server"
+            // })
+            // this.getView().setModel(oData);
 
             let oDataModel = this.getView().getModel()
 
             let oBinding = oDataModel.bindList("/Project_tableView", undefined, [new sap.ui.model.Sorter("rank")], [new sap.ui.model.Filter("year", "EQ", "2024")])
             oBinding.requestContexts().then((aContext) => {
                 const aData = aContext.map(ctx => ctx.getObject());
-                console.log("aData:", aData);
+                console.log("aData 바인딩된 데이터:", aData);
+
                 const oTalbeModel = this._findChildNode(aData)
-                console.log("oTalbeModel:", oTalbeModel)
 
                 this.getView().setModel(new JSONModel(oTalbeModel), "TableModel")
-                
+
                 const oData = this.getView().getModel("TableModel").getProperty("/");
                 const oBackupModel = new JSONModel(JSON.parse(JSON.stringify(oData)));
 
@@ -56,11 +57,16 @@ sap.ui.define([
             })
 
 
-            let oContextBinding = oData.bindContext("/Project_tableView")
-            let oPropertyBinding = oData.bindProperty("year", oContextBinding.getBoundContext());
+            // let oContextBinding = oData.bindContext("/Project_tableView")
+            // let oPropertyBinding = oData.bindProperty("year", oContextBinding.getBoundContext());
 
             console.log("oContextBinding:", oContextBinding);
             console.log("oPropertyBinding:", oPropertyBinding);
+
+            // let oTable = this.byId("tableId");
+            // oTable.bindRows({
+            //     path:'Project_tableView'
+            // })
         },
 
         handleNav: function (oEvent) {
@@ -176,28 +182,30 @@ sap.ui.define([
         },
 
         onSave: async function () {
-            const oView = this.getView();
-            const oModel = oView.getModel();
-            const aCurrentData = oView.getModel("TableModel").getProperty("/");
-            const aOriginalData = oView.getModel("BackupTableModel").getProperty("/");
+            let bHasChanges = false; // 기존 데이터와 변경된 값 확인 flag
 
+            const oModel = this.getView().getModel();   // oData V4 모델
+            const sUpdateGroupId = "MainUpdateGroup";   // Batch 처리할 GroupId
+
+            const aCurrentData = this.getView().getModel("TableModel").getProperty("/");    // 수정된 현재 View Model
+            const aOriginalData = this.getView().getModel("BackupTableModel").getProperty("/");  // 복사된 backup Model
+
+            //bindList를 통해서 엔터티셋을 가져옴
             const oOrgBinding = oModel.bindList("/Organization", null, [], [], {
-                $$updateGroupId: "OrganizationUpdateGroup"
+                $$updateGroupId: sUpdateGroupId
             });
 
-            let bHasChanges = false;
-
-            // 변경 감지 (isNew || 필드 비교)
+            // 백업model vs 변경model 비교하여 변경된 값만 저장
             const aChangedRows = aCurrentData.filter(row => {
-                if (row.isNew) return true;
+                if (row.isNew) return true; //새로 추가된 열이 있는지 확인
 
-                const oOriginal = aOriginalData.find(orig =>
+                const oOriginal = aOriginalData.find(orig => // 변경값 비교 확인
                     orig.totalTargetMargin === row.totalTargetMargin &&
                     orig.organization_name === row.organization_name &&
                     orig.totalTargetRevenue === row.totalTargetRevenue
                 );
 
-                if (!oOriginal) return true; // 혹시 원본에 없으면 무조건 변경된 것으로 간주
+                if (!oOriginal) return true;  // 변경된 것이 하나도 없으면 true
 
                 return (
                     oOriginal.totalTargetRevenue !== row.totalTargetRevenue ||
@@ -211,31 +219,23 @@ sap.ui.define([
                 return;
             }
 
+            // 변경된 데이터들만 서버 요청
             for (const row of aChangedRows) {
-                if (row.isNew) {
-                    // 신규 Organization 생성
+                if (row.isNew) { // create일 경우
                     if (row.organization_name) {
-                        const oContext = oOrgBinding.create({
+                        oOrgBinding.create({    // create 요청을 즉시 서버로 전송하지 않음 Pending Changes 에 보관
                             id: row.node_id,
                             name: row.organization_name
                         });
-
-                        try {
-                            await oContext.created();
-                            bHasChanges = true;
-                        } catch (err) {
-                            sap.m.MessageBox.error("Organization 생성 실패: " + err.message);
-                        }
+                        bHasChanges = true;
                     }
-
                     row.isNew = false;
                 } else {
-                    // 기존 Organization 수정
                     if (row.organization_name) {
                         const oOrgContextBinding = oModel.bindContext(
                             `/Organization(id='${row.node_id}')`,
                             null,
-                            { $$updateGroupId: "OrganizationUpdateGroup" }
+                            { $$updateGroupId: sUpdateGroupId }
                         );
 
                         try {
@@ -254,12 +254,11 @@ sap.ui.define([
                         }
                     }
 
-                    // 기존 Target 수정 (존재하는 경우에만)
                     if (row.totalTargetRevenue != null && row.totalTargetMargin != null) {
                         const oTargetBinding = oModel.bindContext(
                             `/Targets(organization_id='${row.node_id}',year=${row.year},month=${row.month})`,
                             null,
-                            { $$updateGroupId: "TargetUpdateGroup" }
+                            { $$updateGroupId: sUpdateGroupId }
                         );
 
                         try {
@@ -280,25 +279,19 @@ sap.ui.define([
                     }
                 }
             }
-
             if (!bHasChanges) {
                 sap.m.MessageToast.show("변경된 데이터가 없습니다.");
                 return;
             }
-
             try {
-                await Promise.all([
-                    oModel.submitBatch("TargetUpdateGroup"),
-                    oModel.submitBatch("OrganizationUpdateGroup")
-                ]);
+                await oModel.submitBatch(sUpdateGroupId);
 
                 sap.m.MessageToast.show("저장 완료!");
 
-                // 최신 상태로 원본 백업 다시 업데이트
                 const aCloned = JSON.parse(JSON.stringify(aCurrentData));
-                oView.getModel("BackupTableModel").setProperty("/", aCloned);
+                this.getView().getModel("BackupTableModel").setProperty("/", aCloned);
             } catch (err) {
-                sap.m.MessageBox.error("저장 실패: " + err.message);
+                sap.m.MessageToast.show("저장 실패: " + err.message);
             }
         },
 
@@ -314,12 +307,7 @@ sap.ui.define([
                 isLeaf: true,
                 isNew: true
             });
-
             oModel.setProperty("/", aData);
-        },
-
-        onCancel: function (oEvent) {
-            this.getView().getModel("view").setProperty("/hasUIChanges", false);
         },
 
         onDelete: function () {
@@ -330,38 +318,124 @@ sap.ui.define([
                 sap.m.MessageToast.show("삭제할 행을 선택해주세요.");
                 return;
             }
-            const iIndex = aIndices[0];
-            const oContext = oTable.getContextByIndex(iIndex);
-            const oRowData = oContext.getObject();
+
             const oModel = this.getView().getModel();
+            const sUpdateGroupId = "OrganizationUpdateGroup";
 
-            const sPath = `/Organization(id='${oRowData.node_id}')`;
+            const aDeletePromises = [];
+            const aDeletedNodeIds = [];
 
-            const oDeleteContext = oModel.bindContext(sPath, null, {
-                $$updateGroupId: "OrganizationUpdateGroup"
-            }).getBoundContext();
+            aIndices.forEach(iIndex => {
+                const oContext = oTable.getContextByIndex(iIndex);
+                const oRowData = oContext.getObject();
+                const sPath = `/Organization(id='${oRowData.node_id}')`;
 
-            oDeleteContext.requestObject().then(() => {
-                oDeleteContext.delete();
+                // 삭제 context 구성
+                const oDeleteContext = oModel.bindContext(sPath, null, {
+                    $$updateGroupId: sUpdateGroupId
+                }).getBoundContext();
 
-                return oModel.submitBatch("OrganizationUpdateGroup");
+                // 삭제 요청 준비 (requestObject는 생략 가능, 에러 시 delete에서 catch됨)
+                const pDelete = oDeleteContext
+                    .requestObject()
+                    .then(() => {
+                        oDeleteContext.delete(); // 삭제 마킹
+                        aDeletedNodeIds.push(oRowData.node_id); // 이후 ViewModel 정리용
+                    }).catch((err) => {
+                        console.warn(`삭제 실패(${oRowData.node_id}):`, err.message);
+                    });
+
+                aDeletePromises.push(pDelete);
+            });
+
+            Promise.all(aDeletePromises).then(() => {
+                return oModel.submitBatch(sUpdateGroupId);
             }).then(() => {
                 sap.m.MessageToast.show("삭제 완료!");
 
-                // 선택 해제 및 테이블 리프레시
+                // 테이블 선택 해제
                 oTable.clearSelection();
 
-                // 또는 ViewModel 사용 중이면 직접 갱신
-                const aData = this.getView().getModel("TableModel").getProperty("/");
-                const aNewData = aData.filter(row => row.node_id !== oRowData.node_id);
-                this.getView().getModel("TableModel").setProperty("/", aNewData);
-            }).catch((oError) => {
-                sap.m.MessageBox.error("삭제 실패: " + oError.message);
+                // ViewModel에서 삭제된 항목 제거
+                const oTableModel = this.getView().getModel("TableModel");
+                const aCurrentData = oTableModel.getProperty("/");
+                const aNewData = aCurrentData.filter(row => !aDeletedNodeIds.includes(row.node_id));
+                oTableModel.setProperty("/", aNewData);
+            }).catch(err => {
+                sap.m.MessageBox.error("삭제 중 오류 발생: " + err.message);
             });
         },
+
         onRefresh: function () {
             this._setOdataModel();
             sap.m.MessageToast.show("초기화 완료")
         },
+
+        onCancel: function (oEvent) {
+            this.getView().getModel("view").setProperty("/hasUIChanges", false);
+        },
+
+        onSearch: async function (oEvent) {
+            /// Project?$filter=organization/name eq 'LG에너지솔루션'&$expand=organization
+            let sQuery = this.getView().byId("searchId").getValue();
+            let oTable = this.byId("testTable");
+       
+            // const oFilter = new sap.ui.model.Filter({
+            //     path: "detail_customer/name",
+            //     operator: sap.ui.model.FilterOperator.Contains,
+            //     value1: sQuery
+            //   });
+
+            
+            const oFilter = new sap.ui.model.Filter({
+                path: "detail_customer",
+                operator: sap.ui.model.FilterOperator.Any,
+                variable: "c",
+                condition: new sap.ui.model.Filter(`c/name`, sap.ui.model.FilterOperator.Contains, sQuery)
+            });
+            
+            const oBinding = oTable.getBinding("rows");
+            oBinding.filter([oFilter]);
+            // oTable.bindRows({
+            //     path: "/Account",
+            //     parameters: {
+            //         $expand: "detail_customer",
+            //         $filter: `any(d:contains(d/name,'${sQuery}'))`
+            //     }
+            // });
+        },
+
+        onLocaleTest: async function (oEvent) {
+            const oModel = this.getView().getModel(); // OData V4 모델
+
+            const sKey = `Books_texts(ID='1',locale='us')`;
+
+            const oContextBinding = oModel.bindContext("/" + sKey, null, {
+                $$updateGroupId: "textsUpdateGroup"
+            });
+
+            try {
+                // 실제 엔터티 객체 요청
+                const oData = await oContextBinding.requestObject();
+
+                if (oData) {
+                    const oContext = oContextBinding.getBoundContext();
+
+                    // 수정할 값 지정
+                    oContext.setProperty("title", "Test");
+                    oContext.setProperty("descr", "Test Description");
+                }
+                oModel.submitBatch("textsUpdateGroup")
+                    .then(() => {
+                        sap.m.MessageToast.show("Books_texts 업데이트 완료!");
+                    })
+                    .catch((err) => {
+                        sap.m.MessageBox.error("업데이트 실패: " + err.message);
+                    });
+            } catch (err) {
+                sap.m.MessageBox.error("요청 실패: " + err.message);
+            }
+        },
+
     });
 });

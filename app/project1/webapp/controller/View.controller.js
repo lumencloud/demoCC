@@ -267,6 +267,10 @@ sap.ui.define([
 
         onCreate: function (oEvent) {
 
-        }
+        },
+
+		onButtonPress2: function(oEvent) {
+            this.getOwnerComponent().getRouter().navTo("DemoView")
+		}
     });
 });
