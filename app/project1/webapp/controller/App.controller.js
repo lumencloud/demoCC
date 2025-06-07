@@ -6,64 +6,55 @@ sap.ui.define([
   return BaseController.extend("project1.controller.App", {
       onInit() {
       },
-    function handleDropBeforeAfter(oModel, info, position) {
+   function handleDropBeforeAfter(oModel, info, position) {
   const {
-    dragNode,
-    dropNode,
-    sDraggedPath,
-    sDroppedPath,
-    parentPath,
-    dragLevel,
-    dropLevel
+    dragNode, dropNode,
+    sDraggedPath, sDroppedPath,
+    parentPath, dragLevel, dropLevel
   } = info;
 
   const isDragTop = dragNode.Parent_ID === null;
   const isDropTop = dropNode.Parent_ID === null;
 
-  const dropParentPath = sDroppedPath.replace(/\/children\/\d+$/, "");
-  const dropParent = oModel.getProperty(dropParentPath);
-  const dropSiblings = isDropTop ? oModel.getProperty("/") : dropParent.children;
-
-  const dragParent = oModel.getProperty(parentPath);
-  const dragSiblings = dragParent.children;
-
   const dragIdx = extractLastChildIndex(sDraggedPath);
   const dropIdx = extractLastChildIndex(sDroppedPath);
 
-  // 1. 드래그한 노드 제거
-  dragSiblings.splice(dragIdx, 1);
+  // 테이블 최상단 or 최하단 처리
+  const isDropTopRow = dropIdx === 0 && position === "Before";
+  const isDropBottom = position === "After" && dropNode.children == null;
 
-  // 2. drop index 계산
-  let insertIdx = dropIdx;
-  if (position === "After") {
-    insertIdx = dragIdx < dropIdx ? dropIdx : dropIdx + 1;
-  }
+  const topPath = "/"; // 최상위 노드 배열 경로
+  const topNodes = oModel.getProperty(topPath);
 
-  // === 분기 처리 시작 ===
-
-  // 📌 테이블 최상단 드롭 (before + dropIdx === 0)
-  if (position === "Before" && isDropTop && dropIdx === 0) {
+  if (isDropTopRow) {
+    // 최상단: 1레벨/2레벨 둘 다 최상위로 이동
     dragNode.Parent_ID = null;
-    dropSiblings.unshift(dragNode);
+    topNodes.splice(0, 0, dragNode);
+    topNodes.forEach((node, idx) => {
+      node.sort_order = idx + 1;
+      updateODataAfterDrop(node);
+    });
+    oModel.setProperty(topPath, topNodes);
+    return;
   }
 
-  // 📌 테이블 최하단 드롭 (after + 마지막 row)
-  else if (position === "After" && isDropTop && dropIdx === dropSiblings.length) {
+  if (isDropBottom && isDropTop) {
+    // 최하단: 1레벨 → 1레벨 맨 아래로
     dragNode.Parent_ID = null;
-    dropSiblings.push(dragNode);
+    topNodes.splice(topNodes.length, 0, dragNode);
+    topNodes.forEach((node, idx) => {
+      node.sort_order = idx + 1;
+      updateODataAfterDrop(node);
+    });
+    oModel.setProperty(topPath, topNodes);
+    return;
   }
 
-  // 📌 1레벨 → 1레벨 간 정렬
-  else if (isDragTop && isDropTop) {
-    dragNode.Parent_ID = null;
-    dropSiblings.splice(insertIdx, 0, dragNode);
-  }
-
-  // 📌 2레벨 → 1레벨 노드 자식으로 이동
-  else if (!isDragTop && isDropTop) {
+  if (!isDragTop && isDropTop) {
+    // 2레벨 → 1레벨 사이: dropNode 자식으로 이동
     moveChildToAnotherParent({
       draggedNode: dragNode,
-      oldParent: dragParent,
+      oldParent: oModel.getProperty(parentPath),
       newParent: dropNode,
       model: oModel,
       oldParentPath: parentPath,
@@ -72,65 +63,54 @@ sap.ui.define([
     return;
   }
 
-  // 📌 2레벨 → 같은 부모 내 정렬
-  else if (!isDragTop && !isDropTop && dragNode.Parent_ID === dropNode.Parent_ID) {
-    dropSiblings.splice(insertIdx, 0, dragNode);
-  }
-
-  // 📌 2레벨 → 다른 1레벨 자식으로 이동
-  else if (!isDragTop && !isDropTop && dragNode.Parent_ID !== dropNode.Parent_ID) {
-    moveChildToAnotherParent({
-      draggedNode: dragNode,
-      oldParent: dragParent,
-      newParent: dropNode,
-      model: oModel,
-      oldParentPath: parentPath,
-      newParentPath: sDroppedPath
+  if (isDragTop && isDropTop) {
+    // 1레벨 → 1레벨 재정렬
+    topNodes.splice(dragIdx, 1);
+    let insertIdx = dropIdx;
+    if (position === "After") {
+      insertIdx = dragIdx < dropIdx ? dropIdx : dropIdx + 1;
+    }
+    topNodes.splice(insertIdx, 0, dragNode);
+    topNodes.forEach((node, idx) => {
+      node.sort_order = idx + 1;
+      updateODataAfterDrop(node);
     });
+    oModel.setProperty(topPath, topNodes);
     return;
   }
 
-  // 3. sort_order 재정렬
-  dropSiblings.forEach((node, idx) => {
-    node.sort_order = idx + 1;
-    updateODataAfterDrop(node);
-  });
+  if (!isDragTop && !isDropTop) {
+    // 2레벨 → 2레벨: 같은 부모 내 정렬
+    if (dragNode.Parent_ID === dropNode.Parent_ID) {
+      const parent = oModel.getProperty(parentPath);
+      const children = parent.children;
 
-  // 4. 모델 반영
-  const dropTargetPath = isDropTop ? "/" : `${dropParentPath}/children`;
-  oModel.setProperty(dropTargetPath, dropSiblings);
-
-  // 5. 드래그한 부모도 정렬 정리 필요
-  if (!isDragTop && dragParent !== dropParent) {
-    dragParent.children.forEach((child, idx) => {
-      child.sort_order = idx + 1;
-      updateODataAfterDrop(child);
-    });
-    oModel.setProperty(`${parentPath}/children`, dragParent.children);
+      children.splice(dragIdx, 1);
+      let insertIdx = dropIdx;
+      if (position === "After") {
+        insertIdx = dragIdx < dropIdx ? dropIdx : dropIdx + 1;
+      }
+      children.splice(insertIdx, 0, dragNode);
+      children.forEach((child, idx) => {
+        child.sort_order = idx + 1;
+        updateODataAfterDrop(child);
+      });
+      oModel.setProperty(`${parentPath}/children`, children);
+    } else {
+      // 부모 다를 경우: 자식으로 이동
+      moveChildToAnotherParent({
+        draggedNode: dragNode,
+        oldParent: oModel.getProperty(parentPath),
+        newParent: dropNode,
+        model: oModel,
+        oldParentPath: parentPath,
+        newParentPath: sDroppedPath
+      });
+    }
+    return;
   }
 }
 
-function moveChildToAnotherParent({ draggedNode, oldParent, newParent, model, oldParentPath, newParentPath }) {
-  // 1. 기존 부모에서 제거
-  oldParent.children = oldParent.children.filter(child => child.ID !== draggedNode.ID);
-  oldParent.children.forEach((child, idx) => {
-    child.sort_order = idx + 1;
-    updateODataAfterDrop(child);
-  });
-  model.setProperty(`${oldParentPath}/children`, oldParent.children);
-
-  // 2. 새 부모로 이동
-  if (!newParent.children) {
-    newParent.children = [];
-  }
-
-  draggedNode.Parent_ID = newParent.ID;
-  draggedNode.sort_order = newParent.children.length + 1;
-  newParent.children.push(draggedNode);
-
-  model.setProperty(`${newParentPath}/children`, newParent.children);
-  updateODataAfterDrop(draggedNode);
-} 
 
   });
 });
