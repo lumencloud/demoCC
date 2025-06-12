@@ -1,0 +1,67 @@
+{
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.Display",
+      "description": "조회 권한"
+    },
+    {
+      "name": "$XSAPPNAME.Manage",
+      "description": "Manage 권한"
+    },
+    {
+      "name": "$XSAPPNAME.Administration",
+      "description": "관리 권한"
+    }
+  ],
+  "attributes": [],
+  "role-templates": [
+    {
+      "name": "User",
+      "scope-references": [
+        "$XSAPPNAME.Display"
+      ],
+      "description": "BIX Portal USER 권한"
+    },
+    {
+      "name": "Admin",
+      "scope-references": [
+        "$XSAPPNAME.Display",
+        "$XSAPPNAME.Manage",
+        "$XSAPPNAME.Administration"
+      ],
+      "description": "BIX Portal ADMIN 권한"
+    },
+    {
+      "name": "Manager",
+      "scope-references": [
+        "$XSAPPNAME.Display",
+        "$XSAPPNAME.Manage"
+      ],
+      "description": "BIX Portal ADMIN 권한"
+    }
+  ],
+  "role-collections": [
+    {
+      "name" : "BIX User",
+      "description": "",
+      "role-template-references": ["$XSAPPNAME.User"]
+    },
+    {
+      "name" : "BIX Admin",
+      "description": "",
+      "role-template-references": ["$XSAPPNAME.Admin"]
+    },
+    {
+      "name" : "BIX Manager",
+      "description": "",
+      "role-template-references": ["$XSAPPNAME.Manager"]
+    }
+  ],
+  "authorities-inheritance": false,
+  "oauth2-configuration": {
+    "redirect-uris": [
+      "https://*.cfapps.ap12.hana.ondemand.com/**",
+      "https://*.ap12.applicationstudio.cloud.sap/**"
+    ]
+  }
+}

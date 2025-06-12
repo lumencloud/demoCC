@@ -1,0 +1,62 @@
+<mvc:View xmlns:m="sap.m"
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    xmlns:ui="sap.ui.table"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    controllerName="bix.pl.performance.controller.PL"
+    width="100%"
+    height="100%">
+    <Page showHeader="false" backgroundDesign="Standard" >
+        <Panel expandable="false" expanded="true" width="auto"
+            visible="{= ${uiModel>/page} === 'pl'}" class="sapUiTinyMargin">
+            <headerToolbar>
+                <OverflowToolbar >
+                    <ObjectIdentifier title="PL"/>
+                    <ToolbarSpacer/>
+                    <!-- 기능 이후 -->
+                    <Button id="gridBtn" icon="sap-icon://grid" press="onSwitchPL" type="{= ${uiModel>/plView} === 'grid' ? 'Neutral' : 'Default' }" />
+                    <Button id="tableBtn" icon="sap-icon://table-view" press="onSwitchPL" type="{= ${uiModel>/plView} === 'table' ? 'Neutral' : 'Default' }" />
+
+                    <!-- <SegmentedButton id="segmendtedButton" selectedKey="{uiModel>/plView}" >
+                        <items>
+                            <SegmentedButtonItem key="table" text="Table" icon="sap-icon://table-view"/>
+                            <SegmentedButtonItem key="grid" text="Tile" icon="sap-icon://grid"/>
+                        </items>
+                    </SegmentedButton> -->
+                </OverflowToolbar>
+            </headerToolbar>
+            <infoToolbar>
+            </infoToolbar>
+            <content>
+                <mvc:XMLView viewName="bix.pl.performance.view.PLTable" visible="{= ${uiModel>/plView} === 'table' }"/>
+                <mvc:XMLView viewName="bix.pl.performance.view.PLGrid" visible="{= ${uiModel>/plView} === 'grid' }"/>
+            </content>
+        </Panel>
+
+        <Panel expandable="true" expanded="false" width="auto"
+            visible="{= ${uiModel>/page} === 'pl'}" class="sapUiTinyMargin">
+            <headerToolbar>
+                <OverflowToolbar >
+                    <ObjectIdentifier title="OI"/>
+                </OverflowToolbar>
+            </headerToolbar>
+            <content>
+                <mvc:XMLView viewName="bix.pl.performance.view.PerformanceOI"/>
+            </content>
+        </Panel>
+
+        <Panel expandable="true" expanded="true" width="auto"
+            visible="{= ${uiModel>/page} === 'sheet'}" class="sapUiTinyMargin">
+            <headerToolbar>
+                <OverflowToolbar >
+                    <ObjectIdentifier title="장판지"/>
+                </OverflowToolbar>
+            </headerToolbar>
+            <content>
+                <mvc:XMLView viewName="bix.pl.performance.view.Spreadsheet"/>
+            </content>
+        </Panel>
+    </Page>
+</mvc:View>

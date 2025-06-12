@@ -1,0 +1,150 @@
+{
+  "_version": "1.59.0",
+  "sap.app": {
+    "id": "bix.common.dashboard",
+    "type": "application",
+    "i18n": {
+      "bundleUrl": "../../bix/portal/i18n/i18n.properties",
+      "supportedLocales": [
+        "ko",
+        "en"
+      ],
+      "fallbackLocale": "ko"
+    },
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{}",
+    "description": "{}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.13.6",
+      "toolsId": "42e64bc9-e465-478e-b9dc-37bd3f58c4d7"
+    },
+    "dataSources": {
+      "cm_service": {
+        "uri": "../../odata/v4/cm/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
+      },
+      "publishService": {
+        "uri": "../../odata/v4/publish/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.125.1",
+      "libs": {
+        "sap.m": {},
+        "sap.f": {},
+        "sap.tnt": {},
+        "sap.ui.core": {},
+        "sap.ushell": {},
+        "sap.ui.integration": {},
+        "sap.viz": {}
+      }
+    },
+    "componentUsages": {
+      "workpageBuilderComponent": {
+        "name": "bix.common.library.home.library.ushell.components.workPageBuilder",
+        "lazy": true
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleUrl": "../../bix/portal/i18n/i18n.properties",
+          "supportedLocales": [
+            "ko",
+            "en"
+          ],
+          "fallbackLocale": "ko"
+        }
+      },
+      "cm": {
+        "dataSource": "cm_service",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      },
+      "publish": {
+        "dataSource": "publishService",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      }
+    },
+    "resources": {},
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "async": true,
+        "viewPath": "bix.common.dashboard.view",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "clearControlAggregation": false
+      },
+      "routes": [
+        {
+          "name": "Home",
+          "pattern": ":?query:",
+          "target": [
+            "TargetDashboard"
+          ]
+        }
+      ],
+      "targets": {
+        "TargetDashboard": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Dashboard",
+          "viewName": "Dashboard"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "bix.common.dashboard.view.App",
+      "type": "XML",
+      "async": true,
+      "id": "App"
+    }
+  }
+}

@@ -1,0 +1,43 @@
+<mvc:View xmlns:launchpad="sap.ushell.ui.launchpad" controllerName="bix.pl.performance.controller.SGADetailChart"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:table="sap.ui.table"
+    xmlns:layout="sap.ui.layout"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:plugins="sap.m.plugins"
+    busyIndicatorDelay="0"
+    displayBlock="true"
+    width="100%"
+    height="100%"
+>
+    <VBox width="100%" height="100%" >
+        <viz:VizFrame fieldGroupIds="Chart" uiConfig="{applicationSet:'fiori'}"
+            height='20rem' width="100%" vizType="column">
+            <viz:dataset>
+                <viz.data:FlattenedDataset data="{chartModel>/}">
+                    <viz.data:dimensions>
+                        <viz.data:DimensionDefinition name="부문" value="{chartModel>부문}" />
+                    </viz.data:dimensions>
+                    <viz.data:measures>
+                        <viz.data:MeasureDefinition name="인건비" value="{chartModel>인건비}" />
+                        <viz.data:MeasureDefinition name="투자비" value="{chartModel>투자비}" />
+                        <viz.data:MeasureDefinition name="경비" value="{chartModel>경비}" />
+                    </viz.data:measures>
+                </viz.data:FlattenedDataset>
+            </viz:dataset>
+            <viz:feeds>
+                <viz.feeds:FeedItem uid="valueAxis" type="Measure"
+                    values="인건비,투자비,경비" />
+                <viz.feeds:FeedItem uid="categoryAxis" type="Dimension"
+                    values="부문" />
+            </viz:feeds>
+            <viz:dependents>
+                <viz:Popover id="chartPopOver"/>
+            </viz:dependents>
+        </viz:VizFrame>
+    </VBox>
+</mvc:View>

@@ -1,0 +1,63 @@
+{
+  "welcomeFile": "/main/index.html",
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "^/favicon.ico$",
+      "localDir": "./resources/",
+      "csrfProtection": false,
+      "authenticationType": "none"
+    },
+    {
+      "source": "^/theme/(.*)$",
+      "target": "/$1",
+      "service": "com.sap.ui.theming",
+      "authenticationType": "xsuaa",
+      "csrfProtection": true
+    },
+    {
+      "source": "^/?odata/v4/if_api/(.*)$",
+      "target": "/$1",
+      "destination": "srv-api",
+      "csrfProtection": true,
+      "authenticationType": "none"
+    },
+    {
+      "source": "^/?odata/v4/(.*)$",
+      "target": "/$1",
+      "destination": "srv-api",
+      "csrfProtection": true,
+      "authenticationType": "xsuaa"
+    },
+    {
+      "source": "^/i18nInit/v4/(.*)$",
+      "target": "/$1",
+      "destination": "srv-api",
+      "csrfProtection": true,
+      "authenticationType": "xsuaa"
+    },
+    {
+      "source": "^/bix/portal/i18n/(.*)$",
+      "target": "$1",
+      "localDir": "./resources/i18n",
+      "cacheControl": "no-cache, no-store, must-revalidate",
+      "authenticationType": "none",
+      "csrfProtection": true
+    },
+    {
+      "source": "^/main/(.*)$",
+      "target": "/bixmain/$1",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa",
+      "cacheControl": "no-cache",
+      "csrfProtection": true
+    },
+    {
+      "source": "^/([^/]+)/(.*)$",
+      "target": "/$1/$2",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa",
+      "csrfProtection": true
+    }
+  ]
+}

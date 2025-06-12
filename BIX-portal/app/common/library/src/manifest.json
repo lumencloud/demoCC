@@ -1,0 +1,33 @@
+{
+    "_version": "1.32.0",
+    "sap.app": {
+        "id": "bix.common.library",
+        "type": "library",
+        "i18n": "i18n/i18n.properties",
+        "title": "{{title}}",
+        "applicationVersion": {
+            "version": "1.0.0"
+        },
+        "embeds": [
+            "comp/reuse"
+        ]
+    },
+    "sap.ui5": {
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "dependencies": {
+            "minUI5Version": "1.121.0",
+            "libs": {
+                "sap.ui.core": {},
+                "sap.m": {},
+                "sap.f": {}
+            }
+        }
+    },
+    "sap.cloud": {
+        "public": true,
+        "service": "sales.skportal"
+    }
+}

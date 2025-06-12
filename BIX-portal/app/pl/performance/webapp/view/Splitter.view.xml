@@ -1,0 +1,73 @@
+<mvc:View controllerName="bix.pl.performance.controller.Splitter"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:l="sap.ui.layout"
+    xmlns:mvc="sap.ui.core.mvc"
+	displayBlock="true"
+	width="100%"
+	height="100%">
+	<f:DynamicPage backgroundDesign="Transparent" headerExpanded="false" class="sapUiNoContentPadding">
+		<f:title>
+			<f:DynamicPageTitle>
+				<f:heading>
+					<Title text="{i18n>menu_pl_performance}" />
+				</f:heading>
+				<!-- <f:breadcrumbs>
+					<Breadcrumbs>
+						<Link text="Home" />
+						<Link text="Page 1" />
+						<Link text="Page 2" />
+						<Link text="Page 3" />
+						<Link text="Page 4" />
+						<Link text="Page 5" />
+					</Breadcrumbs>
+				</f:breadcrumbs> -->
+				<f:actions>
+					<Label text="마감년월" showColon="true" required="true" class="sapUiTinyMargin"/>
+					<DatePicker id="datePicker" fieldGroupIds="Search,Required" 
+						value="{
+							path: 'searchModel>/yearMonth',
+							type: 'sap.ui.model.type.Date',
+							formatOptions: {
+								format: 'yyyyMM',
+								pattern: 'yyyy-MM'
+							}
+						}" change="onChangeSearch" width="8rem"/>
+
+					<Label text="조직" showColon="true" required="true" class="sapUiTinyMargin"/>
+					<MultiInput id="orgId" enabled="{= !${uiModel>/orgSearch}}"
+						width="15rem" showValueHelp="true" valueHelpRequest=".onOrgSingleSelectDialogOpen" 
+						liveChange="onAddDepInputLiveChange" showSuggestion="false" maxTokens="1" 
+						selectedKey="{searchModel>/orgId}" tokenUpdate="onAddDepTokenUpdate"
+						fieldGroupIds="Search,Required" showValueStateMessage="false"/>
+					<!-- <CheckBox text="전사 조회 (테스트)" selected="{uiModel>/orgSearch}"/> -->
+					<Button text="조회" type="Emphasized" press="onSearch" icon="sap-icon://search" iconFirst="true"/>		
+				</f:actions>
+			</f:DynamicPageTitle>
+		</f:title>
+		<f:header>
+			<f:DynamicPageHeader pinnable="false" >
+			</f:DynamicPageHeader>
+		</f:header>
+		<f:content>
+			<l:ResponsiveSplitter defaultPane="default">
+				<l:PaneContainer resize=".onRootContainerResize">
+					<l:SplitPane>
+						<l:layoutData>
+							<l:SplitterLayoutData size="{sizes>/pane1}" resizable="true"/>
+						</l:layoutData>
+						<NavContainer id="2depth">
+						</NavContainer>
+					</l:SplitPane>
+					<l:SplitPane>
+						<l:layoutData>
+							<l:SplitterLayoutData size="{layoutControl>/3depth_size}" resizable="{layoutControl>/3depth_usage}"/>
+						</l:layoutData>
+						<NavContainer id="3depth" visible="{layoutControl>/3depth_usage}">
+						</NavContainer>
+					</l:SplitPane>
+				</l:PaneContainer>
+			</l:ResponsiveSplitter>
+		</f:content>
+	</f:DynamicPage>
+</mvc:View>

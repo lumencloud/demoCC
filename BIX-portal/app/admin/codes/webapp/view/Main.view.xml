@@ -1,0 +1,527 @@
+<mvc:View controllerName="bix.admin.codes.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:dnd="sap.ui.core.dnd"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:mdc="sap.ui.mdc" busyIndicatorDelay="0" width="100%">
+    <f:DynamicPage class="sapUiContentPadding" showFooter="true" fitContent="true">
+        <f:content>
+            <FlexBox width="100%" height="100%" fitContainer="true" direction="Column" >
+                <form:SimpleForm  editable="true" class="custom-search-container">
+                    <form:content>
+                        <Title text="코드 관리" class="custom-mg-title">
+                            <layoutData>
+                                <layout:GridData span="XL12 L12 M12 S12" />
+                            </layoutData>
+                        </Title>
+                        <HBox class="custom-search-field-box" alignItems="Center">
+                            <Label text="코드 그룹명" labelFor="codeNameInput" />
+                            <Input id="codeNameInput" placeholder="코드 그룹명을 입력해 주세요" value="{searchModel>/name}" />
+                            <layoutData>
+                                <layout:GridData span="XL3 L3 M3 S12" />
+                            </layoutData>
+                        </HBox>
+                        
+                        <HBox class="custom-search-field-box" alignItems="Center">
+                            <Label text="사용 여부" labelFor="codeNameInput" />
+                            <Select width="100%" selectedKey="{searchModel>/use}" 
+                                items="{
+                                    path: 'codeModel>/', 
+                                    filters: [
+                                        { path: 'category', operator: 'EQ', value1: 'use_type' }
+                                    ],
+                                    templateShareable: true
+                                }" class="custom-mg-select">
+                                <core:Item key="{codeModel>value}" text="{codeModel>name}" />
+                                <layoutData>
+                                    <layout:GridData span="XL2 L2 M2 S12" />
+                                </layoutData>
+                            </Select>
+                            <layoutData>
+                                <layout:GridData span="XL3 L3 M3 S12" />
+                            </layoutData>
+                        </HBox>
+
+                        <HBox width="100%" justifyContent="End" class="custom-search-btn-container">
+                            <Button id="codeRefreshButton" text="초기화" press=".onSearch($event, 'refresh')" class="custom-mg-small-btn" icon="sap-icon://refresh"/>
+                            <Button id="codeSearchButton" text="검색" type="Accept" press=".onSearch($event, 'search')" class="custom-mg-small-btn"  icon="sap-icon://search"/>
+                            <layoutData>
+                                <layout:GridData span="XL12 L12 M12 S12" />
+                            </layoutData>
+                        </HBox>
+                    </form:content>
+                </form:SimpleForm>
+
+                <FlexBox width="100%" height="calc(100% - 10.5rem)">
+                    <FlexBox width="100%" height="100%"  class="sapUiSmallMarginTop sapUiSmallMarginEnd">
+                        <Panel width="100%" height="100%">
+                            <table:Table 
+                                id="codeHeaderTable"
+                                class="custom-mg-uiTable custom-selection-uiTable custom-table-rounding-border custom-mg-uiTable-noline" 
+                                selectionMode="{= ${uiModel>/edit} ? 'MultiToggle' : 'None'}" 
+                                busyIndicatorDelay="0" 
+                                rowSelectionChange="onCodeHeaderTableSelect"
+                                rowActionCount="1" >
+                                <table:rowMode>
+                                    <rowmodes:Auto/>
+                                </table:rowMode>
+
+                                <table:extension>
+                                    <OverflowToolbar width="100%" height="3rem" style="Clear" >
+                                        <Title id="codeHeaderTitle" text="{= ${$count} ? '총 ' + ${$count} + ' 개' : '총 0개'}" class="custom-text-medium"/>
+                                        <ToolbarSpacer />
+                                        <Button icon="sap-icon://add" text="행추가" press="onCodeHeaderTableButton($event,'add')" visible="{uiModel>/edit}" 
+                                            class="custom-mg-small-btn" />
+                                        <Button icon="sap-icon://less" text="행삭제" press="onCodeHeaderTableButton($event,'delete')" visible="{uiModel>/edit}" 
+                                            enabled="{uiModel>/codeHeaderDeleteButton}" class="custom-mg-small-btn" />
+                                    </OverflowToolbar>
+                                </table:extension>
+
+                                <table:columns>
+                                    <table:Column width="10rem" hAlign="Center" autoResizable="true">
+                                        <Label text="코드그룹명" wrapping="true" required="{uiModel>/edit}"/>
+                                        <table:template>
+                                            <mdc:Field width="100%" editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}">
+                                                <mdc:contentEdit>
+                                                    <Input value="{category}" fieldGroupIds="CodeHeaderInput" valueLiveUpdate="true" 
+                                                        change=".onLiveChange($event,'header','category')" placeholder="코드그룹명" />
+                                                </mdc:contentEdit>
+                                                <mdc:contentDisplay>
+                                                    <Text text="{category}" tooltip="{category}" class="custom-text-medium" wrapping="false" />
+                                                </mdc:contentDisplay>
+                                            </mdc:Field>
+                                        </table:template>
+                                    </table:Column>
+
+                                    <table:Column hAlign="Center" autoResizable="true">
+                                        <Label text="설명" wrapping="true" required="{uiModel>/edit}" />
+                                        <table:template>
+                                            <mdc:Field width="100%" editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}">
+                                                <mdc:contentEdit>
+                                                    <Input value="{description}" fieldGroupIds="CodeHeaderInput" valueLiveUpdate="true" 
+                                                        liveChange=".onLiveChange($event,'header')"/>
+                                                </mdc:contentEdit>
+                                                <mdc:contentDisplay>
+                                                    <Text text="{description}" tooltip="{description}" wrapping="false"/>
+                                                </mdc:contentDisplay>
+                                            </mdc:Field>
+                                        </table:template>
+                                    </table:Column>
+
+                                    <table:Column hAlign="Center" autoResizable="true" width="5rem">
+                                        <Label text="사용 여부"/>
+                                        <table:template>
+                                            <Switch state="{use_yn}" enabled="{uiModel>/edit}" change="onLiveChange($event,'header')" 
+                                                class="custom-switch" type="AcceptReject" />
+                                        </table:template>
+                                    </table:Column>
+
+                                    <table:Column hAlign="Center" autoResizable="true" width="7rem">
+                                        <Label text="시스템 여부"/>
+                                        <table:template>
+                                            <Switch state="{system_yn}" enabled="{uiModel>/edit}" change="onLiveChange($event,'header')" 
+                                                class="custom-switch" type="AcceptReject" />
+                                        </table:template>
+                                    </table:Column>
+                                </table:columns>
+                                <!-- <table:Column hAlign="Center" autoResizable="true" width="7rem">
+                                    <Label text="생성일" wrapping="true"/>
+                                    <table:template>
+                                        <Text text="{
+                                            path:'createdAt', 
+                                            type: 'sap.ui.model.odata.type.DateTime',
+                                            targetType: 'any',
+                                            formatter: '.formatDate'
+                                        }" tooltip="{
+                                            path:'createdAt', 
+                                            type: 'sap.ui.model.odata.type.DateTime',
+                                            targetType: 'any',
+                                            formatter: '.formatDate'
+                                        }"  wrapping="false" />
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center" autoResizable="true">
+                                    <Label text="생성자" wrapping="true"/>
+                                    <table:template>
+                                        <Text text="{createdBy}" wrapping="false" tooltip="{createdBy}" />
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center" autoResizable="true" width="7rem">
+                                    <Label text="수정일" wrapping="true"/>
+                                    <table:template>
+                                        <Text text="{
+                                            path:'modifiedAt', 
+                                            type: 'sap.ui.model.odata.type.DateTime',
+                                            targetType: 'any',
+                                            formatter: '.formatDate'
+                                        }" tooltip="{
+                                            path:'modifiedAt', 
+                                            type: 'sap.ui.model.odata.type.DateTime',
+                                            targetType: 'any',
+                                            formatter: '.formatDate'
+                                        }" wrapping="false"/>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center" autoResizable="true">
+                                    <Label text="수정자" wrapping="true"/>
+                                    <table:template>
+                                        <Text text="{modifiedBy}" wrapping="false" tooltip="{modifiedBy}" />
+                                    </table:template>
+                                </table:Column> -->
+
+                                <table:rowActionTemplate>
+                                    <table:RowAction>
+                                        <table:RowActionItem type="Navigation" press=".onNavItem" />
+                                    </table:RowAction>
+                                </table:rowActionTemplate>
+                            </table:Table>
+                        </Panel>
+                    </FlexBox>
+                    
+                    <FlexBox width="100%" height="100%" class="sapUiSmallMarginTop">
+                        <Panel width="100%" height="100%">
+                            <table:Table id="codeItemTable"
+                                class="custom-mg-uiTable custom-selection-uiTable custom-table-rounding-border custom-mg-uiTable-noline" 
+                                selectionMode="{= ${uiModel>/edit} ? 'MultiToggle' : 'None'}" 
+                                busyIndicatorDelay="0" 
+                                rowSelectionChange="onCodeItemTableSelect">
+                                <table:rowMode>
+                                    <rowmodes:Auto />
+                                </table:rowMode>
+
+                                <table:dragDropConfig>
+                                    <dnd:DragDropInfo enabled="{uiModel>/edit}" sourceAggregation="rows" targetAggregation="rows"
+                                        dropPosition="Between" drop=".onCodeItemDrop" />
+                                </table:dragDropConfig>
+
+                                <table:extension>
+                                    <OverflowToolbar width="100%" height="3rem" style="Clear" >
+                                        <!-- <Title id="codeItemTitle" text="{= ${$count} ? '총 ' + ${$count} + ' 개' : '총 0개'}" class="custom-text-medium" />
+                                        <Title id="codeItemTitle2" class="sapUiTinyMarginBegin" text="({category})" visible="{= !!${category}}" /> -->
+                                        <Title id="codeItemTitle" class="custom-text-medium" />
+                                        <Title id="codeItemTitle2" class="sapUiTinyMarginBegin" />
+                                        
+                                        <ToolbarSpacer />
+                                        <Button icon="sap-icon://add" text="행추가" press="onCodeItemTableButton($event,'add')" 
+                                            visible="{uiModel>/edit}" class="custom-mg-small-btn" />
+                                        <Button icon="sap-icon://less" text="행삭제" press="onCodeItemTableButton($event,'delete')" 
+                                            visible="{uiModel>/edit}" enabled="{uiModel>/codeItemDeleteButton}" class="custom-mg-small-btn"/>
+                                    </OverflowToolbar>
+                                </table:extension>
+
+                                <table:columns>
+                                    <table:Column width="8rem" hAlign="Center" autoResizable="true">
+                                        <Label text="코드명" wrapping="true" required="{uiModel>/edit}"/>
+                                        <table:template>
+                                            <mdc:Field width="100%" editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}">
+                                                <mdc:contentEdit>
+                                                    <Input value="{path: 'value', type: 'sap.ui.model.type.String', constraints: {minLength: 1}}" 
+                                                        valueLiveUpdate="true" maxLength="50" liveChange=".onLiveChange($event,'item','value')"/>
+                                                </mdc:contentEdit>
+                                                <mdc:contentDisplay>
+                                                    <Text text="{value}" wrapping="false" tooltip="{value}" />
+                                                </mdc:contentDisplay>
+                                            </mdc:Field>
+                                        </table:template>
+                                    </table:Column>
+
+                                    <table:Column width="8rem" hAlign="Center" autoResizable="true" visible="{uiModel>/edit}">
+                                        <Label text="코드값" wrapping="true" required="true"/>
+                                        <table:template>
+                                            <FlexBox width="100%" height="100%" direction="Column" displayInline="true" >
+                                                <mdc:Field width="100%" value="{name}"
+                                                    visible="{  path: 'datatype', formatter: '.formatDatatypeInvisible', targetType: 'any'}"
+                                                    dataType="{= ${datatype} === 'int' ? 'sap.ui.model.type.Integer' : 'sap.ui.model.type.String'}" >
+                                                    <mdc:content>
+                                                        <Input value="{
+                                                            path: '$field>/conditions', type: 'sap.ui.mdc.field.ConditionsType', constraints: {minLength: 1}
+                                                        }"  valueLiveUpdate="true" width="100%" liveChange=".onLiveChange($event,'item','name')"/>
+                                                    </mdc:content>
+                                                </mdc:Field>
+
+                                                <mdc:Field width="100%" 
+                                                    visible="{ path: 'datatype', formatter: '.formatDatatypeVisible', targetType: 'any'}">
+                                                    <mdc:content>
+                                                        <Select width="100%" change=".onLiveChange($event,'item','name')"
+                                                            selectedKey="{name}" 
+                                                            forceSelection="{  path: 'datatype', formatter: '.formatDatatypeVisible', targetType: 'any'}"
+                                                            items="{
+                                                                path: 'codeModel>/', 
+                                                                filters: [
+                                                                    { path: 'category', operator: 'EQ', value1: 'boolean' }
+                                                                ],
+                                                                templateShareable: true
+                                                            }">
+                                                            <core:Item key="{codeModel>value}" text="{codeModel>name}" />
+                                                        </Select>
+                                                    </mdc:content>
+                                                </mdc:Field>
+                                            </FlexBox>
+                                        </table:template>
+                                    </table:Column>
+
+                                    <table:Column width="8rem" hAlign="Center" autoResizable="true" visible="{= !${uiModel>/edit}}">
+                                        <Label text="코드값" wrapping="true"/>
+                                        <table:template>
+                                            <VBox width="100%" height="100%" >
+                                                <Text text="{name}" tooltip="{= String(${name})}" wrapping="false" />
+                                            </VBox>
+                                        </table:template>
+                                    </table:Column>
+
+                                    <table:Column hAlign="Center" autoResizable="true" width="8rem">
+                                        <Label text="값형식" wrapping="true"/>
+                                        <table:template>
+                                            <mdc:Field value="{datatype}" width="100%" editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}" >
+                                                <mdc:contentEdit>
+                                                    <Select change=".onLiveChange($event,'item','datatype')" 
+                                                        selectedKey="{
+                                                            path: '$field>/conditions',
+                                                            type: 'sap.ui.mdc.field.ConditionsType'
+                                                        }" 
+                                                        items="{
+                                                            path: 'codeModel>/', 
+                                                            filters: [
+                                                                { path: 'category', operator: 'EQ', value1: 'codeItem_type' }
+                                                            ],
+                                                            templateShareable: true
+                                                        }">
+                                                        <core:Item key="{codeModel>value}" text="{codeModel>name}" />
+                                                    </Select>
+                                                </mdc:contentEdit>
+                                                <mdc:contentDisplay>
+                                                    <Text text="{datatype}" tooltip="{datatype}" wrapping="false" />
+                                                </mdc:contentDisplay>
+                                            </mdc:Field>
+                                        </table:template>
+                                    </table:Column>
+
+                                    <table:Column hAlign="Center" autoResizable="true" width="5rem" sortProperty="sort_order" showSortMenuEntry="false">
+                                        <Label text="순서" wrapping="true" />
+                                        <table:template>
+                                            <mdc:Field width="100%" >
+                                                <!-- <mdc:contentEdit>
+                                                    <Input value="{ path: 'sort_order', type: 'sap.ui.model.type.Integer', constraints: { minimum: '1' } }" 
+                                                        maxLength="9" valueLiveUpdate="true" 
+                                                        liveChange=".onLiveChange($event,'item','sort_order')"/>
+                                                </mdc:contentEdit> -->
+                                                <mdc:content>
+                                                    <Text text="{sort_order}" wrapping="false" />
+                                                </mdc:content>
+                                            </mdc:Field>
+                                        </table:template>
+                                    </table:Column>
+
+                                    <table:Column hAlign="Center" autoResizable="true" width="5rem">
+                                        <Label text="사용 여부"/>
+                                        <table:template>
+                                            <Switch state="{use_yn}" enabled="{uiModel>/edit}" change=".onLiveChange($event,'item')" 
+                                                class="custom-switch" type="AcceptReject" />
+                                        </table:template>
+                                    </table:Column>
+
+                                    <table:Column hAlign="Center" autoResizable="true" width="10rem" >
+                                        <Label text="옵션1" wrapping="true"/>
+                                        <table:template>
+                                            <mdc:Field width="100%" required="true" editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}">
+                                                <mdc:contentEdit>
+                                                    <Input 
+                                                        width="100%" showClearIcon="true" showSuggestion="true" 
+                                                        value="{
+                                                            parts: [
+                                                                {path: 'header_opt1_ID', targetType: 'any'},
+                                                                {path: 'value_opt1', targetType: 'any'}
+                                                            ],
+                                                            formatter: '.formatHeaderOption',
+                                                            targetType: 'any'
+                                                        }"
+                                                        change=".onLiveChange($event,'item','header_opt1_ID')" 
+                                                        valueStateText="입력한 코드가 존재하지 않습니다."
+                                                        valueLiveUpdate="true"
+                                                        startSuggestion="0"
+                                                        suggestionRows="{
+                                                            path: 'codeModel>/',
+                                                            length: 2000,
+                                                            templateShareable: true
+                                                        }" 
+                                                        suggestionItemSelected=".onSuggestionItemSelected"
+                                                        showTableSuggestionValueHelp="false" >
+                                                        <suggestionColumns>
+                                                            <Column hAlign="Center" width="7rem">
+                                                                <Label text="그룹" />
+                                                            </Column>
+                                                            <Column hAlign="Center" width="7rem">
+                                                                <Label text="아이템" />
+                                                            </Column>
+                                                        </suggestionColumns>
+
+                                                        <suggestionRows>
+                                                            <ColumnListItem >
+                                                                <Text width="100%" text="{codeModel>category}" tooltip="{codeModel>category}" wrapping="false"/>
+                                                                <Text width="100%" text="{codeModel>name}" tooltip="{codeModel>name}" wrapping="false"/>
+                                                            </ColumnListItem>
+                                                        </suggestionRows>
+                                                    </Input>                                            
+                                                </mdc:contentEdit>
+                                                <mdc:contentDisplay>
+                                                    <Text text="{
+                                                        parts: [
+                                                            {path: 'header_opt1_ID', targetType: 'any'},
+                                                            {path: 'value_opt1', targetType: 'any'}
+                                                        ],
+                                                        formatter: '.formatHeaderOption',
+                                                        targetType: 'any'
+                                                    }" tooltip="{
+                                                        parts: [
+                                                            {path: 'header_opt1_ID', targetType: 'any'},
+                                                            {path: 'value_opt1', targetType: 'any'}
+                                                        ],
+                                                        formatter: '.formatHeaderOption',
+                                                        targetType: 'any'
+                                                    }" wrapping="false" />
+                                                </mdc:contentDisplay>
+                                            </mdc:Field>
+                                        </table:template>
+                                    </table:Column>
+
+                                    <table:Column hAlign="Center" autoResizable="true" width="10rem" >
+                                        <Label text="옵션2" wrapping="true"/>
+                                        <table:template>
+                                            <mdc:Field width="100%" required="true" editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}">
+                                                <mdc:contentEdit>
+                                                    <Input 
+                                                        width="100%" showClearIcon="true" showSuggestion="true" 
+                                                        value="{
+                                                            parts: [
+                                                                {path: 'header_opt2_ID', targetType: 'any'},
+                                                                {path: 'value_opt2', targetType: 'any'}
+                                                            ],
+                                                            formatter: '.formatHeaderOption',
+                                                            targetType: 'any'
+                                                        }"
+                                                        change=".onLiveChange($event,'item','header_opt2_ID')" 
+                                                        valueStateText="입력한 코드가 존재하지 않습니다."
+                                                        startSuggestion="0"
+                                                        suggestionRows="{
+                                                            path: 'codeModel>/',
+                                                            length: 2000,
+                                                            templateShareable: true
+                                                        }"                                                     
+                                                        suggestionItemSelected=".onSuggestionItemSelected"
+                                                        showTableSuggestionValueHelp="false" >
+                                                        <suggestionColumns>
+                                                            <Column hAlign="Center" width="7rem">
+                                                                <Label text="그룹" />
+                                                            </Column>
+                                                            <Column hAlign="Center" width="7rem">
+                                                                <Label text="아이템" />
+                                                            </Column>
+                                                        </suggestionColumns>
+
+                                                        <suggestionRows>
+                                                            <ColumnListItem >
+                                                                <Text width="100%" text="{codeModel>category}" tooltip="{codeModel>category}" wrapping="false"/>
+                                                                <Text width="100%" text="{codeModel>name}" tooltip="{codeModel>name}" wrapping="false"/>
+                                                            </ColumnListItem>
+                                                        </suggestionRows>
+                                                    </Input>                                            
+                                                </mdc:contentEdit>
+                                                <mdc:contentDisplay>
+                                                    <Text text="{
+                                                        parts: [
+                                                            {path: 'header_opt2_ID', targetType: 'any'},
+                                                            {path: 'value_opt2', targetType: 'any'}
+                                                        ],
+                                                        formatter: '.formatHeaderOption',
+                                                        targetType: 'any'
+                                                    }" tooltip="{
+                                                        parts: [
+                                                            {path: 'header_opt2_ID', targetType: 'any'},
+                                                            {path: 'value_opt2', targetType: 'any'}
+                                                        ],
+                                                        formatter: '.formatHeaderOption',
+                                                        targetType: 'any'
+                                                    }" wrapping="false" />
+                                                </mdc:contentDisplay>
+                                            </mdc:Field>
+                                        </table:template>
+                                    </table:Column>
+
+                                    <!-- <table:Column hAlign="Center" autoResizable="true" width="7rem">
+                                        <Label text="생성일" wrapping="true"/>
+                                        <table:template>
+                                            <Text text="{
+                                                path:'createdAt', 
+                                                type: 'sap.ui.model.odata.type.DateTime',
+                                                targetType: 'any',
+                                                formatter: '.formatDate'
+                                            }" tooltip="{
+                                                path:'createdAt', 
+                                                type: 'sap.ui.model.odata.type.DateTime',
+                                                targetType: 'any',
+                                                formatter: '.formatDate'
+                                            }" wrapping="false"/>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" autoResizable="true">
+                                        <Label text="생성자" wrapping="true"/>
+                                        <table:template>
+                                            <Text text="{createdBy}" tooltip="{createdBy}" wrapping="false"  />
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" autoResizable="true" width="7rem">
+                                        <Label text="수정일" wrapping="true"/>
+                                        <table:template>
+                                            <Text text="{
+                                                path:'modifiedAt', 
+                                                type: 'sap.ui.model.odata.type.DateTime',
+                                                targetType: 'any',
+                                                formatter: '.formatDate'
+                                            }" tooltip="{
+                                                path:'modifiedAt', 
+                                                type: 'sap.ui.model.odata.type.DateTime',
+                                                targetType: 'any',
+                                                formatter: '.formatDate'
+                                            }" wrapping="false"/>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column hAlign="Center" autoResizable="true">
+                                        <Label text="수정자" wrapping="true"/>
+                                        <table:template>
+                                            <Text text="{modifiedBy}" tooltip="{modifiedBy}" wrapping="false"/>
+                                        </table:template>
+                                    </table:Column> -->
+                                </table:columns>
+                            </table:Table>
+                        </Panel>
+                    </FlexBox>
+                </FlexBox>            
+            </FlexBox>
+        </f:content>
+
+        <f:footer>
+            <OverflowToolbar class="custom-mg-footer">
+                <ToolbarSpacer/>
+
+                <Button type="Accept" class="custom-mg-btn" icon="sap-icon://edit" text="수정" tooltip="수정" press=".onFooterButton($event,'edit')" 
+                    visible="{= !${uiModel>/edit}}">
+                </Button>
+
+                <!-- enabled="{= !${uiModel>/hasErrorMessage} &amp;&amp; ${uiModel>/hasPendingChanges} &amp;&amp; !${uiModel>/hasEmptyField}}" -->
+                <Button type="Accept" class="custom-mg-btn" icon="sap-icon://save" text="저장" tooltip="저장" press=".onFooterButton($event,'save')" 
+                    enabled="{= !${uiModel>/hasError} &amp;&amp; ${uiModel>/hasPendingChanges} &amp;&amp; !${uiModel>/hasEmptyField}}" 
+                    visible="{uiModel>/edit}">
+                </Button>
+
+                <Button class="custom-mg-btn" icon="sap-icon://cancel" text="취소" tooltip="취소" press=".onFooterButton($event,'cancel')" 
+                    visible="{uiModel>/edit}">
+                </Button>
+            </OverflowToolbar>
+        </f:footer>
+    </f:DynamicPage>
+</mvc:View>

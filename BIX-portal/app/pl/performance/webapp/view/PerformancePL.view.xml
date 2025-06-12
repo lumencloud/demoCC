@@ -1,0 +1,187 @@
+<mvc:View controllerName="bix.pl.performance.controller.PerformancePL"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:table="sap.ui.table"
+    xmlns:layout="sap.ui.layout"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:unified="sap.ui.unified"
+    xmlns:mdc="sap.ui.mdc"
+    busyIndicatorDelay="0"
+    displayBlock="true"
+    width="100%"
+    height="100%"
+>   
+    <VBox width="100%" height="100%" >
+        <!-- 검색창 -->
+        <!-- <form:SimpleForm width="100%" editable="true">
+            <VBox width="100%">
+                <Label text="년월" required="true"/>
+                <DatePicker 
+                    id="example1DatePicker" fieldGroupIds="Search,Required,Pl"
+                    displayFormat="yyyy-MM" valueFormat="yyyy-MM" change="onChangeSearch($event,'month')"/>
+                <layoutData><layout:GridData span="XL2 L3 M4 S6" /></layoutData>
+            </VBox>
+
+            <VBox width="100%">
+                <Label text="매출조직명" required="true"/>
+                <MultiInput id="AddDepInput"
+                    width="100%" showValueHelp="true" valueHelpRequest=".onOrgSingleSelectDialogOpen" 
+                    liveChange="onAddDepInputLiveChange" showSuggestion="false" maxTokens="1" 
+                    selectedKey="{SearchModel>/addDepInput}" tokenUpdate="onAddDepTokenUpdate"
+                    fieldGroupIds="Search,Required,Pl" showValueStateMessage="false"/>
+                <layoutData><layout:GridData span="XL2 L3 M4 S6" /></layoutData>
+            </VBox>
+
+            <HBox width="100%" height="54px" alignItems="End" justifyContent="End" >
+                <Button type="Emphasized" text="검색" press=".onPlSearch($event,'Search')"/>
+                <Button text="초기화" press="onPlSearch($event,'Refresh')" class="sapUiTinyMarginBegin" />
+                <layoutData><layout:GridData span="XL8 L6 M4 S12" /></layoutData>
+            </HBox>
+        </form:SimpleForm> -->
+
+        <table:Table id="plUiTable"
+            selectionMode="Single" 
+            selectionBehavior="RowOnly" 
+            rowSelectionChange="onRowSelectionChange"
+            busyIndicatorDelay="0">
+        
+            <table:rowMode>
+                <rowmodes:Fixed rowCount="8" />
+            </table:rowMode>
+
+            <table:columns>
+                <table:Column hAlign="Center" width="6rem" autoResizable="true" name="type" >
+                    <table:multiLabels>
+                        <Label text="조직" wrapping="true"/>
+                        <Label text=""/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text text="{type}" wrapping="false" width="100%" textAlign="Center"
+                            emptyIndicatorMode="On" />
+                    </table:template>
+                </table:Column>
+                <!-- 기존 테이블 형태 -->
+                <!-- <table:Column hAlign="Begin" headerSpan="2" width="100%" autoResizable="true" >
+                    <table:multiLabels>
+                        <Label text='{= "&#39;" + ${tableYearModel>/agoYear} + "년 목표"}' wrapping="true"/>
+                        <Label text=""/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text text="{goal}" wrapping="false" width="100%" textAlign="End" />
+                    </table:template>
+                </table:Column>
+                <table:Column hAlign="Center" width="100%" autoResizable="true">
+                    <table:multiLabels>
+                        <Label text='{= "&#39;" + ${tableYearModel>/agoYear} + "년 목표"}' wrapping="true"/>
+                        <Label text='{= "&#39;" + ${tableYearModel>/agoYear} + "년 실적"}'/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text text="{performance}" wrapping="false" width="100%" textAlign="End" />
+                    </table:template>
+                </table:Column> -->
+                <table:Column hAlign="Center" width="100%" autoResizable="true" >
+                    <table:multiLabels>
+                        <Label text='{= "&#39;" + ${tableYearModel>/year} + "년"}' wrapping="true"/>
+                        <Label text="연간 목표"/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text text="{
+                            parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'goal', targetType: 'any' }
+                            ],
+                            formatter: '.onFormatPerformance'
+                        }" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                    </table:template>
+                </table:Column>
+                <table:Column hAlign="Begin" headerSpan="3" width="100%" autoResizable="true">
+                    <table:multiLabels>
+                        <Label text="당월 실적" wrapping="true"/>
+                        <Label text=""/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text text="{
+                            parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'performanceCurrentYearMonth', targetType: 'any' }
+                            ],
+                            formatter: '.onFormatPerformance'
+                        }" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                    </table:template>
+                </table:Column>
+                <table:Column hAlign="Center" width="100%" autoResizable="true">
+                    <table:multiLabels>
+                        <Label text="당월 실적" wrapping="true"/>
+                        <Label text="전년 동기"/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text
+                        text="{
+                            parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'performanceLastYearMonth', targetType: 'any'}
+                            ],
+                            formatter: '.onFormatPerformance'
+                        }" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                    </table:template>
+                </table:Column>
+                <table:Column hAlign="Center" width="100%" autoResizable="true">
+                    <table:multiLabels>
+                        <Label text="당월 실적" wrapping="true"/>
+                        <Label text="GAP"/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text text="{
+                            parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'performanceCurrentYearMonth', targetType: 'any' },
+                                {path: 'performanceLastYearMonth', targetType: 'any' }
+                            ],
+                            formatter: '.onFormatPerformance'
+                        }" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                    </table:template>
+                </table:Column>
+                <table:Column hAlign="Begin" headerSpan="3" width="100%" autoResizable="true">
+                    <table:multiLabels>
+                        <Label text="진척도" wrapping="true"/>
+                        <Label text=""/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text text="{
+                            path: 'performanceAttainmentRateCurrentYear',
+                            formatter: '.onFormatRate'
+                        }" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                    </table:template>
+                </table:Column>
+                <table:Column hAlign="Center" width="100%" autoResizable="true">
+                    <table:multiLabels>
+                        <Label text="진척도" wrapping="true"/>
+                        <Label text="전년 동기"/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text text="{
+                            path: 'performanceAttainmentRateLastYear',
+                            formatter: '.onFormatRate'
+                        }" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                    </table:template>
+                </table:Column>
+                <table:Column hAlign="Center" width="100%" autoResizable="true">
+                    <table:multiLabels>
+                        <Label text="진척도" wrapping="true"/>
+                        <Label text="GAP"/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text text="{
+                            parts: [
+                                {path: 'performanceAttainmentRateCurrentYear'},
+                                {path: 'performanceAttainmentRateLastYear'}
+                            ],
+                            formatter: '.onFormatRate'
+                        }" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+        </table:Table>
+    </VBox>
+</mvc:View>

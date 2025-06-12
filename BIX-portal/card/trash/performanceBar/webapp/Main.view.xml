@@ -1,0 +1,69 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:commons="sap.suite.ui.commons"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.performanceBar.Main"
+>
+    <commons:ChartContainer showLegendButton="true" showFullScreen="true" showPersonalization="true">
+        <commons:content>
+            <commons:ChartContainerContent icon="sap-icon://horizontal-bullet-chart">
+                <commons:content>
+                    <viz:VizFrame id="performanceBarChart" uiConfig="{applicationSet:'fiori'}"
+                        height='20rem' width="100%" vizType="bullet">
+                        <viz:dataset>
+                            <viz.data:FlattenedDataset data="{barChartModel>/}">
+                                <viz.data:dimensions>
+                                    <viz.data:DimensionDefinition name="type" value="{barChartModel>type}" />
+                                </viz.data:dimensions>
+                                <viz.data:measures>
+                                    <viz.data:MeasureDefinition name="값" value="{barChartModel>performanceCurrentYearMonth}" />
+                                    <viz.data:MeasureDefinition name="목표" value="{barChartModel>goal}" />
+                                </viz.data:measures>
+                            </viz.data:FlattenedDataset>
+                        </viz:dataset>
+                        <viz:feeds>
+                            <viz.feeds:FeedItem uid="actualValues" type="Measure"
+                                values="값" />
+                            <viz.feeds:FeedItem uid="targetValues" type="Measure"
+                                values="목표" />
+                            <viz.feeds:FeedItem uid="categoryAxis" type="Dimension"
+                                values="type" />
+                        </viz:feeds>
+                    </viz:VizFrame>
+                </commons:content>
+            </commons:ChartContainerContent>
+            <commons:ChartContainerContent icon="sap-icon://line-chart">
+                <commons:content>
+                    <viz:VizFrame id="performanceLineChart" uiConfig="{applicationSet:'fiori'}"
+                        height='20rem' width="100%" vizType="timeseries_line">
+                        <viz:dataset>
+                            <viz.data:FlattenedDataset data="{lineChartModel>/}">
+                                <viz.data:dimensions>
+                                    <viz.data:DimensionDefinition name="월" dataType="date" value="{lineChartModel>newDate}" />
+                                </viz.data:dimensions>
+                                <viz.data:measures>
+                                    <viz.data:MeasureDefinition name="매출" value="{lineChartModel>saleRate}" />
+                                    <viz.data:MeasureDefinition name="마진" value="{lineChartModel>marginRate1}" />
+                                    <viz.data:MeasureDefinition name="마진률" value="{lineChartModel>marginRate2}" />
+                                </viz.data:measures>
+                            </viz.data:FlattenedDataset>
+                        </viz:dataset>
+                        <viz:feeds>
+                            <viz.feeds:FeedItem uid="valueAxis" type="Measure"
+                                values="매출,마진,마진률" />
+                            <viz.feeds:FeedItem uid="timeAxis" type="Dimension"
+                                values="월" />
+                        </viz:feeds>
+                    </viz:VizFrame>
+                </commons:content>
+            </commons:ChartContainerContent>
+        </commons:content>
+    </commons:ChartContainer>
+</mvc:View>

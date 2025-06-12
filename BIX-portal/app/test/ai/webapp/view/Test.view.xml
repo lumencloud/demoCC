@@ -1,0 +1,290 @@
+<mvc:View controllerName="bix.test.ai.controller.Test"
+    xmlns:layout="sap.ui.layout" 
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:mdc="sap.ui.mdc"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:uxap="sap.uxap"
+    xmlns:core="sap.ui.core"
+    xmlns:table="sap.ui.table"
+    xmlns:unified="sap.ui.unified"
+    busyIndicatorDelay="0"
+    displayBlock="true"
+    width="100%"
+    height="100%"
+>
+    <uxap:ObjectPageLayout upperCaseAnchorBar="false" headerContentPinnable="false"
+        showTitleInHeaderContent="true" >
+		<uxap:headerTitle>
+            <uxap:ObjectPageDynamicHeaderTitle>
+                <uxap:expandedHeading>
+                    <Title text="AI 에이전트 테스트" />
+                </uxap:expandedHeading>
+
+                <uxap:snappedHeading>
+                    <Title text="AI 에이전트 테스트" />
+                </uxap:snappedHeading>
+
+                <uxap:actions>
+                    <Button 
+                        text="LLM 테스트" 
+                        type="Ghost" 
+                        press="onTestLLM" 
+                        icon="sap-icon://lab" />
+
+                    <Button 
+                        text="AI 분석 실행" 
+                        type="Emphasized" 
+                        press="onExecuteAgent" 
+                        icon="sap-icon://activate" />
+                </uxap:actions>
+            </uxap:ObjectPageDynamicHeaderTitle>
+        </uxap:headerTitle>
+
+		<uxap:sections>
+            <!-- 에이전트 선택 결과 패널 추가 -->
+            <uxap:ObjectPageSection title="에이전트 선택 결과" showTitle="true" visible="{= !!${/selectedAgentInfo}}">
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection>
+                        <uxap:blocks>
+                            <VBox width="100%" height="100%">
+                                <form:SimpleForm width="100%">
+                                    <Label text="선택된 에이전트" design="Bold" />
+                                    <Text text="{/selectedAgentInfo/name}" class="sapUiSmallMarginBottom" />
+                                    
+                                    <Label text="선택 이유" design="Bold" />
+                                    <Text text="{/selectedAgentInfo/reasoning}" />
+                                </form:SimpleForm>
+                            </VBox>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+
+            <!-- 첫 번째 그리드 -->
+            <uxap:ObjectPageSection title="PL" showTitle="true">
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection>
+                        <uxap:blocks>
+                            <VBox width="100%" height="100%">
+                                <Toolbar>
+                                    <Title text="PL 현황" />
+                                    <ToolbarSpacer />
+                                    <Text text="선택된 항목: {/clicked_item}" visible="{= ${/selectedGrid} === 'PL' &amp;&amp; !!${/clicked_item}}" />
+                                </Toolbar>
+                                
+                                <!-- First Grid Table -->
+                                <table:Table
+                                    id="PL"
+                                    selectionMode="Single"
+                                    selectionBehavior="Row"
+                                    rows="{/grid1Data}"
+                                    rowSelectionChange="onGrid1RowSelectionChange"
+                                    visibleRowCount="8"
+                                    alternateRowColors="true"
+                                    enableBusyIndicator="true"
+                                    class="sapUiSmallMarginTop">
+                                    
+                                    <table:columns>
+                                        <table:Column width="10rem">
+                                            <Label text="주요지표" />
+                                            <table:template>
+                                                <Text text="{category}" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="12rem" hAlign="End">
+                                            <Label text="24년 연간 목표" />
+                                            <table:template>
+                                                <Text text="{
+                                                    path: 'yearly_target',
+                                                    type: 'sap.ui.model.type.String',
+                                                    formatOptions: {
+                                                        groupingEnabled: true,
+                                                        groupingSeparator: ','
+                                                    }
+                                                }" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="12rem" hAlign="End">
+                                            <Label text="당월 실적" />
+                                            <table:template>
+                                                <Text text="{
+                                                    path: 'monthly_result',
+                                                    type: 'sap.ui.model.type.String',
+                                                    formatOptions: {
+                                                        groupingEnabled: true,
+                                                        groupingSeparator: ','
+                                                    }
+                                                }" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="10rem" hAlign="End">
+                                            <Label text="당월 실적(전년 동기)" />
+                                            <table:template>
+                                                <Text text="{previous_year}" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="12rem" hAlign="End">
+                                            <Label text="당월 실적(GAP)" />
+                                            <table:template>
+                                                <Text text="{
+                                                    path: 'gap',
+                                                    type: 'sap.ui.model.type.String',
+                                                    formatOptions: {
+                                                        groupingEnabled: true,
+                                                        groupingSeparator: ','
+                                                    }
+                                                }" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="7rem" hAlign="End">
+                                            <Label text="연간 목표 대비 진척도" />
+                                            <table:template>
+                                                <Text text="{progress_rate}" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="10rem" hAlign="End">
+                                            <Label text="연간 목표 대비(전년동기)" />
+                                            <table:template>
+                                                <Text text="{previous_year_rate}" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="7rem" hAlign="End">
+                                            <Label text="연간 목표 대비(GAP)" />
+                                            <table:template>
+                                                <Text text="{gap_rate}" />
+                                            </table:template>
+                                        </table:Column>
+                                    </table:columns>
+                                </table:Table>
+                            </VBox>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+            
+            <!-- 두 번째 그리드 -->
+            <uxap:ObjectPageSection title="O/I" showTitle="true">
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection>
+                        <uxap:blocks>
+                            <VBox width="100%" height="100%">
+                                <Toolbar>
+                                    <Title text="O/I 현황" />
+                                    <ToolbarSpacer />
+                                    <Text text="선택된 항목: {/clicked_item}" visible="{= ${/selectedGrid} === 'OI' &amp;&amp; !!${/clicked_item}}" />
+                                </Toolbar>
+                                
+                                <!-- Second Grid Table -->
+                                <table:Table
+                                    id="OI"
+                                    selectionMode="Single"
+                                    selectionBehavior="Row"
+                                    rows="{/grid2Data}"
+                                    rowSelectionChange="onGrid2RowSelectionChange"
+                                    visibleRowCount="5"
+                                    alternateRowColors="true"
+                                    enableBusyIndicator="true"
+                                    class="sapUiSmallMarginTop">
+                                    
+                                    <table:columns>
+                                        <table:Column width="10rem">
+                                            <Label text="Category" />
+                                            <table:template>
+                                                <Text text="{category}" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="12rem" hAlign="End">
+                                            <Label text="Yearly Target" />
+                                            <table:template>
+                                                <Text text="{
+                                                    path: 'yearly_target',
+                                                    type: 'sap.ui.model.type.String',
+                                                    formatOptions: {
+                                                        groupingEnabled: true,
+                                                        groupingSeparator: ','
+                                                    }
+                                                }" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="12rem" hAlign="End">
+                                            <Label text="Monthly Result" />
+                                            <table:template>
+                                                <Text text="{
+                                                    path: 'monthly_result',
+                                                    type: 'sap.ui.model.type.String',
+                                                    formatOptions: {
+                                                        groupingEnabled: true,
+                                                        groupingSeparator: ','
+                                                    }
+                                                }" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="12rem" hAlign="End">
+                                            <Label text="Previous Year" />
+                                            <table:template>
+                                                <Text text="{
+                                                    path: 'previous_year',
+                                                    type: 'sap.ui.model.type.String',
+                                                    formatOptions: {
+                                                        groupingEnabled: true,
+                                                        groupingSeparator: ','
+                                                    }
+                                                }" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="12rem" hAlign="End">
+                                            <Label text="GAP" />
+                                            <table:template>
+                                                <Text text="{
+                                                    path: 'gap',
+                                                    type: 'sap.ui.model.type.String',
+                                                    formatOptions: {
+                                                        groupingEnabled: true,
+                                                        groupingSeparator: ','
+                                                    }
+                                                }" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="7rem" hAlign="End">
+                                            <Label text="Progress Rate" />
+                                            <table:template>
+                                                <Text text="{progress_rate}" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="10rem" hAlign="End">
+                                            <Label text="Previous Year Rate" />
+                                            <table:template>
+                                                <Text text="{previous_year_rate}" />
+                                            </table:template>
+                                        </table:Column>
+                                        
+                                        <table:Column width="7rem" hAlign="End">
+                                            <Label text="GAP Rate" />
+                                            <table:template>
+                                                <Text text="{gap_rate}" />
+                                            </table:template>
+                                        </table:Column>
+                                    </table:columns>
+                                </table:Table>
+                            </VBox>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+		</uxap:sections>
+	</uxap:ObjectPageLayout>
+</mvc:View>

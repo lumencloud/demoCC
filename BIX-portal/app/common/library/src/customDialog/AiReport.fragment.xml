@@ -1,0 +1,47 @@
+<core:FragmentDefinition xmlns:rowmodes="sap.ui.table.rowmodes" 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:w="sap.ui.integration.widgets"
+	xmlns:card="sap.f.cards"
+	busyIndicatorDelay="0">
+    <Dialog class="sapUiContentPadding" draggable="true" resizable="false" showHeader="false" contentWidth="90rem" contentHeight="85vh">
+        <content>
+			<VBox width="100%" height="100%" class="sapUiNoContentPadding">
+				<!-- 상단 헤더 영역 -->
+				<OverflowToolbar width="100%" height="2rem" style="Clear" >
+					<Title text="경영 현황 요약 리포트" class="custom-header-subtitle" />
+					<ToolbarSpacer/>
+					<Button id="aiAgentButton" icon="sap-icon://manager-insight" text="AI 에이전트" type="Ghost" class="custom-button-color" />
+				</OverflowToolbar>
+				<OverflowToolbar width="100%" height="2rem" style="Standard" class="custom-dialog-toolbar">
+					<Tokenizer id="searchTokenizer" width="100%" editable="false" >
+					</Tokenizer>
+				</OverflowToolbar>
+				
+				<!-- 메인 컨텐츠 영역 -->
+				<HBox width="100%" height="500px" class="sapUiContentPadding">
+					<!-- 왼쪽: 세부 데이터 영역 -->
+					<VBox width="50%" height="100%" class="sapUiTinyMarginEnd">
+						<Title text="세부 데이터" width="100%" class="sapUiTinyMarginBottom sapMFontSizeXLarge" titleStyle="H5" />
+						<w:Card id="card" width="100%" height="500px" class="custom-no-box-shadow custom-card-size">
+						</w:Card>
+					</VBox>
+					
+					<!-- 오른쪽: AI 현황 하이라이트 영역 -->
+					<VBox width="50%" height="100%" class="sapUiTinyMarginStart">
+						<Title text="AI 현황 하이라이트" width="100%" class="sapUiTinyMarginBottom sapMFontSizeXLarge" titleStyle="H5" />
+						<Panel width="100%" height="500px" class="sapUiNoMarginTop">
+							<FormattedText id="highlighText" width="100%" height="100%" class="custom-formattedText-background sapMFontSizeXLarge" />
+						</Panel>
+					</VBox>
+				</HBox>
+				
+				<!-- 하단 버튼 영역 -->
+				<HBox width="100%" height="100px" alignItems="Center" justifyContent="End" class="sapUiContentPadding sapUiMediumMarginTop">
+					<Button id="downloadButton" type="Emphasized" text="PDF 다운로드" class="custom-button-color custom-button-size sapUiTinyMarginEnd" />
+					<Button id="cancelButton" type="Ghost" text="닫기" class="custom-button-color custom-button-size" />
+				</HBox>
+			</VBox>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,210 @@
+<mvc:View controllerName="bix.pl.performance.controller.PLTable"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:table="sap.ui.table"
+    xmlns:layout="sap.ui.layout"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:unified="sap.ui.unified"
+    xmlns:mdc="sap.ui.mdc"
+    busyIndicatorDelay="0"
+    displayBlock="true"
+    width="100%"
+    height="100%"
+>   
+    <table:Table id="plUiTable"
+        class="custom-Column-Header" 
+        selectionMode="Single" 
+        selectionBehavior="RowOnly" 
+        rowSelectionChange="onRowSelectionChange"
+        enableColumnReordering="false"
+        fixedColumnCount="1"
+        busyIndicatorDelay="0">
+    
+        <table:rowMode>
+            <rowmodes:Fixed rowCount="8" />
+        </table:rowMode>
+
+        <table:columns>
+            <table:Column hAlign="Center" width="6rem" autoResizable="true" name="type" >
+                <table:multiLabels>
+                    <Label text="항목" wrapping="true"/>
+                    <Label text=""/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{pl2>type}" wrapping="false" width="100%" textAlign="Center"
+                        emptyIndicatorMode="On" />
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Center" width="100%" autoResizable="true" >
+                <table:multiLabels>
+                    <Label text='{= ${tableYearModel>/year} + "년"}' wrapping="true"/>
+                    <Label text="연간 목표"/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'pl2>type', targetType: 'any' },
+                            {path: 'pl2>target_curr_y_value', targetType: 'any' }
+                        ],
+                        formatter: '.onFormatPerformance'
+                    }" 
+                    tooltip="{parts: [
+                            {path: 'pl2>type', targetType: 'any' },
+                            {path: 'pl2>target_curr_y_value', targetType: 'any' },
+                            {value:''},
+                            {value:'tooltip'}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                    wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Begin" headerSpan="3" width="100%" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="당월 누계 실적" wrapping="true"/>
+                    <Label text=""/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'pl2>type', targetType: 'any' },
+                            {path: 'pl2>actual_curr_ym_value', targetType: 'any' }
+                        ],
+                        formatter: '.onFormatPerformance'
+                    }" 
+                    tooltip="{parts: [
+                            {path: 'pl2>type', targetType: 'any' },
+                            {path: 'pl2>actual_curr_ym_value', targetType: 'any' },
+                            {value:''},
+                            {value:'tooltip'}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                    wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Center" width="100%" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="당월 실적" wrapping="true"/>
+                    <Label text="전년 동기"/>
+                </table:multiLabels>
+                <table:template>
+                    <Text
+                    text="{
+                        parts: [
+                            {path: 'pl2>type', targetType: 'any' },
+                            {path: 'pl2>actual_last_ym_value', targetType: 'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                    }"
+                    tooltip="{parts: [
+                            {path: 'pl2>type', targetType: 'any' },
+                            {path: 'pl2>actual_last_ym_value', targetType: 'any' },
+                            {value:''},
+                            {value:'tooltip'}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                    wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Center" width="100%" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="당월 실적" wrapping="true"/>
+                    <Label text="GAP"/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'pl2>type', targetType: 'any' },
+                            {path: 'pl2>actual_curr_ym_value', targetType: 'any' },
+                            {path: 'pl2>actual_last_ym_value', targetType: 'any' }
+                        ],
+                        formatter: '.onFormatPerformance'
+                    }" 
+                    tooltip="{parts: [
+                            {path: 'pl2>type', targetType: 'any' },
+                            {path: 'pl2>actual_curr_ym_value', targetType: 'any' },
+                            {path: 'pl2>actual_last_ym_value', targetType: 'any' },
+                            {value:'tooltip'}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                    wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Begin" headerSpan="3" width="100%" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="진척도" wrapping="true"/>
+                    <Label text=""/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'pl2>type', targetType: 'any' },
+                            {path: 'pl2>actual_curr_ym_rate', targetType: 'any' },
+                            {value:''},
+                            {value:'percent'}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                        tooltip="{
+                            parts: [
+                                {path: 'pl2>type', targetType: 'any' },
+                                {path: 'pl2>actual_curr_ym_rate', targetType: 'any' },
+                                {value:''},
+                                {value:'percent'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Center" width="100%" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="진척도" wrapping="true"/>
+                    <Label text="전년 동기"/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'pl2>type', targetType: 'any' },
+                            {path: 'pl2>actual_last_ym_rate', targetType: 'any' },
+                            {value:''},
+                            {value:'percent'}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                        tooltip="{
+                            parts: [
+                                {path: 'pl2>type', targetType: 'any' },
+                                {path: 'pl2>actual_last_ym_rate', targetType: 'any' },
+                                {value:''},
+                                {value:'percent'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                    wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Center" width="100%" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="진척도" wrapping="true"/>
+                    <Label text="GAP"/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'pl2>type', targetType: 'any' },
+                            {path: 'pl2>actual_curr_ym_rate', targetType: 'any' },
+                            {path: 'pl2>actual_last_ym_rate', targetType: 'any' },
+                            {value:'percent'}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                        tooltip="{
+                            parts: [
+                                {path: 'pl2>type', targetType: 'any' },
+                                {path: 'pl2>actual_curr_ym_rate', targetType: 'any' },
+                                {path: 'pl2>actual_last_ym_rate', targetType: 'any' },
+                                {value:'percent'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+        </table:columns>
+    </table:Table>
+</mvc:View>

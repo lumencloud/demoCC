@@ -1,0 +1,116 @@
+<mvc:View 
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    xmlns:ui="sap.ui.table"
+    xmlns:mvc="sap.ui.core.mvc"
+    controllerName="bix.pl.performance2.controller.PL"
+    xmlns:w="sap.ui.integration.widgets"
+	xmlns:card="sap.f.cards"
+    displayBlock="true"
+    width="100%"
+    height="100%">
+    <Page backgroundDesign="List" showHeader="true" enableScrolling="true" class="sapUiNoContentPadding custom-page-content-top custom-page-backcolor" > <!-- custom-page-padding-left custom-page-padding-bottom -->
+        <customHeader>
+            <Toolbar height="4rem" style="Clear" design="Info" class="custom-pl-section-header custom-background-transparent">
+                <!-- <Button icon="sap-icon://nav-back" press="onCollapse"/> -->
+                <!-- <ToolbarSpacer/> -->
+                <HBox width="50%" alignContent="Center" alignItems="Center" justifyContent="Center" class="custom-dashboard-datepicker">
+                    <Label text="마감년월" class="sapUiTinyMarginEnd" />
+                    <DatePicker id="datePicker" fieldGroupIds="Search,Required" class="sapUiSmallarginEnd"
+                        value="{
+                            path: 'searchModel>/yearMonth',
+                            type: 'sap.ui.model.type.Date',
+                            formatOptions: {
+                                format: 'yyyyMM',
+                                pattern: 'yyyy-MM'
+                            }
+                        }" change="onChangeSearch"/>
+                </HBox>
+
+                <HBox width="50%" alignContent="Center" alignItems="Center" justifyContent="Center" class="custom-dashboard-datepicker">
+                    <Label text="조직" class="sapUiTinyMarginEnd" />
+                    <Input value="{searchModel>/orgNm}" name="{searchModel>/orgId}"
+                        showClearIcon="true" 
+                        showValueHelp="true" valueHelpRequest=".onOrgSingleSelectDialogOpen" 
+                        showSuggestion="true" change="onOrgSingleChange" valueStateText="입력한 조직이 존재하지 않습니다."
+                        suggestionItems="{ path: 'cm>/latest_org', length: 2000 }" 
+                        class="custom-pl2-org-Btn">
+                        <suggestionItems>
+                            <core:Item key="{cm>id}" text="{cm>name}" />
+                        </suggestionItems>
+                    </Input>
+                </HBox>
+            </Toolbar>
+        </customHeader>
+        <subHeader>
+            <Toolbar height="3.5rem" style="Clear" design="Solid" class="custom-border-radius-top">
+                <SegmentedButton id="plTypeButton" selectedKey="{hashModel>/page}" selectionChange="onSelectionChange" class="custom-segment-btn" >
+                    <items>
+                        <SegmentedButtonItem key="actual" icon="sap-icon://vertical-bar-chart" text="실적PL" tooltip="실적"/>
+                        <SegmentedButtonItem key="plan" icon="sap-icon://vertical-bullet-chart" text="추정PL" tooltip="계획" />
+                    </items>
+                    <layoutData><OverflowToolbarLayoutData priority="NeverOverflow" /></layoutData>
+                </SegmentedButton>
+
+                <ToolbarSpacer />
+
+                <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" />
+
+                <ToolbarSeparator />
+
+                <!-- Grid <-> Table 전환 버튼 -->
+                <Button id="gridBtn" icon="sap-icon://bar-chart" press="onSwitchPL($event,'grid')" 
+                    type="{= ${hashModel>/pageView} === 'grid' ? 'Neutral' : 'Default' }" tooltip="그리드" />
+                <Button id="tableBtn" icon="sap-icon://screen-split-two" press="onSwitchPL($event,'table')" 
+                    type="{= ${hashModel>/pageView} === 'table' ? 'Neutral' : 'Default' }" tooltip="테이블"  />
+            </Toolbar>
+        </subHeader>
+        <content>
+            <FlexBox id="detailBox" width="100%" height="98%" direction="Column" fitContainer="true" 
+                class="custom-border-radius-bottom custom-default-padding " backgroundDesign="Solid" />
+                <!-- 실적 PL -->
+                <!-- <Panel expandable="false" expanded="true" width="100%" class="custom-panel-border custom-panel-no-content-padding"
+                    visible="{= ${hashModel>/page} === 'actual' &amp;&amp; ${hashModel>/pageView} === 'table'}" >
+                    <content>
+                        <w:Card manifest="../bix/card/plUiTable/manifest.json" width="100%" height="100%" overflow="ShowMore"/>
+                    </content>
+                </Panel>
+
+                <Panel expandable="false" expanded="true" width="100%" class="sapUiSmallMarginTop custom-panel-border custom-panel-no-content-padding"
+                    visible="{= ${hashModel>/page} === 'actual' &amp;&amp; ${hashModel>/pageView} === 'table'}" >
+                    <content>
+                        <w:Card manifest="../bix/card/oiUiTable/manifest.json" width="100%" height="100%"/>
+                    </content>
+                </Panel> -->
+
+                <!-- 추정 PL -->
+                <!-- <Panel expandable="false" expanded="true" width="100%" class="custom-panel-border custom-panel-no-content-padding"
+                    visible="{= ${hashModel>/page} === 'plan' &amp;&amp; ${hashModel>/pageView} === 'table'}" >
+                    <content>
+                        <w:Card manifest="../bix/card/forecastPlUiTable/manifest.json" width="100%" height="100%"/>
+                    </content>
+                </Panel>
+
+                <Panel expandable="false" expanded="true" width="100%" class="sapUiSmallMarginTop custom-panel-border custom-panel-no-content-padding"
+                    visible="{= ${hashModel>/page} === 'plan' &amp;&amp; ${hashModel>/pageView} === 'table'}" >
+                    <content>
+                        <w:Card manifest="../bix/card/forecastOiUiTable/manifest.json" width="100%" height="100%"
+                        overflow="ShowMore"/>
+                    </content>
+                </Panel> -->
+
+                <!-- PL Grid -->
+                <!-- <Panel id="panel" expandable="false" expanded="true" width="100%" 
+                    class="custom-panel-border custom-panel-no-content-padding sapUiSmallMarginTop">
+                    <content>
+                        <w:Card manifest="../bix/card/{card_info}/manifest.json" width="100%" height="100%" />
+                    </content>
+                </Panel> -->
+
+                <!-- <layoutData>
+                    <FlexItemData styleClass="sapUiContentPadding" growFactor="1" />
+                </layoutData> -->
+        </content>
+    </Page>
+</mvc:View>

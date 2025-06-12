@@ -1,0 +1,50 @@
+<mvc:View xmlns:m="sap.m"
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    xmlns:ui="sap.ui.table"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    controllerName="bix.pl.performance.controller.SGA"
+    width="100%"
+    height="100%">
+    <Page showHeader="false" backgroundDesign="Standard" >
+        <Panel expandable="true" expanded="true" width="auto"
+            visible="{= ${layoutControl>/page} === 'sga'}" class="sapUiTinyMargin">
+            <headerToolbar>
+                <OverflowToolbar >
+                    <ObjectIdentifier title="SG&#38;A 상세 실적"/>
+                    <ToolbarSpacer/>
+                    <Button text="엑셀" icon="sap-icon://download" press="onExcelDownload('sga')" />
+                </OverflowToolbar>
+            </headerToolbar>
+            <content>
+                <mvc:XMLView viewName="bix.pl.performance.view.SGADetail"/>
+            </content>
+        </Panel>
+        <!-- <Panel expandable="true" expanded="true" width="auto"
+            visible="{= ${layoutControl>/3depth_page_sub} === 'chart'}" class="sapUiTinyMargin" >
+            <headerToolbar>
+                <OverflowToolbar >
+                    <ObjectIdentifier title="SG&#38;A 실적 분포"/>
+                </OverflowToolbar>
+            </headerToolbar>
+            <content>
+                <mvc:XMLView viewName="bix.pl.performance.view.SGADetailChart"/>
+            </content>
+        </Panel> -->
+        <Panel expandable="true" expanded="true" width="auto"
+            visible="{= ${layoutControl>/3depth_page_sub} !== ''}" class="sapUiTinyMargin" >
+            <headerToolbar>
+                <OverflowToolbar >
+                    <ObjectIdentifier title="{layoutControl>/3depth_page_sub_title}"/>
+                    <ToolbarSpacer/>
+                    <Button text="엑셀" icon="sap-icon://download" press="onExcelDownload('sgaDetail')" />
+                </OverflowToolbar>
+            </headerToolbar>
+            <content>
+                <mvc:XMLView viewName="bix.pl.performance.view.SGADetailDetail"/>
+            </content>
+        </Panel>
+    </Page>
+</mvc:View>

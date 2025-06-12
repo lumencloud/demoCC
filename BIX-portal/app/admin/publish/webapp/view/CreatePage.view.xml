@@ -1,0 +1,61 @@
+<mvc:View controllerName="bix.admin.publish.controller.CreatePage"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout" height="100%">
+    <Page class="sapUiContentPadding" id="workpagesBuilder" showHeader="false" showFooter="true">
+        <content>
+            <form:SimpleForm editable="true" >
+                <form:toolbar >
+                    <OverflowToolbar class="custom-toolbar sapUiSmallMarginBegin sapUiSmallMarginEnd">
+                        <core:Icon src="sap-icon://undo" press=".onCancel" width="36px" height="36px" class="back-icon"/>
+                        <Title text="{= ${ui>/edit}? ${i18n>edit_publish} : ${i18n>register_publish}}" class="sapUiSmallMarginBegin custom-mg-title" visible="true" />
+                    </OverflowToolbar>
+                </form:toolbar>
+                <form:content>
+                    <HBox class="custom-search-field-box sapUiSmallMarginBegin" alignItems="Center" >
+                        <Label text="{i18n>publish_name}" labelFor="widgetTitle" tooltip="{i18n>publish_name}" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL1 L2 M2 S12" />
+                            </layoutData>
+                        </Label>
+                        <Input id="widgetTitle" value="{publishModel>/name}" maxLength="50" type="Text" fieldGroupIds="Required" change="onFieldCheck"/>
+                        <layoutData>
+                            <layout:GridData span="XL3 L3 M3 S12" />
+                        </layoutData>
+                    </HBox>
+                    <HBox class="custom-search-field-box" alignItems="Center">
+                        <Label text="{i18n>publish_type}" labelFor="publishType" tooltip="{i18n>publish_type}" wrapping="false"/>
+                        <Select id="publishType" selectedKey="{publishModel>/publishType}" width="100%" fieldGroupIds="Required" change="onTypeChange" enabled="false" class="custom-mg-select">
+                            <items>
+                                <core:Item key="main" text="{i18n>main}" />
+                                <core:Item key="team" text="{i18n>team}" />
+                            </items>
+                        </Select>
+                        <layoutData>
+                            <layout:GridData span="XL3 L3 M3 S12" />
+                        </layoutData>
+                    </HBox>
+                </form:content>
+            </form:SimpleForm>
+            <core:ComponentContainer width="100%" height="100%" usage="workpageBuilderComponent" manifest="false" componentCreated=".workPageBuilderComponentCreated" async="true" />
+        </content>
+        <footer>
+            <OverflowToolbar style="Clear" class="custom-mg-footer">
+                <ToolbarSpacer />
+                <Button type="Accept" class="custom-mg-btn" icon="sap-icon://save" text="{i18n>save}" tooltip="{i18n>save}" visible="{= ${oAuthData>/create} || ${oAuthData>/update} }" press=".onSave">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+                <Button class="custom-mg-btn" icon="sap-icon://cancel" text="{i18n>cancel}" tooltip="{i18n>cancel}" press=".onCancel">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+            </OverflowToolbar>
+        </footer>
+    </Page>
+</mvc:View>

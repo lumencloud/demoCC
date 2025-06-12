@@ -1,0 +1,246 @@
+<mvc:View xmlns:launchpad="sap.ushell.ui.launchpad" controllerName="bix.pl.performance.controller.SGADetail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:table="sap.ui.table"
+    xmlns:layout="sap.ui.layout"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:plugins="sap.m.plugins"
+    busyIndicatorDelay="0"
+    displayBlock="true"
+    width="100%"
+    height="100%"
+>
+    <table:Table id="sagDetailTreeTable"
+        rows="{sgaDetailTreeTableModel2>/}" 
+        firstVisibleRowChanged="onFirstVisibleRowChanged"
+        fixedColumnCount="3"
+        selectionMode="None"
+        cellClick="onCellClick">
+        
+        <table:rowMode>
+            <rowmodes:Fixed rowCount="12" />
+        </table:rowMode>
+
+        <table:columns>
+            <table:Column hAlign="Center" width="8rem" autoResizable="true" headerSpan="2,2">
+                <table:multiLabels>
+                    <Label text="조직" wrapping="true"/>
+                    <Label text=""/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{sgaDetailTreeTableModel2>level1}" wrapping="false" width="100%" textAlign="Center"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Center" width="8rem" autoResizable="true" headerSpan="2,2">
+                <table:multiLabels>
+                    <Label text="조직" wrapping="true"/>
+                    <Label text=""/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{sgaDetailTreeTableModel2>level2}" wrapping="false" width="100%" textAlign="Center"/>
+                </table:template>
+            </table:Column>
+            <!-- <table:Column hAlign="Center" width="10rem" autoResizable="true" headerSpan="3">
+                <table:multiLabels>
+                    <Label text="조직" wrapping="true"/>
+                    <Label text=""/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{sgaDetailTreeTableModel2>level3}" wrapping="false" width="100%" textAlign="Center"/>
+                </table:template>
+            </table:Column>                  -->
+                
+            <table:Column hAlign="Center" width="5rem" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="비용" wrapping="true"/>
+                    <Label text=""/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        path: 'sgaDetailTreeTableModel2>type',
+                        formatter: '.onFormatTypeText'
+                        }" wrapping="false" width="100%" textAlign="Center"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Center" width="8rem" autoResizable="true" >
+                <table:multiLabels>
+                    <Label text='{= ${tableYearModel>/year} + "년"}' wrapping="true"/>
+                    <Label text="연간 목표"/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>goal', targetType: 'any' },
+                            {value:''},
+                            {value:'int'}
+                        ],
+                        formatter: '.onFormat'
+                        }"
+                        tooltip="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>goal', targetType: 'any' },
+                            {value:''},
+                            {value:'tooltip'}
+                        ],
+                        formatter: '.onFormat'
+                        }"
+                        width="100%" textAlign="End"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Begin" headerSpan="3" width="7rem" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="당월 실적" wrapping="true"/>
+                    <Label text=""/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>performanceCurrentYearMonth', targetType: 'any' },
+                            {value:''},
+                            {value:'int'}
+                        ],
+                        formatter: '.onFormat'
+                        }"
+                        tooltip="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>performanceCurrentYearMonth', targetType: 'any' },
+                            {value:''},
+                            {value:'tooltip'}
+                        ],
+                        formatter: '.onFormat'
+                        }"
+                        wrapping="false" width="100%" textAlign="End"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Center" width="7rem" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="당월 실적" wrapping="true"/>
+                    <Label text="전년 동기"/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>performanceLastYearMonth', targetType: 'any' },
+                            {value:''},
+                            {value:'int'}
+                        ],
+                        formatter: '.onFormat'
+                        }"
+                        tooltip="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>performanceLastYearMonth', targetType: 'any' },
+                            {value:''},
+                            {value:'tooltip'}
+                        ],
+                        formatter: '.onFormat'
+                        }"
+                        wrapping="false" width="100%" textAlign="End"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Center" width="7rem" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="당월 실적" wrapping="true"/>
+                    <Label text="차이"/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>performanceCurrentYearMonth', targetType: 'any' },
+                            {path: 'sgaDetailTreeTableModel2>performanceLastYearMonth', targetType: 'any'},
+                            {value:'int'}
+                        ],
+                        formatter: '.onFormat'
+                        }"
+                        tooltip="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>performanceCurrentYearMonth', targetType: 'any' },
+                            {path: 'sgaDetailTreeTableModel2>performanceLastYearMonth', targetType: 'any'},
+                            {value:'tooltip'}
+                        ],
+                        formatter: '.onFormat'
+                        }"
+                        wrapping="false" width="100%" textAlign="End"/> 
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Begin" headerSpan="3" width="5rem" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="진척도" wrapping="true"/>
+                    <Label text=""/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>performanceAttainmentRateCurrentYear', targetType: 'any' },
+                            {value:''},
+                            {value:'percent'}
+                        ],
+                        formatter: '.onFormat'
+                        }"
+                        tooltip="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>performanceAttainmentRateCurrentYear', targetType: 'any' },
+                            {value:''},
+                            {value:'percent'}
+                        ],
+                        formatter: '.onFormat'
+                        }" 
+                        wrapping="false" width="100%" textAlign="End"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Center" width="5rem" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="진척도" wrapping="true"/>
+                    <Label text="전년 동기"/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>performanceAttainmentRateLastYear', targetType: 'any' },
+                            {value:''},
+                            {value:'percent'}
+                        ],
+                        formatter: '.onFormat'
+                        }"
+                        tooltip="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>performanceAttainmentRateLastYear', targetType: 'any' },
+                            {value:''},
+                            {value:'percent'}
+                        ],
+                        formatter: '.onFormat'
+                        }" 
+                        wrapping="false" width="100%" textAlign="End"/>
+                </table:template>
+            </table:Column>
+            <table:Column hAlign="Center" width="5rem" autoResizable="true">
+                <table:multiLabels>
+                    <Label text="진척도" wrapping="true"/>
+                    <Label text="차이"/>
+                </table:multiLabels>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>performanceAttainmentRateCurrentYear', targetType: 'any' },
+                            {path: 'sgaDetailTreeTableModel2>performanceAttainmentRateLastYear', targetType: 'any'},
+                            {value:'percent'}
+                        ],
+                        formatter: '.onFormat'
+                        }"
+                        tooltip="{
+                        parts: [
+                            {path: 'sgaDetailTreeTableModel2>performanceAttainmentRateCurrentYear', targetType: 'any' },
+                            {path: 'sgaDetailTreeTableModel2>performanceAttainmentRateLastYear', targetType: 'any'},
+                            {value:'percent'}
+                        ],
+                        formatter: '.onFormat'
+                        }"
+                        wrapping="false" width="100%" textAlign="End"/>
+                </table:template>
+            </table:Column>
+        </table:columns>
+    </table:Table>
+</mvc:View>

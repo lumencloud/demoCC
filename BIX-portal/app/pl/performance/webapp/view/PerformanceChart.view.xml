@@ -1,0 +1,31 @@
+<mvc:View controllerName="bix.pl.performance.controller.PerformanceChart"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:si="sap.suite.ui.commons.statusindicator"
+    busyIndicatorDelay="0"
+    displayBlock="true"
+    width="100%"
+    height="100%"
+>
+    <Panel expandable="true" expanded="true" class="sapUiResponsiveMargin" height="100%">
+        <headerToolbar>
+            <OverflowToolbar >
+                <ObjectIdentifier title="차트"/>
+            </OverflowToolbar>
+        </headerToolbar>
+        <content>
+            <VBox width="100%" id="pLPageChartBox1" alignItems="Center" justifyContent="Center" />
+        </content>
+    </Panel>
+
+    <!-- <VBox width="100%" height="100%" >
+        <HBox width="100%" height="100%" >
+
+            <si:StatusIndicator id="indicator1" width="100%" height="100%">
+                <si:ShapeGroup >
+                    <si:CustomShape id="customShape0" fillingType="Linear" />
+                </si:ShapeGroup>
+            </si:StatusIndicator>
+        </HBox>
+    </VBox> -->
+</mvc:View>

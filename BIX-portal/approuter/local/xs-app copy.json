@@ -1,0 +1,56 @@
+{
+    "welcomeFile": "/main/index.html",
+    "routes": [
+        {
+            "source": "^/favicon.ico$",
+            "localDir": "../resources/",
+            "csrfProtection": false,
+            "authenticationType": "none"
+        },
+        {
+            "source": "^/theme/(.*)$",
+            "target": "/$1",
+            "service": "com.sap.ui.theming",
+            "authenticationType": "xsuaa",
+            "csrfProtection": true
+        },
+        {
+            "source": "^/?odata/(.*)$",
+            "target": "/$1",
+            "destination": "srv-api",
+            "csrfProtection": true
+        },
+        {
+            "source": "^/bix/portal/i18n/(.*)$",
+            "target": "$1",
+            "localDir": "../resources/i18n",
+            "cacheControl": "no-cache, no-store, must-revalidate",
+            "authenticationType": "none",
+            "csrfProtection": true
+        },
+        {
+            "source": "^/main/(.*)$",
+            "target": "app/main/webapp/$1",
+            "localDir": "../../",
+            "cacheControl": "no-cache, no-store, must-revalidate"
+        },
+        {
+            "source": "^(.*)/lib/(.*)$",
+            "target": "app/lib/$2",
+            "localDir": "../../",
+            "cacheControl": "no-cache, no-store, must-revalidate"
+        },        
+        {
+            "source": "^/bix/([^/]+)/([^/]+)/(.*)$",
+            "target": "app/$1/$2/webapp/$3",
+            "localDir": "../../",
+            "cacheControl": "no-cache, no-store, must-revalidate"
+        },
+        {
+            "source": "^/([^/]+)/([^/]+)/(.*)$",
+            "target": "app/$1/$2/webapp/$3",
+            "localDir": "../../",
+            "cacheControl": "no-cache, no-store, must-revalidate"
+        }
+    ]
+}

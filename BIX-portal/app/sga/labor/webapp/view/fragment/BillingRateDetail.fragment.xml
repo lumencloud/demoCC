@@ -1,0 +1,155 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:mdc="sap.ui.mdc"
+    xmlns:mdct="sap.ui.mdc.table"
+>
+    <Dialog
+        id="billingRateDetailDialog"
+        class="sapUiContentPadding"
+    >
+        <customHeader>
+            <OverflowToolbar id="_IDGenOverflowToolbar1">
+                <content>
+                    <Title id="title" />
+                    <ToolbarSpacer/>
+                    <Button
+                        icon="sap-icon://decline"
+                        press=".onBillingRateDetailDialogButton"
+                    />
+                </content>
+            </OverflowToolbar>
+        </customHeader>
+        <content>
+            <Table
+                id="billingRateDetailtable"
+                mode="None"
+                items="{detailModel>/}"
+            >
+                <columns>
+                    <Column
+                        hAlign="Center"
+                        width="15rem"
+                    >
+                        <Text
+                            text="사업 기회"
+                        />
+                    </Column>
+                    <Column
+                        hAlign="Center"
+                        width="5rem"
+                    >
+                        <Text
+                            text="사업유형"
+                        />
+                    </Column>
+                    <Column
+                        hAlign="Center"
+                        width="5rem"
+                    >
+                        <Text
+                            text="수주 금액"
+                        />
+                    </Column>
+                    <Column
+                        hAlign="Center"
+                        width="5rem"
+                    >
+                        <Text
+                            text="매출액"
+                        />
+                    </Column>
+                    <Column
+                        hAlign="Center"
+                        width="5rem"
+                    >
+                        <Text
+                            text="투입 추정 인건비"
+                        />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem
+                        vAlign="Middle"
+                    >
+                        <cells>
+                            <Text
+                                text="{detailModel>biz_opp_nm}"
+                            />
+                            <Text
+                                text="{detailModel>prj_tp_nm}"
+                            />
+                            <Text
+                                text="{
+                                    parts:[
+                                        {path:'detailModel>received_order_amt', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'billion'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'detailModel>received_order_amt', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'tooltip'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                                emptyIndicatorMode="Auto"
+                            />
+                            <Text
+                                text="{
+                                    parts:[
+                                        {path:'detailModel>sales_amt', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'billion'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'detailModel>sales_amt', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'tooltip'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                                emptyIndicatorMode="Auto"
+								
+                            />
+                            <Text
+                                text="{
+                                    parts:[
+                                        {path:'detailModel>labor_cost', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'billion'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'detailModel>labor_cost', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'tooltip'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                                emptyIndicatorMode="Auto"
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>

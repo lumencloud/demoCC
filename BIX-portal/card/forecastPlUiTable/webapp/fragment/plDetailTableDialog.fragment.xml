@@ -1,0 +1,129 @@
+<core:FragmentDefinition
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:table="sap.ui.table"
+    xmlns:layout="sap.ui.layout"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:unified="sap.ui.unified"
+    busyIndicatorDelay="0"
+    displayBlock="true"
+    width="100%"
+    height="100%">
+    <Dialog id="plDetailTableDialog" class="sapUiContentPadding" showHeader="false" contentHeight="80%"  contentWidth="80%" verticalScrolling="false" >
+        <content>
+            <FlexBox width="100%" height="100%" direction="Column" fitContainer="true" >
+                <OverflowToolbar height="3rem" style="Standard" class="custom-dialog-toolbar">
+                    <Title text="PL 전체보기" class="custom-header-subtitle"></Title>
+                    <ToolbarSpacer/>
+                    <Button icon="sap-icon://decline" press="onCloseDialog" tooltip="close" class="custom-button-color"/>
+                </OverflowToolbar>
+
+                
+                <table:Table id="plDetailTable"
+                    class="custom-table-container custom-table-header custom-table-body custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-table-rounding-border sapUiTinyMarginTopBottom" 
+                    selectionMode="Single" 
+                    selectionBehavior="RowOnly"
+                    fixedColumnCount="2" 
+                    rows="{
+                    path:'plDetailTableModel>/'
+                }" >
+                    <table:extension>
+                        <OverflowToolbar width="100%" height="3rem" style="Standard">
+                            <ToolbarSpacer />
+                            <Text text="단위 (억)"/>
+                        </OverflowToolbar>
+                    </table:extension>
+                    <table:rowMode>
+						<rowmodes:Fixed rowCount="17"/>
+					</table:rowMode>
+
+                    <table:columns>
+                    <table:Column hAlign="Center" width="10rem" autoResizable="true">
+                            <table:multiLabels>
+                                <Label text="부문" wrapping="true"/>
+                                <Label text=""/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text text="{plDetailTableModel>org_kor_nm}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" width="6rem" autoResizable="true">
+                            <table:multiLabels>
+                                <Label text="구분" wrapping="true"/>
+                                <Label text=""/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text text="{plDetailTableModel>type}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" width="100%" autoResizable="true" >
+                            <table:multiLabels>
+                                <Label text='{= "&#39;" + ${tableYearModel>/year} + "년"}' wrapping="true"/>
+                                <Label text="연간 목표"/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text text="{plDetailTableModel>goal}" wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Begin" headerSpan="3" width="100%" autoResizable="true">
+                            <table:multiLabels>
+                                <Label text="당월 실적" wrapping="true"/>
+                                <Label text=""/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text text="{plDetailTableModel>performanceCurrentYearMonth}" wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" width="100%" autoResizable="true">
+                            <table:multiLabels>
+                                <Label text="당월 실적" wrapping="true"/>
+                                <Label text="전년 동기"/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text text="{plDetailTableModel>performanceLastYearMonth}" wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" width="100%" autoResizable="true">
+                            <table:multiLabels>
+                                <Label text="당월 실적" wrapping="true"/>
+                                <Label text="GAP"/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text text="{plDetailTableModel>performanceYearMonthGap}" wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Begin" headerSpan="3" width="100%" autoResizable="true">
+                            <table:multiLabels>
+                                <Label text="진척도" wrapping="true"/>
+                                <Label text=""/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text text="{plDetailTableModel>performanceAttainmentRateCurrentYear}" wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" width="100%" autoResizable="true">
+                            <table:multiLabels>
+                                <Label text="진척도" wrapping="true"/>
+                                <Label text="전년 동기"/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text text="{plDetailTableModel>performanceAttainmentRateLastYear}" wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" width="100%" autoResizable="true">
+                            <table:multiLabels>
+                                <Label text="진척도" wrapping="true"/>
+                                <Label text="GAP"/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text text="{plDetailTableModel>performanceAttainmentRategap}" wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+                </table:Table>  
+            </FlexBox>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>

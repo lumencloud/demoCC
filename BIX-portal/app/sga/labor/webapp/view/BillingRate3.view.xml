@@ -1,0 +1,74 @@
+<mvc:View controllerName="bix.sga.labor.controller.BillingRate3"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    busyIndicatorDelay="0"
+    displayBlock="true"
+    width="100%"
+    height="100%"
+>   
+    <VBox id="_IDGenVBox7" width="100%" height="100%" >
+        <!-- <form:SimpleForm width="100%" editable="true">
+            <VBox width="100%">
+                <Label text="년월" required="true"/>
+                <DatePicker 
+                    id="searchMonthYear" fieldGroupIds="Search,Required,Pl"
+                    displayFormat="yyyy-MM" valueFormat="yyyy-MM" change="onChangeSearch($event,'month')"/>
+                <layoutData><layout:GridData span="XL2 L3 M4 S6" /></layoutData>
+            </VBox>
+
+            <VBox width="100%">
+                <Label text="매출조직명" required="true"/>
+                <MultiInput id="AddDepInput"
+                    width="100%" showValueHelp="true" valueHelpRequest=".onOrgSingleSelectDialogOpen($event,'Department')" 
+                    liveChange="onAddDepInputLiveChange" showSuggestion="false" maxTokens="1" 
+                    selectedKey="{SearchModel>/addDepInput}" tokenUpdate="onAddDepTokenUpdate"
+                    fieldGroupIds="Search,Required,Pl" showValueStateMessage="false"/>
+                <layoutData><layout:GridData span="XL2 L3 M4 S6" /></layoutData>
+            </VBox>
+
+            <HBox width="100%" height="54px" alignItems="End" justifyContent="End" >
+                <Button type="Emphasized" text="검색" press=".onSearch($event,'Search')"/>
+                <Button text="초기화" press="onSearch($event,'Refresh')" class="sapUiTinyMarginBegin" />
+                <layoutData><layout:GridData span="XL8 L6 M4 S12" /></layoutData>
+            </HBox>
+        </form:SimpleForm> -->
+
+        <form:SimpleForm id="_IDGenSimpleForm" width="100%">
+            <VBox id="_IDGenVBox8">
+                <viz:VizFrame id="chart1" uiConfig="{applicationSet:'fiori'}"
+                    height="30rem" width="100%" vizType="timeseries_line"
+                    legendVisible="true" fieldGroupIds="Chart">
+                    <viz:dataset>
+                        <viz.data:FlattenedDataset id="_IDGenFlattenedDataset" data="{testModel>/}">
+                            <viz.data:dimensions>
+                                <viz.data:DimensionDefinition id="_IDGenDimensionDefinition" name="월" dataType="date" value="{testModel>month}" />
+                            </viz.data:dimensions>
+                            <viz.data:measures>
+                                <viz.data:MeasureDefinition id="_IDGenMeasureDefinition" identity="test1" name="ES1본부 확보 BR" value="{testModel>test1}" />
+                                <viz.data:MeasureDefinition id="_IDGenMeasureDefinition1" identity="test2" name="ES2본부 확보 BR" value="{testModel>test2}" />
+                            </viz.data:measures>
+                        </viz.data:FlattenedDataset>
+                    </viz:dataset>
+                    <viz:feeds>
+                        <viz.feeds:FeedItem id="_IDGenFeedItem" uid="valueAxis" type="Measure"
+                            values="test1,test2" />
+                        <viz.feeds:FeedItem id="_IDGenFeedItem1" uid="timeAxis" type="Dimension"
+                            values="월" />
+                    </viz:feeds>
+                    <viz:dependents>
+                        <viz:Popover id="idPopOver1"></viz:Popover>
+                    </viz:dependents>
+                </viz:VizFrame>
+
+                <layoutData>
+                    <layout:GridData id="_IDGenGridData6" span="XL4 L6 M6 S12" />
+                </layoutData>
+            </VBox>
+        </form:SimpleForm>
+    </VBox>
+</mvc:View>

@@ -1,0 +1,54 @@
+COLUMN TABLE MCM_EMPLOYEE (
+  "EMP_NO" NVARCHAR(10) NOT NULL,
+  "NAME" NVARCHAR(50) NOT NULL,
+  "EMAIL" NVARCHAR(100) NOT NULL,
+  "OFFICE_PHONE" NVARCHAR(30),
+  "CELL_PHONE" NVARCHAR(30),
+  "SSN" NVARCHAR(25),
+  "JIKUI_ID" NVARCHAR(10),
+  "SDATE" DATE,
+  "EDATE" DATE,
+  "SINBUN_CODE" NVARCHAR(10),
+  "SINBUN_NAME" NVARCHAR(30),
+  --[삭제요청] "BIRTHDAY" NVARCHAR(10),
+  "BIRTHDAY_TYPE_CODE" NVARCHAR(1),
+  "FORMAL_STATUS_CODE" NVARCHAR(1),
+  "EMP_STATUS_CODE" NVARCHAR(1),
+  "ORDER_DATE" DATE,
+  "ORDER_STATUS_CODE" NVARCHAR(1),
+  "SYSTEM_DATE" DATE,
+  "ADDRESS" NVARCHAR(120),
+  "DONG_NAME" NVARCHAR(200),
+  "DORO_NAME" NVARCHAR(500),
+  "IF_YN" BOOLEAN DEFAULT FALSE NOT NULL,
+  "CREATE_TIME" SECONDDATE,
+  "CREATE_USER_ID" NVARCHAR(255),
+  "CHANGE_TIME" SECONDDATE,
+  "CHANGE_USER_ID" NVARCHAR(255),
+  PRIMARY KEY ("EMP_NO")
+) ;
+-- WITH ASSOCIATIONS(
+--   JOIN "EXPENSE"."MCM_CODE" AS "BIRTHDAY_TYPE"
+--  ON birthday_type.code = birthday_type_code
+--   AND birthday_type.master_code = 'BIRTHDAY_TYPE',
+--   JOIN "EXPENSE"."MCM_CODE" AS "EMP_STATUS"
+--  ON emp_status.code = emp_status_code
+--   AND emp_status.master_code = 'EMP_STATUS',
+--   JOIN "EXPENSE"."MCM_CODE" AS "FORMAL_STATUS"
+--  ON formal_status.code = formal_status_code
+--   AND formal_status.master_code = 'FORMAL_STATUS',
+--   JOIN "EXPENSE"."MCM_CODE" AS "JIKUI"
+--  ON jikui.code = jikui_id
+--   AND jikui.master_code = 'JICKUI',
+--   JOIN "EXPENSE"."MCM_CODE" AS "ORDER_STATUS"
+--  ON order_status.code = order_status_code
+--   AND order_status.master_code = 'ORDER_STATUS',
+--   JOIN "EXPENSE"."MCM_ORGANIZATION_MAP" AS "ORG"
+--  ON org.emp_no = emp_no
+--   AND org.primary_yn = TRUE,
+--   JOIN "EXPENSE"."MCM_ORGANIZATION_MAP" AS "ORG_MAP"
+--  ON org_map.emp_no = emp_no,
+--   JOIN "EXPENSE"."MCM_CODE" AS "SINBUN"
+--  ON sinbun.code = sinbun_code
+--   AND sinbun.master_code = 'SINBUN'
+-- ) UNLOAD PRIORITY 5 AUTO MERGE;

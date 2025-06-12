@@ -1,0 +1,160 @@
+<mvc:View
+    controllerName="bix.common.dashboard.controller.Dashboard"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:tnt="sap.tnt"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    id="workPageBuilder"
+    displayBlock="true"
+    width="100%"
+    height="100%"
+>
+    <f:DynamicPage
+        id="workpagesBuilder"
+        class="sapUiNoContentPadding"
+        showFooter="false"
+    >
+        <f:content>
+            <tnt:ToolPage id="toolPage">
+                <!-- <tnt:header>
+                    <tnt:ToolHeader
+                        class="homeUpper"
+                        visible="false"
+                    >
+                        <IconTabHeader
+                            id="iconTabHeader"
+                            select=".onSelectTab"
+                            backgroundDesign="Transparent"
+                            items="{path: 'upmenu>/',sorter:[{path:'uiSeq'}], templateShareable: false}"
+                            mode="Inline"
+                        >
+                            <layoutData>
+                                <OverflowToolbarLayoutData
+                                    priority="NeverOverflow"
+                                    shrinkable="true"
+                                />
+                            </layoutData>
+                            <items>
+                                <IconTabFilter
+                                    items="{path: 'upmenu>children', templateShareable: false}"
+                                    text="{upmenu>name}"
+                                    key="{upmenu>seq}"
+                                    visible="{upmenu>checkValue}"
+                                >
+                                    <items>
+                                        <IconTabFilter
+                                            text="{upmenu>name}"
+                                            key="{upmenu>seq}"
+                                            visible="{upmenu>checkValue}"
+                                        />
+                                    </items>
+                                </IconTabFilter>
+                            </items>
+                        </IconTabHeader>
+                        <Button
+                            id="editButton"
+                            icon="sap-icon://edit"
+                            text="{i18n>edit}"
+                            tooltip="{i18n>edit}"
+                            type="Emphasized"
+                            press="onEdit"
+                            visible="{editUi>/edit}"
+                        >
+                            <layoutData>
+                                <OverflowToolbarLayoutData
+                                    priority="NeverOverflow"
+                                />
+                            </layoutData>
+                        </Button>
+                    </tnt:ToolHeader>
+                </tnt:header> -->
+                <tnt:mainContents>
+                    <VBox class="homeUpper">
+                        <OverflowToolbar
+                            width="100%"
+                            height="6.5rem"
+                            style="Clear"
+                            class="custom-dashboard-toolbar"
+                        >
+                            <HBox alignItems="End" class="custom-dashboard-title" gap="1rem">
+                                <Title
+                                    text="Dashboard"
+                                />
+                                <Text
+                                    id="dashinfo"
+                                />
+                            </HBox>
+                            <ToolbarSpacer />
+                            <HBox class="custom-dashboard-datepicker" alignItems="Center">
+                                <Label
+                                    text="월단위"
+                                    class="sapUiTinyMarginBeginEnd custom-sapUiCustomTinyMarginTop custom-dashboard-subtitle"
+                                />
+                                <DatePicker
+                                    id="monthpicker"
+                                    class=""
+                                    value="{information>/month}"
+                                    width="7rem"
+                                    afterValueHelpOpen="removeWeekNum"
+                                    valueFormat="yyyy-MM"
+                                    displayFormat="yyyy-MM"
+                                    change=".onDashboardMonthChange"
+                                />
+                            </HBox>
+                            <HBox class="custom-dashboard-datepicker" alignItems="Center">
+                                <Label
+                                    text="마감단위"
+                                    class="sapUiTinyMarginBeginEnd custom-dashboard-subtitle"
+                                />
+                                <DatePicker
+                                    id="deadlinepicker"
+                                    value="{information>/deadline}"
+                                    width="7rem"
+                                    afterValueHelpOpen="removeWeekNum"
+                                    valueFormat="yyyy-MM"
+                                    displayFormat="yyyy-MM"
+                                    change="deadlinchange"
+                                />
+                            </HBox>
+                            <Button
+                                text="다운로드"
+                                icon="sap-icon://download"
+                                class="sapUiTinyMarginEnd custom-dashboard-download-btn"
+                                iconFirst="false"
+                                width="9.375rem"
+                            />
+                        </OverflowToolbar>
+                    </VBox>
+                    <core:ComponentContainer
+                        width="100%"
+                        height="calc(100% - 5rem)"
+                        usage="workpageBuilderComponent"
+                        manifest="false"
+                        componentCreated=".workPageBuilderComponentCreated"
+                        async="true"
+                    />
+                </tnt:mainContents>
+            </tnt:ToolPage>
+        </f:content>
+        <f:footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button
+                    icon="sap-icon://save"
+                    text="{i18n>save}"
+                    tooltip="{i18n>save}"
+                    type="Emphasized"
+                    press="onSave"
+                />
+                <Button
+                    icon="sap-icon://cancel"
+                    text="{i18n>cancel}"
+                    tooltip="{i18n>cancel}"
+                    type="Ghost"
+                    press="onCancel"
+                />
+            </OverflowToolbar>
+        </f:footer>
+    </f:DynamicPage>
+</mvc:View>
