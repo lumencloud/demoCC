@@ -186,158 +186,84 @@ function classifyDropCase(oDraggedContext, oDroppedContext, oModel, position) {
   return;
 }
 
+  
 function moveNode(info) {
-  const { sameLevel, dragLevel, iNextLevel, iPrevLevel, dragNode, sameParent } = info;
-  const bLevelFirst = dragLevel === 1;       // 선택한 노드가 1레벨인지
-  const bLevelSecond = dragLevel === 2;      // 선택한 노드가 2레벨인지
-  const bBetweenFirst = iPrevLevel === 1 && iNextLevel === 1; // 1레벨과 1레벨 사이인지
-  const bBetweenSecond = iPrevLevel === 2 && iNextLevel === 2; // 2레벨과 2레벨 사이인지
-  const bTopRow = iPrevLevel === null && iNextLevel === 1;  // 최상단 1레벨 위인지
-  const bBottomRowFirst = iPrevLevel === 1 && iNextLevel === null; // 최하단 row가 1레벨 아래인지
-  const bBottomRowSecond = iPrevLevel === 2 && iNextLevel === null; // 최하단 row가 2레벨 아래인지
-  const bBetweenFirstSecond = iPrevLevel === 1 && iNextLevel === 2; // 1레벨과 2레벨 사이인지
-  const bBetweenSecondFirst = iPrevLevel === 2 && iNextLevel === 1; // 2레벨과 1레벨 사이인지
-
-  // if (dragNode.isApp = "none") {
-  //   MessageToast.show("폴더 메뉴는 이동할 수 없습니다.");
-  //   return;
-  // }
-
-  if (sameLevel) {
-    // 1레벨과 1레벨 사이에 (? Level ) 옮길 시 (1Lv : 1레벨 정렬 , 2Lv : 1레벨 정렬)
-    if (bLevelFirst && bBetweenFirst) {
-      spliceNodeFromTo(info, true);
-    } else if (bLevelSecond && bBetweenFirst) {
-      spliceNodeFromTo(info, false);
-      return;
-    }
-
-    // 2레벨과 2레벨 사이 ( ? Level ) 옮길 시 (1Lv : 부모 2레벨 위치정렬 , 2Lv : 부모 2레벨 위치정렬)
-    if (bLevelFirst && bBetweenSecond) { // 다른 그룹으로 이동
-      spliceNodeFromTo(info, false);
-    } else if (bLevelSecond && bBetweenSecond) { // 다른 그룹일수 있고 같은 그룹일수도 있고
-      spliceNodeFromTo(info, true);
-    }
-  } else if (!sameLevel) {
-    // 1레벨과 2레벨 사이 ( ? Level ) 옮길 시 (1Lv : 부모 2레벨 최상단정렬 , 2Lv : 부모 2레벨 최상단 정렬)
-    if (bBetweenFirstSecond && !bBetweenSecondFirst) {
-      if (bLevelFirst) {
-        spliceNodeFromTo(info, false);   // 1레벨 옮김시 → 다른 그룹에서 이동
-      } else if (bLevelSecond && sameParent) {
-        spliceNodeFromTo(info, true);    // 같은 부모 그룹 2레벨 이동
-      } else if (bLevelSecond && !sameParent) {
-        spliceNodeFromTo(info, false);   // 다른 부모 그룹 2레벨 이동
-      }
-    }
-
-    // 2레벨과 1레벨 사이 ( ? Level ) 옮길 시 (1Lv : 1레벨까지 위치정렬 , 2Lv : 부모 2레벨 최하단 정렬)
-    else if (!bBetweenFirstSecond && bBetweenSecondFirst) {
-      if (bLevelFirst) {
-        spliceNodeFromTo(info, false);
-      } else if (bLevelSecond && sameParent) { // 같은 부모 그룹 2레벨 이동
-        spliceNodeFromTo(info, true);
-      } else if (bLevelSecond && !sameParent) { // 다른 부모 그룹 2레벨 이동
-        spliceNodeFromTo(info, false);
-      }
-    }
-  } else if (bTopRow) {
-    // 1레벨 최상단 (? Level ) 옮길 시 (1Lv : 1레벨 최상단 정렬 , 2Lv : 1레벨 최상단 정렬)
-    if (bLevelFirst) {
-      spliceNodeFromTo(info, true);
-    } else if (bLevelSecond) {
-      spliceNodeFromTo(info, false);
-    }
-  } else if (bBottomRowFirst) {
-    // 1레벨 최하단 (? Level ) 옮길 시 (1Lv : 1레벨 최하단 정렬 , 2Lv : 최하단 부모 최하단 정렬)
-    if (bLevelFirst) {
-      spliceNodeFromTo(info, true);
-    } else if (bLevelSecond) {
-      spliceNodeFromTo(info, false);
-    }
-  } else if (bBottomRowSecond) {
-    // 2레벨 최하단 (? Level ) 옮길 시 (1Lv : 최하단 부모 최하단 정렬 , 2Lv : 최하단 부모 최하단 정렬)
-    if (bLevelFirst) {
-      spliceNodeFromTo(info, false);
-    } else if (bLevelSecond && sameParent) { // 같은 부모 그룹 2레벨 이동
-      spliceNodeFromTo(info, true);
-    } else if (bLevelSecond && !sameParent) { // 다른 부모 그룹 2레벨 이동
-      spliceNodeFromTo(info, false);
-    }
-  }
-
-  // position "on" → 해당 부모 자식으로
-  if (!iNextLevel && !iPrevLevel) { // 이전 노드 이후 노드가 없으니 on
-    spliceNodeFromTo(info, false);
-    return;
-  }
-}
-
-function moveNode(info) {
-  const { sameLevel, dragLevel, iNextLevel, iPrevLevel, dragNode, sameParent, position } = info;
+  const {
+    dragLevel,
+    iPrevLevel,
+    iNextLevel,
+    sameParent,
+    position
+  } = info;
 
   const isLv1 = dragLevel === 1;
   const isLv2 = dragLevel === 2;
 
-  const prevLv = iPrevLevel;
-  const nextLv = iNextLevel;
-
-  const isPrevLv1 = prevLv === 1;
-  const isNextLv1 = nextLv === 1;
-  const isPrevLv2 = prevLv === 2;
-  const isNextLv2 = nextLv === 2;
+  const isPrevLv1 = iPrevLevel === 1;
+  const isNextLv1 = iNextLevel === 1;
+  const isPrevLv2 = iPrevLevel === 2;
+  const isNextLv2 = iNextLevel === 2;
 
   const isBetweenLv1 = isPrevLv1 && isNextLv1;
   const isBetweenLv2 = isPrevLv2 && isNextLv2;
   const isFirstToSecond = isPrevLv1 && isNextLv2;
   const isSecondToFirst = isPrevLv2 && isNextLv1;
 
-  const isTopRow = prevLv === null && isNextLv1;
-  const isBottomRowLv1 = isPrevLv1 && nextLv === null;
-  const isBottomRowLv2 = isPrevLv2 && nextLv === null;
+  const isTopRow = iPrevLevel === null && isNextLv1;
+  const isBottomRowLv1 = isPrevLv1 && iNextLevel === null;
+  const isBottomRowLv2 = isPrevLv2 && iNextLevel === null;
 
-  const move = (flag) => spliceNodeFromTo(info, flag);
-
-  // position "on"에서 이전/다음 노드가 없는 경우 (자식으로 삽입)
-  if (!nextLv && !prevLv) {
-    return move(false);
-  }
-
-  if (sameLevel) {
-    if (isLv1 && isBetweenLv1) return move(true);
-    if (isLv2 && isBetweenLv1) return move(false);
-    if (isLv1 && isBetweenLv2) return move(false);
-    if (isLv2 && isBetweenLv2) return move(true);
-  } else {
-    if (isFirstToSecond) {
-      if (isLv1) return move(false);
-      if (isLv2 && sameParent) return move(true);
-      if (isLv2 && !sameParent) return move(false);
-    }
-    if (isSecondToFirst) {
-      if (isLv1) return move(false);
-      if (isLv2 && sameParent) return move(true);
-      if (isLv2 && !sameParent) return move(false);
-    }
-  }
-
+  // 1. 최상단: 이전 노드 없음, 다음 노드가 1레벨
   if (isTopRow) {
-    if (isLv1) return move(true);
-    if (isLv2) return move(false);
+    if (isLv1) return spliceNodeFromTo(info, { levelCase: '1to1', positionCase: 'top', sameParent: true });
+    if (isLv2) return spliceNodeFromTo(info, { levelCase: '2to1', positionCase: 'top', sameParent: false });
   }
 
+  // 2. 최하단: 다음 노드 없음
   if (isBottomRowLv1) {
-    if (isLv1) return move(true);
-    if (isLv2) return move(false);
+    if (isLv1) return spliceNodeFromTo(info, { levelCase: '1to1', positionCase: 'bottom', sameParent: true });
+    if (isLv2) return spliceNodeFromTo(info, { levelCase: '2to1', positionCase: 'bottom', sameParent: false });
   }
 
   if (isBottomRowLv2) {
-    if (isLv1) return move(false);
-    if (isLv2 && sameParent) return move(true);
-    if (isLv2 && !sameParent) return move(false);
+    if (isLv1) return spliceNodeFromTo(info, { levelCase: '1to2', positionCase: 'bottom', sameParent: false });
+    if (isLv2) return spliceNodeFromTo(info, { levelCase: '2to2', positionCase: 'bottom', sameParent });
   }
+
+  // 3. 같은 레벨 간 이동
+  if (isBetweenLv1) {
+    if (isLv1) return spliceNodeFromTo(info, { levelCase: '1to1', positionCase: 'between', sameParent: true });
+    if (isLv2) return spliceNodeFromTo(info, { levelCase: '2to1', positionCase: 'between', sameParent: false });
+  }
+
+  if (isBetweenLv2) {
+    if (isLv1) return spliceNodeFromTo(info, { levelCase: '1to2', positionCase: 'between', sameParent: false });
+    if (isLv2) return spliceNodeFromTo(info, { levelCase: '2to2', positionCase: 'between', sameParent });
+  }
+
+  // 4. 레벨 교차 간 이동
+  if (isFirstToSecond) {
+    if (isLv1) return spliceNodeFromTo(info, { levelCase: '1to2', positionCase: 'between', sameParent: false });
+    if (isLv2 && sameParent) return spliceNodeFromTo(info, { levelCase: '2to2', positionCase: 'between', sameParent: true });
+    if (isLv2 && !sameParent) return spliceNodeFromTo(info, { levelCase: '2to2', positionCase: 'between', sameParent: false });
+  }
+
+  if (isSecondToFirst) {
+    if (isLv1) return spliceNodeFromTo(info, { levelCase: '1to1', positionCase: 'between', sameParent: true });
+    if (isLv2 && sameParent) return spliceNodeFromTo(info, { levelCase: '2to2', positionCase: 'between', sameParent: true });
+    if (isLv2 && !sameParent) return spliceNodeFromTo(info, { levelCase: '2to1', positionCase: 'between', sameParent: false });
+  }
+
+  // 5. position === "On" 일 때: 드롭 노드의 자식으로 들어감
+  if (!iPrevLevel && !iNextLevel && position === "On") {
+    return spliceNodeFromTo(info, { levelCase: 'on', positionCase: 'on', sameParent: false });
+  }
+
+  // fallback
+  console.warn("Unhandled moveNode condition", info);
 }
 
-  
+
   
   });
 });
