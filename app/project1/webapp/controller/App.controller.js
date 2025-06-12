@@ -173,7 +173,7 @@ sap.ui.define([
                   if (positionCase === "On") {
                       insertPath = sDropPath + "/children";
                   } else {
-                      insertPath = sDropPath;
+                      insertPath = "/";
                   }
 
               } else if (levelCase === "2to1") {
@@ -183,7 +183,7 @@ sap.ui.define([
 
                   deletePath = sDragPath.split("/children")[0] + "/children";
               } else {
-                  insertPath = sDropPath;
+                  insertPath = "/";
               }
               return { deletePath, insertPath };
           }
