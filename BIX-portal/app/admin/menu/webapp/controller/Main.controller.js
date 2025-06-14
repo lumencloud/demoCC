@@ -153,8 +153,8 @@ sap.ui.define([
                     isApp: "none",
                     category: "",
                     code: "",
-                }
 
+                }
                 if (bCheckTable) {
                     oTemp.Parent_ID = oData.ID;
                     if (oData.ID.includes("new")) {
@@ -212,6 +212,9 @@ sap.ui.define([
                             let oContext = await oDataModel.bindContext(sBindingPath, undefined, { $$updateGroupId: "AddMenuFolder" });
                             oContext.getBoundContext().setProperty("delete_yn", true);
                         })
+                        let sBindingPath = `/Menus(ID='${oData.ID}')`
+                        let oContext = await oDataModel.bindContext(sBindingPath, undefined, { $$updateGroupId: "AddMenuFolder" });
+                        oContext.getBoundContext().setProperty("delete_yn", true);
                     } else {
                         // 자식없으면 자신만 삭제만 처리
                         let sBindingPath = `/Menus(ID='${oData.ID}')`
@@ -368,6 +371,10 @@ sap.ui.define([
                     // 모델 및 데이터 초기화
                     await this._setModel();
                     this._aFolderTableData = JSON.parse(JSON.stringify(this.getView().getModel("menuFolderTableModel").getData()));
+                    const oModel = this.getView().getModel("menuFolderTableModel")
+                    oModel.attachPropertyChange(function (oEvent) {
+                        this._validCheckAllRows();
+                    }.bind(this))
                     this.getView().getModel("uiModel").setProperty("/tableSaveButton", false);
                 } else {
                     Module.messageBox('warning', '데이터 저장에 실패했습니다.');
