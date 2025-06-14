@@ -8,7 +8,6 @@ sap.ui.define([
 
 ], (Controller, JSONModel, MessageToast, Module, DragDropInfo, Messaging) => {
     "use strict";
-
     return Controller.extend("bix.admin.menu.controller.Main", {
         /**
          * @type {Array} 
@@ -16,7 +15,6 @@ sap.ui.define([
          */
         _aFolderTableData: [],
         _sNewId: "new0",
-
         /**
          * 초기 실행 메소드
          */
@@ -24,7 +22,6 @@ sap.ui.define([
             const myRoute = this.getOwnerComponent().getRouter().getRoute("RouteMain");
             myRoute.attachPatternMatched(this.onMyRoutePatternMatched, this);
         },
-
         /**
          * 프로젝트 목록 페이지 라우팅 시 실행 코드
          */
@@ -59,7 +56,6 @@ sap.ui.define([
                 tableMoveButton: false, // 테이블 최상위로 이동 제어 버튼
                 hasError: false,
             }), "uiModel");
-
             // 트리 테이블 구조 바인딩
             let aTree = this._buildTree(aData);
             this.getView().setModel(new JSONModel(aTree), "menuFolderTableModel");
@@ -69,7 +65,6 @@ sap.ui.define([
             this._aFolderTableData = JSON.parse(JSON.stringify(aTree));
             this.getView().setBusy(false);
         },
-
         // path 값을 저장한 트리데이터 펼친 데이터
         flattenTreeWithPath: function (tree, path = "") {
             const flatData = [];
@@ -100,7 +95,6 @@ sap.ui.define([
             // 선택된 행이 있을 때 삭제 버튼 활성화
             oUiModel.setProperty("/tableEnabledButton", isSelected);
         },
-
         /**
          * 테이블 변경 버튼
          */
@@ -110,7 +104,6 @@ sap.ui.define([
                 // 메시지 모델의 메시지 삭제
                 Messaging.removeAllMessages();
                 let oTable = this.byId("menuFolderTable");
-
                 //테이블 드래그앤 드랍 객체 설정
                 if (oTable) {
                     let oDragDropConfig = new DragDropInfo({
@@ -120,12 +113,10 @@ sap.ui.define([
                         drop: this._dragEnd.bind(this),
                         dropPosition: "OnOrBetween",
                     });
-
                     oTable.addDragDropConfig(oDragDropConfig);
                     oTable.setSelectionMode("Single");
                     this.getView().getModel("uiModel").setProperty("/tableVisibleButton", false);
                     this.getView().getModel("uiModel").setProperty("/tableEnabledButton", false);
-                    // this.byId("menuPage").setShowFooter(true);
                 };
                 this.byId("menuFolderTable").clearSelection();
                 MessageToast.show("메뉴 폴더 수정을\n시작합니다.");
@@ -133,7 +124,6 @@ sap.ui.define([
                 // 추가 버튼 클릭 시 
             } else if (sChk === "Add") {
                 let oTable = this.byId("menuFolderTable");
-
                 let oModel = this.getView().getModel("menuFolderTableModel");
                 let bCheckTable = oTable.getBinding("rows").getContexts()[oTable.getSelectedIndex()]
                 let sPath = bCheckTable?.getPath();
@@ -153,7 +143,6 @@ sap.ui.define([
                     isApp: "none",
                     category: "",
                     code: "",
-
                 }
                 if (bCheckTable) {
                     oTemp.Parent_ID = oData.ID;
@@ -162,7 +151,6 @@ sap.ui.define([
                         this.byId("menuFolderTable").clearSelection();
                         return;
                     };
-
                     let iCount1 = sPath.split("/").length - 1;
                     let iCount2 = sPath.split("children").length; // 현재 레벨
                     if (iCount1 > 1 && iCount2 > 1) {
@@ -188,7 +176,6 @@ sap.ui.define([
 
                 // 제거 버튼 클릭 시
             } else if (sChk === "Delete") {
-
                 let oModel = this.getView().getModel("menuFolderTableModel");
                 let oTable = this.byId("menuFolderTable");
                 let sPath = oTable.getBinding("rows").getContexts()[oTable.getSelectedIndex()].getPath();
@@ -203,7 +190,6 @@ sap.ui.define([
                 if (!oSameGroup && !bCheckNewData) {
                     let bChk = await Module.messageBoxConfirm('warning', '최상위 폴더입니다. 하위 메뉴도 삭제됩니다.\n삭제하시겠습니까?', '폴더 삭제');
                     if (!bChk) { return; };
-
                     const aChild = oTable.getBinding().getModel().getProperty(sPath).children;
                     // 하위에 포함된 자식들도 삭제 처리
                     if (aChild.length > 0) {
@@ -221,7 +207,6 @@ sap.ui.define([
                         let oContext = await oDataModel.bindContext(sBindingPath, undefined, { $$updateGroupId: "AddMenuFolder" });
                         oContext.getBoundContext().setProperty("delete_yn", true);
                     }
-
                     // 삭제한 1레벨을 제외한 나머지 1레벨끼리 sort_order 정렬
                     const oModelData = oModel.getProperty("/");
                     oModelData.splice(iIndex, 1);
@@ -252,7 +237,6 @@ sap.ui.define([
                         oContext.getBoundContext().setProperty("sort_order", node.sort_order);
                     })
                 };
-
                 // 추가버튼을 눌러서 DB에 저장하지 않은 새로운 데이터를 삭제할 땐 model에서만 삭제
                 if (bCheckNewData) {
                     if (!oSameGroup) {
@@ -273,9 +257,9 @@ sap.ui.define([
                 this.getView().getModel("uiModel").setProperty("/tableSaveButton", true)
                 oTable.clearSelection();
                 MessageToast.show("삭제가 완료되었습니다.");
+             
                 // 최상위 메뉴로 이동
             } else if (sChk === "Move") {
-
                 let oModel = this.getView().getModel("menuFolderTableModel");
                 let oTable = this.byId("menuFolderTable");
                 let sPath = oTable.getBinding("rows").getContexts()[oTable.getSelectedIndex()].getPath();
@@ -303,7 +287,6 @@ sap.ui.define([
                 MessageToast.show("최상위 메뉴로\n이동 하였습니다.");
             };
         },
-
         /**
          *  테이블 저장 버튼
          */
@@ -311,7 +294,6 @@ sap.ui.define([
             let bCheck = await Module.messageBoxConfirm('information', '저장하시겠습니까?', '메뉴 저장');
             if (!bCheck) return
             let aTableData = this.getView().getModel("menuFolderTableModel").getData();
-
             //생성된 배열 추출 작업중
             async function flattenTree(tree, map = {}) {
                 tree.forEach(node => {
@@ -326,7 +308,6 @@ sap.ui.define([
             };
             // id 를 key 값으로 객체화된 객체로 구성된 객체
             const aModifiedMap = await flattenTree(aTableData);
-
             let createdNodes = [];
             for (const id in aModifiedMap) {
                 let newNode = aModifiedMap[id];
@@ -348,7 +329,6 @@ sap.ui.define([
                 let oBinding = oModel.bindList("/Menus", undefined, undefined, undefined, {
                     $$updateGroupId: "AddMenuFolder"
                 });
-
                 oBinding.create({
                     name: oData.name,
                     i18nTitle_i18nKey: oData.i18nTitle_i18nKey,
@@ -367,7 +347,6 @@ sap.ui.define([
                 let aChanges = oModel.hasPendingChanges("AddMenuFolder");
                 if (!aChanges) {
                     MessageToast.show("저장이 완료되었습니다.");
-
                     // 모델 및 데이터 초기화
                     await this._setModel();
                     this._aFolderTableData = JSON.parse(JSON.stringify(this.getView().getModel("menuFolderTableModel").getData()));
@@ -408,14 +387,12 @@ sap.ui.define([
             oTable.setRowActionCount(0);
             oTable.destroyRowActionTemplate();
             oTable.setFirstVisibleRow(0);
-
             let aFields = this.getView().getControlsByFieldGroupId("folderSaveCheck")
             aFields.forEach(oControl => {
                 if (oControl.setValueState) {
                     oControl.setValueState("None");
                 }
             })
-
             this.getView().getModel("uiModel").setProperty("/tableVisibleButton", true);
             this.getView().getModel("uiModel").setProperty("/tableSaveButton", false);
             this.getView().setModel(new JSONModel(JSON.parse(JSON.stringify(this._aFolderTableData))), "menuFolderTableModel");
@@ -433,7 +410,6 @@ sap.ui.define([
             if (sChk === "typeMain") {
                 let oData = oSource.getBindingContext("menuFolderTableModel").getProperty();
                 let sPath = oSource.getBindingContext("menuFolderTableModel").getPath();
-
                 if (oData.isApp === "main") {
                     this.getView().getModel("menuFolderTableModel").setProperty(sPath + "/category", oData.category || "");
                     this.getView().getModel("menuFolderTableModel").setProperty(sPath + "/code", oData.code || "");
@@ -465,7 +441,6 @@ sap.ui.define([
             // Switch UI 제어 
             else if (sChk === "mainSwitch") {
                 let sValue = oEvent.getParameter("state");
-
                 if (!oSource.getBindingContext("menuFolderTableModel").getProperty("ID").includes("new")) {
                     // 변경 데이터 bindContext에 담아 batch Update
                     let oModel = this.getOwnerComponent().getModel();
@@ -541,18 +516,27 @@ sap.ui.define([
             const oDroppedRow = oDragSession.getDropControl();
             const aDraggedRowContext = oDragSession.getComplexData("hierarchymaintenance").draggedRowContexts // 옮기려는 node context
             const oDroppedRowContext = oTreeTable.getContextByIndex(oDroppedRow.getIndex()); // 옮겨질 위치의 node context
+
+            // 드래그시 전체 적인 로직 처리 시작 함수
+            for (const oDraggedContext of aDraggedRowContext) {
+                //oModel = 트리테이블에 바인딩된 모델
+                const dropInfo = classifyDropCase(oDraggedContext, oDroppedRowContext, oModel, sDropPosition);
+                if (dropInfo.isDescendant) {
+                    MessageToast.show("같은 레벨 간에는\n이동할 수 없습니다.")
+                    return;
+                }
+                moveNode(dropInfo);
+            }
             // 현재 드랍한 라인 (before || After) 상관없이 그 라인의 아래 , 위 노드의 레벨을 가져옴
             function findLevelBetweenNodes(position, sDroppedPath) {
                 const oBinding = that.getView().getModel("menuPathModel").getData();
                 const iLastIdx = that.getView().getModel("menuFolderTableModel").getData().length - 1
                 const iDropIdx = oBinding.findIndex(child => child.path === sDroppedPath);
-
                 const iPrevIdx = position === "Before" ? iDropIdx - 1 : iDropIdx;
                 const iNextIdx = position === "Before" ? iDropIdx : iDropIdx + 1;
 
                 const oPrevContext = oBinding[iPrevIdx] || null;
                 const oNextContext = oBinding[iNextIdx] || null;
-
                 const sPrevPath = oPrevContext?.path;
                 const sNextPath = oNextContext?.path;
                 const iCurrentIdx = sNextPath ? extractLastChildIndex(sNextPath) : iLastIdx;
@@ -563,16 +547,6 @@ sap.ui.define([
                 return {
                     iPrevLevel, iNextLevel, iCurrentIdx, sPrevPath, sNextPath
                 }
-            }
-            // 드래그시 전체 적인 로직 처리 시작 함수
-            for (const oDraggedContext of aDraggedRowContext) {
-                //oModel = 트리테이블에 바인딩된 모델
-                const dropInfo = classifyDropCase(oDraggedContext, oDroppedRowContext, oModel, sDropPosition);
-                if (dropInfo.isDescendant) {
-                    MessageToast.show("같은 레벨 간에는\n이동할 수 없습니다.")
-                    return;
-                }
-                moveNode(dropInfo);
             }
             // 드랍 조건 별 분류 통합 함수
             function classifyDropCase(oDraggedContext, oDroppedContext, oModel, position) {
@@ -614,6 +588,10 @@ sap.ui.define([
             function moveNode(info) {
                 const { dragLevel, iPrevLevel, iNextLevel, sameParent, position, dropLevel, dragNode, family, sNextPath, sPrevPath, sNextParentPath, oModel, dropNode } = info;
                 const blocked = blockMoveToLevel({ dropLevel, dragLevel, dragNode, position });
+                if (dragNode.isApp === 'none') {
+                    MessageToast.show("폴더 메뉴는 \n이동 할 수 없습니다.")
+                    return;
+                }
                 if (blocked) {
                     MessageToast.show("2레벨 이상으로 \n이동할 수 없습니다.")
                     return;
@@ -682,7 +660,6 @@ sap.ui.define([
 
             function spliceNodeFromTo(info, { levelRelation, positionCase, sameParent, sDroppedPath, sParentId }) {
                 const { dragNode, iPrevIndex, oModel, sDraggedPath, iCurrentIdx, position } = info;
-
                 const iDragIdx = iPrevIndex;
                 const iDropIdx = position !== "On" ? iCurrentIdx : iCurrentIdx - 1;
                 const sDropPath = sDroppedPath;  // moveNode에서 조건 별 가공된 path값을 넣어준다.
@@ -703,13 +680,13 @@ sap.ui.define([
                 }
                 updateOdata(oDragNode);
 
-                // 삭제 후 삽입
+                // 삭제 그룹에 삭제
                 oDeleteGroup.splice(iDeleteIdx, 1);
                 // 삽입하는 인덱스 positionCase 조건에 따라서 위치 재할당
                 if (positionCase === "top" || positionCase === "bottom") {
                     iInsertIdx = positionCase === "top" ? 0 : parseInt(oInsertGroup.length);
                 } else { iInsertIdx }
-
+                //삽입 그룹에 드랍
                 oInsertGroup.splice(iInsertIdx, 0, oDragNode);
                 [oDeleteGroup, oInsertGroup]
                     .filter(group => Array.isArray(group) && group.length > 0)
@@ -767,7 +744,7 @@ sap.ui.define([
                     return { sDeletePath, sDeleteModelPath }
                 }
 
-                function extractInsertPath(path) {    // path 값의 children 을 포함하고있으면 뒤에 숫자 인덱스스만 삭제 // 
+                function extractInsertPath(path) {    // path 값의 children 을 포함하고있으면 뒤에 숫자 인덱스만 삭제
                     if (path.includes("children")) {
                         const segments = path.split("/"); segments.pop();
                         return segments.join("/")
@@ -794,7 +771,6 @@ sap.ui.define([
                     let bFlag = iDragIdx < iDropIdx;
                     return { iInsertIdx, bFlag }  // bFlag가 true면 하위노드에서 상위 노드로 옮기는 flag값
                 }
-
                 return;
             }
             // Odata v4 모델 업데이트 함수
@@ -804,7 +780,6 @@ sap.ui.define([
                 let oContext = oDataModel.bindContext(sBindingPath, undefined, {
                     $$updateGroupId: "AddMenuFolder"
                 }).getBoundContext();
-
                 oContext.setProperty("Parent_ID", node.Parent_ID ?? null);
                 oContext.setProperty("sort_order", node.sort_order);
             }
