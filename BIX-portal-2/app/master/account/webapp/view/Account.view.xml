@@ -1,0 +1,140 @@
+<mvc:View controllerName="bix.master.account.controller.Account"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:unified="sap.ui.unified"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:f="sap.f" busyIndicatorDelay="0" width="100%" >
+    <Page class="sapUiContentPadding" showHeader="false">
+        <content>
+            <form:SimpleForm editable="true" class="custom-search-container">
+                <form:content>
+                        <Title text="Account별 고객사 관리" class="custom-mg-title">
+                            <layoutData>
+                                <layout:GridData span="XL12 L12 M12 S12" />
+                            </layoutData>
+                        </Title>
+                        <HBox class="custom-search-field-box" alignItems="Center">
+                            <Label text="Account" labelFor="searchAccount"/>
+                            <Input id="searchAccount" width="100%" value="{searchModel>/account}" fieldGroupIds="Search" placeholder="account 명"/>
+                            <layoutData>
+                                <layout:GridData span="XL3 L3 M3 S12" />
+                            </layoutData>
+                        </HBox>
+                        <HBox class="custom-search-field-box" alignItems="Center">
+                            <Label text="고객사" labelFor="searchCustomer"/>
+                            <Input id="searchCustomer" width="100%" value="{searchModel>/customer}" fieldGroupIds="Search" placeholder="고객사 명"/>
+                            <layoutData>
+                                <layout:GridData span="XL3 L3 M3 S12" />
+                            </layoutData>
+                        </HBox>
+                        <HBox justifyContent="End" class="custom-search-btn-container">
+                            <Button text="초기화" press=".onSearch($event,'refresh')" class="custom-mg-small-btn" icon="sap-icon://refresh"/>
+                            <Button id="searchButton" text="검색" type="Accept" press=".onSearch($event,'search')" class="custom-mg-small-btn" icon="sap-icon://search"/>
+                            <layoutData>
+                                <layout:GridData span="XL12 L12 M12 S12" />
+                            </layoutData>
+                        </HBox>
+                </form:content>
+            </form:SimpleForm>
+            <FlexBox width="100%" height="calc(100% - 11rem)">
+                <FlexBox width="100%" height="100%" class="sapUiSmallMarginTop sapUiSmallMarginEnd">
+                    <Panel width="100%" height="100%">
+                        <table:Table id="accountTable" selectionMode="MultiToggle"
+                            rowSelectionChange ="selctionAccountChange"
+                            class="custom-mg-uiTable custom-selection-uiTable custom-table-rounding-border custom-mg-uiTable-noline" 
+                            selectionBehavior="Row" rowActionCount="2" busyIndicatorDelay="0">
+                            <table:rowMode>
+                                <rowmodes:Auto />
+                            </table:rowMode>
+                            <table:extension>
+                                <OverflowToolbar width="100%" height="3rem" style="Clear"  >
+                                    <Title id="accountTitle" text="{= ${$count} ? '총 ' + ${$count} + ' 개' : '총 0개'}" class="custom-text-medium"/>
+                                    <ToolbarSpacer />
+                                    <Button icon="sap-icon://add" text="행추가" press=".onAccountTableButton($event,'Create')" class="custom-mg-small-btn" />
+                                    <Button id="deleteAccount" icon="sap-icon://less" text="행삭제" enabled="false" press=".onAccountTableButton($event,'Delete')" class="custom-mg-small-btn" />
+                                </OverflowToolbar>
+                            </table:extension>
+                            <table:rowActionTemplate>
+                                <table:RowAction>
+                                    <table:RowActionItem type="Custom" icon="sap-icon://edit" press=".onAccountTableButton($event,'Update')" />
+                                    <table:RowActionItem type="Navigation" press=".onNavCustomer" class="sapUiTinyMarginBegin" />
+                                </table:RowAction>
+                            </table:rowActionTemplate>
+                            <table:columns>
+                                <table:Column hAlign="Center" width="100%" autoResizable="true">
+                                    <Label text="코드" wrapping="true" />
+                                    <table:template>
+                                        <Text text="{biz_tp_account_cd}" wrapping="false" width="100%" textAlign="Center" class="custom-text-medium"/>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center" width="100%" autoResizable="true">
+                                    <Label text="Account 명" wrapping="true" />
+                                    <table:template>
+                                        <Text text="{biz_tp_account_nm}" wrapping="false" width="100%" textAlign="Center" />
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center" width="6rem"  autoResizable="true">
+                                    <Label text="정렬 순서" wrapping="true" />
+                                    <table:template>
+                                        <Text text="{sort_order}" wrapping="false" width="100%" textAlign="Center" />
+                                    </table:template>
+                                </table:Column>
+                            </table:columns>
+                        </table:Table>
+                    </Panel>
+                </FlexBox>
+
+                <FlexBox width="100%" height="100%" class="sapUiSmallMarginTop">
+                    <Panel width="100%" height="100%">
+                        <table:Table id="customerTable" selectionMode="MultiToggle"
+                            rowSelectionChange="selctionCustomerChange"
+                            class="custom-mg-uiTable custom-selection-uiTable custom-table-rounding-border custom-mg-uiTable-noline" 
+                            rowActionCount="1" selectionBehavior="Row" busyIndicatorDelay="0">
+                            <table:rowMode>
+                                <rowmodes:Auto />
+                            </table:rowMode>
+                            <table:extension>
+                                <OverflowToolbar width="100%" height="3rem" style="Clear" >
+                                    <Title id="customerTitle" text="{= ${$count} ? '총 ' + ${$count} + ' 개' : '총 0개'}" class="custom-text-medium"/>
+                                    <Title id="customerTitle2" class="sapUiTinyMarginBegin" text="({biz_tp_account_nm})" visible="{= !!${biz_tp_account_nm}}" />
+                                    <ToolbarSpacer />
+                                    <Button id="addCustomer" icon="sap-icon://add" text="행추가" press="onCustomerTableButton($event,'Create')" class="custom-mg-small-btn" />
+                                    <Button id="deleteCustomer" icon="sap-icon://less" text="행삭제" enabled="false" press="onCustomerTableButton($event,'Delete')" class="custom-mg-small-btn" />
+                                </OverflowToolbar>
+                            </table:extension>
+
+                            <table:rowActionTemplate>
+                                <table:RowAction>
+                                    <table:RowActionItem type="Custom" icon="sap-icon://edit" press=".onCustomerTableButton($event,'Update')" />
+                                </table:RowAction>
+                            </table:rowActionTemplate>
+
+                            <table:columns>
+                                <table:Column hAlign="Center" width="100%" autoResizable="true">
+                                    <Label text="코드" wrapping="true" />
+                                    <table:template>
+                                        <Text text="{code}" wrapping="false" width="100%" textAlign="Center"/>
+                                    </table:template>
+                                </table:Column>
+                                <table:Column hAlign="Center" width="100%" autoResizable="true">
+                                    <Label text="고객사 명" wrapping="true" />
+                                    <table:template>
+                                        <Text text="{name}" wrapping="false" width="100%" textAlign="Center" />
+                                    </table:template>
+                                </table:Column>
+                            </table:columns>
+                        </table:Table>
+                    </Panel>
+                </FlexBox>
+
+                <layoutData>
+                    <FlexItemData growFactor="1"></FlexItemData>
+                </layoutData>
+            </FlexBox>
+        </content>
+    </Page>
+</mvc:View>

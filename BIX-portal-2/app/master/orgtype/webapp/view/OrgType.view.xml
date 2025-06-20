@@ -1,0 +1,342 @@
+<mvc:View
+    controllerName="bix.master.orgtype.controller.OrgType"
+    displayBlock="true"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:mdc="sap.ui.mdc"
+    width="100%"
+    height="100%"
+    busyIndicatorDelay="0"
+>
+    <Page
+        class="sapUiContentPadding"
+        showHeader="false"
+        showFooter="true">
+        <content>
+            <form:SimpleForm editable="true" class="custom-search-container">
+                <Title text="조직 속성 관리" class="custom-mg-title">
+                    <layoutData>
+                        <layout:GridData span="XL12 L12 M12 S12" />
+                    </layoutData>
+                </Title>
+                <HBox class="custom-search-field-box" alignItems="Center">
+                    <Label text="조직명" wrapping="false" labelFor="searchName"/>
+                    <Input
+                        id="searchName"
+                        value="{searchModel>/name}"
+                        fieldGroupIds="Search"
+                        placeholder="조직명을 입력해 주세요"/>
+                    <layoutData>
+                        <layout:GridData span="XL3 L3 M3 S12" />
+                    </layoutData>
+                </HBox>
+
+                
+                <HBox class="custom-search-field-box" alignItems="Center">
+                    <Label text="조직ID" wrapping="false" labelFor="searchId"/>
+                    <Input
+                        id="searchId"
+                        value="{searchModel>/id}"
+                        fieldGroupIds="Search"/>
+                    <layoutData>
+                        <layout:GridData span="XL3 L3 M3 S12" />
+                    </layoutData>
+                </HBox>
+                
+                <HBox class="custom-search-field-box" alignItems="Center">
+                    <Label text="코스트센터" wrapping="false" labelFor="searchCcorg_cd"/>
+                    <Input
+                        id="searchCcorg_cd"
+                        value="{searchModel>/ccorg_cd}"
+                        fieldGroupIds="Search"/>
+                    <layoutData>
+                        <layout:GridData span="XL3 L3 M3 S12" />
+                    </layoutData>
+                </HBox>
+                
+                <HBox class="custom-search-field-box" alignItems="Center">
+                    <Label text="속성타입" wrapping="false" labelFor="orgTypeSelect"  />
+                    <MultiComboBox
+                        id="orgTypeSelect"
+                        selectionChange="onSelectionChange"                        
+                        width="100%"                        
+                        items="{
+                            path: '/GetCodeItemView(category=\'org_type\')/Set',
+                            templateShareable: false}"
+                    >
+                        <core:Item
+                            key="{value}"
+                            text="{name}"
+                        />
+                        
+                    </MultiComboBox>
+                    <layoutData>
+                        <layout:GridData span="XL3 L3 M3 S12"/>
+                    </layoutData>
+                </HBox>
+
+                <HBox width="100%" justifyContent="End" class="custom-search-btn-container sapUiTinyMarginTop">
+                    <Button
+                        id="resetButton"
+                        text="초기화"
+                        icon="sap-icon://refresh"
+                        press=".onSearchReset"
+                        class="custom-mg-small-btn"/>
+                    <Button
+                        id="searchButton"
+                        text="검색"
+                        type="Accept"
+                        icon="sap-icon://search"
+                        press=".onSearch"
+                        class="custom-mg-small-btn"/>
+                    <layoutData>
+                        <layout:GridData span="XL12 L12 M12 S12" />
+                    </layoutData>
+                </HBox>
+            </form:SimpleForm>
+            <Panel width="100%" height="calc(100% - 12rem)" class="sapUiSmallMarginTop">
+                <table:TreeTable
+                    id="treeTable"
+                    selectionMode="None"
+                    enableColumnReordering="false"
+                    class="custom-mg-uiTable custom-table-rounding-border custom-mg-uiTable-noline"
+                    rows="{ 
+                            path: 'orgModel>/',
+                            parameters: {
+                                $count: true,
+                                arrayNames: ['children'],
+                                numberOfExpandedLevels: 6
+                            }
+                        }"
+                    busyIndicatorDelay="0"
+                >
+                    <table:rowMode>
+                        <rowmodes:Auto />
+                    </table:rowMode>
+
+                    <table:columns>
+                        <table:Column width="18rem">
+                            <Label
+                                text="조직명"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                            <table:template>
+                                <Text
+                                    text="{orgModel>name}"
+                                    tooltip="{orgModel>name}"
+                                    wrapping="false"
+                                />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+
+                    <table:columns>
+                        <table:Column width="7rem" hAlign="Center" >
+                            <Label
+                                text="Delivery유무"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                            <table:template>
+                                            <CheckBox
+                                                selected="{orgModel>is_delivery}"                                            
+                                                select=".onChange" 
+                                                class="custom-checkBox"            
+                                                editable="{uiModel>/edit}"
+                                            />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+
+                    <table:columns>
+                        <table:Column width="9rem">
+                            <Label
+                                text="속성 타입"
+                                textAlign="Center"
+                                width="100%"
+                            />
+
+                            <table:template>
+                                <mdc:Field
+                                    width="100%"
+                                    editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}"
+                                >
+                                    <mdc:contentEdit>
+                                        <Select
+                                            forceSelection="false"
+                                            selectedKey="{orgModel>org_tp}"
+                                            width="auto"
+                                            change=".onChange($event)"
+                                            items="{path: '/GetCodeItemView(category=\'org_type\')/Set', templateShareable: false}"
+                                            wrapItemsText="false"
+                                        >
+                                            <core:Item
+                                                key="{value}"
+                                                text="{name}"
+                                            />
+                                        </Select>
+                                    </mdc:contentEdit>
+                                    <mdc:contentDisplay>
+                                        <Text
+                                            text="{orgModel>org_tp_name}"
+                                            tooltip="{orgModel>org_tp_name}"
+                                            wrapping="false"
+                                        />
+                                    </mdc:contentDisplay>
+                                </mdc:Field>
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+
+                    <table:columns>
+                        <table:Column width="8rem">
+                            <Label
+                                text="코스트센터 코드"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                            <table:template>
+                                <HBox
+                                    justifyContent="Center"
+                                    width="100%"
+                                >
+                                    <Text
+                                        text="{orgModel>ccorg_cd}"
+                                        tooltip="{orgModel>ccorg_cd}"
+                                        wrapping="false"
+                                    />
+                                </HBox>
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+
+                    <table:columns>
+                        <table:Column width="14rem">
+                            <Label
+                                text="생성자"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                            <table:template>
+                                <Text
+                                    text="{orgModel>createdBy}"
+                                    tooltip="{orgModel>createdBy}"
+                                    wrapping="false"
+                                />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+
+                    <table:columns>
+                        <table:Column width="6rem">
+                            <Label
+                                text="생성일"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                            <table:template>
+                                <Text
+                                    text="{path:'orgModel>createdAt', type: 'sap.ui.model.odata.type.DateTime',
+                                            targetType: 'any', formatter:'.onFormatDate'}"
+                                    tooltip="{path:'orgModel>createdAt', type: 'sap.ui.model.odata.type.DateTime',
+                                            targetType: 'any', formatter:'.onFormatDate'}"
+                                    wrapping="false"
+                                />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+
+                    <table:columns>
+                        <table:Column width="14rem">
+                            <Label
+                                text="수정자"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                            <table:template>
+                                <Text
+                                    text="{orgModel>modifiedBy}"
+                                    tooltip="{orgModel>modifiedBy}"
+                                    wrapping="false"
+                                />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+
+                    <table:columns>
+                        <table:Column width="6rem">
+                            <Label
+                                text="수정일"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                            <table:template>
+                                <Text
+                                    text="{path:'orgModel>modifiedAt', type: 'sap.ui.model.odata.type.DateTime',
+                                            targetType: 'any', formatter: '.onFormatDate'}"
+                                    tooltip="{path:'orgModel>modifiedAt', type: 'sap.ui.model.odata.type.DateTime',
+                                            targetType: 'any', formatter: '.onFormatDate'}"
+                                    wrapping="false"
+                                />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+                </table:TreeTable>
+            </Panel>
+        </content>
+        <footer>
+            <OverflowToolbar
+                style="Clear"
+                class="custom-mg-footer sapUiTinyMargin"
+            >
+                <ToolbarSpacer />
+                <Button
+                    type="Accept"
+                    class="custom-mg-btn"
+                    icon="sap-icon://edit"
+                    text="수정"
+                    tooltip="수정"
+                    press=".onFooterButton($event,'edit')"
+                    visible="{= !${uiModel>/edit}}"
+                >
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+                <Button
+                    type="Accept"
+                    class="custom-mg-btn"
+                    icon="sap-icon://save"
+                    text="저장"
+                    tooltip="저장"                    
+                    press=".onFooterButton($event,'save')"
+                    enabled="{=${uiModel>/hasUpdatingChanges} || ${uiModel>/hasCreateChanges}}"
+                    visible="{uiModel>/edit}"
+                >
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+                <Button
+                    class="custom-mg-btn"
+                    icon="sap-icon://cancel"
+                    text="취소"
+                    tooltip="취소"
+                    press=".onFooterButton($event,'cancel')"
+                    visible="{uiModel>/edit}"
+                >
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+            </OverflowToolbar>
+        </footer>
+    </Page>
+</mvc:View>

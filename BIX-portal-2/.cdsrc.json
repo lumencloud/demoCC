@@ -1,0 +1,97 @@
+{
+    "requires": {
+        "[hybrid]": {
+            "db": "hana"
+        },
+        "[production]": {
+            "db": "hana",
+            "auth": "xsuaa"
+        },
+        "db": "hana",
+        "connectivity": true
+    },
+    "build": {
+        "target": "gen",
+        "tasks": [
+            {
+                "for": "hana",
+                "src": "db",
+                "options": {
+                    "model": [
+                        "db",
+                        "db/cds/ai",
+                        "db/cds/pl",
+                        "db/cds/pl/view",
+                        "db/cds/rsp",
+                        "db/cds/rsp/view",
+                        "db/cds/oi",
+                        "db/cds/sga",
+                        "db/cds/sc",
+                        "db/cds/common",
+                        "db/cds/metastore",
+                        "db/cds/common/view",
+                        "db/cds/sga/view",
+                        "db/cds/customer",
+                        "db/cds/reporting",
+                        "srv",
+                        "srv/cds/ai",
+                        "srv/cds/pl",
+                        "srv/cds/rsp",
+                        "srv/cds/oi",
+                        "srv/cds/sga",
+                        "srv/cds/sc",
+                        "srv/cds/common",
+                        "srv/cds/metastore",
+                        "srv/cds/interface",
+                        "srv/cds/reporting"
+                    ]
+                }
+            },
+            {
+                "for": "nodejs",
+                "src": "srv",
+                "options": {
+                    "model": [
+                        "db",
+                        "db/cds/ai",
+                        "db/cds/pl",
+                        "db/cds/pl/view",
+                        "db/cds/rsp",
+                        "db/cds/rsp/view",
+                        "db/cds/oi",
+                        "db/cds/sga",
+                        "db/cds/sc",
+                        "db/cds/mock",
+                        "db/cds/common",
+                        "db/cds/common/view",
+                        "db/cds/metastore",
+                        "db/cds/sga/view",
+                        "db/cds/customer",
+                        "srv",
+                        "srv/cds/ai",
+                        "srv/cds/cm",
+                        "srv/cds/pl",
+                        "srv/cds/rsp",
+                        "srv/cds/oi",
+                        "srv/cds/sga",
+                        "srv/cds/sc",
+                        "srv/cds/mock",
+                        "srv/cds/common",
+                        "srv/cds/metastore",
+                        "srv/cds/interface",
+                        "srv/cds/reporting"
+                    ]
+                }
+            }
+        ]
+    },
+    "hana": {
+        "journal": {
+            "enable-drop": true,
+            "change-mode": "drop"
+        }
+    },
+    "sql": {
+        "native_hana_associations": false
+    }
+}

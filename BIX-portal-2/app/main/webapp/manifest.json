@@ -1,0 +1,154 @@
+{
+  "_version": "1.65.0",
+  "sap.app": {
+    "id": "bix.main",
+    "type": "application",
+    "i18n": {
+      "bundleUrl": "../../bix/portal/i18n/i18n.properties",
+      "supportedLocales": [
+        "ko",
+        "en"
+      ],
+      "fallbackLocale": "ko"
+    },
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.16.4",
+      "toolsId": "8605b675-2491-4897-b003-046776b1f2cb"
+    },
+    "dataSources": {}
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.134.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.f": {},
+        "sap.tnt": {},
+        "sap.ui.table": {},
+        "sap.uxap": {},
+        "sap.ui.layout": {},
+        "sap.viz": {},
+        "sap.ui.integration": {},
+        "sap.ui.unified": {},
+        "sap.ui.mdc": {},
+        "sap.ui.fl": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleUrl": "../../bix/portal/i18n/i18n.properties",
+          "supportedLocales": [
+            "ko",
+            "en"
+          ],
+          "fallbackLocale": "ko"
+        }
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "componentUsages": {
+      "bix.common.dashboard": {
+        "name": "bix.common.dashboard"
+      },
+      "bix.ai.component": {
+        "name": "bix.ai.component"
+      }
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.f.routing.Router",
+        "controlId": "fcl",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "bix.main.view"
+      },
+      "routes": [
+        {
+          "name": "RouteHome",
+          "pattern": ":?query:",
+          "target": [
+            {
+              "name": "TargetDashboard",
+              "prefix": "#"
+            },
+            {
+              "name": "TargetAI",
+              "prefix": "ai"
+            }
+          ]
+        }
+      ],
+      "targets": {
+        "TargetHome": {
+          "id": "MainHome",
+          "name": "MainHome",
+          "title": "{i18n>p_t_homeTitle}",
+          "controlAggregation": "beginColumnPages"
+        },
+        "TargetMenu": {
+          "type": "Component",
+          "usage": "bix.admin.menu",
+          "title": "Menu Management",
+          "id": "menu",
+          "controlAggregation": "beginColumnPages"
+        },
+        "TargetAI": {
+          "type": "Component",
+          "usage": "bix.ai.component",
+          "id": "ai",
+          "controlAggregation": "midColumnPages"
+        },
+        "TargetDashboard": {
+          "type": "Component",
+          "usage": "bix.common.dashboard",
+          "title": "Home",
+          "id": "Home",
+          "controlAggregation": "beginColumnPages"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "bix.main.view.App",
+      "type": "XML",
+      "id": "App"
+    }
+  }
+}

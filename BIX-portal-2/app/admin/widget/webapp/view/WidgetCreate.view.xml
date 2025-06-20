@@ -1,0 +1,195 @@
+<mvc:View
+    controllerName="bix.admin.widget.controller.WidgetCreate"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:uxap="sap.uxap"
+    xmlns="sap.m"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:f="sap.f"
+    xmlns:table="sap.ui.table"
+>
+    <f:DynamicPage
+        class="sapUiContentPadding"
+        showFooter="true"
+    >
+        <f:content>
+            <Panel
+                expanded="true"
+                width="auto"
+            >
+                <form:SimpleForm editable="true">
+                    <form:toolbar>
+                        <OverflowToolbar class="custom-toolbar">
+                            <core:Icon
+                                src="sap-icon://undo"
+                                width="36px"
+                                height="36px"
+                                press=".onCancel"
+                                class="back-icon"
+                            />
+                            <Title
+                                text="{= ${ui>/edit} ? '위젯 수정' : '위젯 생성'}"
+                                class="custom-mg-title sapUiSmallMarginBegin"
+                            />
+                        </OverflowToolbar>
+                    </form:toolbar>
+                    <form:content>
+                        <Text
+                            class="custom-mg-tx"
+                            text="카테고리"
+                            tooltip="카테고리"
+                            wrapping="false"
+                        >
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M4 S12" />
+                            </layoutData>
+                        </Text>
+                        <Select
+                            selectedKey="{widgetModel>/category}"
+                            width="100%"
+                            fieldGroupIds="Required,Clear,Input"
+                            change="onChangeCategory"
+                            editable="{= !${ui>/edit}}"
+                            forceSelection="true"
+                            items="{
+                                                path: 'cm>/code_item_view(\'widget_type\')/Set'
+                                            }"
+                        >
+                            <items>
+                                <core:Item
+                                    key="{cm>value}"
+                                    text="{cm>name}"
+                                />
+                            </items>
+                            <layoutData>
+                                <layout:GridData span="XL4 L4 M8 S12" />
+                            </layoutData>
+                        </Select>
+
+                        <Text
+                            class="custom-mg-tx"
+                            text="위젯 제목"
+                            tooltip="위젯 제목"
+                            wrapping="false"
+                        >
+                            <layoutData>
+                                <layout:GridData
+                                    span="XL2 L2 M4 S12"
+                                    linebreakXL="true"
+                                />
+                            </layoutData>
+                        </Text>
+                        <Input
+                            value="{widgetModel>/name}"
+                            placeholder="위젯 제목"
+                            maxLength="50"
+                            type="Text"
+                            liveChange="onFieldChange"
+                            fieldGroupIds="Clear,Input,Required,Title"
+                        >
+                            <layoutData>
+                                <layout:GridData span="XL4 L4 M8 S12" />
+                            </layoutData>
+                        </Input>
+
+                        <Text
+                            class="custom-mg-tx"
+                            text="위젯 설명"
+                            tooltip="위젯 설명"
+                            wrapping="false"
+                        >
+                            <layoutData>
+                                <layout:GridData
+                                    span="XL2 L2 M4 S12"
+                                    linebreakXL="true"
+                                />
+                            </layoutData>
+                        </Text>
+                        <Input
+                            value="{widgetModel>/description}"
+                            placeholder="위젯 설명"
+                            maxLength="50"
+                            type="Text"
+                            change="onFieldChange"
+                            fieldGroupIds="Clear,Input"
+                        >
+                            <layoutData>
+                                <layout:GridData span="XL4 L4 M8 S12" />
+                            </layoutData>
+                        </Input>
+                        <Text
+                            class="custom-mg-tx"
+                            text="콘텐츠 폴더"
+                            tooltip="콘텐츠 폴더"
+                            wrapping="false"
+                            visible="{= ${widgetModel>/category} === 'content' &amp;&amp; ${widgetModel>/contentType} === 0}"
+                        >
+                            <layoutData>
+                                <layout:GridData
+                                    span="XL2 L2 M4 S12"
+                                    linebreakXL="true"
+                                />
+                            </layoutData>
+                        </Text>
+                        <Select
+                            selectedKey="{widgetModel>/cardFolder}"
+                            width="100%"
+                            visible="{= ${widgetModel>/category} === 'content' &amp;&amp; ${widgetModel>/contentType} === 0}"
+                            change="onFieldChange"
+                            forceSelection="false"
+                            fieldGroupIds="Clear,Input,Required"
+                            items="{
+                                                path: 'cm>/code_item_view(\'card_type\')/Set'
+                                            }"
+                        >
+                            <items>
+                                <core:Item
+                                    key="{cm>value}"
+                                    text="{cm>name}"
+                                />
+                            </items>
+                            <layoutData>
+                                <layout:GridData span="XL4 L4 M8 S12" />
+                            </layoutData>
+                        </Select>
+                    </form:content>
+                </form:SimpleForm>
+            </Panel>
+        </f:content>
+        <f:footer>
+            <OverflowToolbar
+                style="Clear"
+                class="custom-mg-footer"
+            >
+                <ToolbarSpacer />
+                <Button
+                    visible="{oAuthData>/create}"
+                    icon="sap-icon://save"
+                    id="saveButton"
+                    text="저장"
+                    tooltip="저장"
+                    press="onRegister"
+                    type="Accept"
+                    class="custom-mg-btn"
+                >
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+                <Button
+                    icon="sap-icon://cancel"
+                    text="취소"
+                    tooltip="취소"
+                    class="custom-mg-btn"
+                    press="onCancel"
+                >
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+            </OverflowToolbar>
+        </f:footer>
+    </f:DynamicPage>
+</mvc:View>

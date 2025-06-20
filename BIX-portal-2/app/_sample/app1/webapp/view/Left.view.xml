@@ -1,0 +1,125 @@
+<mvc:View xmlns:m="sap.m"
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:ui="sap.ui.table"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    controllerName="bix.sample.app1.controller.Left"
+    height="100%">
+    <Page showHeader="false" backgroundDesign="List">
+        <l:ResponsiveSplitter defaultPane="default" class="sapUiNoContentPadding">
+            <l:PaneContainer resize=".onRootContainerResize">
+                <l:PaneContainer orientation="Vertical" resize=".onInnerContainerResize">
+                    <l:SplitPane requiredParentWidth="600" demandPane="false">
+                        <l:layoutData>
+                            <l:SplitterLayoutData resizable="false" size="2.75rem" />
+                        </l:layoutData>
+                        <IconTabHeader mode="Inline" class="sapUiNoContentPadding">
+                            <items>
+                                <IconTabFilter key="Account 별" text="Account 별" />
+                                <IconTabSeparator/>
+                                <IconTabFilter key="Delivery 별" text="Delivery 별"/>
+                            </items>
+                        </IconTabHeader>
+                    </l:SplitPane>
+                    <l:SplitPane requiredParentWidth="600">
+                        <l:layoutData>
+                            <l:SplitterLayoutData size="{sizes>/pane2}" />
+                        </l:layoutData>
+                        <Table
+                            sticky="HeaderToolbar,ColumnHeaders"
+                            mode="SingleSelectMaster"
+                            itemPress="onListItemPress"
+                            inset="false"
+                            items="{
+                                path: 'products>/ProductCollection',
+                                sorter: {
+                                    path: 'Name'
+                                }
+                            }"
+                            class="sapFDynamicPageAlignContent sapUiTinyMarginBeginEnd"
+                            width="auto">
+                            <headerToolbar>
+                                <OverflowToolbar>
+                                    <ObjectStatus
+                                        text="[ 테이블 타이틀 ]"
+                                        state="Indication05"
+                                        inverted="true"/>
+                                    <ToolbarSpacer/>
+                                    <SearchField search="onSearch" width="17.5rem"/>
+                                    <OverflowToolbarButton icon="sap-icon://add" type="Transparent" press="onPress"/>
+                                    <OverflowToolbarButton icon="sap-icon://sort" type="Transparent" press="onPress2"/>
+                                </OverflowToolbar>
+                            </headerToolbar>
+                            <columns>
+                                <Column width="12em">
+                                    <Text text="Product" />
+                                </Column>
+                                <Column	hAlign="End">
+                                    <Text text="Price" />
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem type="Navigation">
+                                    <cells>
+                                        <ObjectIdentifier title="{products>Name}" text="{products>ProductId}" />
+                                        <ObjectNumber
+                                                number="{
+                                                    parts:[{path:'products>Price'},{path:'products>CurrencyCode'}],
+                                                    type: 'sap.ui.model.type.Currency',
+                                                    formatOptions: {showMeasure: false}
+                                                }"
+                                                unit="{products>CurrencyCode}" />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                        
+                    </l:SplitPane>
+                    <l:SplitPane requiredParentWidth="300">
+                        <l:layoutData>
+                            <l:SplitterLayoutData size="{sizes>/pane3}" />
+                        </l:layoutData>
+                        <ui:Table
+                            class="sapFDynamicPageAlignContent sapUiTinyMargin"
+                            rows="{/ProductCollection}"
+                            selectionMode="MultiToggle"
+                            paste="onPaste"
+                            rowMode="Auto"
+                            ariaLabelledBy="title">
+                            <ui:extension>
+                                <OverflowToolbar style="Clear">
+                                    <ObjectStatus
+                                        text="[ 테이블 타이틀 ]"
+                                        state="Indication05"
+                                        inverted="true"/>
+                                </OverflowToolbar>
+                            </ui:extension>
+                            <ui:columns>
+                                <ui:Column width="11rem">
+                                    <Label text="Product Name" />
+                                    <ui:template>
+                                        <Text text="{Name}" wrapping="false" />
+                                    </ui:template>
+                                </ui:Column>
+                                <ui:Column width="11rem">
+                                    <Label text="Product Id" />
+                                    <ui:template>
+                                        <Input value="{ProductId}"/>
+                                    </ui:template>
+                                </ui:Column>
+                                <ui:Column width="6rem" hAlign="End">
+                                    <Label text="Quantity" />
+                                    <ui:template>
+                                        <Label text="{Quantity}" />
+                                    </ui:template>
+                                </ui:Column>
+                                </ui:columns>
+                            </ui:Table>
+                        
+                    </l:SplitPane>
+                </l:PaneContainer>
+            </l:PaneContainer>
+        </l:ResponsiveSplitter>
+    </Page>
+</mvc:View>

@@ -1,0 +1,93 @@
+[
+    {
+        "menu_id": "PL_actual_sales_margin",
+        "name": "실적PL 매출 마진",
+        "description": "실적PL, 매출, 마진, 전사 및 조직별 매출과 마진 수치를 확인할 수 있는 화면, 경영 실적의 기본 구조를 파악할 때 사용되고 수익성과 비용 구조를 통합적으로 분석",
+        "trigger_patterns": ["실적PL", "실적", "매출", "마진", "마진율", "마진률"],
+        "url": "actual/table/saleMargin/detail"
+    },
+    {
+        "menu_id": "PL_actual_sgna",
+        "name": "실적PL SG&A",
+        "description": "실적PL, 판매관리비(SG&A)의 구성 및 지출 현황을 확인하는 화면이고 인건비, 경비, 투자비 등 조직 운영 간접비를 상세히 분석 가능 및 비용 절감이나 조직 효율성 분석",
+        "trigger_patterns": ["실적PL", "실적", "sg&a", "sgna", "sga", "판관비", "판매관리비", "인건비", "경비", "투자비", "운영 간접비"],
+        "url": "actual/table/sga/detail"
+    },
+    {
+        "menu_id": "OI_actual_dt",
+        "name": "실적OI DT 매출 마진",
+        "description": "실적OI, 과제 단위로 DT 사업의 매출과 마진을 분석하는 화면, 개별 프로젝트의 수익성과 기여도를 상세히 비교",
+        "trigger_patterns": ["실적OI", "실적", "DT", "dt", "과제", "digital transformation"],
+        "url": "actual/table/dtSaleMargin/detail"
+    },
+    {
+        "menu_id": "OI_actual_Non-MM",
+        "name": "실적OI Non-MM",
+        "description": "실적 OI, 비 M/M 형태의 사업(구독형, 유지보수 등) 매출을 분석하는 화면, MM 방식 이외의 고정적 수익 모델을 평가",
+        "trigger_patterns": ["실적OI", "실적", "non-mm", "Non-MM", "비 M/M", "논 맴먼스", "유지보수", "고정 수익"],
+        "url": "actual/table/nonMm/detail"
+    },
+    {
+        "menu_id": "OI_actual_br",
+        "name": "실적OI BR",
+        "description": "실적OI, BR(Billing Rate) 관련 지표를 확인하는 화면. 투입 인력의 단가 및 과제별 청구 단가 분석에 활용, 인력 운영 효율성 및 단가 정책 검토가 필요할 때 사용 조직별 투입되지 않은 인원을 파악할 때 활용",
+        "trigger_patterns": ["실적OI", "실적", "BR", "br", "가동률", "인력", "b", "u", "nb", "mm", "billing cost", "br(mm)", "br(cost)"],
+        "url": "actual/table/br/detail"
+    },
+    {
+        "menu_id": "OI_actual_rohc",
+        "name": "실적OI RoHC",
+        "description": "실적OI, 인당 생산성(RoHC)을 분석하는 화면. 조직 또는 과제 단위로 인력 대비 산출 성과를 측정, 인력 효율성 및 최적 인력 배치 전략 수립 시 활용",
+        "trigger_patterns": ["실적OI", "실적", "ROHC", "rohc", "인당 생산성", "인력 대비 산출 성과"],
+        "url": "actual/table/rohc/detail"
+    },
+    {
+        "menu_id": "PL_plan_pipeline",
+        "name": "추정PL Pipeline 상세",
+        "description": "추정PL, 수주 파이프라인에 대한 상세 현황을 보여주는 화면. 예상 수주, 기회 단계, 예상 매출 등의 정보를 기반으로 향후 매출 흐름을 예측 가능, 매출 전망 분석 또는 수주 전략 수립에 적합",
+        "trigger_patterns": ["추정PL", "pipeline", "deal stage", "수주 금액", "수주 건수", "수주 매출", "lead", "identified", "validated", "qualified", "negotiated", "contracted", "deal lost", "deselected"],
+        "url": "plan/table/enterprisePipeline/detail"
+    },
+    {
+        "menu_id": "PL_plan_sales_margin",
+        "name": "추정PL 매출 마진",
+        "description": "추정PL, 매출, 마진, 전사 및 조직별 매출과 마진 수치를 확인할 수 있는 화면, 경영 실적의 기본 구조를 파악할 때 사용되고 수익성과 비용 구조를 통합적으로 분석",
+        "trigger_patterns": ["추정PL", "추정", "매출", "마진", "마진율", "마진률"],
+        "url": "plan/table/saleMargin/detail"
+    },
+    {
+        "menu_id": "PL_plan_sgna",
+        "name": "추정PL SG&A",
+        "description": "추정PL, 판매관리비(SG&A)의 구성 및 지출 현황을 확인하는 화면이고 인건비, 경비, 투자비 등 조직 운영 간접비를 상세히 분석 가능 및 비용 절감이나 조직 효율성 분석",
+        "trigger_patterns": ["추정PL", "추정", "sg&a", "sgna", "sga", "판관비", "판매관리비", "인건비", "경비", "투자비", "운영 간접비"],
+        "url": "plan/table/sga/detail"
+    },
+    {
+        "menu_id": "OI_plan_dt",
+        "name": "추정OI DT 매출 마진",
+        "description": "추정OI, 과제 단위로 DT 사업의 매출과 마진을 분석하는 화면, 개별 프로젝트의 수익성과 기여도를 상세히 비교",
+        "trigger_patterns": ["추정OI", "추정", "DT", "dt", "과제", "digital transformation"],
+        "url": "plan/table/dtSaleMargin/detail"
+    },
+    {
+        "menu_id": "OI_plan_offshoring",
+        "name": "추정OI Offshoring",
+        "description": "추정OI, Offshoring을 통해 발생한 비용 절감 효과를 분석하는 화면, AGS 등 해외 인력 활용을 통한 절감액과 내국인력 대비 효율성을 확인",
+        "trigger_patterns": ["추정OI", "추정", "offshoring", "ags", "해외 외주 인력"],
+        "url": "plan/table/offshoring/detail"
+    },
+    {
+        "menu_id": "OI_plan_Non-MM",
+        "name": "추정OI Non-MM",
+        "description": "추정 OI, 비 M/M 형태의 사업(구독형, 유지보수 등) 매출을 분석하는 화면, MM 방식 이외의 고정적 수익 모델을 평가",
+        "trigger_patterns": ["추정OI", "추정", "non-mm", "Non-MM", "비 M/M", "논 맴먼스", "유지보수", "고정 수익"],
+        "url": "plan/table/nonMm/detail"
+    },
+    {
+        "menu_id": "OI_plan_br",
+        "name": "추정OI BR",
+        "description": "추정OI, BR(Billing Rate) 관련 지표를 확인하는 화면. 투입 인력의 단가 및 과제별 청구 단가 분석에 활용, 인력 운영 효율성 및 단가 정책 검토가 필요할 때 사용 조직별 투입되지 않은 인원을 파악할 때 활용",
+        "trigger_patterns": ["추정OI", "추정", "BR", "br", "가동률", "인력", "b", "u", "nb", "mm", "billing cost", "br(mm)", "br(cost)"],
+        "url": "plan/table/br/detail"
+    }
+]

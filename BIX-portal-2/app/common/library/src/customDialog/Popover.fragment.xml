@@ -1,0 +1,23 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Popover 
+        id="AiPopover"
+        class="sapUiResponsivePadding--header"
+        placement="Bottom">
+        <customHeader>
+            <OverflowToolbar >
+                <core:Icon src="sap-icon://manager-insight"></core:Icon>
+                <Title text="AI 에이전트"></Title>
+                
+            </OverflowToolbar>
+        </customHeader>
+
+        <VBox >            
+            <Text text="종합적 분석 결과를 구조화된"/>
+            <Text text="텍스트 보고서 형태로"/>
+            <Text text="제공합니다."/>    
+        </VBox>
+        
+    </Popover>
+</core:FragmentDefinition>

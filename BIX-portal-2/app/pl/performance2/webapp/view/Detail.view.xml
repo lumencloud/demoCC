@@ -1,0 +1,70 @@
+<mvc:View 
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:w="sap.ui.integration.widgets"
+	xmlns:card="sap.f.cards"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    xmlns:ui="sap.ui.table"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:uxap="sap.uxap"
+    displayBlock="true"
+    controllerName="bix.pl.performance2.controller.Detail"
+    width="100%"
+    height="100%">
+    <Page showHeader="false" enableScrolling="true" class="custom-page-backcolor">
+        <content>
+            <FlexBox width="100%" height="100%" direction="Column" fitContainer="true">
+                <Toolbar height="4rem" style="Clear" design="Info" class="custom-background-transparent custom-no-padding" >
+                    <HeaderContainer id="detailContainer" content="{detailModel>/}" showDividers="false" width="100%" class="depth-container">
+                        <ToggleButton text="{detailModel>name}" press=".onPressMenuTitle($event,${detailModel>detail_path})" 
+                            visible="{= ${hashModel>/page} === ${detailModel>page_path}}"
+                            pressed="{= ${hashModel>/detail} === ${detailModel>detail_path}}"
+                            class="custom-depth-btn"/>
+                    </HeaderContainer>
+                    <!-- AI 현황 분석 버튼 추가
+                    <Button id="aiAnalysisBtn" 
+                        text="AI 현황 분석" 
+                        icon="sap-icon://insight-from-dataset" 
+                        type="Emphasized" 
+                        press=".onPressAIAnalysis"
+                        tooltip="AI를 활용한 현황 분석 수행"
+                        class="sapUiSmallMarginBegin"/>
+                    -->
+                </Toolbar>
+
+                <Toolbar height="3.5rem" style="Clear" design="Solid" class="custom-border-radius-top">
+                    <SegmentedButton id="segmentedButton" selectedKey="{hashModel>/detailType}" selectionChange="onSelectionChange" class="custom-segment-btn">
+                        <items>
+                            <SegmentedButtonItem key="chart" icon="sap-icon://vertical-waterfall-chart" text="차트"/>
+                            <SegmentedButtonItem key="detail" icon="sap-icon://Chart-Tree-Map" text="디테일" />
+                        </items>
+                        <layoutData><OverflowToolbarLayoutData priority="NeverOverflow" /></layoutData>
+                    </SegmentedButton>
+                    
+                    <ToolbarSpacer />      
+
+                    <Button text="PDF 다운로드" class="custom-text-semibold" icon="sap-icon://pdf-attachment" type="Neutral" press="onPDFDownload" />
+                    <ToolbarSeparator />
+                    <core:Icon src="sap-icon://favorite" 
+                        color="{= !!${favorite>/add} ?'#feca57' : '#ddd'}" size="1rem" press="onAddFavorite"/>
+                </Toolbar>
+
+                <VBox width="100%" height="1px" fitContainer="true" alignItems="Center" renderType="Bare" class="custom-background-white">
+                    <OverflowToolbar width="calc(100% - 1rem)" height="1px" style="Standard" design="Solid" />
+                </VBox>
+
+                <FlexBox id="viewPanel" width="100%" height="calc(100% - 8.5rem)" direction="Column" 
+                    backgroundDesign="Solid" fitContainer="true"
+                    class="sapUiNoContentPadding custom-border-radius-bottom">
+                    <w:Card id="detailCard" width="100%" height="100%" class="custom-no-box-shadow custom-card-size" 
+                        useProgressiveDisclosure="false">
+                        <w:layoutData>
+                            <FlexItemData growFactor="1" />
+                        </w:layoutData>
+                    </w:Card>
+                </FlexBox>
+            </FlexBox>
+        </content>
+    </Page>
+</mvc:View>

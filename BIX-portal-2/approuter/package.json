@@ -1,0 +1,17 @@
+{
+  "name": "bix-portal-approuter",
+  "dependencies": {
+    "@sap/approuter": "^20.2.0",
+    "@sap/xsenv": "^5.5.0",
+    "axios": "^1.8.3",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.1-security"
+  },
+  "engines": {
+    "node": "^20"
+  },
+  "scripts": {
+    "start": "node ./approuter-ext.js",
+    "start-local": "node ./approuter-ext.js -w ./local"
+  }
+}

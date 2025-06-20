@@ -1,0 +1,348 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    width="100%"
+    height="100%"
+    displayBlock="true"
+    controllerName="bix.card.sgaDetailTable.Main"
+    busyIndicatorDelay="0"
+>   
+    <Panel expandable="false"
+        expanded="true"
+        width="100%"
+        height="100%"
+        class="sapUiNoContentPadding">
+
+        <content>
+            <VBox height="100%" fitContainer="true">
+                <table:Table id="table"
+                    rows="{sgaDetailTreeTableModel>/}" 
+                    firstVisibleRowChanged="onFirstVisibleRowChanged"
+                    fixedColumnCount="2"
+                    selectionMode="Single" 
+                    selectionBehavior="RowOnly" 
+                    rowSelectionChange="onRowSelectionChange"
+                    visibleRowCountMode="Auto"
+                    class="custom-table-container custom-table-header custom-table-body custom-pl-table custom-alternate-row-color3
+                        custom-table-rounding-border custom-inherit-height custom-uiTable-selection" 
+                    fieldGroupIds="content">
+                    <table:extension>
+                        <OverflowToolbar width="100%" height="3rem" style="Standard">
+                            <ToolbarSpacer />
+                            <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" />
+                            <ToolbarSeparator />
+                            <Text emptyIndicatorMode="On"  text="단위 (억)"/>
+                        </OverflowToolbar>
+                    </table:extension>
+                    <table:rowSettingsTemplate>
+                        <table:RowSettings />
+                    </table:rowSettingsTemplate>
+                    <table:layoutData>
+                        <FlexItemData growFactor="1"/>
+                    </table:layoutData>
+
+                    <table:columns>
+                        <table:Column hAlign="Center" width="10rem" resizable="false" >
+                            <table:multiLabels>
+                                <Label text="부문" wrapping="true"/>
+                                <Label text=""/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text emptyIndicatorMode="On"  text="{sgaDetailTreeTableModel>div_nm}" wrapping="false" width="100%" textAlign="Center"   />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" width="8rem" resizable="false" >
+                            <table:multiLabels>
+                                <Label text="구분" wrapping="true"/>
+                                <Label text=""/>
+                            </table:multiLabels>
+                            <table:template>
+                                    <Text emptyIndicatorMode="On"  text="{
+                                        path: 'sgaDetailTreeTableModel>type',
+                                        formatter: '.onFormatTypeText'
+                                        }" wrapping="false" width="100%" textAlign="Center"  />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" minWidth="8rem" resizable="false" visible="false" >
+                            <table:multiLabels>
+                                <Label text='{= ${tableYearModel>/year} + "년"}' wrapping="true"/>
+                                <Label text="연간 목표"/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text emptyIndicatorMode="On"  text="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>goal', targetType: 'any' },
+                                        {value:''},
+                                        {value:'int'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }"
+                                    tooltip="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>goal', targetType: 'any' },
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }"
+                                    width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" headerSpan="3" minWidth="9rem" resizable="false">
+                            <table:multiLabels>
+                                <Label text="당월 실적" wrapping="true"/>
+                                <Label text="당월"/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text emptyIndicatorMode="On"  text="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>actual_curr_ym_value', targetType: 'any' },
+                                        {value:''},
+                                        {value:'int'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }"
+                                    tooltip="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>actual_curr_ym_value', targetType: 'any' },
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }"
+                                    wrapping="false" width="100%" textAlign="End"  />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" minWidth="7rem" resizable="false">
+                            <table:multiLabels>
+                                <Label text="당월 실적" wrapping="true"/>
+                                <Label text="전년 동기"/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text emptyIndicatorMode="On"  text="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>actual_last_ym_value', targetType: 'any' },
+                                        {value:''},
+                                        {value:'int'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }"
+                                    tooltip="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>actual_last_ym_value', targetType: 'any' },
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }"
+                                    wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" minWidth="9rem" resizable="false">
+                            <table:multiLabels>
+                                <Label text="당월 실적" wrapping="true"/>
+                                <Label text="GAP"/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text emptyIndicatorMode="On"  text="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>actual_ym_gap', targetType: 'any' },
+                                        {value:''},
+                                        {value:'int'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }"
+                                    tooltip="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>actual_ym_gap', targetType: 'any' },
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }"
+                                    wrapping="false" width="100%" textAlign="End" /> 
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" headerSpan="3" minWidth="6rem" resizable="false">
+                            <table:multiLabels>
+                                <Label text="진척도" wrapping="true"/>
+                                <Label text="당월"/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text emptyIndicatorMode="On"  text="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>actual_curr_ym_rate', targetType: 'any' },
+                                        {value:''},
+                                        {value:'percent'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }"
+                                    tooltip="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>actual_curr_ym_rate', targetType: 'any' },
+                                        {value:''},
+                                        {value:'percent'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }" 
+                                    wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" minWidth="6rem" resizable="false">
+                            <table:multiLabels>
+                                <Label text="진척도" wrapping="true"/>
+                                <Label text="전년 동기"/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text emptyIndicatorMode="On"  text="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>actual_last_ym_rate', targetType: 'any' },
+                                        {value:''},
+                                        {value:'percent'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }"
+                                    tooltip="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>actual_last_ym_rate', targetType: 'any' },
+                                        {value:''},
+                                        {value:'percent'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }" 
+                                    wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" minWidth="6rem" resizable="false">
+                            <table:multiLabels>
+                                <Label text="진척도" wrapping="true"/>
+                                <Label text="GAP"/>
+                            </table:multiLabels>
+                            <table:template>
+                                <Text emptyIndicatorMode="On"  text="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>actual_ym_rate_gap', targetType: 'any' },
+                                        {value:''},
+                                        {value:'percent'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }"
+                                    tooltip="{
+                                    parts: [
+                                        {path: 'sgaDetailTreeTableModel>actual_ym_rate_gap', targetType: 'any' },
+                                        {value:''},
+                                        {value:'percent'}
+                                    ],
+                                    formatter: '.onFormat'
+                                    }"
+                                    wrapping="false" width="100%" textAlign="End"  />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+                </table:Table>
+
+                <table:Table
+                    rows="{sgaDetailTableModel>/}" 
+                    id="actualSgaDetailTable"
+                    class="custom-table-container custom-table-header custom-table-body custom-table-first-emphasis
+                     custom-uiTable-selection custom-table-rounding-border custom-inherit-height sapUiTinyMarginBottom" 
+                    selectionMode="Single" 
+                    selectionBehavior="RowOnly" 
+                    enableColumnReordering="false"
+                    fixedColumnCount="1"
+                    busyIndicatorDelay="0"
+                    visible="{visibleModel>/visible}"
+                    >
+                    
+                    <table:rowMode>
+                        <rowmodes:Auto />
+                    </table:rowMode>
+
+                    <table:columns>
+                        <table:Column hAlign="Center" width="10rem" resizable="false" name="type" >
+                                <Label text="항목" wrapping="true"/>
+                            <table:template>
+                                <Text emptyIndicatorMode="On"  text="{sgaDetailTableModel>name}" wrapping="false" width="100%" textAlign="Center"
+                                     />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" resizable="false">
+                            <Label text="실적 금액" wrapping="true"/>
+                            <table:template>
+                                <Text emptyIndicatorMode="On"  text="{
+                                    parts: [
+                                        {path: 'sgaDetailTableModel>cost_curr_ym', targetType: 'any' }
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }" 
+                                tooltip="{parts: [
+                                        {path: 'sgaDetailTableModel>cost_curr_ym', targetType: 'any' },
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'}"
+                                wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" width="auto" resizable="false">
+                            <Label text="당해 추정" wrapping="true"/>
+                            <table:template>
+                                <Text emptyIndicatorMode="On" 
+                                text="{
+                                    parts: [
+                                        {path: 'sgaDetailTableModel>cost_total_curr_y', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{parts: [
+                                        {path: 'sgaDetailTableModel>cost_total_curr_y', targetType: 'any' },
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'}"
+                                wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" width="auto" resizable="false">
+                            <Label text="전년 동기" wrapping="true"/>
+                            <table:template>
+                                <Text emptyIndicatorMode="On" 
+                                text="{
+                                    parts: [
+                                        {path: 'sgaDetailTableModel>cost_last_ym', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{parts: [
+                                        {path: 'sgaDetailTableModel>cost_last_ym', targetType: 'any' },
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'}"
+                                wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" width="auto" resizable="false">
+                            <Label text="차이" wrapping="true"/>
+                            <table:template>
+                                <Text emptyIndicatorMode="On" 
+                                text="{
+                                    parts: [
+                                        {path: 'sgaDetailTableModel>cost_gap', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{parts: [
+                                        {path: 'sgaDetailTableModel>cost_gap', targetType: 'any' },
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'}"
+                                wrapping="false" width="100%" textAlign="End" />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+                </table:Table>
+            </VBox>
+        </content>
+    </Panel>
+</mvc:View>

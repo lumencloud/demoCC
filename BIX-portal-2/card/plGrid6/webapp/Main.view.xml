@@ -1,0 +1,70 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:card="sap.f.cards"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.plGrid6.Main"
+    
+>
+    <Toolbar height="3rem" class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop">
+        <f:Avatar src="sap-icon://high-priority" displaySize="XS" backgroundColor="Accent2"/>
+        <Title text="영업이익 실적" class="custom-text-bold" titleStyle="H4"/>
+    </Toolbar>
+    <HBox class="sapUiTinyMarginTop sapUiSmallMarginBottom sapUiMediumMarginBeginEnd" justifyContent="SpaceAround" width="100%">
+        <VBox justifyContent="Center" >
+            <HBox>
+                <Title text="{chartModel>/5/value}" class="custom-text-bold" titleStyle="H3"/>
+                <core:Icon id="plGrid6ChartIcon"/>
+            </HBox>
+            <Text text="{chartModel>/5/title}" />
+        </VBox>
+        <FlexBox alignItems="Center" justifyContent="Center" renderType="Bare"
+        fitContainer="true" >
+        <core:HTML id="html" />        
+        </FlexBox>
+    </HBox>
+    <!-- <f:Card height="100%">
+        <f:header>
+            <card:Header
+                title="영업이익 실적"
+                iconSrc="sap-icon://product"
+                iconSize="XS"
+                iconBackgroundColor="Accent6"
+            />
+        </f:header>
+        <f:content>
+            <HBox
+                height="8rem"
+                class="sapUiContentPadding"
+                justifyContent="SpaceAround"
+                alignItems="Center"
+            >
+                <VBox
+                    width="5rem"
+                    height="100%"
+                    class="sapUiSmallMarginBeginEnd"
+                    justifyContent="Center"
+                >
+                    <Title text="{chartModel>/5/value}" titleStyle="H4"/>
+                    <Text text="{chartModel>/5/title}" />
+                </VBox>
+
+                <FlexBox
+                    id="plGrid6_Box"
+                    width="12rem"
+                    justifyContent="Center"
+                />
+            </HBox>
+        </f:content>
+        <f:layoutData>
+            <f:GridContainerItemLayoutData
+                rows="2"
+                columns="3"
+            />
+        </f:layoutData>
+    </f:Card> -->
+</mvc:View>

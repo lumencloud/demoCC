@@ -1,0 +1,20 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.sgaDetailMonth.Main"
+>
+    <OverflowToolbar>
+        <Select items="{periodSelect>/}" width="30%" selectedKey="{searchModel>/period}" change=".onChange($event, 'period')">
+            <core:Item key="{periodSelect>key}" text="{periodSelect>value}"/>
+        </Select>
+        <Select items="{typeSelect>/}" width="30%" selectedKey="{searchModel>/type}" change=".onChange($event, 'type')">
+            <core:Item key="{typeSelect>key}" text="{typeSelect>value}"/>
+        </Select>
+    </OverflowToolbar>
+<FlexBox alignItems="Center" justifyContent="Center" renderType="Bare"
+        fitContainer="true" >
+        <core:HTML id="html" />
+    </FlexBox></mvc:View>

@@ -1,0 +1,277 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    width="100%"
+    height="100%"
+    displayBlock="true"
+    controllerName="bix.card.actualSGATable.Main"
+>
+    <Panel
+        expandable="false"
+        expanded="true"
+        width="100%"
+        height="100%"
+        class="sapUiNoContentPadding"
+    >
+        <headerToolbar>
+            <OverflowToolbar style="Clear" />
+        </headerToolbar>
+        <content>
+        <VBox fitContainer="true">
+            <table:Table
+                id="actualSGATable1"
+                rows="{path:'tableModel>/'}"
+                class="custom-table-container custom-table-header custom-table-body custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-table-rounding-border" 
+                selectionMode="None"
+                visible="{=${uIModel>/tableKind} === 'org'}"
+                visibleRowCountMode="Auto"              
+                fixedColumnCount="2"
+                busyIndicatorDelay="0"
+            >
+
+            <table:layoutData>
+                        <FlexItemData growFactor="1"/>
+                    </table:layoutData>
+                
+                <table:columns>
+                    <table:Column
+                        hAlign="Center"
+                        width="5rem"
+                        resizable="false"
+                        name="type"
+                    >
+                        <table:multiLabels>
+                            <Label />
+                            <Label
+                                text="조직"
+                                wrapping="true"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{tableModel>type1}"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Center"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        width="5rem"
+                        resizable="false"
+                        name="type"
+                    >
+                        <table:multiLabels>
+                            <Label />
+                            <Label
+                                text="구분"
+                                wrapping="true"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{tableModel>type2}"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Center"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        width="5rem"
+                        resizable="false"
+                        name="type"
+                    >
+                        <table:multiLabels>
+                            <Label />
+                            <Label
+                                text="목표"
+                                wrapping="true"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{tableModel>total}"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Center"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        headerSpan="3"
+                        resizable="false"
+                        width="7rem"
+                    >
+                        <table:multiLabels>
+                            <Label
+                                text="당월 실적"
+                                wrapping="true"
+                            />
+                            <Label
+                                text="당월"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{tableModel>total}"
+                                tooltip=""
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        width="7rem"
+                        resizable="false"
+                    >
+                        <table:multiLabels>
+                            <Label
+                                text="당월 실적"
+                                wrapping="true"
+                            />
+                            <Label
+                                text="전년 동기"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{tableModel>total}"
+                                tooltip=""
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        width="7rem"
+                        resizable="false"
+                    >
+                        <table:multiLabels>
+                            <Label
+                                text="당월 실적"
+                                wrapping="true"
+                            />
+                            <Label
+                                text="GAP"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{tableModel>total}"
+                                tooltip=""
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        width="7rem"
+                        resizable="false"
+                        headerSpan="3"
+                    >
+                        <table:multiLabels>
+                            <Label
+                                text="진척도"
+                                wrapping="true"
+                            />
+                            <Label
+                                text="당월"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{tableModel>total}"
+                                tooltip=""
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        width="7rem"
+                        resizable="false"
+                    >
+                        <table:multiLabels>
+                            <Label
+                                text="진척도"
+                                wrapping="true"
+                            />
+                            <Label
+                                text="전년 동기"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{tableModel>total}"
+                                tooltip=""
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        width="7rem"
+                        resizable="false"
+                    >
+                        <table:multiLabels>
+                            <Label
+                                text="진척도"
+                                wrapping="true"
+                            />
+                            <Label
+                                text="GAP"
+                                textAlign="Center"
+                                width="100%"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{tableModel>total}"
+                                tooltip=""
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+                </table:columns>
+            </table:Table>
+        </VBox>
+        </content>
+    </Panel>
+</mvc:View>

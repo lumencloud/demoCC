@@ -1,0 +1,32 @@
+{
+  "name": "bix.common.ai",
+  "version": "0.0.1",
+  "private": true,
+  "sapuxLayer": "",
+  "description": "A shared library",
+  "keywords": [
+    "ui5",
+    "openui5",
+    "sapui5"
+  ],
+  "main": "webapp/index.html",
+  "scripts": {
+    "build:cf": "ui5 build preload --clean-dest --config ui5-deploy.yaml",
+    "build_old": "ui5 build -a --clean-dest",
+    "build": "ui5 build -a --clean-dest --include-task=generateCachebusterInfo",
+    "deploy-config": "fiori add deploy-config"
+  },
+  "devDependencies": {
+    "@ui5/fs": "^4.0.1",
+    "@ui5/logger": "^4.0.1",
+    "rimraf": "^6.0.1",
+    "ui5-task-zipper": "^3.3.1",
+    "@ui5/cli": "^3.0.0",
+    "@sap/ux-ui5-tooling": "1"
+  },
+  "ui5": {
+    "dependencies": [
+      "ui5-task-zipper"
+    ]
+  }
+}

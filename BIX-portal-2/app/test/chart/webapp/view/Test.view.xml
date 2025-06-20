@@ -1,0 +1,356 @@
+<mvc:View controllerName="bix.test.chart.controller.Test"
+    xmlns:layout="sap.ui.layout" 
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:mdc="sap.ui.mdc"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:uxap="sap.uxap"
+    xmlns:core="sap.ui.core"
+    xmlns:table="sap.ui.table"
+    xmlns:unified="sap.ui.unified"
+    busyIndicatorDelay="0"
+    displayBlock="true"
+    width="100%"
+    height="100%"
+>
+    <uxap:ObjectPageLayout upperCaseAnchorBar="false" headerContentPinnable="false"
+        showTitleInHeaderContent="true" >
+		<uxap:headerTitle>
+            <uxap:ObjectPageDynamicHeaderTitle >
+                <uxap:expandedHeading>
+                    <Title text="테스트" />
+                </uxap:expandedHeading>
+
+                <uxap:snappedHeading>
+                    <Title text="테스트" />
+                </uxap:snappedHeading>
+            </uxap:ObjectPageDynamicHeaderTitle>
+		</uxap:headerTitle>
+
+		<uxap:sections>
+            <uxap:ObjectPageSection title="ChartJS" showTitle="true" titleUppercase="false" >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection >
+                        <uxap:blocks>
+                            <FlexBox width="100%" id="chartBox" alignItems="Center" justifyContent="Center" />
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+        
+            <!-- <uxap:ObjectPageSection title="테스트1" showTitle="true" >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection >
+                        <uxap:blocks>
+                            <VBox width="100%" height="100%">
+                                <form:SimpleForm width="100%" editable="true" >
+                                    <Label text="Sale" showColon="true" />
+                                    <Input id="testSale"
+                                        value="{
+                                        path: 'testModel>/sale',
+                                        type: 'sap.ui.model.type.Integer',
+                                        formatOptions: {
+                                            groupSeparator: ',',
+                                            groupingEnabled: true
+                                        }
+                                    }" 
+                                
+                                    fieldGroupIds="Test1" width="100%" liveChange="onLiveChange"  />
+                                    <Label text="Margin" showColon="true"/>
+                                    <mdc:Field value="{testModel>/margin}" dataType="sap.ui.model.type.Integer" 
+                                        fieldGroupIds="Test1" width="100%" liveChange="onLiveChange" 
+                                        dataTypeFormatOptions="{
+                                            groupSeparator: ',',
+                                            groupingEnabled: true
+                                        }" />
+                                </form:SimpleForm>
+                            </VBox>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection> -->
+        
+            <!-- <uxap:ObjectPageSection title="조회" showTitle="true" >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection >
+                        <uxap:blocks>
+                            <VBox width="100%" height="100%">
+                                <Toolbar>
+                                    <ToolbarSpacer />
+                                    <Button id="EditButton" text="{= ${uiModel>/editMode} ? '조회' : '수정'}" 
+                                        press="onEdit($event,${uiModel>/editMode})" />
+                                    <Button text="저장" 
+                                        press="onSave" visible="{uiModel>/editMode}" />
+                                </Toolbar>
+
+                                <form:SimpleForm id="SimpleForm1" width="100%" editable="true" 
+                                    binding="{
+                                        path: '/Test3(\'Test1\')',
+                                        parameters: {
+                                            $$updateGroupId: 'Test'
+                                        }
+                                    }" >
+                                    <VBox width="100%">
+                                        <Label text="{name##@com.sap.vocabularies.Common.v1.Label}" showColon="true" />
+                                        <mdc:Field value="{
+                                                path: 'name',
+                                                type: 'sap.ui.model.type.String'
+                                            }"
+                                            fieldGroupIds="SimpleForm1" width="100%" 
+                                            editMode="{= ${uiModel>/editMode} ? 'Editable' : 'Display' }" />
+                                        <layoutData><layout:GridData span="XL6 L6 M6 S6" /></layoutData>
+                                    </VBox>
+                                    
+                                    <VBox width="100%">
+                                        <Label text="{amount##@com.sap.vocabularies.Common.v1.Label}" showColon="true"/>
+                                        <mdc:Field id="testAmount"
+                                            value="{
+                                                path: 'amount', 
+                                                type: 'sap.ui.model.type.Integer'
+                                            }"
+                                            fieldGroupIds="SimpleForm1" width="100%" 
+                                            editMode="{= ${uiModel>/editMode} ? 'Editable' : 'Display' }" >
+                                        </mdc:Field>
+                                        <layoutData><layout:GridData span="XL6 L6 M6 S6" /></layoutData>
+                                    </VBox>
+                                </form:SimpleForm>
+                            </VBox>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection> -->
+
+            <!-- <uxap:ObjectPageSection title="생성" showTitle="true" >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection >
+                        <uxap:blocks>
+                            <VBox width="100%" height="100%">
+                                <Toolbar>
+                                    <ToolbarSpacer />
+                                    <Button text="생성" press="onCreate" />
+                                </Toolbar>
+                                <form:SimpleForm id="SimpleForm2" width="100%" editable="true"  >
+                                        <VBox width="100%">
+                                            <Label text="{name##@com.sap.vocabularies.Common.v1.Label}" showColon="true"/>
+                                            <mdc:Field value="{name}" dataType="sap.ui.model.type.String" width="100%" />
+                                            <layoutData><layout:GridData span="XL6 L6 M6 S6" /></layoutData>
+                                        </VBox>
+                                        
+                                        <VBox width="100%">
+                                            <Label text="{amount##@com.sap.vocabularies.Common.v1.Label}" showColon="true"/>
+                                            <mdc:Field value="{amount}" dataType="sap.ui.model.type.Integer" width="100%" />
+                                            <layoutData><layout:GridData span="XL6 L6 M6 S6" /></layoutData>
+                                        </VBox>
+                                </form:SimpleForm>
+                            </VBox>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection> -->
+
+            <!-- <uxap:ObjectPageSection title="삭제" showTitle="true" >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection >
+                        <uxap:blocks>
+                            <VBox width="100%" height="100%">
+                                <form:SimpleForm id="SimpleForm3" width="100%" editable="true"  >
+                                    <table:Table
+                                        id="testTable"
+                                        selectionMode="MultiToggle"
+                                        threshold="10"
+                                        enableBusyIndicator="true"
+                                        busyIndicatorDelay="0"
+                                        class="custom-Column-Header"
+                                        rows="{
+                                            path: '/Test3',
+                                            parameters : {
+                                                $count : true,
+                                                $filter : 'id ne \'Test1\''
+                                            },
+                                            events: {
+                                                dataReceived: '.onTableDataEvent'
+                                            }
+                                        }">
+                                        <table:extension>
+                                            <OverflowToolbar style="Standard">
+                                                <Title id="testTableTitle" text="총 {$count} 건" />
+                                                <ToolbarSpacer />
+                                                <Button text="삭제" press="onDelete" />
+                                            </OverflowToolbar>
+                                        </table:extension>
+                                        <table:Column width="auto" >
+                                            <Label text="{/Test3/id##@com.sap.vocabularies.Common.v1.Label}" />
+                                            <table:template>
+                                                <mdc:Field value="{id}" dataType="sap.ui.model.type.String" 
+                                                    editMode="Display" />
+                                            </table:template>
+                                        </table:Column>
+                                        <table:Column width="auto">
+                                            <Label text="{/Test3/name##@com.sap.vocabularies.Common.v1.Label}"/>
+                                            <table:template>
+                                                <mdc:Field value="{name}" dataType="sap.ui.model.type.String" 
+                                                    editMode="Display" />
+                                            </table:template>
+                                        </table:Column>
+                                        <table:Column width="auto">
+                                            <Label text="{/Test3/amount##@com.sap.vocabularies.Common.v1.Label}"/>
+                                            <table:template>
+                                                <mdc:Field value="{amount}" dataType="sap.ui.model.type.Integer" 
+                                                    editMode="Display" />
+                                            </table:template>
+                                        </table:Column>
+                                    </table:Table>
+                                </form:SimpleForm>
+                            </VBox>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection> -->
+
+            <!-- <uxap:ObjectPageSection title="유효성 검사" showTitle="true" >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection >
+                        <uxap:blocks>
+                            <VBox width="100%" height="100%">
+                                <form:SimpleForm id="SimpleForm4" width="100%" editable="true"  >
+                                    <table:Table
+                                        id="validTable"
+                                        threshold="10"
+                                        enableBusyIndicator="true"
+                                        busyIndicatorDelay="0"
+                                        class="custom-Column-Header"
+                                        rows="{
+                                            path: 'validModel>/'
+                                        }">
+                                        <table:extension>
+                                            <OverflowToolbar style="Standard">
+                                                <ToolbarSpacer />
+                                                <Button text="저장" press="onValidSave" />
+                                            </OverflowToolbar>
+                                        </table:extension>                                        
+                                        <table:Column width="auto" hAlign="Center">
+                                            <Label text="{/Test3/name##@com.sap.vocabularies.Common.v1.Label}"/>
+                                            <table:template>
+                                                <Text text="{validModel>name}" textAlign="End" />
+                                            </table:template>
+                                        </table:Column>
+                                        <table:Column width="auto" hAlign="Center">
+                                            <Label text="{/Test3/amount##@com.sap.vocabularies.Common.v1.Label}"  />
+                                            <table:template>
+                                                <Input width="100%" showClearIcon="true" textAlign="End" placeholder="금액 입력"
+                                                    value="{
+                                                        path: 'validModel>amount',
+                                                        type: 'sap.ui.model.type.Integer',
+                                                        formatOptions : {  
+                                                            groupingEnabled: true,
+                                                            groupingSeparator: ','
+                                                        }
+                                                    }" liveChange="onValidLiveChange" />
+                                            </table:template>
+                                        </table:Column>
+                                        <table:Column width="auto" hAlign="Center">
+                                            <Label text="{/Test3/margin##@com.sap.vocabularies.Common.v1.Label}"/>
+                                            <table:template>
+                                                <Input width="100%" showClearIcon="true" textAlign="End" placeholder="금액 입력"
+                                                    value="{
+                                                        path: 'validModel>margin',
+                                                        type: 'sap.ui.model.type.Integer',
+                                                        formatOptions : {  
+                                                            groupingEnabled: true,
+                                                            groupingSeparator: ','
+                                                        }
+                                                    }" liveChange="onValidLiveChange" />
+                                            </table:template>
+                                        </table:Column>
+                                        <table:Column width="auto" hAlign="Center">
+                                            <Label text="마진율" />
+                                            <table:template>
+                                                <Text text="{
+                                                    parts: [
+                                                        {path: 'validModel>amount', type: 'sap.ui.model.type.Integer'},
+                                                        {path: 'validModel>margin', type: 'sap.ui.model.type.Integer'}
+                                                    ],
+                                                    formatter: '.onMarginRate'
+                                                }" textAlign="End" emptyIndicatorMode="On"/>
+                                            </table:template>
+                                        </table:Column>                                        
+                                    </table:Table>
+                                </form:SimpleForm>
+                            </VBox>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection> -->
+
+            <!-- <uxap:ObjectPageSection title="엑셀업로드" showTitle="true" >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection >
+                        <uxap:blocks>
+                            <VBox width="100%" height="100%">
+                                <form:SimpleForm id="SimpleForm5" width="100%" editable="true"  >
+                                    <table:Table id="excelTestTable"
+                                        rows="{
+                                            path:'localModel>/'
+                                        }" class="custom-Column-Header" selectionMode="None">
+                                        <table:extension>
+                                            <OverflowToolbar>
+                                                <ToolbarSpacer />
+                                                <unified:FileUploader
+                                                    id="FileUploaderId" sameFilenameAllowed="true" iconOnly="false" buttonOnly="true" fileType="XLSX,xlsx"
+                                                    icon="sap-icon://upload" iconFirst="true" style="Emphasized" change="onUpload" buttonText="Excel Upload"/>
+                                                <Button icon="sap-icon://download" text="Template Download" press="onTemplateDown" />
+                                            </OverflowToolbar>
+                                        </table:extension>
+                                        <table:columns>
+                                            <table:Column hAlign="Center" width="100%" autoResizable="true">
+                                                <Label text="Name" wrapping="true"/>
+                                                <table:template>
+                                                    <Text text="{localModel>Name}" wrapping="false" width="100%" textAlign="Center"/>
+                                                </table:template>
+                                            </table:Column>
+                                            <table:Column hAlign="Center" width="100%" autoResizable="true" >
+                                                <Label text="Age"/>
+                                                <table:template>
+                                                    <Text text="{localModel>Age}" wrapping="false" width="100%" textAlign="Center" />
+                                                </table:template>
+                                            </table:Column>
+                                            <table:Column hAlign="Center" width="100%" autoResizable="true">
+                                                    <Label text="Job" wrapping="true"/>
+                                                <table:template>
+                                                    <Text text="{localModel>Job}" wrapping="false" width="100%" textAlign="Center" />
+                                                </table:template>
+                                            </table:Column>
+                                            <table:Column hAlign="Center" width="100%" autoResizable="true">
+                                                <Label text="Address" wrapping="true"/>
+                                                <table:template>
+                                                    <Text text="{localModel>Address}" wrapping="false" width="100%" textAlign="Center" />
+                                                </table:template>
+                                            </table:Column>
+                                        </table:columns>
+                                    </table:Table>
+                                </form:SimpleForm>
+                            </VBox>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection> -->
+
+            <!-- <uxap:ObjectPageSection title="템플릿" showTitle="true" >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection >
+                        <uxap:blocks>
+                            <VBox width="100%" height="100%">
+                                <form:SimpleForm id="SimpleForm4" width="100%" editable="true" binding="{/Test3('Test1')}" >
+                                    <template:repeat list="{Test3>com.sap.vocabularies.Common.v1.Label}" var="field">
+                                        <Label text="{path: 'field>Label', formatter: 'sap.ui.model.odata.AnnotationHelper.format'}" />
+                                        <Text text="{path: 'field>Value', formatter: 'sap.ui.model.odata.AnnotationHelper.format'}" />
+                                    </template:repeat>
+                                </form:SimpleForm>
+                            </VBox>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection> -->
+		</uxap:sections>
+	</uxap:ObjectPageLayout>
+</mvc:View>

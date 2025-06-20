@@ -1,0 +1,79 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:mdc="sap.ui.mdc"
+	busyIndicatorDelay="0">
+    <Dialog id="accountDetailDialog" class="sapUiContentPadding" 
+        contentWidth="30rem" contentHeight="auto" draggable="true" resizable="false" showHeader="false">
+
+        <content>
+        	<OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-dialog-toolbar">
+				<content>
+					<Title text="{uiModel>/title}" class="custom-header-subtitle"  />
+					<ToolbarSpacer/>
+					<Button icon="sap-icon://decline" press="onAccountDetailDialogButton($event,'Close')" />
+				</content>
+			</OverflowToolbar>
+            <form:SimpleForm id="simpleForm" editable="true">
+                <Label text="코드" required="{uiModel>/enabled}">
+                    <layoutData>
+                        <layout:GridData span="XL2 L3 M4 S12" />
+                    </layoutData>
+                </Label>
+                <Input value="{biz_tp_account_cd}" fieldGroupIds="Required" enabled="{uiModel>/enabled}"
+                    liveChange="onAccountChange($event,'biz_tp_account_cd')"
+                    valueLiveUpdate="true">
+                    <layoutData>
+                        <layout:GridData span="XL10 L9 M8 S12" />
+                    </layoutData>
+                </Input>
+
+                <Label text="Account 명" required="true" >
+                    <layoutData>
+                        <layout:GridData span="XL2 L3 M4 S12" />
+                    </layoutData>
+                </Label>                
+                <Input value="{biz_tp_account_nm}" fieldGroupIds="Required" 
+                    liveChange="onAccountChange($event,'biz_tp_account_nm')"
+                    valueLiveUpdate="true">
+                    <layoutData>
+                        <layout:GridData span="XL10 L9 M8 S12" />
+                    </layoutData>
+                </Input>      
+
+                <Label text="정렬 순서" required="true">
+                    <layoutData>
+                        <layout:GridData span="XL2 L3 M4 S12" />
+                    </layoutData>
+                </Label>            
+                <Input value="{
+                    path: 'sort_order',
+                    type: 'sap.ui.model.type.Integer',
+                    constraints: { minimum: '1' }
+                    }"
+                    fieldGroupIds="Required"
+                    liveChange="onAccountChange($event,'sort_order')"
+                    valueLiveUpdate="true"
+                    >
+                    <layoutData>
+                        <layout:GridData span="XL10 L9 M8 S12" />
+                    </layoutData>
+                </Input>
+                
+            </form:SimpleForm>
+            
+            <FlexBox width="100%" justifyContent="End" direction="Row" fitContainer="true" >
+                <Button width="auto" type="Emphasized" text="저장" 
+                    id="accountSaveButton"
+                    press="onAccountDetailDialogButton($event,'Save')" 
+                    enabled="false"
+                    class="custom-button-color custom-button-size sapUiTinyMarginBegin" />
+                <Button width="auto" type="Ghost" text="취소"
+                    press="onAccountDetailDialogButton($event,'Close')"
+                    class="custom-button-color custom-button-size sapUiTinyMarginBegin" />
+            </FlexBox>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>

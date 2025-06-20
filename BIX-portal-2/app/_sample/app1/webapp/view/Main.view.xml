@@ -1,0 +1,45 @@
+<mvc:View displayBlock="true"
+    controllerName="bix.sample.app1.controller.Main" height="100%"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:l="sap.ui.layout"
+    xmlns:ui="sap.ui.table"
+    xmlns:mvc="sap.ui.core.mvc">
+	<Page showHeader="true" backgroundDesign="List">
+		<customHeader>
+			<OverflowToolbar>
+				<Title text="헤더"/>
+				<ToolbarSpacer />
+				<Breadcrumbs id="location" separatorStyle="Slash">
+					<links>
+						<Link text="A 메뉴"/>
+						<Link text="B 메뉴"/>
+					</links>
+					<currentLocation>
+						<Link text="C 메뉴" emphasized="true" enabled="false"/>
+					</currentLocation>
+				</Breadcrumbs>
+			</OverflowToolbar>
+		</customHeader>
+		<content>
+			<l:ResponsiveSplitter defaultPane="default" class="sapUiNoContentPadding">
+				<l:PaneContainer resize=".onRootContainerResize">
+					<l:SplitPane>
+						<l:layoutData>
+							<l:SplitterLayoutData size="{sizes>/pane1}"/>
+						</l:layoutData>
+						<NavContainer id="2depth">
+						</NavContainer>
+					</l:SplitPane>
+					<l:SplitPane>
+						<l:layoutData>
+							<l:SplitterLayoutData size="{layoutControl>/3depth_size}" resizable="{layoutControl>/3depth_usage}"/>
+						</l:layoutData>
+						<NavContainer id="3depth" visible="{layoutControl>/3depth_usage}">
+						</NavContainer>
+					</l:SplitPane>
+				</l:PaneContainer>
+			</l:ResponsiveSplitter>
+		</content>
+	</Page>
+</mvc:View>
