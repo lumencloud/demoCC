@@ -1,0 +1,8 @@
+<core:FragmentDefinition
+		xmlns="sap.m"
+		xmlns:core="sap.ui.core">
+	<Menu itemSelected="EditMenuSelection" id="EditMenuSelection">
+		<MenuItem id="changeMenu" text="{i18n>change_name}"/>
+		<MenuItem id="deleteMenu" text="{i18n>delete_menu}"/>
+	</Menu>
+</core:FragmentDefinition>

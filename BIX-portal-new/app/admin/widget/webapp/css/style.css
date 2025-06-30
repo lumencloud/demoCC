@@ -1,0 +1,43 @@
+/* Enter your custom styles here */
+
+/* level3 링크 색깔 */
+.Menu3 .sapMLnk:visited,
+.Menu3 .sapMLnk:not(.sapMLnkDsbl) {
+    text-shadow: none !important;
+    text-decoration: underline;
+    color: #000;
+}
+
+.Menu3 .sapMTitle {
+    font-size: .875rem;
+    color: #000;
+}
+
+/* 서브 메뉴 background 색깔 */
+.Menu4 {
+    box-shadow: none !important;
+}
+
+/* 상위 로고 underline 제거 */
+.Bordernone {
+    border: none !important;
+}
+
+.adminMenu {
+    box-shadow: none !important;
+}
+
+.categoryPadding .sapTntToolHeader.sapMTB {
+    border-radius: 0;
+    padding: 0.25rem 1.25rem 0 0.75rem;
+    height: auto !important;
+}
+.tox-silver-sink{
+    height: 0% !important;
+}
+.sapMDialogScroll {
+    height: 100%;
+}
+.sapMListTblCell.cellBorderRight {
+	border-right: 1px solid lightgray;
+}

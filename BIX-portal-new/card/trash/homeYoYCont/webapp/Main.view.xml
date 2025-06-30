@@ -1,0 +1,13 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.homeYoYCont.Main"
+>
+    <!-- <FlexBox width="100%" id="chartBox9" alignItems="Center" justifyContent="Center" /> -->
+                <core:HTML id="html" />
+
+</mvc:View>

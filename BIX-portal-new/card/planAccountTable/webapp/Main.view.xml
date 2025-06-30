@@ -1,0 +1,1177 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    width="100%"
+    height="100%"
+    displayBlock="true"
+    controllerName="bix.card.planAccountTable.Main"
+>
+    <Panel
+        expandable="false"
+        expanded="true"
+        width="auto"
+        height="100%"
+        class="sapUiNoContentPadding"
+    >
+        
+        <content>
+        <VBox width="100%" height="100%">
+                    <OverflowToolbar style="Clear" height="2.5rem">
+                        <!-- <Title id="tempMessage" text="※ 현재 데이터가 없어 수주 및 건수 값이 맞지 않을 수 있습니다." /> -->
+                    
+                        <ToolbarSpacer />                
+                        <HBox class="custom-select-box" width="30%" justifyContent="End">
+                            <Select
+                                id="detailSelect"
+                                change=".onUiChange"
+                                width="30%"                            
+                                selectedKey="{uiModel>/tableKind}"
+                                items="{path: 'selectModel>/'}"
+                            >
+                                <items>
+                                    <core:ListItem
+                                        key="{selectModel>sub_key}"
+                                        text="{selectModel>sub_text}"
+                                    />
+                                </items>
+                            </Select>
+                        </HBox>
+                    </OverflowToolbar>
+        <VBox id="planAccountBox1" busyIndicatorDelay="0" visible="{=${uiModel>/tableKind} === 'deal_stage'}" class="custom-vbox-wrap-table" height="100%">
+            <table:Table
+                id="planAccountTable1"
+                rows="{path:'oDealTableModel>/'}"
+                selectionMode="None"
+                class="custom-table-container custom-table-header custom-table-body custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-table-rounding-border"
+                busyIndicatorDelay="0"
+                visibleRowCountMode="Auto"
+                fixedColumnCount="2"
+            >
+
+            <table:layoutData>
+                        <FlexItemData growFactor="1"/>
+                    </table:layoutData>
+                
+
+                <table:columns>
+                    <table:Column
+                        hAlign="Center"
+                        headerSpan="2"
+                        autoResizable="true"
+                        width="10rem"
+                    >
+                        <table:multiLabels>
+                            <Label
+                                text="단위/억"
+                                wrapping="true"
+                            />
+                            <Label />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{oDealTableModel>div_name}"
+                                tooltip="{oDealTableModel>div_name}"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Center"
+                            />
+                        </table:template>
+                    </table:Column>
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="5rem"
+                    >
+                        
+                        <table:multiLabels>
+                            <Label />
+                            <Label />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{oDealTableModel>type}"
+                                tooltip="{oDealTableModel>type}"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Center"
+                            />
+                        </table:template>
+                    </table:Column>
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                    >
+                        <table:multiLabels>
+                            <Label
+                                text="Total"
+                                wrapping="true"
+                            />
+                            <Label />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oDealTableModel>total_data', targetType: 'any'},
+                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oDealTableModel>total_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        headerSpan="6"
+                        width="7rem"
+                    >
+                        <table:multiLabels>
+                            <Label
+                                text="미확보"
+                                wrapping="true"
+                            />
+                            <Label
+                                text="미확보 Total"
+                                wrapping="true"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oDealTableModel>not_secured_total', targetType: 'any'},
+                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oDealTableModel>not_secured_total', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                    >
+                        <table:multiLabels>
+                            <Label text="미확보" />
+                            <Label
+                                text="Lead"
+                                wrapping="true"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oDealTableModel>lead_data', targetType: 'any'},
+                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oDealTableModel>lead_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                    >
+                        <table:multiLabels>
+                            <Label text="미확보" />
+                            <Label
+                                text="Identified"
+                                wrapping="true"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oDealTableModel>identified_data', targetType: 'any'},
+                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oDealTableModel>identified_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                    >
+                        <table:multiLabels>
+                            <Label text="미확보" />
+                            <Label
+                                text="Validated"
+                                wrapping="true"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oDealTableModel>validated_data', targetType: 'any'},
+                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oDealTableModel>validated_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                    >
+                        <table:multiLabels>
+                            <Label text="미확보" />
+                            <Label
+                                text="Qualified"
+                                wrapping="true"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oDealTableModel>qualified_data', targetType: 'any'},
+                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oDealTableModel>qualified_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                    >
+                        <table:multiLabels>
+                            <Label text="미확보" />
+                            <Label
+                                text="Negotiated"
+                                wrapping="true"
+                            />
+                        </table:multiLabels>
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oDealTableModel>negotiated_data', targetType: 'any'},
+                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oDealTableModel>negotiated_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>                    
+                </table:columns>
+            </table:Table>
+            </VBox>
+            <VBox id="planAccountBox2" busyIndicatorDelay="0" visible="{=${uiModel>/tableKind} === 'month'}" class="custom-vbox-wrap-table" height="100%">
+            <table:Table
+                id="planAccountTable2"
+                rows="{path:'oMonthTableModel>/'}"
+                selectionMode="None"
+                class="custom-table-container custom-table-header custom-table-body custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-table-rounding-border custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-selection-radius"
+                busyIndicatorDelay="0"
+                visibleRowCountMode="Auto"
+                fixedColumnCount="2"
+            >
+            <table:layoutData>
+                        <FlexItemData growFactor="1"/>
+                    </table:layoutData>
+                
+                <table:columns>
+                    <table:Column
+                        hAlign="Center"
+                        headerSpan="2"
+                        autoResizable="true"
+                        width="10rem"
+                    >
+                        <Label
+                            text="단위/억"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{oMonthTableModel>div_name}"
+                                tooltip="{oMonthTableModel>div_name}"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Center"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="5rem"
+                    >
+                        <Label
+                            text="단위/억"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{oMonthTableModel>type}"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Center"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                    >
+                        <Label
+                            text="Total"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>total_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>total_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                        visible="{oColumnsVisibleModel>/m_01_data}"
+                    >
+                        <Label
+                            text="1월"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_01_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_01_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                        visible="{oColumnsVisibleModel>/m_02_data}"
+                    >
+                        <Label
+                            text="2월"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_02_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_02_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                        visible="{oColumnsVisibleModel>/m_03_data}"
+                    >
+                        <Label
+                            text="3월"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_03_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_03_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                        visible="{=${oColumnsVisibleModel>/m_04_data}}"
+                    >
+                        <Label
+                            text="4월"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_04_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_04_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                        visible="{oColumnsVisibleModel>/m_05_data}"
+                    >
+                        <Label
+                            text="5월"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_05_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_05_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                        visible="{oColumnsVisibleModel>/m_06_data}"
+                    >
+                        <Label
+                            text="6월"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_06_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_06_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                        visible="{oColumnsVisibleModel>/m_07_data}"
+                    >
+                        <Label
+                            text="7월"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_07_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_07_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                        visible="{oColumnsVisibleModel>/m_08_data}"
+                    >
+                        <Label
+                            text="8월"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_08_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_08_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                        visible="{oColumnsVisibleModel>/m_09_data}"
+                    >
+                        <Label
+                            text="9월"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_09_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_09_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                        visible="{oColumnsVisibleModel>/m_10_data}"
+                    >
+                        <Label
+                            text="10월"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_10_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_10_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                        visible="{oColumnsVisibleModel>/m_11_data}"
+                    >
+                        <Label
+                            text="11월"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                               text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_11_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_11_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                        visible="{oColumnsVisibleModel>/m_12_data}"
+                    >
+                        <Label
+                            text="12월"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                               text="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_12_data', targetType: 'any'},
+                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oMonthTableModel>m_12_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+                </table:columns>
+            </table:Table>
+            </VBox>
+            <VBox id="planAccountBox3" busyIndicatorDelay="0" visible="{=${uiModel>/tableKind} === 'rodr'}" class="custom-vbox-wrap-table" height="100%">
+            <table:Table
+                id="planAccountTable3"
+                rows="{path:'oRodrTableModel>/'}"
+                selectionMode="None"
+                class="custom-table-container custom-table-header custom-table-body custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-table-rounding-border custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-selection-radius"
+                busyIndicatorDelay="0"
+                visibleRowCountMode="Auto"
+                fixedColumnCount="2"
+            >
+
+            <table:layoutData>
+                        <FlexItemData growFactor="1"/>
+                    </table:layoutData>
+                
+                <table:columns>
+                    <table:Column
+                        hAlign="Center"
+                        headerSpan="2"
+                        autoResizable="true"
+                        width="10rem"
+                    >
+                        <Label
+                            text="단위/억"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{oRodrTableModel>div_name}"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Center"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="5rem"
+                    >
+                        <Label
+                            text="단위/억"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{oRodrTableModel>type}"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Center"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"                        
+                    >
+                        <Label
+                            text="Total"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oRodrTableModel>total_data', targetType: 'any'},
+                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oRodrTableModel>total_data', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"                        
+                    >
+                        <Label
+                            text="100억 이상"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oRodrTableModel>more10bil', targetType: 'any'},
+                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oRodrTableModel>more10bil', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"                        
+                    >
+                        <Label
+                            text="50억~100억"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oRodrTableModel>5bil-10bil', targetType: 'any'},
+                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oRodrTableModel>5bil-10bil', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                    >
+                        <Label
+                            text="30억~50억"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oRodrTableModel>3bil-5bil', targetType: 'any'},
+                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oRodrTableModel>3bil-5bil', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                    >
+                        <Label
+                            text="10억~30억"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                               text="{
+                                    parts:[
+                                        {path:'oRodrTableModel>1bil-3bil', targetType: 'any'},
+                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oRodrTableModel>1bil-3bil', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                    >
+                        <Label
+                            text="5억~10억"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oRodrTableModel>500mil-1bil', targetType: 'any'},
+                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oRodrTableModel>500mil-1bil', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                    >
+                        <Label
+                            text="1억~5억"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oRodrTableModel>100mil-500mil', targetType: 'any'},
+                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oRodrTableModel>100mil-500mil', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column
+                        hAlign="Center"
+                        autoResizable="true"
+                        width="7rem"
+                    >
+                        <Label
+                            text="1억 미만"
+                            wrapping="true"
+                        />
+                        <table:template>
+                            <Text emptyIndicatorMode="On"
+                                text="{
+                                    parts:[
+                                        {path:'oRodrTableModel>less100mil', targetType: 'any'},
+                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'oRodrTableModel>less100mil', targetType: 'any'},
+                                        {value:''},
+                                        {value:'tooltip'}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                            />
+                        </table:template>
+                    </table:Column>
+                </table:columns>
+            </table:Table>
+        </VBox>
+        </VBox>
+        </content>
+    </Panel>
+</mvc:View>

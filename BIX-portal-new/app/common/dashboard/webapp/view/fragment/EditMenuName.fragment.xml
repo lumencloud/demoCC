@@ -1,0 +1,29 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Dialog
+        id="EditMenuNameDialog">
+        <customHeader>
+			<Bar class="settingDialog">
+				<contentLeft>
+					<Text text="{i18n>change_menu_name}" class="settingDialogForFont"></Text>					
+				</contentLeft>
+				<contentRight>					
+                	<Button icon="sap-icon://decline" press=".onCancelEditMenu"/>            
+				</contentRight>
+			</Bar>
+		</customHeader>
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <Label text="{i18n>menu_name}" required="true" />
+                <Input id="EditNameInput" value="" fieldGroupIds="Required" placeholder="{i18n>enter_menu_name}" />
+            </VBox>
+        </content>
+        <beginButton>
+            <Button icon="sap-icon://accept" text="{i18n>confirm}" type="Emphasized" press="onSaveMenuName" />
+        </beginButton>
+        <endButton>
+            <Button icon="sap-icon://cancel" text="{i18n>cancel}" tooltip="{i18n>cancel}" type="Ghost" press="onCancelEditMenu" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

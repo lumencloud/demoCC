@@ -1,0 +1,1049 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    width="100%"
+    height="100%"
+    displayBlock="true"
+    controllerName="bix.card.actualDTSalesTableAiReport.Main"
+>
+    <Panel
+        expandable="false"
+        expanded="true"
+        width="auto"
+        height="100%"
+        class="sapUiNoContentPadding"> 
+        <content>
+            <VBox width="100%" height="100%">
+
+                        
+                <SegmentedButton
+                    id="detailSelect"
+                    selectionChange=".onUiChange"
+                    selectedKey="{uiModel>/tableKind}"
+                    class="custom-detail-select-btn"
+                    items="{path: 'selectModel>/'}"
+                    visible="fasle">
+                    <items>
+                        <SegmentedButtonItem key="{selectModel>sub_key}" text="{selectModel>sub_text}"/>
+                    </items>
+                </SegmentedButton>
+
+                <VBox fitContainer="true" id="actualDTSalesBox1" busyIndicatorDelay="0"
+                        visible="{=${uiModel>/tableKind} === 'org'}"
+                    class="custom-vbox-wrap-table"
+                    height="100%"
+                >
+                    <table:Table
+                        id="actualDTSalesTable1"
+                        rows="{path:'oOrgTableModel>/'}"
+                        class="custom-table-container custom-table-header custom-table-body 
+                            custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-table-rounding-border"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange="onRowSelectionChange"
+                        fixedColumnCount="1"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                    >
+
+                        <table:extension>
+                            <OverflowToolbar width="100%" height="3rem" style="Standard">
+
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
+                                <Text text="세부데이터"/>
+                                <ToolbarSpacer />
+                                <ToolbarSeparator />
+                                <Text emptyIndicatorMode="On"  text="단위 (억)"/>
+                            </OverflowToolbar>
+                        </table:extension>
+
+                        <table:layoutData>
+                            <FlexItemData growFactor="1"/>
+                        </table:layoutData>
+
+
+                    
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="13rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label />
+                                    <Label
+                                        text="부문"
+                                        wrapping="true"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{oOrgTableModel>org_name}"
+                                        tooltip="{oOrgTableModel>org_name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                name="type"
+                            >
+                                <table:multiLabels>
+                                    <Label />
+                                    <Label
+                                        text="목표"
+                                        wrapping="true"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oOrgTableModel>target_curr_y_value', targetType: 'any'},
+                                                {value:''},
+                                                {value:''},
+                                                {value:'target'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oOrgTableModel>target_curr_y_value', targetType: 'any'},
+                                                {value:''},
+                                                {value:''},
+                                                {value:'targetTooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="3"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oOrgTableModel>actual_curr_ym_value', targetType: 'any'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oOrgTableModel>actual_curr_ym_value', targetType: 'any'},
+                                                {value:''},
+                                                {value:''},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oOrgTableModel>actual_last_ym_value', targetType: 'any'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oOrgTableModel>actual_last_ym_value', targetType: 'any'},
+                                                {value:''},
+                                                {value:''},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oOrgTableModel>actual_curr_ym_value', targetType: 'any'},
+                                                {path:'oOrgTableModel>actual_last_ym_value', targetType: 'any'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oOrgTableModel>actual_curr_ym_value', targetType: 'any'},
+                                                {path:'oOrgTableModel>actual_last_ym_value', targetType: 'any'},
+                                                {value:''},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                headerSpan="3"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oOrgTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                                {value:''},
+                                                {value:'percent'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oOrgTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                                {value:''},
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oOrgTableModel>actual_last_ym_rate', targetType: 'any'},
+                                                {value:''},
+                                                {value:'percent'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oOrgTableModel>actual_last_ym_rate', targetType: 'any'},
+                                                {value:''},
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oOrgTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                                {path:'oOrgTableModel>actual_last_ym_rate', targetType: 'any'},
+                                                {value:'percent'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oOrgTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                                {path:'oOrgTableModel>actual_last_ym_rate', targetType: 'any'},
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:Table>
+                </VBox>
+                <VBox fitContainer="true" id="actualDTSalesBox2" busyIndicatorDelay="0"
+                        visible="{=${uiModel>/tableKind} === 'account'}"
+                            class="custom-vbox-wrap-table"
+                            height="100%"
+                >
+                    <table:Table
+                        id="actualDTSalesTable2"
+                        rows="{path:'oAccountTableModel>/'}"
+                        class="custom-table-container custom-table-header custom-table-body custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-table-rounding-border"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange="onRowSelectionChange"
+                        fixedColumnCount="2"
+                        busyIndicatorDelay="0"
+                    >
+
+                        <table:extension>
+                            <OverflowToolbar width="100%" height="3rem" style="Standard">
+
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
+                                <Text text="세부데이터"/>
+                                <ToolbarSpacer />
+                                <ToolbarSeparator />
+                                <Text emptyIndicatorMode="On"  text="단위 (억)"/>
+                            </OverflowToolbar>
+                        </table:extension>
+
+                        <table:layoutData>
+                            <FlexItemData growFactor="1"/>
+                        </table:layoutData>
+
+                        
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="13rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label />
+                                    <Label
+                                        text="부문"
+                                        wrapping="true"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{oAccountTableModel>name}"
+                                        tooltip="{oAccountTableModel>name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                    />
+                                </table:template>
+                            </table:Column>
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="3"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oAccountTableModel>curr_value', targetType: 'any'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oAccountTableModel>curr_value', targetType: 'any'},
+                                                {value:''},
+                                                {value:''},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <!-- <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oAccountTableModel>actual_last_ym_value', targetType: 'any'},
+                                                {path:'', targetType: 'any'},
+                                                {value:'billion'},{value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oAccountTableModel>actual_last_ym_value', targetType: 'any'},
+                                                {path:'', targetType: 'any'},
+                                                {value:'tooltip'},{value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column> -->
+
+                            <!-- <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oAccountTableModel>actual_curr_ym_value', targetType: 'any'},
+                                                {path:'oAccountTableModel>actual_last_ym_value', targetType: 'any'},
+                                                {value:'billion'},{value:'GAP'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oAccountTableModel>actual_curr_ym_value', targetType: 'any'},
+                                                {path:'oAccountTableModel>actual_last_ym_value', targetType: 'any'},
+                                                {value:'tooltip'},{value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column> -->
+
+                            <!-- <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                headerSpan="3"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oAccountTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                                {path:'', targetType: 'any'},
+                                                {value:'percent'},{value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oAccountTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                                {path:'', targetType: 'any'},
+                                                {value:'tooltip'},{value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column> -->
+
+                            <!-- <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oAccountTableModel>actual_last_ym_rate', targetType: 'any'},
+                                                {path:'', targetType: 'any'},
+                                                {value:'percent'},{value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oAccountTableModel>actual_last_ym_rate', targetType: 'any'},
+                                                {path:'', targetType: 'any'},
+                                                {value:'tooltip'},{value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column> -->
+
+                            <!-- <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oAccountTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                                {path:'oAccountTableModel>actual_last_ym_rate', targetType: 'any'},
+                                                {value:'percent'},{value:'GAP'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oAccountTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                                {path:'oAccountTableModel>actual_last_ym_rate', targetType: 'any'},
+                                                {value:'tooltip'},{value:'GAP'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column> -->
+                        </table:columns>
+                    </table:Table>
+
+                    </VBox>
+                    <VBox fitContainer="true" id="actualDTSalesBox3"
+                        visible="{=${uiModel>/tableKind} === 'task'}"            
+                    busyIndicatorDelay="0" 
+                                class="custom-vbox-wrap-table"
+                                height="100%"
+
+                    >
+
+
+                    <table:Table
+                        id="actualDTSalesTable3"
+                        rows="{path:'oTaskTableModel>/'}"
+                        class="custom-table-container custom-table-header custom-table-body custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-table-rounding-border"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange="onRowSelectionChange"
+                        fixedColumnCount="1"
+                        busyIndicatorDelay="0"
+                    >     
+
+                        <table:extension>
+                            <OverflowToolbar width="100%" height="3rem" style="Standard">
+
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
+                                <Text text="세부데이터"/>
+                                <ToolbarSpacer />
+                                <ToolbarSeparator />
+                                <Text emptyIndicatorMode="On"  text="단위 (억)"/>
+                            </OverflowToolbar>
+                        </table:extension>       
+
+                        <table:layoutData>
+                            <FlexItemData growFactor="1"/>
+                        </table:layoutData>
+
+                        
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="13rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label />
+                                    <Label
+                                        text="부문"
+                                        wrapping="true"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{oTaskTableModel>name}"
+                                        tooltip="{oTaskTableModel>name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                name="type"
+                            >
+                                <table:multiLabels>
+                                    <Label />
+                                    <Label
+                                        text="목표"
+                                        wrapping="true"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oTaskTableModel>target_curr_y_value', targetType: 'any'},
+                                                {value:''},
+                                                {value:''},
+                                                {value:'target'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oTaskTableModel>target_curr_y_value', targetType: 'any'},
+                                                {value:''},
+                                                {value:''},
+                                                {value:'targetTooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="1"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text 
+                                        text="{
+                                            parts:[
+                                                {path:'oTaskTableModel>actual_curr_ym_value', targetType: 'any'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oTaskTableModel>actual_curr_ym_value', targetType: 'any'},
+                                                {value:''},
+                                                {value:''},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                        emptyIndicatorMode="On"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <!-- <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oTaskTableModel>actual_last_ym_value', targetType: 'any'},
+                                                {path:'', targetType: 'any'},
+                                                {value:'billion'},{value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oTaskTableModel>actual_last_ym_value', targetType: 'any'},
+                                                {path:'', targetType: 'any'},
+                                                {value:'tooltip'},{value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column> -->
+
+                            <!-- <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oTaskTableModel>actual_curr_ym_value', targetType: 'any'},
+                                                {path:'oTaskTableModel>actual_last_ym_value', targetType: 'any'},
+                                                {value:'billion'},{value:'GAP'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oTaskTableModel>actual_curr_ym_value', targetType: 'any'},
+                                                {path:'oTaskTableModel>actual_last_ym_value', targetType: 'any'},
+                                                {value:'tooltip'},{value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column> -->
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                headerSpan="1"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oTaskTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                                {value:''},
+                                                {value:'percent'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oTaskTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                                {value:''},
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <!-- <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oTaskTableModel>actual_last_ym_rate', targetType: 'any'},
+                                                {path:'', targetType: 'any'},
+                                                {value:'percent'},{value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oTaskTableModel>actual_last_ym_rate', targetType: 'any'},
+                                                {path:'', targetType: 'any'},
+                                                {value:'tooltip'},{value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column> -->
+
+                            <!-- <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'oTaskTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                                {path:'oTaskTableModel>actual_last_ym_rate', targetType: 'any'},
+                                                {value:'percent'},{value:'GAP'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'oTaskTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                                {path:'oTaskTableModel>actual_last_ym_rate', targetType: 'any'},
+                                                {value:'tooltip'},{value:'GAP'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column> -->
+                        </table:columns>
+                    </table:Table>
+                </VBox>        
+            </VBox>
+        </content>
+    </Panel>
+</mvc:View>

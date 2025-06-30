@@ -1,0 +1,55 @@
+<mvc:View controllerName="bix.ai.report.controller.CreatePage"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout" height="100%">
+    <Page class="sapUiContentPadding" id="workpagesBuilder" showHeader="false" showFooter="true">
+        <content>
+            <form:SimpleForm editable="true">
+                <form:toolbar >
+                    <OverflowToolbar class="custom-toolbar sapUiSmallMarginBegin sapUiSmallMarginEnd">
+                        <core:Icon src="sap-icon://undo" press=".onCancel" width="36px" height="36px" class="back-icon"/>
+                        <Title text="{= ${ui>/edit}? 'AI Report 수정' : 'AI Report 생성'}" class="sapUiSmallMarginBegin custom-mg-title" visible="true" />
+                        <ToolbarSpacer />
+                        <VBox >
+                            <Button text="슬라이드 추가" icon="sap-icon://add" class="custom-mg-small-btn" press="addSlide"/>
+                        </VBox>
+                    </OverflowToolbar>
+                </form:toolbar>
+                <form:content>
+                    <HBox class="custom-search-field-box sapUiSmallMarginBegin" alignItems="Center">
+                        <Label text="{i18n>publish_name}" labelFor="widgetTitle" tooltip="{i18n>publish_name}" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL1 L1 M3 S12" />
+                            </layoutData>
+                        </Label>
+                        <Input id="widgetTitle" value="{publishModel>/name}" maxLength="50" type="Text" fieldGroupIds="Required" change="onFieldCheck"/>
+                        <layoutData>
+                            <layout:GridData span="XL3 L3 M3 S12" />
+                        </layoutData>
+                    </HBox>
+                </form:content>
+            </form:SimpleForm>
+            <Carousel loop="true" id="containerSwipe" height="80%">
+                <!-- <core:ComponentContainer width="100%" height="100%" usage="workpageBuilderComponent" manifest="false" componentCreated=".workPageBuilderComponentCreated" async="true" /> -->
+            </Carousel>
+        </content>
+        <footer>
+            <OverflowToolbar style="Clear" class="custom-mg-footer">
+                <ToolbarSpacer />
+                <Button type="Accept" class="custom-mg-btn" icon="sap-icon://save" text="{i18n>save}" tooltip="{i18n>save}" press=".onSave">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+                <Button class="custom-mg-btn" icon="sap-icon://cancel" text="{i18n>cancel}" tooltip="{i18n>cancel}" press=".onCancel">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+            </OverflowToolbar>
+        </footer>
+    </Page>
+</mvc:View>

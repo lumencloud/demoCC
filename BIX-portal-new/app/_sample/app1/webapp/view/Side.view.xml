@@ -1,0 +1,8 @@
+<mvc:View controllerName="bix.sample.app1.controller.Side"
+    displayBlock="true"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="app">
+        <Title text="sss"/>
+    </Page>
+</mvc:View>

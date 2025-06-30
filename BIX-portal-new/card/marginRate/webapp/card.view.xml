@@ -1,0 +1,106 @@
+<mvc:View xmlns:layout="sap.ui.layout" controllerName="bix.card.marginRate.card"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    height="100%"
+    width="100%"
+    displayBlock="true"
+>  
+    <form:SimpleForm>
+        <form:content>
+            <VBox width="100%" class="custom-manifest-card-inner marginRate">
+                <VBox width="100%">     
+                    <HBox
+                        width="100%"
+                        alignItems="Center"
+                        justifyContent="SpaceBetween"
+                    >
+                        <VBox>
+                            <Title class="custom-title-card-color marginRate custom-card-sub-title"
+                            text="{
+                                        parts:[
+                                            {path:'InfoModel>/marginrate_curr_ym_amt', targetType: 'any'},
+                                            {value:'percent'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                    }"
+                                    tooltip="{
+                                        parts:[
+                                            {path:'InfoModel>/marginrate_curr_ym_amt', targetType: 'any'},
+                                            {value:'tooltip'}
+                                        ],
+                                        formatter: '.onFormatPerformance'                                
+                                    }"
+                            />
+                            <Text emptyIndicatorMode="On" text="{
+                                        parts:[
+                                            {path:'InfoModel>/marginrate_last_ym_amt', targetType: 'any'},
+                                            {value:'percent'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                    }"
+                                    tooltip="{
+                                        parts:[
+                                            {path:'InfoModel>/marginrate_last_ym_amt', targetType: 'any'},
+                                            {value:'tooltip'}
+                                        ],
+                                        formatter: '.onFormatPerformance'                                
+                                    }"/>
+                        </VBox>
+
+                        <VBox alignItems="End">
+                            <Text emptyIndicatorMode="On"  class="custom-card-content"
+                            text="{
+                                        parts:[
+                                            {path:'InfoModel>/marginrate_curr_ym_rate', targetType: 'any'},
+                                            {value:'percent'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                    }"
+                                    tooltip="{
+                                        parts:[
+                                            {path:'InfoModel>/marginrate_curr_ym_rate', targetType: 'any'},
+                                            {value:'tooltip'}
+                                        ],
+                                        formatter: '.onFormatPerformance'                                
+                                    }"
+                            />                            
+                            <HBox id="icon_box">
+                                
+                                <Text emptyIndicatorMode="On" id ="Icon_text" 
+                                    text="{
+                                        parts:[
+                                            {path:'InfoModel>/marginrate_last_ym_rate', targetType: 'any'},
+                                            {value:'percent'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                    }"
+                                    tooltip="{
+                                        parts:[
+                                            {path:'InfoModel>/marginrate_last_ym_rate', targetType: 'any'},
+                                            {value:'tooltip'}
+                                        ],
+                                        formatter: '.onFormatPerformance'                                
+                                    }"
+                                />
+                                <core:Icon id="Icon" size="1rem"  class="sapUiTinyMarginEnd"/>    
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                    
+
+                    <ProgressIndicator
+                        id="pi-without-animation"                            
+                        class="sapUiTinyMarginBottom"
+                        width="108%"
+                        state="None"
+                        percentValue='{InfoModel>/marginrate_curr_ym_rate}'
+                        displayOnly="true"
+                    />
+                </VBox>
+            </VBox>
+        </form:content>
+    </form:SimpleForm>         
+</mvc:View>

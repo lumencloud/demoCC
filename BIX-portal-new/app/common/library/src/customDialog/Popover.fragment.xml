@@ -1,0 +1,22 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Popover 
+        id="AiPopover"
+        class="sapUiResponsivePadding--header custom-aireport-popover"
+        contentHeight="76px"
+        contentWidth="180px"
+        placement="Bottom"
+        showHeader="false">
+        <!-- <customHeader>
+            <OverflowToolbar>
+                <Image id="popoverIcon" src="./resource/icon/ai_icon02.png" width="1rem" height="1rem"/>
+                <Title id="popoverTitle" class="custom-aireport-popover-content" text="AI 에이전트"></Title>
+            </OverflowToolbar>
+        </customHeader> -->
+        <VBox>            
+            <Text id="popoverDescription" class="custom-aireport-popover-content" text="AI 에이전트 선택 중입니다."/>
+
+        </VBox>
+    </Popover>
+</core:FragmentDefinition>

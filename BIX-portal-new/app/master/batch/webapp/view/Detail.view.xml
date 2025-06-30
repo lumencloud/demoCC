@@ -1,0 +1,146 @@
+<mvc:View 
+    id="Detail"
+    controllerName="bix.master.batch.controller.Detail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:mdc="sap.ui.mdc" busyIndicatorDelay="0" width="100%">
+    <Page class="sapUiContentPadding" showFooter="true" showHeader="false">
+        <content>
+            <Panel expanded="true" width="auto" height="auto">
+                <form:SimpleForm id="simpleForm" layout="ResponsiveGridLayout" editable="true">
+                    <form:toolbar>
+                        <OverflowToolbar class="custom-toolbar">
+                            <core:Icon src="sap-icon://undo" press=".onBack" width="36px" height="36px" class="back-icon"/>
+                            <Title text="BATCH  상세 조회 " class="custom-mg-title sapUiSmallMarginBegin" />
+                        </OverflowToolbar>
+                    </form:toolbar>
+                    <form:content>
+
+                        <Text text="버전"  class="custom-mg-tx" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S4" />
+                            </layoutData>
+                        </Text>
+                        <Text text="{ver}" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S8" />
+                            </layoutData>
+                        </Text>
+
+                        <Text text="인터페이스"  class="custom-mg-tx" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S4" />
+                            </layoutData>
+                        </Text>
+                        <Text text="{if_step}" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S8" />
+                            </layoutData>
+                        </Text>
+
+                        <Text text="대상테이블"  class="custom-mg-tx" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S4" />
+                            </layoutData>
+                        </Text>
+                        <Text text="{table_name}">
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S8" />
+                            </layoutData>
+                        </Text>
+
+                        <Text text="프로시저명" class="custom-mg-tx" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S4" />
+                            </layoutData>
+                        </Text>
+                        <Text text="{procedure_name}" >
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S8" />
+                            </layoutData>
+                        </Text>
+
+                        <Text text="내용" class="custom-mg-tx" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S4" />
+                            </layoutData>
+                        </Text>
+                        <Text text="{log}" >
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S8" />
+                            </layoutData>
+                        </Text>
+
+                        <Text text="I/F 수신" class="custom-mg-tx" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S4" />
+                            </layoutData>
+                        </Text>
+                        <Text text="" >
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S8" />
+                            </layoutData>
+                        </Text>
+                                                
+                        <Text text="conversion" class="custom-mg-tx" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S4" />
+                            </layoutData>
+                        </Text>
+                        <ObjectStatus
+                            text="{=${success_yn}? '성공' : '실패'}"
+                            state="{=${success_yn}? 'Success' : 'Error'}" >
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S8" />
+                            </layoutData>
+                        </ObjectStatus>
+                                                
+                        <Text text="건수" class="custom-mg-tx" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S4" />
+                            </layoutData>
+                        </Text>
+                        <Text text="{row_count}" >
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S8" />
+                            </layoutData>
+                        </Text>
+
+                                                
+                        <Text text="소요시간" class="custom-mg-tx" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S4" />
+                            </layoutData>
+                        </Text>
+                        <Text text="{execute_time}" >
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S8" />
+                            </layoutData>
+                        </Text>
+
+
+ 
+
+                        <Text text="에러내용" class="custom-mg-tx" wrapping="false">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S4" />
+                            </layoutData>
+                        </Text>
+                        <Text text="{err_cd}" >
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S8" />
+                            </layoutData>
+                        </Text>
+                        
+                    </form:content>
+                </form:SimpleForm>
+            </Panel>
+        </content>
+    </Page>
+</mvc:View>

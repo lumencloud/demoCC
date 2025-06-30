@@ -1,0 +1,37 @@
+[
+    {
+        "agent_id": "general_qa_agent",
+        "name": "일반 질의 에이전트",
+        "description": "용어를 조회하고 LLM이 최종 결론을 생성하여 복합적인 질문에 심층적인 응답 제공",
+        "trigger_patterns": ["이유", "설명", "왜", "어떻게", "의미", "개념", "정의", "차이점", "비교", "관계", "영향"],
+        "icon_path": "./resource/icon/ai_icon01.png"
+    },
+    {
+        "agent_id": "quick_answer_agent",
+        "name": "즉답형 에이전트",
+        "description": "단순 질문에 대해 데이터베이스 쿼리를 생성하여 정확한 수치 및 사실 정보 제공",
+        "trigger_patterns": ["조회", "쿼리", "얼마", "몇 개", "누구", "언제", "어디", "최대", "최소", "평균", "합계", "~인가요"],
+        "icon_path": "./resource/icon/ai_icon02.png"
+    },
+    {
+        "agent_id": "navigator_agent",
+        "name": "네비게이터 에이전트",
+        "description": "사용자 질문에 대해 특정 화면이나 대시보드로 이동 안내 및 관련 메뉴 안내",
+        "trigger_patterns": ["어디서", "화면", "이동", "대시보드", "메뉴", "페이지", "보여줘", "열어줘", "접속", "~화면으로", "~대시보드로"],
+        "icon_path": "./resource/icon/ai_icon04.png"
+    },
+    {
+        "agent_id": "report_agent",
+        "name": "리포트 에이전트",
+        "description": "종합적 분석 결과를 구조화된 텍스트 보고서 형태로 제공",
+        "trigger_patterns": ["리포트", "보고서", "분석", "요약", "정리", "인사이트", "종합", "문서화", "리포트", "레포트"],
+        "icon_path": "./resource/icon/ai_icon05.png"
+    },
+    {
+        "agent_id": "visualization_agent",
+        "name": "시각화 에이전트",
+        "description": "데이터를 차트, 그래프 등 시각적 요소로만 표현하며 심층적인 텍스트 분석 없이 순수 시각 자료 생성",
+        "trigger_patterns": ["차트", "그래프", "시각화", "그려줘", "보여줘", "추이", "추세", "패턴", "분포", "시각적으로"],
+        "icon_path": "./resource/icon/ai_icon03.png"
+    }
+]

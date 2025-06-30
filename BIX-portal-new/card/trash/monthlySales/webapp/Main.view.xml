@@ -1,0 +1,18 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:layout="sap.ui.layout"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.monthlySales.Main"
+>
+    <FlexBox
+        alignItems="Center"
+        justifyContent="Center"
+        renderType="Bare"
+        fitContainer="true"
+    >
+        <core:HTML id="html" />
+    </FlexBox>
+</mvc:View>

@@ -1,0 +1,310 @@
+<mvc:View controllerName="bix.master.faq.controller.Detail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:unified="sap.ui.unified"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:richtexteditor="sap.ui.richtexteditor"
+    xmlns:mdc="sap.ui.mdc"
+    xmlns:upload="sap.m.upload"
+    xmlns:plugin="sap.m.plugins"
+    xmlns:dnd="sap.ui.core.dnd"
+    xmlns:f="sap.f" 
+    busyIndicatorDelay="0" 
+    width="100%"
+    height="100%"
+    displayBlock="true">
+    <f:DynamicPage 
+        class="sapUiContentPadding"
+        fitContent="true"
+        showFooter="true">
+        <f:content>
+            <Panel expanded="true" width="100%" height="100%" class="sapUiNoContentPadding" >
+                <form:SimpleForm id="simpleForm" 
+                    layout="ResponsiveGridLayout"
+                    editable="true"
+                    class="custom-simpleForm sapUiNoContentPadding">
+                    <form:content>
+                        <OverflowToolbar height="70px" >
+                            <HBox width="100%" height="100%" fitContainer="true" alignItems="Center">
+                                <core:Icon src="sap-icon://undo" press=".onBack" width="36px" height="36px" class="back-icon"/>
+                                <VBox width="100%" height="100%" fitContainer="true" renderType="Bare" visible="{= !${uiModel>/edit}}" justifyContent="Center">
+                                    <Title text="{title}" tooltip="{title}" class="custom-mg-title sapUiSmallMarginBegin" />
+
+                                    <OverflowToolbar style="Clear" width="100%" class="sapUiTinyMarginBegin">
+                                        <Text text="{createdBy}" tooltip="{createdBy}" />
+                                        <ToolbarSeparator />
+                                        <Text text="{createdAt}" tooltip="{createdAt}"/>
+                                        <ToolbarSeparator />
+                                        <Text text="{category/name}" />
+                                        <ToolbarSeparator />
+                                        <core:Icon src="sap-icon://show" />
+                                        <Text text="{count}" />
+                                    </OverflowToolbar>
+                                </VBox>
+
+                                <Title text="FAQ 수정" class="custom-mg-title sapUiSmallMarginBegin" visible="{uiModel>/edit}"/>
+                            </HBox>
+                        </OverflowToolbar>
+                        <Text text="제목" class="custom-mg-tx" visible="{uiModel>/edit}">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S12" />
+                            </layoutData>
+                        </Text>
+                        <mdc:Field width="100%" editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}" visible="{uiModel>/edit}">
+                            <mdc:contentEdit>
+                                <Input value="{title}" valueLiveUpdate="true">
+                                </Input>
+                            </mdc:contentEdit>
+                            <mdc:contentDisplay>
+                                <Text text="{title}">
+                                </Text>
+                            </mdc:contentDisplay>
+                            <mdc:layoutData>
+                                <layout:GridData span="XL10 L10 M9 S12" />
+                            </mdc:layoutData>
+                        </mdc:Field>
+
+                        <Text text="카테고리" class="custom-mg-tx" visible="{uiModel>/edit}">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S12" />
+                            </layoutData>
+                        </Text>
+                        <!-- <Select selectedKey="{category}" width="100%" forceSelection="true" editable="{uiModel>/edit}" items="{
+                                path: '/GetCodeItemView(category=\'faq_type\')/Set',
+                                filters: [
+                                    { path: 'value', operator: 'NE', value1: 'all' }
+                                ],
+                                templateShareable:"false"
+                            }">
+                            <core:Item key="{value}" text="{name}" />
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S12" />
+                            </layoutData>
+                        </Select> -->
+                        <mdc:Field value="{category_ID}" width="100%" editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}" visible="{uiModel>/edit}">
+                            <mdc:contentEdit>
+                                <Select 
+                                    id="selectCategory"
+                                    selectedKey="{category_ID}"
+                                    width="100%" forceSelection="true" editable="{uiModel>/edit}" 
+                                    items="{
+                                        path: '/GetCodeItemView(category=\'faq_type\')/Set',
+                                        filters: [
+                                            { path: 'value', operator: 'NE', value1: 'all' }
+                                        ],
+                                        templateShareable:false
+                                    }">
+                                    <core:Item key="{item_ID}" text="{name}" />
+                                    <layoutData>
+                                        <layout:GridData span="XL10 L10 M9 S12" />
+                                    </layoutData>
+                                </Select>
+                            </mdc:contentEdit>
+                            <mdc:contentDisplay>
+                                <Text text="{category/name}" />
+                            </mdc:contentDisplay>
+                            
+                            <mdc:layoutData>
+                                <layout:GridData span="XL10 L10 M9 S12" />
+                            </mdc:layoutData>
+                        </mdc:Field>
+
+                        <Text text="내용" visible="{=!${uiModel>/edit}}"  class="custom-mg-tx">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S12" />
+                            </layoutData>
+                        </Text>
+                        <VBox width="100%" id="contentHtmlContainer" justifyContent="End">
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S12" />
+                            </layoutData>
+                        </VBox>
+                        
+                        <Text text="내용" visible="{uiModel>/edit}" class="custom-mg-tx">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S12" />
+                            </layoutData>
+                        </Text>
+                        <VBox width="100%" height="100%" justifyContent="End" fitContainer="true">
+                            <ScrollContainer id="scrollContainer" height="calc(100vh - 34rem)" 
+                                visible="{= !${uiModel>/edit}}" horizontal="true" vertical="true" >
+                                <core:HTML id="content" content="{content}" 
+                                preferDOM="false" sanitizeContent="false" />
+                            </ScrollContainer>
+                            <richtexteditor:RichTextEditor id="richTextEditor"
+                                visible="{uiModel>/edit}" width= "100%" height="calc(100vh - 38rem)" value="{content}"
+                                editorType= "TinyMCE6" sanitizeValue="false" beforeEditorInit=".onBeforeEditorInit" readyRecurring=".onEditorReady"
+                                busyIndicatorDelay="0" showGroupFont="false" showGroupTextAlign="true"
+                                showGroupStructure="true" showGroupUndo="true" showGroupLink="true">
+                            </richtexteditor:RichTextEditor>
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S12"  />
+                                <!-- <FlexItemData shrinkFactor="1" growFactor="1" /> -->
+                            </layoutData>
+                        </VBox>
+                        
+                        <Text text="첨부파일"
+                            id="uploadText"
+                            class="custom-mg-tx" 
+                            visible="{path:'files',targetType:'any',formatter:'.isFileVisible'}">
+                            <layoutData>
+                                <layout:GridData span="XL2 L2 M3 S12" linebreak="true"/>
+                            </layoutData>
+                        </Text>
+                        <HBox width="100%" height="100%" >
+                            <table:Table 
+                                id="uploadSetTable"
+                                rows="{files}" 
+                                visible="{path:'files',targetType:'any',formatter:'.isFileVisible'}" 
+                                selectionMode="MultiToggle" 
+                                width="100%">
+                                <table:extension>
+                                    <OverflowToolbar width="100%" height="3rem" style="Clear">
+                                        <Title text="{='첨부파일 ('+${uiModel>/fileCount}+')'} " />
+                                        <ToolbarSpacer />
+                                        <upload:ActionsPlaceholder id="uploadButton" visible="{uiModel>/edit}" placeholderFor="UploadButtonPlaceholder" />
+                                        <Button id="downloadButton" text="다운로드" visible="{=!${uiModel>/edit}}" enabled="false" press="onDownloadFiles"></Button>
+                                        <Button id="deleteButton" text="삭제" visible="{uiModel>/edit}"  enabled="false" press="onDeleteFiles"/>
+                                    </OverflowToolbar>
+                                </table:extension>
+
+                                <table:dependents >
+                                    <plugin:UploadSetwithTable 
+                                        multiple="true" 
+                                        beforeUploadStarts="onBeforeUploadStarts" 
+                                        uploadCompleted="onUploadCompleted" 
+                                        onActivated="onPluginActivated" 
+                                        actions="uploadButton">
+                                        <upload:UploadItemConfiguration 
+                                            fileNamePath="name" 
+                                            mediaTypePath="type" 
+                                            urlPath="url" 
+                                            fileSizePath="size" />
+                                    </plugin:UploadSetwithTable>
+                                </table:dependents>
+
+                                <table:dragDropConfig>
+                                    <dnd:DragDropInfo enabled="false" />
+                                </table:dragDropConfig>
+                                
+                                <table:rowMode>
+                                    <rowmodes:Fixed rowCount="3" rowContentHeight="64" />
+                                </table:rowMode>
+
+                                <table:columns>
+                                    <table:Column width="5rem" >
+                                        <Label text="썸네일" textAlign="Center" width="100%"/>
+                                        <table:template>
+                                            <HBox justifyContent="Center">
+                                                <Image src="{
+                                                    parts: ['ID','url'],
+                                                    formatter: '.formatFilePath'
+                                                }" visible="{
+                                                    path: 'type',
+                                                    targetType : 'any',
+                                                    formatter: '.formatImageVisible'
+                                                }" class="sapMUSTItemImage sapMUSTItemIcon backgroundTransparent" height="3rem" />
+                                                <core:Icon src="{
+                                                    parts: ['type', 'name'],
+                                                    formatter: '.formatFileIconSrc'
+                                                }" visible="{
+                                                    path: 'type',
+                                                    targetType : 'any',
+                                                    formatter: '.formatIconVisible'
+                                                }" class="sapMUSTItemImage sapMUSTItemIcon" size="3rem"  />
+                                            </HBox>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column width="auto">
+                                        <Label text="파일명" textAlign="Center" width="100%" />
+                                        <table:template>                                            
+                                            <Link text="{name}" press="openPreview" class="custom-faq-noFocus"/>
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column width="30%">
+                                        <Label text="파일 유형" textAlign="Center" width="100%" />
+                                        <table:template>
+                                            <Text text="{type}" wrapping="false" tooltip="{type}" />
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column width="15%">
+                                        <Label text="파일 크기" textAlign="Center" width="100%" />
+                                        <table:template>
+                                            <Text text="{
+                                                path: 'size',
+                                                formatter: '.formatFileSize'
+                                            }"
+                                            textAlign="Center" />
+                                        </table:template>
+                                    </table:Column>
+                                </table:columns>
+                            </table:Table>
+                            <layoutData>
+                                <layout:GridData span="XL10 L10 M9 S12" />
+                            </layoutData>
+                        </HBox>
+                    </form:content>
+                </form:SimpleForm>
+
+                <layoutData>
+                    <FlexItemData growFactor="1" />
+                </layoutData>
+            </Panel>
+        </f:content>
+
+        <f:footer>
+            <OverflowToolbar class="custom-mg-footer">
+                <ToolbarSpacer/>
+                <Button type="Accept" 
+                    class="custom-mg-btn"
+                    icon="sap-icon://edit"
+                    text="수정" tooltip="수정" 
+                    visible="{=!${uiModel>/edit}}" 
+                    press=".onFooterButton($event,'edit')">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow"/>
+                    </layoutData>
+                </Button>
+
+                <Button type="Accept" 
+                    class="custom-mg-btn" 
+                    icon="sap-icon://save" 
+                    text="저장" 
+                    tooltip="저장" 
+                    enabled="{= ${uiModel>/save} &amp;&amp; !${uiModel>/hasError}}"  
+                    visible="{uiModel>/edit}" 
+                    press=".onFooterButton($event,'save')">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow"/>
+                    </layoutData>
+                </Button>
+                <Button 
+                    class="custom-mg-btn" 
+                    icon="sap-icon://cancel" 
+                    text="취소" 
+                    tooltip="취소" 
+                    visible="{uiModel>/edit}" 
+                    press=".onFooterButton($event,'cancel')">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow"/>
+                    </layoutData>
+                </Button>
+                <Button type="Accept" 
+                    class="custom-mg-btn" 
+                    icon="sap-icon://delete" 
+                    text="삭제" 
+                    tooltip="삭제" 
+                    visible="{=!${uiModel>/edit}}" 
+                    press=".onFooterButton($event,'delete')">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow"/>
+                    </layoutData>
+                </Button>
+            </OverflowToolbar>
+        </f:footer>
+    </f:DynamicPage>
+</mvc:View>

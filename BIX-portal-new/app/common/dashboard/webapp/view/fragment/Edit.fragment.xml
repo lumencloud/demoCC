@@ -1,0 +1,8 @@
+<core:FragmentDefinition
+		xmlns="sap.m"
+		xmlns:core="sap.ui.core">
+	<Menu itemSelected="onMenuAction" id="menuAction">
+		<MenuItem id="menu" text="{i18n>menu}"/>
+		<MenuItem id="layout" text="{i18n>content}"/>
+	</Menu>
+</core:FragmentDefinition>

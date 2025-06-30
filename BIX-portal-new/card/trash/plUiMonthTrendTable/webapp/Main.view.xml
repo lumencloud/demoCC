@@ -1,0 +1,330 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    width="100%"
+    height="100%"
+    displayBlock="true"
+    controllerName="bix.card.plUiMonthTrendTable.Main"
+    
+>
+     <table:Table
+        id="plUiMonthTrendTable"
+        class="custom-table-container custom-table-header custom-table-body custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-selection-radius" 
+        selectionMode="Single" 
+        selectionBehavior="RowOnly" 
+        rowSelectionChange="onRowSelectionChange"
+        enableColumnReordering="false"
+        fixedColumnCount="1"
+        busyIndicatorDelay="0"
+
+        >
+
+        <table:extension>
+            <OverflowToolbar width="100%" height="3rem" style="Standard">
+                <Avatar displaySize="XS" initials="PL" showBorder="true" class="customTableAvatar" backgroundColor="Transparent"/>
+                <ToolbarSpacer />                
+                 <Text text="단위 (억)"/>
+            </OverflowToolbar>
+        </table:extension>
+        
+        <table:rowMode>
+            <rowmodes:Fixed rowCount="5" />
+        </table:rowMode>
+
+        <table:columns>
+            <table:Column hAlign="Center" width="6rem" resizable="false" name="type" >
+                <Label text="구분" wrapping="true"/>
+                <table:template>
+                    <Text text="{type}" wrapping="false" width="100%" textAlign="Center"
+                         />
+                </table:template>
+            </table:Column>
+           
+            <table:Column hAlign="Center"  width="5rem" resizable="false" >
+                <Label text="Total"/>
+                <table:template>
+                     <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'total_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'total_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+            <table:Column hAlign="Center" width="5rem" resizable="false" >
+                <Label text="1월"/>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'm_01_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'm_01_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+            <table:Column hAlign="Center" width="5rem"  resizable="false" >
+                <Label text="2월"/>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'm_02_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'm_02_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+            
+            <table:Column hAlign="Center" width="5rem"  resizable="false" >
+                <Label text="3월"/>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'm_03_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'm_03_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+
+            <table:Column hAlign="Center" width="5rem" resizable="false" >
+                <Label text="4월"/>
+               <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'm_04_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'm_04_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+
+            <table:Column hAlign="Center" width="5rem"  resizable="false" >
+                <Label text="5월"/>
+                <table:template>
+                   <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'm_05_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'm_05_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+
+            <table:Column hAlign="Center" width="5rem"  resizable="false" >
+                <Label text="6월"/>
+                <table:template>
+                   <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'm_06_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'm_06_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+
+            <table:Column hAlign="Center" width="5rem"  resizable="false" >
+                <Label text="7월"/>
+                <table:template>
+                   <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'm_07_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'm_07_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+
+            <table:Column hAlign="Center" width="5rem"  resizable="false" >
+                <Label text="8월"/>
+                <table:template>
+                   <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'm_08_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'm_08_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+
+            <table:Column hAlign="Center" width="5rem"  resizable="false" >
+                <Label text="9월"/>
+                <table:template>
+                  <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'm_09_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'm_09_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+
+            <table:Column hAlign="Center" width="5rem"  resizable="false" >
+                <Label text="10월"/>
+                <table:template>
+                   <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'm_10_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'm_10_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+
+            <table:Column hAlign="Center" width="5rem"  resizable="false" >
+                <Label text="11월"/>
+                <table:template>
+                   <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'm_11_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'm_11_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+
+            <table:Column hAlign="Center" width="5rem"  resizable="false" >
+                <Label text="12월"/>
+                <table:template>
+                   <Text text="{
+                        parts: [
+                            {path: 'type', targetType:'any'},
+                            {path: 'm_12_data', targetType:'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'm_12_data', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+        </table:columns>
+    </table:Table>
+</mvc:View>

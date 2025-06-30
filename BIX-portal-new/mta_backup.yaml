@@ -1,0 +1,478 @@
+_schema-version: 3.3.0
+ID: bix-portal
+description: BIX Portal CAP Full-stack Project MTA
+version: 1.0.0
+modules:
+# CAP node.js 백엔드 어플리케이션
+- name: bix-portal-srv
+  type: nodejs
+  path: gen/srv
+  requires:
+  - name: bix-portal-db
+  - name: bix-portal-auth
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+    instances: 1
+  build-parameters:
+    builder: npm-ci
+# HANA DB 배포도구 (MTA 배포시 HANA DB 배포실행 후 정지)
+- name: bix-portal-db-deployer
+  type: hdb
+  path: gen/db
+  requires:
+  - name: bix-portal-db
+  parameters:
+    buildpack: nodejs_buildpack
+# Portal 앱라우터 (포탈 Web 앱)
+- name: bix-portal
+  type: approuter.nodejs
+  path: approuter
+  requires:
+  - name: srv-api
+    group: destinations
+    properties:
+      forwardAuthToken: true
+      name: srv-api
+      url: ~{srv-url}
+  - name: bix-portal-auth
+  - name: bix-theme
+  - name: bix-portal-html5-runtime
+  - name: bix-portal-destination-service
+    group: destinations
+    properties:
+      forwardAuthToken: false
+      name: ui5
+      url: https://ui5.sap.com
+  provides:
+  - name: app-api
+    properties:
+      app-protocol: ${protocol}
+      app-uri: ${default-uri}
+  parameters:
+    disk-quota: 256M
+    keep-existing-routes: true
+    memory: 256M
+# UI5 (HTML5) 프론트앤드 앱 배포 (여러개의 UI5 단일 앱들을 하나로 묶어서 HTML5-repo-host 서비스로 배포)
+- name: bix-portal-app-deployer
+  type: com.sap.application.content
+  path: gen
+  requires:
+  - name: bix-portal-html5-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: app
+    requires:
+    - artifacts:
+      - bixmain.zip
+      name: bixmain
+      target-path: app/
+    - artifacts:
+      - bixadminmenu.zip
+      name: bixadminmenu
+      target-path: app/
+    - artifacts:
+      - bixadmincodes.zip
+      name: bixadmincodes
+      target-path: app/      
+    - artifacts:
+      - bixadminmultilingual.zip
+      name: bixadminmultilingual
+      target-path: app/      
+    - artifacts:
+      - bixsgnahuman.zip
+      name: bixsgnahuman
+      target-path: app/
+    - artifacts:
+      - bixsgnaintegration.zip
+      name: bixsgnaintegration
+      target-path: app/      
+    # - artifacts:
+    #   - bixentplenterprise.zip
+    #   name: bixentplenterprise
+    #   target-path: app/
+    - artifacts:
+      - bixplperformance.zip
+      name: bixplperformance
+      target-path: app/
+    - artifacts:
+      - bixmasterorgtarget.zip
+      name: bixmasterorgtarget
+      target-path: app/     
+    - artifacts:
+      - bixmasteraccount.zip
+      name: bixmasteraccount
+      target-path: app/
+    - artifacts:
+      - bixaicomponent.zip
+      name: bixaicomponent
+      target-path: app/
+    - artifacts:
+      - bixcardtreemap.zip
+      name: bixcardtreemap
+      target-path: card/
+    - artifacts:
+      - skcard.overview.zip
+      name: skcard.overview
+      target-path: card/
+    - artifacts:
+      - skcard.income.zip
+      name: skcard.income
+      target-path: card/
+    - artifacts:
+      - skcard.dealtype.zip
+      name: skcard.dealtype
+      target-path: card/
+    - artifacts:
+      - skcard.activity.zip
+      name: skcard.activity
+      target-path: card/
+    - artifacts:
+      - skcard.salesperformance.zip
+      name: skcard.salesperformance
+      target-path: card/
+    - artifacts:
+      - skcard.salesprogress.zip
+      name: skcard.salesprogress
+      target-path: card/
+    - artifacts:
+      - skcard.marginprogress.zip
+      name: skcard.marginprogress
+      target-path: card/
+    - artifacts:
+      - skcard.sgaprogress.zip
+      name: skcard.sgaprogress
+      target-path: card/
+    - artifacts:
+      - skcard.yoysalesgap.zip
+      name: skcard.yoysalesgap
+      target-path: card/
+    # - artifacts:
+    #   - skwidgetmanagementui.zip
+    #   name: skwidgetmanagementui
+    #   target-path: app/
+    # - artifacts:
+    #   - skpublishmanagementui.zip
+    #   name: skpublishmanagementui
+    #   target-path: app/
+    - artifacts:
+      - skhomeui.zip
+      name: skhomeui
+      target-path: app/
+    - artifacts:
+      - skportalcommon.zip
+      name: skportalcommon
+      target-path: app/
+- name: skportalcommon
+  type: html5
+  path: app/lib/customLibrary
+  build-parameters:
+    build-result: resources
+    builder: custom
+    preload: true
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+    build-options:
+        preload: true
+# - name: skwidgetmanagementui
+#   type: html5
+#   path: app/admin/widget_management_ui
+#   build-parameters:
+#     build-result: dist
+#     builder: custom
+#     commands:
+#     - npm install
+#     - npm run build:cf
+#     supported-platforms: []
+# - name: skpublishmanagementui
+#   type: html5
+#   path: app/admin/publish_management_ui
+#   build-parameters:
+#     build-result: dist
+#     builder: custom
+#     commands:
+#     - npm install
+#     - npm run build:cf
+#     supported-platforms: []
+- name: skhomeui
+  type: html5
+  path: app/admin/home_ui
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: bixcardtreemap
+  type: html5
+  path: card/treemap
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: skcard.overview
+  type: html5
+  path: card/overview
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: skcard.income
+  type: html5
+  path: card/income
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: skcard.dealtype
+  type: html5
+  path: card/dealType
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: skcard.activity
+  type: html5
+  path: card/activity
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: skcard.salesperformance
+  type: html5
+  path: card/salesPerformance
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: skcard.salesprogress
+  type: html5
+  path: card/salesProgress
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: skcard.marginprogress
+  type: html5
+  path: card/marginProgress
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: skcard.sgaprogress
+  type: html5
+  path: card/sgaProgress
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: skcard.yoysalesgap
+  type: html5
+  path: card/yoySalesGap
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: bixmain
+  type: html5
+  path: app/main
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: bixadminmenu
+  type: html5
+  path: app/admin/menu
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: bixadmincodes
+  type: html5
+  path: app/admin/codes
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []    
+- name: bixadminmultilingual
+  type: html5
+  path: app/admin/multilingual
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: bixsgnahuman
+  type: html5
+  path: app/sgna/human
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: bixsgnaintegration
+  type: html5
+  path: app/sgna/integration
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: bixmasterorgtarget
+  type: html5
+  path: app/master/orgtarget
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: bixmasteraccount
+  type: html5
+  path: app/master/account
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []    
+# - name: bixentplenterprise
+#   type: html5
+#   path: app/entpl/enterprise
+#   build-parameters:
+#     build-result: dist
+#     builder: custom
+#     commands:
+#     - npm install
+#     - npm run build:cf
+#     supported-platforms: []
+- name: bixplperformance
+  type: html5
+  path: app/pl/performance
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: bixaicomponent
+  type: html5
+  path: app/ai/component
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: bix-portal-db
+  type: com.sap.xs.hdi-container
+  parameters:
+    config:
+      schema: ${schema-name}
+    service: hana
+    service-plan: hdi-shared
+- name: bix-portal-auth
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      tenant-mode: dedicated
+      xsappname: bix-portal-${org}-${space}
+    path: ./xs-security.json
+    service: xsuaa
+    service-plan: application
+- name: bix-portal-html5-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-plan: app-host
+- name: bix-portal-html5-runtime
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-plan: app-runtime
+- name: bix-theme
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: theming
+    service-plan: standard
+    skip-service-updates:
+      parameters: true
+- name: bix-portal-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: false
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: bix-portal-destination-service
+    service-plan: lite
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+  schema-name: bix_portal

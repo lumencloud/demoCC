@@ -1,0 +1,523 @@
+<mvc:View
+    controllerName="bix.master.project.controller.Project"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:unified="sap.ui.unified"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:mdc="sap.ui.mdc"
+    xmlns:f="sap.f"
+    busyIndicatorDelay="0"
+    width="100%"
+    height="100%"
+>
+    <Page
+        class="sapUiContentPadding"
+        showHeader="false"
+    >
+        <content>
+            <form:SimpleForm
+                editable="true"
+                class="custom-search-container"
+            >
+                <form:content>
+                    <Title
+                        text="프로젝트 마스터"
+                        class="custom-mg-title"
+                    >
+                        <layoutData>
+                            <layout:GridData span="XL12 L12 M12 S12" />
+                        </layoutData>
+                    </Title>
+                    <HBox
+                        class="custom-search-field-box"
+                        alignItems="Center"
+                    >
+                        <Label
+                            text="조직"
+                            labelFor="orgInput"
+                        />
+                        <Input
+                            id="orgInput"
+                            value="{searchModel>/orgNm}"
+                            name="{searchModel>/orgId}"
+                            showClearIcon="true"
+                            showValueHelp="true"
+                            valueHelpRequest=".onOrgSingleSelectDialogOpen"
+                            showSuggestion="true"
+                            change="onOrgSingleChange"
+                            valueStateText="입력한 조직이 존재하지 않습니다."
+                            suggestionItems="{ path: '/latest_org', length: 2000}"
+                        >
+                            <suggestionItems>
+                                <core:Item
+                                    key="{id}"
+                                    text="{name}"
+                                />
+                            </suggestionItems>
+                        </Input>
+                        <layoutData>
+                            <layout:GridData span="XL3 L3 M3 S12" />
+                        </layoutData>
+                    </HBox>
+                    <HBox
+                        class="custom-search-field-box"
+                        alignItems="Center"
+                    >
+                        <Label
+                            text="프로젝트 번호"
+                            labelFor="projectNo"
+                        />
+                        <Input
+                            id="projectNo"
+                            width="100%"
+                            value="{searchModel>/prj_no}"
+                        />
+                        <layoutData>
+                            <layout:GridData span="XL3 L3 M3 S12" />
+                        </layoutData>
+                    </HBox>
+                    <HBox
+                        class="custom-search-field-box"
+                        alignItems="Center"
+                    >
+                        <Label
+                            text="프로젝트 명"
+                            labelFor="projectName"
+                        />
+                        <Input
+                            id="projectName"
+                            width="100%"
+                            value="{searchModel>/prj_nm}"
+                        />
+                        <layoutData>
+                            <layout:GridData span="XL3 L3 M3 S12" />
+                        </layoutData>
+                    </HBox>
+
+                    <HBox
+                        width="100%"
+                        justifyContent="End"
+                        class="custom-search-btn-container"
+                    >
+                        <Button
+                            text="초기화"
+                            press=".onSearch($event, 'refresh')"
+                            class="custom-mg-small-btn"
+                            icon="sap-icon://refresh"
+                        />
+                        <Button
+                            text="검색"
+                            type="Accept"
+                            id="searchButton"
+                            press=".onSearch($event, 'search')"
+                            class="custom-mg-small-btn"
+                            icon="sap-icon://search"
+                        />
+                        <layoutData>
+                            <layout:GridData span="XL12 L12 M12 S12" />
+                        </layoutData>
+                    </HBox>
+                </form:content>
+            </form:SimpleForm>
+
+            <Panel
+                width="100%"
+                height="calc(100% - 12rem)"
+                class="sapUiSmallMarginTop sapUiSmallMarginEnd"
+            >
+                <table:Table
+                    id="projectTable"
+                    selectionMode="None"
+                    class="custom-table-container custom-mg-table-header custom-table-rounding-border"
+                    selectionBehavior="Row"
+                    rowActionCount="1"
+                    busyIndicatorDelay="0"
+                >
+                    <table:rowMode>
+                        <rowmodes:Auto />
+                    </table:rowMode>
+
+                    <table:extension>
+                        <OverflowToolbar
+                            width="100%"
+                            height="3rem"
+                            style="Clear"
+                        >
+                            <Title
+                                id="projectTitle"
+                                text="{= ${$count} ? '총 ' + ${$count} + ' 개' : '총 0개'}"
+                                class="custom-text-medium"
+                            />
+                        </OverflowToolbar>
+                    </table:extension>
+
+                    <table:columns>
+                        <table:Column
+                            headerSpan="2"
+                            width="10rem"
+                        >
+                            <table:multiLabels>
+                                <Text text="" />
+                                <Text
+                                    text="프로젝트번호"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                            </table:multiLabels>
+                            <table:template>
+                                <Text
+                                    width="100%"
+                                    text="{prj_no}"
+                                    tooltip="{prj_no}"
+                                    wrapping="false"
+                                    textAlign="Center"
+                                />
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="20rem">
+                            <table:multiLabels>
+                                <Text text="" />
+                                <Text
+                                    text="프로젝트 명"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                            </table:multiLabels>
+                            <table:template>
+                                <Text
+                                    width="100%"
+                                    text="{prj_nm}"
+                                    tooltip="{prj_nm}"
+                                    wrapping="false"
+                                />
+                            </table:template>
+                        </table:Column>
+                        <table:Column
+                            headerSpan="6"
+                            width="10rem"
+                        >
+                            <table:multiLabels>
+                                <Text
+                                    text="비즈니스 도메인 정보"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                                <Text
+                                    text="Domain 1"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                            </table:multiLabels>
+                            <table:template>
+                                <Text
+                                    width="100%"
+                                    text="{bd_n1_cd}"
+                                    tooltip="{bd_n1_cd}"
+                                    wrapping="false"
+                                    textAlign="Center"
+                                />
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="10rem">
+                            <table:multiLabels>
+                                <Text text="비즈니스 도메인 정보" />
+                                <Text
+                                    text="Domain 2"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                            </table:multiLabels>
+                            <table:template>
+                                <mdc:Field
+                                    width="100%"
+                                    editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}"
+                                >
+                                    <mdc:contentEdit>
+                                        <Input
+                                            width="100%"
+                                            value="{bd_n2_cd}"
+                                            valueLiveUpdate="true"
+                                            change=".onLiveChange"
+                                            maxLength="20"
+                                        />
+                                    </mdc:contentEdit>
+                                    <mdc:contentDisplay>
+                                        <Text
+                                            width="100%"
+                                            text="{bd_n2_cd}"
+                                            tooltip="{bd_n2_cd}"
+                                            wrapping="false"
+                                            textAlign="Center"
+                                        />
+                                    </mdc:contentDisplay>
+                                </mdc:Field>
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="10rem">
+                            <table:multiLabels>
+                                <Text text="비즈니스 도메인 정보" />
+                                <Text
+                                    text="Domain 3"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                            </table:multiLabels>
+                            <table:template>
+                                <mdc:Field
+                                    width="100%"
+                                    editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}"
+                                >
+                                    <mdc:contentEdit>
+                                        <Input
+                                            width="100%"
+                                            value="{bd_n3_cd}"
+                                            valueLiveUpdate="true"
+                                            change=".onLiveChange"
+                                            maxLength="20"
+                                        />
+                                    </mdc:contentEdit>
+                                    <mdc:contentDisplay>
+                                        <Text
+                                            width="100%"
+                                            text="{bd_n3_cd}"
+                                            tooltip="{bd_n3_cd}"
+                                            wrapping="false"
+                                            textAlign="Center"
+                                        />
+                                    </mdc:contentDisplay>
+                                </mdc:Field>
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="10rem">
+                            <table:multiLabels>
+                                <Text text="비즈니스 도메인 정보" />
+                                <Text
+                                    text="Domain 4"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                            </table:multiLabels>
+                            <table:template>
+                                <mdc:Field
+                                    width="100%"
+                                    editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}"
+                                >
+                                    <mdc:contentEdit>
+                                        <Input
+                                            width="100%"
+                                            value="{bd_n4_cd}"
+                                            valueLiveUpdate="true"
+                                            change=".onLiveChange"
+                                            maxLength="20"
+                                        />
+                                    </mdc:contentEdit>
+                                    <mdc:contentDisplay>
+                                        <Text
+                                            width="100%"
+                                            text="{bd_n4_cd}"
+                                            tooltip="{bd_n4_cd}"
+                                            wrapping="false"
+                                            textAlign="Center"
+                                        />
+                                    </mdc:contentDisplay>
+                                </mdc:Field>
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="10rem">
+                            <table:multiLabels>
+                                <Text text="비즈니스 도메인 정보" />
+                                <Text
+                                    text="Domain 5"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                            </table:multiLabels>
+                            <table:template>
+                                <mdc:Field
+                                    width="100%"
+                                    editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}"
+                                >
+                                    <mdc:contentEdit>
+                                        <Input
+                                            width="100%"
+                                            value="{bd_n5_cd}"
+                                            valueLiveUpdate="true"
+                                            change=".onLiveChange"
+                                            maxLength="20"
+                                        />
+                                    </mdc:contentEdit>
+                                    <mdc:contentDisplay>
+                                        <Text
+                                            width="100%"
+                                            text="{bd_n5_cd}"
+                                            tooltip="{bd_n5_cd}"
+                                            wrapping="false"
+                                            textAlign="Center"
+                                        />
+                                    </mdc:contentDisplay>
+                                </mdc:Field>
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="10rem">
+                            <table:multiLabels>
+                                <Text text="비즈니스 도메인 정보" />
+                                <Text
+                                    text="Domain 6"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                            </table:multiLabels>
+                            <table:template>
+                                <mdc:Field
+                                    width="100%"
+                                    editMode="{= ${uiModel>/edit} ? 'Editable' : 'Display'}"
+                                    dataType="sap.ui.model.type.String"
+                                >
+                                    <mdc:contentEdit>
+                                        <Input
+                                            width="100%"
+                                            value="{bd_n6_cd}"
+                                            valueLiveUpdate="true"
+                                            change=".onLiveChange"
+                                            maxLength="20"
+                                        />
+                                    </mdc:contentEdit>
+                                    <mdc:contentDisplay>
+                                        <Text
+                                            width="100%"
+                                            text="{bd_n6_cd}"
+                                            tooltip="{bd_n6_cd}"
+                                            wrapping="false"
+                                            textAlign="Center"
+                                        />
+                                    </mdc:contentDisplay>
+                                </mdc:Field>
+                            </table:template>
+                        </table:Column>
+                        <table:Column
+                            headerSpan="3"
+                            width="10rem"
+                        >
+                            <table:multiLabels>
+                                <Text
+                                    text="조직정보"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                                <Text
+                                    text="부문"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                            </table:multiLabels>
+                            <table:template>
+                                <Text
+                                    width="100%"
+                                    text="{div_name}"
+                                    tooltip="{div_name}"
+                                    emptyIndicatorMode="On"
+                                    wrapping="false"
+                                    textAlign="Center"
+                                />
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="10rem">
+                            <table:multiLabels>
+                                <Text text="조직정보" />
+                                <Text
+                                    text="본부"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                            </table:multiLabels>
+                            <table:template>
+                                <Text
+                                    width="100%"
+                                    text="{hdqt_name}"
+                                    tooltip="{hdqt_name}"
+                                    emptyIndicatorMode="On"
+                                    wrapping="false"
+                                    textAlign="Center"
+                                />
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="10rem">
+                            <table:multiLabels>
+                                <Text text="조직정보" />
+                                <Text
+                                    text="팀"
+                                    width="100%"
+                                    textAlign="Center"
+                                />
+                            </table:multiLabels>
+                            <table:template>
+                                <Text
+                                    width="100%"
+                                    text="{team_name}"
+                                    tooltip="{team_name}"
+                                    emptyIndicatorMode="On"
+                                    wrapping="false"
+                                    textAlign="Center"
+                                />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+                </table:Table>
+                <layoutData>
+                    <FlexItemData growFactor="1" />
+                </layoutData>
+            </Panel>
+        </content>
+        <footer>
+            <OverflowToolbar
+                style="Clear"
+                class="custom-mg-footer sapUiTinyMargin"
+            >
+                <ToolbarSpacer />
+                <Button
+                    type="Accept"
+                    class="custom-mg-btn"
+                    icon="sap-icon://edit"
+                    text="수정"
+                    tooltip="수정"
+                    press=".onFooterButton($event, 'edit')"
+                    visible="{= !${uiModel>/edit}}"
+                >
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+                <Button
+                    type="Accept"
+                    class="custom-mg-btn"
+                    icon="sap-icon://save"
+                    text="저장"
+                    tooltip="저장"
+                    press=".onFooterButton($event, 'save')"
+                    enabled="{= ${uiModel>/hasPendingChanges}}"
+                    visible="{uiModel>/edit}"
+                >
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+                <Button
+                    class="custom-mg-btn"
+                    icon="sap-icon://cancel"
+                    text="취소"
+                    tooltip="취소"
+                    press=".onFooterButton($event, 'cancel')"
+                    visible="{uiModel>/edit}"
+                >
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+            </OverflowToolbar>
+        </footer>
+    </Page>
+</mvc:View>

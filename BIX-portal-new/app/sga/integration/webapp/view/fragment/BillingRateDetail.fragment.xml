@@ -1,0 +1,50 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"     
+    xmlns:core="sap.ui.core"
+    xmlns:mdc="sap.ui.mdc"
+	xmlns:mdct="sap.ui.mdc.table">
+    <Dialog id="billingRateDetailDialog" class="sapUiContentPadding">
+		<customHeader>
+			<OverflowToolbar>
+				<content>
+					<Title id="title" />
+					<ToolbarSpacer/>
+					<Button icon="sap-icon://decline" press=".onBillingRateDetailDialogButton($event,'Close')"/>
+				</content>
+			</OverflowToolbar>
+		</customHeader>
+        <content>
+			<Table id="table" mode="None"
+				items="{detailModel>/}">
+				<columns>
+					<Column hAlign="Center">
+						<Text text="사업기회명" />
+					</Column>
+					<Column hAlign="Center">
+						<Text text="사업유형" />
+					</Column>
+					<Column hAlign="Center">
+						<Text text="수주금액" />
+					</Column>
+					<Column hAlign="Center" >
+						<Text text="매출액(용역)" />
+					</Column>
+					<Column hAlign="Center">
+						<Text text="투입 추정 인건비" />
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem vAlign="Middle" >
+						<cells>
+							<Text text="{detailModel>test1}"/>
+							<Text text="{detailModel>test2}"/>
+							<Text text="{detailModel>test3}"/>
+							<Text text="{detailModel>test4}"/>
+							<Text text="{detailModel>test5}"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>

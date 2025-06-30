@@ -1,0 +1,290 @@
+_schema-version: 3.3.0
+ID: bix-portal-ui
+description: BIX Portal UI5 apps
+version: 1.0.0
+modules:
+- name: bix-portal-app-deployer
+  type: com.sap.application.content
+  path: ./
+  requires:
+  - name: bix-portal-html5-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - bixmain.zip
+      name: bixmain
+      target-path: resources/
+    - artifacts:
+      - bixadminmenu.zip
+      name: bixadminmenu
+      target-path: resources/
+    - artifacts:
+      - bixadmincodes.zip
+      name: bixadmincodes
+      target-path: resources/      
+    - artifacts:
+      - bixadminmultilingual.zip
+      name: bixadminmultilingual
+      target-path: resources/      
+    - artifacts:
+      - bixsgalabor.zip
+      name: bixsgalabor
+      target-path: resources/
+    - artifacts:
+      - bixsgaintegration.zip
+      name: bixsgaintegration
+      target-path: resources/      
+    - artifacts:
+      - bixploverview.zip
+      name: bixploverview
+      target-path: resources/
+    - artifacts:
+      - bixtestapi.zip
+      name: bixtestapi
+      target-path: resources/
+    - artifacts:
+      - bixmasterorgtarget.zip
+      name: bixmasterorgtarget
+      target-path: resources/     
+    - artifacts:
+      - bixmasteraccount.zip
+      name: bixmasteraccount
+      target-path: resources/
+    - artifacts:
+      - bixaicomponent.zip
+      name: bixaicomponent
+      target-path: resources/
+    - artifacts:
+      - bixaireport.zip
+      name: bixaireport
+      target-path: resources/
+    - artifacts:
+      - bixadminwidget.zip
+      name: bixadminwidget
+      target-path: resources/
+    - artifacts:
+      - bixadminpublish.zip
+      name: bixadminpublish
+      target-path: resources/
+    - artifacts:
+      - bixcommondashboard.zip
+      name: bixcommondashboard
+      target-path: resources/
+    - artifacts:
+      - bixcommonlibrary.zip
+      name: bixcommonlibrary
+      target-path: resources/
+    - artifacts:
+      - bixcommonai.zip
+      name: bixcommonai
+      target-path: resources/
+    - artifacts:
+      - bixmasterfaq.zip
+      name: bixmasterfaq
+      target-path: resources/      
+    - artifacts:
+      - bixmasterproject.zip
+      name: bixmasterproject
+      target-path: resources/      
+    - artifacts:
+      - bixmasterorgtype.zip
+      name: bixmasterorgtype
+      target-path: resources/            
+- name: bixcommonlibrary
+  type: html5
+  path: ./common/library
+  build-parameters:
+    build-result: dist
+    builder: custom
+    preload: true
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+    build-options:
+        preload: true
+- name: bixcommonai
+  type: html5
+  path: ./common/ai
+  build-parameters:
+    build-result: dist
+    builder: custom
+    preload: true
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+    build-options:
+        preload: true
+- name: bixadminwidget
+  type: html5
+  path: ./admin/widget
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixadminpublish
+  type: html5
+  path: ./admin/publish
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixcommondashboard
+  type: html5
+  path: ./common/dashboard
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixmain
+  type: html5
+  path: ./main
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixadminmenu
+  type: html5
+  path: ./admin/menu
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixadmincodes
+  type: html5
+  path: ./admin/codes
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []    
+- name: bixadminmultilingual
+  type: html5
+  path: ./admin/multilingual
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixsgalabor
+  type: html5
+  path: ./sga/labor
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixsgaintegration
+  type: html5
+  path: ./sga/integration
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixmasterorgtarget
+  type: html5
+  path: ./master/orgtarget
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixmasteraccount
+  type: html5
+  path: ./master/account
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []    
+- name: bixploverview
+  type: html5
+  path: ./pl/overview
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixtestapi
+  type: html5
+  path: ./test/api
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixmasterfaq
+  type: html5
+  path: ./master/faq
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixmasterproject
+  type: html5
+  path: ./master/project
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixmasterorgtype
+  type: html5
+  path: ./master/orgtype
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []    
+- name: bixaicomponent
+  type: html5
+  path: ./ai/component
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+- name: bixaireport
+  type: html5
+  path: ./ai/report
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: bix-portal-html5-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-plan: app-host
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true

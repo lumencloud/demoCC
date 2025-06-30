@@ -1,0 +1,266 @@
+<mvc:View controllerName="bix.sga.labor.controller.BillingRate"
+    id="Main"
+    xmlns:simple="sap.gantt.simple"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:mdc="sap.ui.mdc" busyIndicatorDelay="0" width="100%">
+
+
+<Page class="sapUiContentPadding" showFooter="true" showHeader="false">
+        <content>
+            <form:SimpleForm  editable="true" class="custom-search-container">
+                <form:content>
+                    <OverflowToolbar class="custom-toolbar">
+                        <ToggleButton press="onTogglePress" class="custom-depth-btn" text="인력추정"  pressed="true"/>
+                        <ToggleButton press="onTogglePress" class="custom-depth-btn" text="추정치" />
+                        <layoutData>
+                            <layout:GridData span="XL12 L12 M12 S12" />
+                        </layoutData>
+                    </OverflowToolbar>                    
+                </form:content>
+                <HBox class="custom-search-field-box" alignItems="Center">
+                    <Label  text="년월" tooltip="년월" wrapping="false" required="true">
+                        <layoutData>
+                            <layout:GridData span="XL2 L2 M2 S12" />
+                        </layoutData>
+                    </Label>
+                    <DatePicker 
+                        id ="searchMonthYear"
+                        class="sapUiSmallarginEnd"
+                        value="{
+                            path: 'searchModel>/yearMonth',
+                            type: 'sap.ui.model.type.Date',
+                            formatOptions: {
+                                format: 'yyyyMM',
+                                pattern: 'yyyy-MM'
+                            }
+                        }"
+                        fieldGroupIds="Search,Required" change="onChangeSearch($event,'month')"/>
+                    <layoutData>
+                        <layout:GridData span="XL3 L3 M3 S12" />
+                    </layoutData>
+                </HBox>
+
+            <!-- 매출조직명 -->
+            <HBox class="custom-search-field-box" alignItems="Center">
+                <Label  text="매출조직명" required="true"/>
+                <Input                     
+                    width="100%" showValueHelp="true" valueHelpRequest=".onOrgSingleSelectDialogOpen($event,'Department')" 
+                    showSuggestion="true" change="onChangeSearch($event,'org')" valueStateText="입력한 조직이 존재하지 않습니다."
+                    suggestionItems="{ path: 'cm>/latest_org', length: 2000 }"
+                    value="{searchModel>/orgNm}" name="{searchModel>/orgId}"                    
+                    fieldGroupIds="Search,Required" showValueStateMessage="true"
+                >
+                    <suggestionItems>
+                         <core:Item key="{cm>id}" text="{cm>name}" />
+                    </suggestionItems>
+                </Input>
+                <layoutData>
+                    <layout:GridData span="XL3 L3 M3 S12" />
+                </layoutData>
+            </HBox>
+
+            <HBox  width="100%" class="custom-search-btn-container" justifyContent="End" >
+            <Button icon="sap-icon://refresh" text="초기화" press="onSearch($event,'Refresh')" class="custom-mg-small-btn" />
+            <Button icon="sap-icon://search" id="btnSearch" type="Accept" text="검색" press=".onSearch($event,'Search')" class="custom-mg-small-btn"/>                                
+                <layoutData>
+                    <layout:GridData span="XL12 L12 M12 S12" />
+                </layoutData>
+            </HBox>
+            </form:SimpleForm>
+
+            <Panel height="calc(100% - 15rem)" class="sapUiSmallMarginTop">
+
+            <table:Table
+                id="table"
+                selectionMode="None"
+                class="custom-mg-uiTable custom-selection-uiTable custom-table-rounding-border" 
+                busyIndicatorDelay="0"
+                visible="{=${searchModel>/category}==='인력추정'}"
+                rows="{path:'brTableModel>/'}"     
+                cellClick=".onBillingRateDetailDialogOpen"       
+            >
+            <table:rowMode>
+                        <rowmodes:Auto />
+                    </table:rowMode>
+
+            <table:columns>
+                <table:Column  hAlign="Center" width="12rem" autoResizable="true" class="custom-colspan2" visible="{tableVisibleModel>/div}">
+                    <table:multiLabels>
+                        <Label text="부문" wrapping="true"/>
+                        <Label  text=""/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text emptyIndicatorMode='On'  text="{brTableModel>div_name}" wrapping="false" width="100%" textAlign="Center"/>
+                    </table:template>
+                </table:Column>
+
+                <table:Column hAlign="Center" width="12rem" autoResizable="true" visible="{tableVisibleModel>/hdqt}">
+                    <table:multiLabels>
+                        <Label text="본부" wrapping="true"/>
+                        <Label text=""/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text emptyIndicatorMode='On'   text="{brTableModel>hdqt_name}" wrapping="false" width="100%" textAlign="Center"/>
+                    </table:template>
+                </table:Column>
+
+                <table:Column  hAlign="Center" width="12rem" autoResizable="true" visible="{tableVisibleModel>/team}"> 
+                    <table:multiLabels>
+                        <Label  text="조직" wrapping="true"/>
+                        <Label text=""/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text emptyIndicatorMode='On'   text="{brTableModel>team_name}" wrapping="false" width="100%" textAlign="Center"/>
+                    </table:template>
+                </table:Column>
+
+                <table:Column  hAlign="Center" width="10rem" autoResizable="true">
+                    <table:multiLabels>
+                        <Label  text="팀별 BR실적 (목표)" wrapping="true"/>
+                        <Label  text=""/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text emptyIndicatorMode='On'  
+                        text="{
+                                    parts:[
+                                        {path:'brTableModel>target', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'percent_goal'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'brTableModel>target', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'tooltip'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                                
+                            />
+                    </table:template>
+                </table:Column>
+
+                <table:Column  hAlign="Center" width="8rem" autoResizable="true" headerSpan="3">
+                    <table:multiLabels>
+                        <Label text="팀별 BR 추정" wrapping="true"/>
+                        <Label  text="전체BR 추정"/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text emptyIndicatorMode='On'   
+                        text="{
+                                    parts:[
+                                        {path:'brTableModel>forecast_value', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'percent'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'brTableModel>forecast_value', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'tooltip'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                                />
+                    </table:template>
+                </table:Column>
+
+                <table:Column  hAlign="Center" width="8rem" autoResizable="true" headerSpan="3">
+                    <table:multiLabels>
+                        <Label  text="팀별 BR 추정" wrapping="true"/>
+                        <Label  text="확보 추정"/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text emptyIndicatorMode='On'  
+                         text="{
+                                    parts:[
+                                        {path:'brTableModel>secured_value', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'percent'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'brTableModel>secured_value', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'tooltip'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                                
+                            />
+
+                    </table:template>
+                </table:Column>
+
+                <table:Column hAlign="Center" width="8rem" autoResizable="true" headerSpan="3">
+                    <table:multiLabels>
+                        <Label text="팀별 BR 추정" wrapping="true"/>
+                        <Label text="미확보 추정"/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text emptyIndicatorMode='On'    text="{
+                                    parts:[
+                                        {path:'brTableModel>not_secured_value', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'percent'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'
+                                }"
+                                tooltip="{
+                                    parts:[
+                                        {path:'brTableModel>not_secured_value', targetType: 'any'},
+                                        {path:'', targetType: 'any'},
+                                        {value:'tooltip'},{value:''}
+                                    ],
+                                    formatter: '.onFormatPerformance'                                
+                                }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="End"
+                                
+                            />
+                    </table:template>
+                </table:Column>                   
+            </table:columns>            
+        </table:Table>
+
+        <!-- 테이블 -->
+        <table:Table id="table2"
+            class="custom-mg-uiTable custom-selection-uiTable custom-table-rounding-border " 
+            selectionMode="None"
+            busyIndicatorDelay="0"
+            visible="{=${searchModel>/category}==='추정치'}"
+            rows="{path:'detailTableModel>/'}"     
+            >
+
+            <table:rowMode>
+                <rowmodes:Auto/>
+            </table:rowMode>
+        </table:Table>
+        </Panel>
+        </content>
+    </Page>
+   
+</mvc:View>

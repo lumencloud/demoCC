@@ -1,0 +1,27 @@
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:viz="sap.viz.ui5.controls" 
+	xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:form="sap.ui.layout.form"
+    controllerName="bix.card.income.card"
+    height="100%"
+	width="100%"
+>
+    <!-- <Panel 
+        height="500px"
+        width="100%">
+        <HBox justifyContent="Center" height="100%">
+            <core:HTML
+            content="&lt;canvas id=&quot;income&quot; &gt;&lt;/canvas&gt;"/>
+        </HBox>
+    </Panel> -->
+        <HBox justifyContent="Center" height="100%">
+
+        <core:HTML id="html" />
+
+        </HBox>
+
+</mvc:View>

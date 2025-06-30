@@ -1,0 +1,160 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:ui="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    width="100%"
+    height="100%"
+    displayBlock="true"
+    controllerName="bix.card.accountSaleDetailTable.Main"
+>
+    <ui:Table
+        selectionMode="None"
+        id="accountDetailTable"
+        class="custom-table custom-uiTable-selection custom-inherit-height" 
+        rows="{path: 'accountModel>/'}"
+        width="100%"
+        fixedColumnCount="1"
+        busyIndicatorDelay="0"
+    >
+        <ui:extension>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Text text="(단위:억)" />
+            </OverflowToolbar>
+        </ui:extension>
+        <ui:rowMode>
+            <rowmodes:Auto />
+        </ui:rowMode>
+        <ui:columns>
+            <ui:Column
+                hAlign="Center"
+                width="8rem"
+            >
+                <Label text="구분" />
+                <ui:template>
+                    <Text text="{accountModel>name}" />
+                </ui:template>
+            </ui:Column>
+        </ui:columns>
+        <ui:columns>
+            <ui:Column
+                hAlign="Center"
+                width="8rem"
+            >
+                <Label text="목표매출" />
+                <ui:template>
+                    <HBox
+                        width="100%"
+                        justifyContent="End"
+                    >
+                        <Text
+                            text="{path:'accountModel>target', formatter:'.formatNumber'}"
+                        />
+                    </HBox>
+                </ui:template>
+            </ui:Column>
+        </ui:columns>
+        <ui:columns>
+            <ui:Column
+                hAlign="Center"
+                width="8rem"
+            >
+                <Label text="확보매출" />
+                <ui:template>
+                    <HBox
+                        width="100%"
+                        justifyContent="End"
+                    >
+                        <Text
+                            text="{path:'accountModel>confirmedSale', formatter:'.formatNumber'}"
+                        />
+                    </HBox>
+                </ui:template>
+            </ui:Column>
+        </ui:columns>
+        <ui:columns>
+            <ui:Column
+                hAlign="Center"
+                width="6rem"
+            >
+                <Label text="진척률" />
+                <ui:template>
+                    <HBox
+                        width="100%"
+                        justifyContent="End"
+                    >
+                        <Text
+                            text="{path:'accountModel>progress', formatter:'.formatPercent'}"
+                        />
+                    </HBox>
+                </ui:template>
+            </ui:Column>
+        </ui:columns>
+        <ui:columns>
+            <ui:Column
+                headerSpan="3"
+                hAlign="Center"
+                width="8rem"
+            >
+                <ui:multiLabels>
+                    <Label text="Pipeline" />
+                    <Label text="수주" />
+                </ui:multiLabels>
+                <ui:template>
+                    <HBox
+                        width="100%"
+                        justifyContent="End"
+                    >
+                        <Text
+                            text="{path:'accountModel>contract', formatter:'.formatNumber'}"
+                        />
+                    </HBox>
+                </ui:template>
+            </ui:Column>
+        </ui:columns>
+        <ui:columns>
+            <ui:Column
+                hAlign="Center"
+                width="8rem"
+            >
+                <ui:multiLabels>
+                    <Label text="Pipeline" />
+                    <Label text="매출" />
+                </ui:multiLabels>
+                <ui:template>
+                    <HBox
+                        width="100%"
+                        justifyContent="End"
+                    >
+                        <Text
+                            text="{path:'accountModel>sale', formatter:'.formatNumber'}"
+                        />
+                    </HBox>
+                </ui:template>
+            </ui:Column>
+        </ui:columns>
+        <ui:columns>
+            <ui:Column
+                hAlign="Center"
+                width="8rem"
+            >
+                <ui:multiLabels>
+                    <Label text="Pipeline" />
+                    <Label text="마진" />
+                </ui:multiLabels>
+                <ui:template>
+                    <HBox
+                        width="100%"
+                        justifyContent="End"
+                    >
+                        <Text
+                            text="{path:'accountModel>margin', formatter:'.formatNumber'}"
+                        />
+                    </HBox>
+                </ui:template>
+            </ui:Column>
+        </ui:columns>
+    </ui:Table>
+</mvc:View>
