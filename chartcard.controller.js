@@ -1,65 +1,37 @@
-_groupInfo: function(aResults) {
-    // x축 라벨
-    let aLabel = aResults.map(r => r.account_nm);
+id: "subLabels",
+    afterDatasetsDraw(chart, args, pluginOptions) {
+        const { ctx, chartArea: { left, bottom }, scales } = chart;
+        let subLabelsArr = chart.options.plugins.subLabels && chart.options.plugins.subLabels.labels;
+        let aLabels = chart.data.labels;
+        if (!subLabelsArr || !aLabels) return;
 
-    // div_name별 그룹 정보 계산
-    let groupMap = {}; // { div_name: {start: idx, end: idx, sum: int} }
-    aResults.forEach((row, idx) => {
-        let name = row.div_name;
-        if (!groupMap[name]) {
-            groupMap[name] = { start: idx, end: idx, sum: 0 };
-        }
-        groupMap[name].end = idx;
-        groupMap[name].sum += Number(row.div_value) || 0;
-    });
-
-    return { aLabel, groupMap };
-}
-
-const groupLabelsPlugin = {
-    id: 'groupLabelsPlugin',
-    afterDraw(chart, args, options) {
-        const { ctx, chartArea, scales } = chart;
-        const xScale = scales.x;
-        if (!xScale) return;
-
-        // UI5 Controller에서 계산한 groupMap을 chart.options.plugins.groupLabels에 전달해야 함
-        const groupMap = chart.options.plugins.groupLabels.groupMap;
-        if (!groupMap) return;
+        // 1. div_name별로 start/end/cnt 계산
+        let groupMap = {};
+        subLabelsArr.forEach((item, i) => {
+            let divName = item[0];
+            if (!groupMap[divName]) {
+                groupMap[divName] = { start: i, end: i, cnt: 1, sum: item[1] };
+            } else {
+                groupMap[divName].end = i;
+                groupMap[divName].cnt++;
+            }
+        });
 
         ctx.save();
-        ctx.textAlign = "center";
-        ctx.font = "bold 13px Arial";
-        let y = chartArea.bottom + 30; // x축 아래 그룹명
-        let y2 = chartArea.bottom + 50; // x축 아래 그룹 합계
+        ctx.textAlign = 'center';
 
+        // 2. 각 그룹별로 중앙 인덱스 찾아 한 번만 그리기
         Object.keys(groupMap).forEach(divName => {
             const info = groupMap[divName];
-            // 그룹 첫번째~마지막 x축 위치의 가운데 계산
-            let x1 = xScale.getPixelForValue(info.start);
-            let x2 = xScale.getPixelForValue(info.end);
-            let midX = (x1 + x2) / 2;
-
-            // 1. div_name 출력
-            ctx.fillStyle = "#222";
-            ctx.fillText(divName, midX, y);
-
-            // 2. div_value 합계 출력 (콤마, 억 단위 등 포맷 원하는 대로)
-            ctx.font = "normal 12px Arial";
-            ctx.fillStyle = "#666";
-            ctx.fillText(info.sum.toLocaleString(), midX, y2);
-
-            // 원하면 밑줄도 추가 가능 (선택)
-            // ctx.beginPath();
-            // ctx.moveTo(x1 + 10, y + 10);
-            // ctx.lineTo(x2 - 10, y + 10);
-            // ctx.strokeStyle = "#aaa";
-            // ctx.lineWidth = 1;
-            // ctx.stroke();
+            let centerIdx = Math.floor((info.start + info.end) / 2);
+            let x = scales.x.getPixelForValue(centerIdx);
+            ctx.font = 'bolder 13px sans-serif';
+            ctx.fillStyle = '#333';
+            ctx.fillText(divName, x, bottom + 30);
+            ctx.font = 'normal 12px sans-serif';
+            ctx.fillStyle = '#888';
+            ctx.fillText(info.sum, x, bottom + 50);
         });
 
         ctx.restore();
     }
-};
-
-
