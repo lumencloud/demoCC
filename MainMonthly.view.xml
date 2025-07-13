@@ -1,0 +1,59 @@
+<mvc:View xmlns:launchpad="sap.ushell.ui.launchpad" controllerName="bix.ai.list.controller.MainMonthly"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:w="sap.ui.integration.widgets"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout" height="100%">
+    <Page class="sapUiContentPadding custom-ai-report-test-container detail" id="workpagesBuilder" showHeader="false" showFooter="true" enableScrolling="false">
+        <content>
+            <form:SimpleForm editable="true">
+                <OverflowToolbar class="custom-toolbar sapUiSmallMarginBegin sapUiSmallMarginEnd">
+                    <!-- <core:Icon src="sap-icon://undo" press=".onCancel" width="36px" height="36px" class="back-icon"/> -->
+                    <Title id="detailTitle" text="월마감 AI 리포트" class="custom-mg-title sapUiSmallMarginBegin" visible="{= !${ui>/edit}}"/>
+                    <ToolbarSpacer/>
+                     <HBox width="200px" alignContent="Center" alignItems="Center" justifyContent="Center" class="custom-ai-report-box">
+                          <Select width="100%" id="selectType" forceSelection="true" items="{
+                                path: '/GetCodeItemView(category=\'ai_report_type\')/Set'
+                            }"  change="onSelectTypeChange" >
+                            <core:Item key="{value}" text="{name}" />
+                        </Select>
+                    </HBox>
+                    <HBox width="200px" alignContent="Center" alignItems="Center" justifyContent="Center" class="custom-ai-report-box" visible="{ui>/bFlag}">
+                        <Select items="{path:'selectModel>/'}" change="onSelectChange" selectedKey="{selectModel>/selectedKey}">
+                            <core:Item key="{selectModel>org_id}" text="{selectModel>org_name}"></core:Item>
+                        </Select>
+                    </HBox>
+                    <HBox width="200px" alignContent="Center" alignItems="Center" justifyContent="Center" class="custom-ai-report-box">
+                        <DatePicker id="datePicker" fieldGroupIds="Search,Required" value="{
+                            path: 'ui>/date',
+                            type: 'sap.ui.model.type.Date',
+                            formatOptions: {
+                                format: 'yyyyMM',
+                                pattern: 'yyyy-MM'
+                            }
+                        }" change="onDateChange"/>
+                    </HBox>
+                    <Button text="PDF 다운로드" id="pdfDownload" class="custom-text-semibold" icon="sap-icon://pdf-attachment" type="Neutral" press="onPDF" enabled="false" visible="{= ${envModel>/env} === 'QA' ? false : true}"/>
+                </OverflowToolbar>
+            </form:SimpleForm>
+            <NavContainer id="navCon">
+                <mvc:XMLView viewName="bix.ai.list.view.AllMonthly" id="ax" async="true"  height="100%"/>
+                <mvc:XMLView viewName="bix.ai.list.view.DeliveryMonthly" id="delivery" async="true" height="100%"/>
+                <mvc:XMLView viewName="bix.ai.list.view.CloudMonthly" id="cloud" async="true" height="100%"/>
+                <mvc:XMLView viewName="bix.ai.list.view.AccountMonthly" id="account" async="true"  height="100%"/>
+            </NavContainer>
+        </content>
+        <footer>
+            <OverflowToolbar style="Clear" class="sapUiTinyMargin custom-mg-footer">
+                <ToolbarSpacer />
+                <Button class="custom-mg-btn" icon="sap-icon://cancel" text="{i18n>cancel}" tooltip="{i18n>cancel}" press=".onCancel">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+            </OverflowToolbar>
+        </footer>
+    </Page>
+</mvc:View>
