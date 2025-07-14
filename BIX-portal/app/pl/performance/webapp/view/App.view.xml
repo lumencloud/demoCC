@@ -1,9 +1,0 @@
-<mvc:View controllerName="bix.pl.performance.controller.App"
-    displayBlock="true"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns:f="sap.f"
-    xmlns="sap.m">
-    <App id="app">
-        <f:FlexibleColumnLayout id="fcl" stateChange="onStateChanged" layout="{viewControl>/layout}" backgroundDesign="Solid" />
-    </App>
-</mvc:View>
