@@ -1,0 +1,25 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.deliveryMonthlyContent1_1.Main"
+>
+    <VBox id="cardContent" class="custom-ai-report-test-delivery-content1_1-container">
+        <!--VBox width="100%" class="custom-ai-report-summary-box">
+            <Title text="Summary" />
+            <VBox width="100%" class="smry-box">
+                <Text text="{LLMModel>/positive}" class="review-positive sapUiTinyMarginBegin" />
+                <Text text="{LLMModel>/negative}" class="review-negative sapUiTinyMarginBegin" />
+            </VBox>
+        </VBox-->
+        
+        <VBox width="100%">
+            <!--Title text="Review" /-->
+            <Text text="{LLMModel>/title}" class="custom-ai-report-review-header sapUiTinyMarginBegin" />
+            <Text text="{LLMModel>/full}" class="custom-ai-report-review-content sapUiTinyMarginBegin" />
+        </VBox>
+    </VBox>
+</mvc:View>

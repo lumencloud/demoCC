@@ -1,0 +1,23 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.aiReportMonthlyAiInsight.Main"
+>
+    <VBox id="cardContent" width="100%">
+        <VBox width="100%" class="title-wrapper inner-spacing back-gray border-rounding sapUiMediumMarginBottom">
+            <HBox>
+                <Image src="./resource/icon/ai_icon05.png" />
+                <Title text="AI Insight"/>
+            </HBox>
+            <Text text="{LLMModel>/insight}" />
+        </VBox>
+        
+        <VBox width="100%" class="title-wrapper inner-spacing back-gray border-rounding">
+            <Title text="AI Summerize"/>
+            <Text text="{LLMModel>/summary}" />
+        </VBox>
+    </VBox>
+</mvc:View>

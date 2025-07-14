@@ -1,0 +1,37 @@
+{
+    "role": {
+        "name": "SC_IF_TABLE_CRUD",
+        "object_privileges": [
+            {
+                "name": "SC_IF_PL",
+                "type": "TABLE",
+                "privileges": [
+                    "INSERT",
+                    "SELECT",
+                    "UPDATE",
+                    "DELETE"
+                ]
+            },
+            {
+                "name": "SC_IF_EXPENSE",
+                "type": "TABLE",
+                "privileges": [
+                    "INSERT",
+                    "SELECT",
+                    "UPDATE",
+                    "DELETE"
+                ]
+            },
+            {
+                "name": "SC_IF_LABOR",
+                "type": "TABLE",
+                "privileges": [
+                    "INSERT",
+                    "SELECT",
+                    "UPDATE",
+                    "DELETE"
+                ]
+            }
+        ]
+    }
+}

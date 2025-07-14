@@ -1,0 +1,2294 @@
+<mvc:View xmlns:tnt="sap.tnt"
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    width="100%"
+    height="100%"
+    displayBlock="true"
+    busyIndicatorDelay="0"
+    controllerName="bix.card.actualSaleMarginDetailTable.Main"
+>
+    <Panel
+        expandable="false"
+        expanded="true"
+        width="100%"
+        height="100%"
+        class="sapUiNoContentPadding"
+    >
+        <content>
+            <VBox
+                width="100%"
+                height="100%"
+            >
+                <OverflowToolbar
+                    width="100%"
+                    height="3rem"
+                    class="custom-overflow-toolbar"                    
+                >
+                    <!-- <Title
+                        id="tempMessage"
+                        text="※ 현재 데이터가 없어 목표 및 진척도의 값이 맞지 않을 수 있습니다."
+                        visible="{=${uiModel>/tableKind} === 'account'}"
+                    />
+                    <Title
+                        id="tempMessage2"
+                        text="※ 현재 법인 데이터가 없어 값이 맞지 않을 수 있습니다."
+                        visible="{=${uiModel>/tableKind} === 'sub_company'}"
+                    /> -->
+                    <ToolbarSpacer />
+                    <SegmentedButton
+                        id="detailSelect"
+                        selectionChange=".onUiChange"
+                        selectedKey="{uiModel>/tableKind}"
+                        class="custom-detail-select-btn"
+                        items="{path: 'selectModel>/'}">
+                        <items>
+                            <SegmentedButtonItem key="{selectModel>sub_key}" text="{selectModel>sub_text}"/>
+                        </items>
+                    </SegmentedButton>
+                    <!-- <HBox class="custom-select-box" width="30%" justifyContent="End">
+                    <Select
+                        id="detailSelect"
+                        change=".onUiChange"
+                        width="100%"
+                        selectedKey="{uiModel>/tableKind}"
+                        items="{path: 'selectModel>/'}"
+                    >
+                        <items>
+                            <core:ListItem
+                                key="{selectModel>sub_key}"
+                                text="{selectModel>sub_text}"
+                            />
+                        </items>
+                    </Select>
+                    </HBox> -->
+                </OverflowToolbar>
+
+                <VBox
+                    class="custom-vbox-wrap-table"
+                    busyIndicatorDelay="0"
+                    height="100%"
+                    width="100%" 
+                    visible="{=${uiModel>/tableKind} === 'org'}"
+                >
+                    <table:Table
+                        id="actualSaleMarginDetailTable1"
+                        rows="{path:'/'}"
+                        class=" custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange="onRowSelectionChange"
+                        fixedColumnCount="2"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        noData=" "
+                        fieldGroupIds="content,org"
+                    >
+                        <table:layoutData>
+                            <FlexItemData growFactor="1" />
+                        </table:layoutData>
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="10rem"
+                                resizable="false"
+                                
+                            >
+                                    <Label
+                                        text="조직"
+                                        wrapping="true"
+                                    />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{org_name}"
+                                        tooltip="{org_name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Begin"
+                                    />
+                                </table:template>
+                                <!--  TableMerge 수정 250701  -->
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="org_name" />
+                                </table:customData>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                
+                            >
+                                <Label
+                                    text="구분"
+                                    wrapping="true"
+                                />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{type}"
+                                        tooltip="{type}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                        class="custom-text-regular"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                
+                            >
+                                <Label
+                                    text="목표"
+                                    wrapping="true"
+                                />
+                                <table:template>
+                                    <Text
+                                        emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[                                                
+                                                {path:'target_curr_y_value', targetType: 'any'},                                                
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'target'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{     
+                                            parts:[                                                         
+                                                {path:'target_curr_y_value', targetType: 'any'},                                                        
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'targetTooltip'}
+                                            ],     
+                                            formatter: '.onFormatPerformance'                                 
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="3"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{     
+                                    parts:[         
+                                        {path:'actual_curr_ym_value', targetType: 'any'},    
+                                        {value:''},
+                                        {path:'type',  targetType: 'any'}     
+                                    ],     
+                                    formatter: '.onFormatPerformance' }"
+                                        tooltip="{     
+                                            parts:[     
+                                                {path:'actual_curr_ym_value', targetType: 'any'},  
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],     
+                                            formatter: '.onFormatPerformance'                                 
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{     
+                                        parts:[        
+                                            {path:'actual_last_ym_value', targetType: 'any'}, 
+                                            {value:''},
+                                            {path:'type', targetType: 'any'}
+                                        ],     
+                                        formatter: '.onFormatPerformance'
+                                    }"
+                                        tooltip="{    
+                                        parts:[       
+                                            {path:'actual_last_ym_value', targetType: 'any'},   
+                                            {value:''},
+                                            {path:'type',  targetType: 'any'},
+                                            {value:'tooltip'}
+                                        ],     
+                                        formatter: '.onFormatPerformance'                                 
+                                    }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <tnt:InfoLabel
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {path:'actual_last_ym_value', targetType: 'any'}, 
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'infoLabel'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                            }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {path:'actual_last_ym_value', targetType: 'any'}, 
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                            }"
+                                        colorScheme="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
+                                                {value: ''}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        icon="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
+                                                {value: 'icon'}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        class="custom-pl-cell-color"
+                                        width="100%"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                headerSpan="3"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                            }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                            }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <tnt:InfoLabel
+                                        text="{
+                                        parts:[ 
+                                            {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                            {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                            {value:'percent'},
+                                            {value:'infoLabel'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'},
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        colorScheme="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                                {path: 'actual_last_ym_rate', targetType: 'any' },
+                                                {value: ''}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        icon="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                                {path: 'actual_last_ym_rate', targetType: 'any' },
+                                                {value: 'icon'}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        class="custom-pl-cell-color"
+                                        width="100%"
+                                    />
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:Table>
+                </VBox>
+
+                <VBox
+                    class="custom-vbox-wrap-table"
+                    busyIndicatorDelay="0"
+                    height="100%"
+                    width="100%" 
+                    visible="{=${uiModel>/tableKind} === 'org_delivery'}"
+                >
+                    <table:Table
+                        id="actualSaleMarginDetailTable2"
+                        rows="{path:'/'}"
+                        class=" custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange="onRowSelectionChange"
+                        fixedColumnCount="2"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        noData=" "
+                        fieldGroupIds="content,org_delivery"
+                    >
+                        <table:layoutData>
+                            <FlexItemData growFactor="1" />
+                        </table:layoutData>
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="10rem"
+                                resizable="false"
+                                
+                            >
+                                    <Label
+                                        text="조직"
+                                        wrapping="true"
+                                    />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{org_name}"
+                                        tooltip="{org_name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Begin"
+                                    />
+                                </table:template>
+                                <!--  TableMerge 수정 250701  -->
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="org_name" />
+                                </table:customData>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                
+                            >
+                                <Label
+                                    text="구분"
+                                    wrapping="true"
+                                />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{type}"
+                                        tooltip="{type}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                        class="custom-text-regular"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                
+                            >
+                                <Label
+                                    text="목표"
+                                    wrapping="true"
+                                />
+                                <table:template>
+                                    <Text
+                                        emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[                                                
+                                                {path:'target_curr_y_value', targetType: 'any'},                                                
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'target'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{     
+                                            parts:[                                                         
+                                                {path:'target_curr_y_value', targetType: 'any'},                                                        
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'targetTooltip'}
+                                            ],     
+                                            formatter: '.onFormatPerformance'                                 
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="3"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{     
+                                    parts:[         
+                                        {path:'actual_curr_ym_value', targetType: 'any'},    
+                                        {value:''},
+                                        {path:'type',  targetType: 'any'}     
+                                    ],     
+                                    formatter: '.onFormatPerformance' }"
+                                        tooltip="{     
+                                            parts:[     
+                                                {path:'actual_curr_ym_value', targetType: 'any'},  
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],     
+                                            formatter: '.onFormatPerformance'                                 
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{     
+                                        parts:[        
+                                            {path:'actual_last_ym_value', targetType: 'any'}, 
+                                            {value:''},
+                                            {path:'type', targetType: 'any'}
+                                        ],     
+                                        formatter: '.onFormatPerformance'
+                                    }"
+                                        tooltip="{    
+                                        parts:[       
+                                            {path:'actual_last_ym_value', targetType: 'any'},   
+                                            {value:''},
+                                            {path:'type',  targetType: 'any'},
+                                            {value:'tooltip'}
+                                        ],     
+                                        formatter: '.onFormatPerformance'                                 
+                                    }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <tnt:InfoLabel
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {path:'actual_last_ym_value', targetType: 'any'}, 
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'infoLabel'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                            }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {path:'actual_last_ym_value', targetType: 'any'}, 
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                            }"
+                                        colorScheme="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
+                                                {value: ''}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        icon="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
+                                                {value: 'icon'}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        class="custom-pl-cell-color"
+                                        width="100%"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                headerSpan="3"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                            }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                            }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <tnt:InfoLabel
+                                        text="{
+                                        parts:[ 
+                                            {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                            {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                            {value:'percent'},
+                                            {value:'infoLabel'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'},
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        colorScheme="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                                {path: 'actual_last_ym_rate', targetType: 'any' },
+                                                {value: ''}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        icon="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                                {path: 'actual_last_ym_rate', targetType: 'any' },
+                                                {value: 'icon'}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        class="custom-pl-cell-color"
+                                        width="100%"
+                                    />
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:Table>
+                </VBox>
+
+                <VBox
+                    class="custom-vbox-wrap-table"
+                    busyIndicatorDelay="0"
+                    height="100%"
+                    width="100%" 
+                    visible="{=${uiModel>/tableKind} === 'org_account'}"
+                >
+                    <table:Table
+                        id="actualSaleMarginDetailTable3"
+                        rows="{path:'/'}"
+                        class=" custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange="onRowSelectionChange"
+                        fixedColumnCount="2"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        noData=" "
+                        fieldGroupIds="content,org_account"
+                    >
+                        <table:layoutData>
+                            <FlexItemData growFactor="1" />
+                        </table:layoutData>
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="10rem"
+                                resizable="false"
+                                
+                            >
+                                    <Label
+                                        text="조직"
+                                        wrapping="true"
+                                    />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{org_name}"
+                                        tooltip="{org_name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Begin"
+                                    />
+                                </table:template>
+                                <!--  TableMerge 수정 250701  -->
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="org_name" />
+                                </table:customData>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                
+                            >
+                                <Label
+                                    text="구분"
+                                    wrapping="true"
+                                />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{type}"
+                                        tooltip="{type}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                        class="custom-text-regular"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                
+                            >
+                                <Label
+                                    text="목표"
+                                    wrapping="true"
+                                />
+                                <table:template>
+                                    <Text
+                                        emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[                                                
+                                                {path:'target_curr_y_value', targetType: 'any'},                                                
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'target'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{     
+                                            parts:[                                                         
+                                                {path:'target_curr_y_value', targetType: 'any'},                                                        
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'targetTooltip'}
+                                            ],     
+                                            formatter: '.onFormatPerformance'                                 
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="3"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{     
+                                    parts:[         
+                                        {path:'actual_curr_ym_value', targetType: 'any'},    
+                                        {value:''},
+                                        {path:'type',  targetType: 'any'}     
+                                    ],     
+                                    formatter: '.onFormatPerformance' }"
+                                        tooltip="{     
+                                            parts:[     
+                                                {path:'actual_curr_ym_value', targetType: 'any'},  
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],     
+                                            formatter: '.onFormatPerformance'                                 
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{     
+                                        parts:[        
+                                            {path:'actual_last_ym_value', targetType: 'any'}, 
+                                            {value:''},
+                                            {path:'type', targetType: 'any'}
+                                        ],     
+                                        formatter: '.onFormatPerformance'
+                                    }"
+                                        tooltip="{    
+                                        parts:[       
+                                            {path:'actual_last_ym_value', targetType: 'any'},   
+                                            {value:''},
+                                            {path:'type',  targetType: 'any'},
+                                            {value:'tooltip'}
+                                        ],     
+                                        formatter: '.onFormatPerformance'                                 
+                                    }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <tnt:InfoLabel
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {path:'actual_last_ym_value', targetType: 'any'}, 
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'infoLabel'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                            }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {path:'actual_last_ym_value', targetType: 'any'}, 
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                            }"
+                                        colorScheme="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
+                                                {value: ''}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        icon="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
+                                                {value: 'icon'}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        class="custom-pl-cell-color"
+                                        width="100%"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                headerSpan="3"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                            }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                            }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <tnt:InfoLabel
+                                        text="{
+                                        parts:[ 
+                                            {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                            {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                            {value:'percent'},
+                                            {value:'infoLabel'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'},
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        colorScheme="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                                {path: 'actual_last_ym_rate', targetType: 'any' },
+                                                {value: ''}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        icon="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                                {path: 'actual_last_ym_rate', targetType: 'any' },
+                                                {value: 'icon'}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        class="custom-pl-cell-color"
+                                        width="100%"
+                                    />
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:Table>
+                </VBox>
+
+                <VBox
+                    class="custom-vbox-wrap-table"
+                    busyIndicatorDelay="0"
+                    height="100%"
+                    visible="{=${uiModel>/tableKind} === 'account'}"
+                >
+                    <table:Table
+                        id="actualSaleMarginDetailTable4"
+                        rows="{path:'/'}"
+                        class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        rowSelectionChange="onRowSelectionChange"
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        fixedColumnCount="2"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        fieldGroupIds="content,account"
+                    >
+                        <table:layoutData>
+                            <FlexItemData growFactor="1" />
+                        </table:layoutData>
+
+                       
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="10rem"
+                                resizable="false"
+                                
+                            >
+                                <Label
+                                    text="Account"
+                                    wrapping="true"
+                                />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{account_nm}"
+                                        tooltip="{account_nm}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Begin"
+                                    />
+                                </table:template>
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="account_nm" />
+                                </table:customData>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                visible="false"
+                                
+                            >
+                                <Label
+                                    text="구분"
+                                    wrapping="true"
+                                />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{type}"
+                                        tooltip="{type}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                        class="custom-text-regular"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                
+                            >
+                                <Label
+                                    text="목표"
+                                    wrapping="true"
+                                />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'target_curr_y_value', targetType: 'any'}, 
+                                                {value:''}, 
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'target'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'target_curr_y_value', targetType: 'any'}, 
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'targetTooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                            }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="3"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {value:''}, 
+                                                {path:'type',  targetType: 'any'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[                                             
+                                                {path:'actual_curr_ym_value', targetType: 'any'},                                             
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_last_ym_value', targetType: 'any'}, 
+                                                {value:''},                                                 
+                                                {path:'type', targetType: 'any'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_last_ym_value', targetType: 'any'},
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <tnt:InfoLabel
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_value', targetType: 'any'},                                                 
+                                                {path:'actual_last_ym_value', targetType: 'any'},                                                 
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'infoLabel'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[                                             
+                                                {path:'actual_curr_ym_value', targetType: 'any'},                                             
+                                                {path:'actual_last_ym_value', targetType: 'any'},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        colorScheme="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
+                                                {value: ''}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        icon="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
+                                                {value: 'icon'}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        class="custom-pl-cell-color"
+                                        width="100%"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                headerSpan="3"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                                {value:''}, 
+                                                {value:'percent'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                                {value:''}, 
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                                {value:''}, 
+                                                {value:'percent'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                                {value:''},
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <tnt:InfoLabel
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
+                                                {value:'percent'},
+                                                {value:'infoLabel'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                                {path:'actual_last_ym_rate', targetType: 'any'},
+                                                {value:'percent'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        colorScheme="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                                {path: 'actual_last_ym_rate', targetType: 'any' },
+                                                {value: ''}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        icon="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                                {path: 'actual_last_ym_rate', targetType: 'any' },
+                                                {value: 'icon'}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        class="custom-pl-cell-color"
+                                        width="100%"
+                                    />
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:Table>
+                </VBox>
+
+                <VBox
+                    class="custom-vbox-wrap-table"
+                    busyIndicatorDelay="0"
+                    height="100%"
+                    visible="{=${uiModel>/tableKind} === 'relsco'}"
+                >
+                    <table:Table
+                        id="actualSaleMarginDetailTable5"
+                        rows="{path:'/'}"
+                        class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        rowSelectionChange="onRowSelectionChange"
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        fixedColumnCount="3"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        fieldGroupIds="content,relsco"
+                    >
+                        <table:layoutData>
+                            <FlexItemData growFactor="1" />
+                        </table:layoutData>
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="10rem"
+                                resizable="false"
+                                
+                            >
+                                <Label text="조직" />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{org_name}"
+                                        tooltip="{org_name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Begin"
+                                    />
+                                </table:template>
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="org_name" />
+                                </table:customData>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                
+                            >
+                                <Label
+                                    text="대내/대외"
+                                    wrapping="false"                           
+                                />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{relsco_type}"
+                                        tooltip="{relsco_type}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                        class="custom-text-regular"
+                                    />
+                                </table:template>
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="relsco_type" />
+                                </table:customData>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                visible="false"
+                                
+                            >
+                                <Label
+                                    text="구분"
+                                    wrapping="true"
+                                />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{type}"
+                                        tooltip="{type}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                        class="custom-text-regular"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                
+                            >
+                                <Label
+                                    text="목표"
+                                    wrapping="true"
+                                />
+                                <table:template>
+                                    <HBox width="100%" height="100%" class="cutsom-table-empty-cell">
+                                        <Text text="" width="100%"  />
+                                    </HBox>
+                                </table:template>
+                            </table:Column>
+
+                            
+                            
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="3"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {value:''}, 
+                                                {path:'type',  targetType: 'any'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {value:''}, 
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_last_ym_value', targetType: 'any'}, 
+                                                {value:''}, 
+                                                {path:'type',  targetType: 'any'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_last_ym_value', targetType: 'any'}, 
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <tnt:InfoLabel
+                                        text="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {path:'actual_last_ym_value', targetType: 'any'}, 
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'infoLabel'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[ 
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {path:'actual_last_ym_value', targetType: 'any'},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        colorScheme="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
+                                                {value: ''}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        icon="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
+                                                {value: 'icon'}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        class="custom-pl-cell-color"
+                                        width="100%"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                headerSpan="3"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <HBox width="100%" height="100%" class="cutsom-table-empty-cell">
+                                        <Text text="" width="100%"  />
+                                    </HBox>
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <HBox width="100%" height="100%" class="cutsom-table-empty-cell">
+                                        <Text text="" width="100%"  />
+                                    </HBox>
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <HBox width="100%" height="100%" class="cutsom-table-empty-cell">
+                                        <Text text="" width="100%"  />
+                                    </HBox>
+                                </table:template>
+                            </table:Column>
+                           
+                        </table:columns>
+                    </table:Table>
+                </VBox>
+
+                <!-- <VBox
+                    busyIndicatorDelay="0"
+                    height="100%"
+                    class="custom-vbox-wrap-table"
+                    visible="{=${uiModel>/tableKind} === 'crov'}"
+                >
+                    <table:Table
+                        id="actualSaleMarginDetailTable6"
+                        rows="{path:'/'}"
+                        class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        rowSelectionChange="onRowSelectionChange"
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        fixedColumnCount="3"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        fieldGroupIds="content,crov"
+                    >
+                        <table:layoutData>
+                            <FlexItemData growFactor="1" />
+                        </table:layoutData>
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="10rem"
+                                resizable="false">
+                                <Label text="조직" />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{org_name}"
+                                        tooltip="{org_name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Begin"
+                                    />
+                                </table:template>
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="org_name" />
+                                </table:customData>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                
+                            >
+                                <Label
+                                    text="신규/이월"
+                                    wrapping="true"
+                                />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{crov_type}"
+                                        tooltip="{crov_type}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                    />
+                                </table:template>
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="crov_type" />
+                                </table:customData>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                
+                            >
+                                <Label text="구분" />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{type}"
+                                        tooltip="{type}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                
+                            >
+                                <Label text="목표" />
+                                <table:template>
+                                    <HBox width="100%" height="100%" class="cutsom-table-empty-cell">
+                                        <Text text="" width="100%"  />
+                                    </HBox>
+                                </table:template>
+                            </table:Column>                            
+
+                            
+
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="3"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{ 
+                                            parts:[     
+                                                {path:'actual_curr_ym_value', targetType: 'any'},     
+                                                {value:''},     
+                                                {path:'type',  targetType: 'any'}
+                                                ], 
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{ 
+                                            parts:[     
+                                                {path:'actual_curr_ym_value', targetType: 'any'},     
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                                ], 
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{ 
+                                            parts:[     
+                                                {path:'actual_last_ym_value', targetType: 'any'},     
+                                                {value:''},     
+                                                {path:'type',  targetType: 'any'}
+                                                ], 
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[     
+                                                {path:'actual_last_ym_value', targetType: 'any'},     
+                                                {value:''},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                                ], 
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="당월 실적"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <tnt:InfoLabel
+                                        text="{ 
+                                            parts:[     
+                                                {path:'actual_curr_ym_value', targetType: 'any'},     
+                                                {path:'actual_last_ym_value', targetType: 'any'},     
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'infoLabel'}
+                                                ], 
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[     
+                                                {path:'actual_curr_ym_value', targetType: 'any'},     
+                                                {path:'actual_last_ym_value', targetType: 'any'},
+                                                {path:'type',  targetType: 'any'},
+                                                {value:'tooltip'}
+                                                ], 
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        colorScheme="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
+                                                {value: ''}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        icon="{
+                                            parts: [
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
+                                                {value: 'icon'}
+                                            ],
+                                            formatter: '.onFormatInfoLabel'}"
+                                        class="custom-pl-cell-color"
+                                        width="100%"
+                                    />
+                                </table:template>
+                            </table:Column>
+                            
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                                headerSpan="3"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="당월"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <HBox width="100%" height="100%" class="cutsom-table-empty-cell">
+                                        <Text text="" width="100%"  />
+                                    </HBox>
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="전년 동기"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <HBox width="100%" height="100%" class="cutsom-table-empty-cell">
+                                        <Text text="" width="100%"  />
+                                    </HBox>
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="진척도"
+                                        wrapping="true"
+                                    />
+                                    <Label
+                                        text="GAP"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <HBox width="100%" height="100%" class="cutsom-table-empty-cell">
+                                        <Text text="" width="100%"  />
+                                    </HBox>
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:Table>
+                </VBox> -->
+            </VBox>
+        </content>
+    </Panel>
+</mvc:View>

@@ -1,0 +1,39 @@
+/* Enter your custom styles here */
+
+/* ai 공통 */
+.text_type01 {font-size: 0.875rem; line-height: 200%; color: #333; font-weight: 500; word-break: keep-all;}
+.text_type02 {font-size: 0.875rem; line-height: 200%; color: #333; font-weight: 400; word-break: keep-all;}
+.text_type03 {font-size: 0.8125rem; line-height: 200%; color: #333; font-weight: 500; word-break: keep-all;}
+.text_type04 {font-size: 0.8125rem; line-height: 200%; color: #333; font-weight: 400; word-break: keep-all;}
+.bold {font-weight: 700;}
+
+.list_type {margin-bottom: 1rem;}
+.list_type dt {font-size: 0.875rem; line-height: 200%; color: #333; font-weight: 500; word-break: keep-all; margin-bottom: 0.625rem;}
+.list_type dd {font-size: 0.875rem; line-height: 200%; color: #333; font-weight: 400; word-break: keep-all; position: relative; padding-left: 0.625rem; margin-left: 1rem;}
+.list_type dd::before {position: absolute; left: 0; top: 0.75rem; background-color: #444; width: 0.1875rem; height: 0.1875rem; border-radius: 50%; content: '';}
+
+.bg_area {background-color: #f0f3f6; padding: 1.5rem 1.5rem 0.5rem; border-radius: 1.25rem; margin-bottom: 1rem;}
+.bg_area dl {margin-top: 0;}
+
+.text_add span {font-size: 0.875rem; line-height: 200%; color: #333; font-weight: 500; word-break: keep-all; padding-left: 1.5rem; position: relative; margin-bottom: 0.625rem; display: inline-block;}
+.text_add span::before {position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 1.25rem; height: 1.25rem; background-repeat: no-repeat; background-position: center center; background-size: 1.125rem; content: '';}
+.text_add.icon01 span::before {background-image: url(../../../main/resource/icon/ai_icon10.png); background-size: 0.85rem;}/*질의형*/
+.text_add.icon02 span::before {background-image: url(../../../main/resource/icon/ai_icon02.png);}/*즉답형*/
+.text_add.icon03 span::before {background-image: url(../../../main/resource/icon/ai_icon03.png);}/*시각화형*/
+.text_add.icon04 span::before {background-image: url(../../../main/resource/icon/ai_icon04.png);}/*네비게이터형*/
+.text_add.icon05 span::before {background-image: url(../../../main/resource/icon/ai_icon05.png); background-size: 0.9rem;}/*현황분석형*/
+.text_add.icon06 span::before {background-image: url(../../../main/resource/icon/ai_icon06.png);}/*사용안내형*/
+.text_add.icon07 span::before {background-image: url(../../../main/resource/icon/ai_icon11.png);}/*보고서형*/
+
+.report_img {width: 100%; margin-bottom: 1rem; overflow: hidden;}
+.report_img img {width: 100%;}
+
+
+/* 경영현황리포트 */
+.ai_report a {cursor: pointer;}
+.ai_report .report_img {height: 100%;}
+
+
+/* ai전문가 */
+.ai_assistant a {cursor: pointer;}
+.ai_assistant .report_img {max-height: 9rem;}

@@ -1,0 +1,9 @@
+[\n      {\n        \"biz_opp_nm\": \"SKB 25년 울산 AI DC 구축 사업\",\n        
+\"biz_tp_account_nm\": \"02. SKB\",\n        \
+"cls_rsn_tp_nm\": \"\",\n        \"rodr_amt\": 594\n      },\n      
+{\n        \"biz_tp_account_nm\": \"기타\",\n       
+ \"rodr_amt\": 160.37505473,\n        \"rodr_cnt\": 32,\n        
+ \"biz_opp_nm\": \"02. SKB\",\n        \"cls_rsn_tp_nm\": \"\"\n      },\n      
+ {\n        \"biz_opp_nm\": \"SKT 25년 SDN IP장비 유지보수 용역계약\",\n        
+ \"biz_tp_account_nm\": \"01. SKT\",\n        \"cls_rsn_tp_nm\": \"\",\n        
+ \"rodr_amt\": 87\n      },\n      {\n        \"biz_opp_nm\": \"SK중국법인 '25년 SKhy NDTM IT StandUp 5차\",\n        \"biz_tp_account_nm\": \"04. SKHy\",\n        \"cls_rsn_tp_nm\": \"\",\n        \"rodr_amt\": 77.2822174\n      },\n      {\n        \"biz_opp_nm\": \"SKP 25년 위탁운영 서비스 유지보수\",\n        \"biz_tp_account_nm\": \"03. T/B외 ICT계열\",\n        \"cls_rsn_tp_nm\": \"\",\n        \"rodr_amt\": 25.114\n      }\n    ]\n  }\n}"}

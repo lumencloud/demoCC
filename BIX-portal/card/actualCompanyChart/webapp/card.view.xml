@@ -1,0 +1,71 @@
+<mvc:View controllerName="bix.card.actualCompanyChart.card"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:vbm="sap.ui.vbm"
+    xmlns:layout="sap.ui.layout"
+    xmlns:table="sap.ui.table"
+    xmlns="sap.m"
+    width="100%"
+    height="100%"
+    xmlns:w="sap.ui.integration.widgets"
+    displayBlock="true"
+>
+    <Panel id="flexBox" class="sapUiTinyMarginTop"
+       backgroundDesign="Solid">
+        <OverflowToolbar style="Clear" width="100%" height="2.5rem" class="sapUiMediumMarginBottom">
+            <Title id="tempMessage" text="※ 현재 데이터가 없어 일부 값이 맞지 않을 수 있습니다." />
+
+            <ToolbarSpacer />
+        </OverflowToolbar>
+
+        <vbm:AnalyticMap width="100%" id="vbm" regionClick=".onRegionClick" initialZoom="1"
+            initialPosition="15;25;0" class="custom-default-background"
+            regions="{regionModel>/}">
+            <vbm:regions>
+                <vbm:Region code="{regionModel>code}" color="{regionModel>color}" tooltip="{regionModel>name}"  />
+            </vbm:regions>       
+
+            <vbm:Containers items="{regionModel>/}">
+                <vbm:Container position="{regionModel>position}" >
+                    <vbm:item>
+                        <FlexBox width="auto" height="auto" direction="Column" fitContainer="true" backgroundDesign="Solid">
+                            <Label text="{regionModel>name}" design="Bold"  />
+                            <Text emptyIndicatorMode="On"
+                                text="{     
+                                        parts:[        
+                                            {path:'regionModel>sale', targetType: 'any'}, 
+                                            {value:'map'}
+                                        ],     
+                                        formatter: '.onFormatPerformance'
+                                    }" 
+                                tooltip="{     
+                                        parts:[        
+                                            {path:'regionModel>sale', targetType: 'any'}, 
+                                            {value:'map'}
+                                        ],     
+                                        formatter: '.onFormatPerformance'
+                                    }"
+                                     wrapping="false"/>
+                            <Text emptyIndicatorMode="On"
+                                text="{     
+                                        parts:[        
+                                            {path:'regionModel>margin', targetType: 'any'}, 
+                                            {value:'map2'}
+                                        ],     
+                                        formatter: '.onFormatPerformance'
+                                    }" 
+                                tooltip="{     
+                                        parts:[        
+                                            {path:'regionModel>margin', targetType: 'any'}, 
+                                            {value:'map2'}
+                                        ],     
+                                        formatter: '.onFormatPerformance'
+                                    }" wrapping="false"/>
+                        </FlexBox>
+                    </vbm:item>
+                </vbm:Container>
+            </vbm:Containers>
+        </vbm:AnalyticMap>
+    </Panel>
+        
+</mvc:View>

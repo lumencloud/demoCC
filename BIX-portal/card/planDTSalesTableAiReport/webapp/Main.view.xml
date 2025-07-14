@@ -1,0 +1,1330 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    width="100%"
+    height="100%"
+    displayBlock="true"
+    controllerName="bix.card.planDTSalesTableAiReport.Main"
+>
+    <Panel
+        expandable="false"
+        expanded="true"
+        width="auto"
+        height="100%"
+        class="sapUiNoContentPadding"
+    >
+        
+        <content>
+            <VBox height="100%" width="100%">
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'org'}" class="custom-vbox-wrap-table" height="100%">
+                    <table:Table
+                        id="planDTSalesTable1"
+                        rows="{path:'/'}"
+                        class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange="onRowSelectionChange"
+                        fixedColumnCount="2"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        fieldGroupIds="content,org"
+                    >
+                        <table:extension>
+                            <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
+
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
+                                <Text text="세부데이터"/>
+                                <ToolbarSpacer />
+                                <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false"/>
+                                <ToolbarSeparator visible="false"/>
+                                <Text emptyIndicatorMode="On"  text="단위 (억)" visible="false"/>
+                            </OverflowToolbar>
+                        </table:extension>
+
+                        <table:layoutData>
+                            <FlexItemData growFactor="1"/>
+                        </table:layoutData>
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="12rem"
+                                resizable="false"
+                            >
+                                    <Label
+                                        text="조직"
+                                        wrapping="false"
+                                    />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{org_name}"
+                                        tooltip="{org_name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Begin"
+                                    />
+                                </table:template> 
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="org_name" />
+                                </table:customData>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="5"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="추정"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'forecast_value', targetType: 'any'},
+                                                {value:''}
+
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'forecast_value', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="확보"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'secured_value', targetType: 'any'},
+                                                {value:''}
+
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'secured_value', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="미확보"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'not_secured_value', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'not_secured_value', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="계획비"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'plan_ratio', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'plan_ratio', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="전년비"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'yoy', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'yoy', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:Table>
+                </VBox>
+
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'org_delivery'}" class="custom-vbox-wrap-table" height="100%">
+                    <table:Table
+                        id="planDTSalesTable2"
+                        rows="{path:'/'}"
+                        class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange="onRowSelectionChange"
+                        fixedColumnCount="2"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        fieldGroupIds="content,org_delivery"
+                    >
+                        <table:extension>
+                            <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
+
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
+                                <Text text="세부데이터"/>
+                                <ToolbarSpacer />
+                                <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false"/>
+                                <ToolbarSeparator visible="false"/>
+                                <Text emptyIndicatorMode="On"  text="단위 (억)" visible="false"/>
+                            </OverflowToolbar>
+                        </table:extension>
+
+                        <table:layoutData>
+                            <FlexItemData growFactor="1"/>
+                        </table:layoutData>
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="12rem"
+                                resizable="false"
+                            >
+                                    <Label
+                                        text="조직"
+                                        wrapping="false"
+                                    />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{org_name}"
+                                        tooltip="{org_name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Begin"
+                                    />
+                                </table:template> 
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="org_name" />
+                                </table:customData>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="5"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="추정"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'forecast_value', targetType: 'any'},
+                                                {value:''}
+
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'forecast_value', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="확보"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'secured_value', targetType: 'any'},
+                                                {value:''}
+
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'secured_value', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="미확보"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'not_secured_value', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'not_secured_value', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="계획비"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'plan_ratio', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'plan_ratio', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="전년비"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'yoy', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'yoy', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:Table>
+                </VBox>
+
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'org_account'}" class="custom-vbox-wrap-table" height="100%">
+                    <table:Table
+                        id="planDTSalesTable3"
+                        rows="{path:'/'}"
+                        class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange="onRowSelectionChange"
+                        fixedColumnCount="2"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        fieldGroupIds="content,org_account"
+                    >
+                        <table:extension>
+                            <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
+
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
+                                <Text text="세부데이터"/>
+                                <ToolbarSpacer />
+                                <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false"/>
+                                <ToolbarSeparator visible="false"/>
+                                <Text emptyIndicatorMode="On"  text="단위 (억)" visible="false"/>
+                            </OverflowToolbar>
+                        </table:extension>
+
+                        <table:layoutData>
+                            <FlexItemData growFactor="1"/>
+                        </table:layoutData>
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="12rem"
+                                resizable="false"
+                            >
+                                    <Label
+                                        text="조직"
+                                        wrapping="false"
+                                    />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{org_name}"
+                                        tooltip="{org_name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Begin"
+                                    />
+                                </table:template> 
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="org_name" />
+                                </table:customData>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="5"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="추정"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'forecast_value', targetType: 'any'},
+                                                {value:''}
+
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'forecast_value', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="확보"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'secured_value', targetType: 'any'},
+                                                {value:''}
+
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'secured_value', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="미확보"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'not_secured_value', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'not_secured_value', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="계획비"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'plan_ratio', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'plan_ratio', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="전년비"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'yoy', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'yoy', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:Table>
+                </VBox>
+
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'account'}" class="custom-vbox-wrap-table" height="100%">
+                    <table:Table
+                        id="planDTSalesTable4"
+                        rows="{path:'/'}"
+                        class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="Single" 
+                        selectionBehavior="RowOnly" 
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange="onRowSelectionChange"
+                        fixedColumnCount="2"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        fieldGroupIds="content,account"
+                    >
+                        <table:extension>
+                            <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
+
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
+                                <Text text="세부데이터"/>
+                                <ToolbarSpacer />
+                                <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false" />
+                                <ToolbarSeparator visible="false" />
+                                <Text emptyIndicatorMode="On"  text="단위 (억)" visible="false"/>
+                            </OverflowToolbar>
+                        </table:extension>
+
+                        <table:layoutData>
+                                <FlexItemData growFactor="1"/>
+                            </table:layoutData>
+
+                        
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="12rem"
+                                resizable="false"
+                            >
+                                    <Label
+                                        text="고객사명"
+                                        wrapping="false"
+                                    />
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{cstco_name}"
+                                        tooltip="{cstco_name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Begin"
+                                    />
+                                </table:template> 
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="cstco_name" />
+                                </table:customData>
+                            </table:Column>
+
+                            
+
+                            <table:Column
+                                hAlign="Center"
+                                headerSpan="5"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="추정"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'forecast', targetType: 'any'},
+                                                {value:''}
+
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'forecast', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="확보"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'secured', targetType: 'any'},
+                                                {value:''}
+
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'secured', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="미확보"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'not_secured', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'not_secured', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="계획비"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <HBox width="100%" height="100%" class="cutsom-table-empty-cell">
+                                        <Text text="" width="100%"  />
+                                    </HBox>
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="전년비"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <HBox width="100%" height="100%" class="cutsom-table-empty-cell">
+                                        <Text text="" width="100%"  />
+                                    </HBox>
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:Table>
+                </VBox>
+                
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'task'}" class="custom-vbox-wrap-table" height="100%">
+                    <table:Table
+                        id="planDTSalesTable5"
+                        rows="{path:'/'}"
+                        class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="None"
+                        fixedColumnCount="2"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange=".onRowSelectionChange"
+                        fieldGroupIds="content,task"
+                    >
+                        <table:extension>
+                            <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
+
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
+                                <Text text="세부데이터"/>
+                                <ToolbarSpacer />
+                                <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" />
+                                <ToolbarSeparator />
+                                <Text emptyIndicatorMode="On"  text="단위 (억)"/>
+                            </OverflowToolbar>
+                        </table:extension>
+
+                    <table:layoutData>
+                                <FlexItemData growFactor="1"/>
+                            </table:layoutData>
+
+                        
+
+                        <table:columns>
+                            <table:Column
+                                hAlign="Center"
+                                width="14rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label />
+                                    <Label
+                                        text="과제명"
+                                        wrapping="false"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{org_name}"
+                                        tooltip="{org_name}"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                    />
+                                </table:template>
+                            </table:Column>
+                        
+                            <table:Column
+                                hAlign="Begin"
+                                headerSpan="5"
+                                resizable="false"
+                                width="7rem"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="추정"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'forecast_value', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'forecast_value', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="확보"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'secured_value', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'secured_value', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="미확보"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'not_secured_value', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'not_secured_value', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="계획비"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'plan_ratio', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'plan_ratio', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+
+                            <table:Column
+                                hAlign="Center"
+                                width="7rem"
+                                resizable="false"
+                            >
+                                <table:multiLabels>
+                                    <Label
+                                        text="연간 추정"
+                                        wrapping="false"
+                                    />
+                                    <Label
+                                        text="전년비"
+                                        textAlign="Center"
+                                        width="100%"
+                                    />
+                                </table:multiLabels>
+                                <table:template>
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'yoy', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'yoy', targetType: 'any'},
+                                                {value:'tooltip'}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="End"
+                                    />
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:Table>
+
+                </VBox>
+                
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'member_year'}" class="custom-vbox-wrap-table" height="100%">
+                    <table:Table
+                        id="planDTSalesTable6"
+                        class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="None"
+                        fixedColumnCount="1"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange=".onRowSelectionChange"
+                        fieldGroupIds="content,member_year"
+                    >
+                        <table:extension>
+                            <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
+
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
+                                <Text text="세부데이터"/>
+                                <ToolbarSpacer />
+                                <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" />
+                                <ToolbarSeparator />
+                                <Text emptyIndicatorMode="On"  text="단위 (억)"/>
+                            </OverflowToolbar>
+                        </table:extension>
+                            <table:layoutData>
+                                <FlexItemData growFactor="1"/>
+                            </table:layoutData>
+                    </table:Table>
+                </VBox>
+
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'task_year'}" class="custom-vbox-wrap-table" height="100%">
+                    <table:Table
+                        id="planDTSalesTable7"
+                        rows="{path:'/'}"
+                        class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        selectionMode="None"
+                        fixedColumnCount="1"
+                        busyIndicatorDelay="0"
+                        visibleRowCountMode="Auto"
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        rowSelectionChange=".onRowSelectionChange"
+                        fieldGroupIds="content,task_year"
+                    >   
+                        <table:extension>
+                            <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
+
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
+                                <Text text="세부데이터"/>
+                                <ToolbarSpacer />
+                                <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" />
+                                <ToolbarSeparator />
+                                <Text emptyIndicatorMode="On"  text="단위 (억)"/>
+                            </OverflowToolbar>
+                        </table:extension>
+                        <table:layoutData>
+                                <FlexItemData growFactor="1"/>
+                            </table:layoutData>
+                    </table:Table>
+                </VBox>
+            </VBox>
+        </content>
+    </Panel>
+</mvc:View>

@@ -1,0 +1,15 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.deliveryMonthlyTitle2.Main"
+>
+    <VBox id="cardContent" class="custom-ai-report-test-delivery-title-text-container">
+        <VBox class="title-text" alignItems="Center" justifyContent="Center">
+            <Title text="{ui>/month}월 {ui>/title}"/>
+        </VBox>
+    </VBox>
+</mvc:View>

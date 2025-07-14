@@ -1,0 +1,177 @@
+sap.ui.define([
+    "sap/m/library",
+    "sap/ui/core/library",
+    "sap/ui/core/mvc/Controller",
+    "sap/ui/model/json/JSONModel",
+    "bix/common/library/control/Modules",
+    "sap/ui/core/EventBus"
+],
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (
+        mLibrary,
+        coreLibrary,
+        Controller,
+        JSONModel,
+        Modules,
+        EventBus
+    ) {
+        "use strict";
+
+        return Controller.extend("bix.ai.list.controller.AllMonthly", {
+            _oEventBus: EventBus.getInstance(),
+            onInit: function () {
+                this._iCardReady = 0;
+                const myRoute = this.getOwnerComponent().getRouter().getRoute("AllMonthly");
+                myRoute.attachPatternMatched(this.onMyRoutePatternMatched, this);
+            },
+            
+            onMyRoutePatternMatched: async function (oEvent) {
+                const oCarousel = this.byId("carousel");
+                if (oCarousel) {
+                    oCarousel.setActivePage(oCarousel.getPages()[0]);
+                }
+                let oToday = new Date();
+                let oLastMonth = new Date(oToday.getFullYear(), oToday.getMonth() - 1, 1)
+                let sYear = oToday.getFullYear();
+                let sMonth = String(oToday.getMonth()).padStart(2, "0");
+                this.byId("datePicker").setMaxDate(oLastMonth)
+                this.getView().setModel(new JSONModel({ date: oLastMonth, month: oToday.getMonth() }), "ui");
+                sessionStorage.setItem("aiReport", JSON.stringify({
+                    orgId: '5',
+                    type: '',
+                    title: 'SK AX',
+                    year: sYear,
+                    month: sMonth,
+                }));
+                this._oEventBus.publish("aireport", "infoSet");
+                this._oEventBus.subscribe("aiReport", "newMonthData", this._setModel, this)
+                this._oEventBus.subscribe("aiReport", "deselMonthData", this._setModel, this)
+                this._oEventBus.subscribe("aiReport", "negoMonthData", this._setModel, this)
+                this._oEventBus.subscribe("aiReport", "comMonthData", this._setModel, this)
+                this._oEventBus.subscribe("CardChannel", "CardFullLoad", this._onCardReady, this)
+            },
+            _onCardReady: function (sChannelId, sEventId, oData) {
+                this._iCardReady++;
+                if (this._iCardReady === this.iCardCount) {
+                    this.byId("pdfDownload").setEnabled(true);
+                }
+            },
+
+            onAfterRendering: function () {
+
+                const oData = JSON.parse(sessionStorage.getItem("aiReport"))
+                const oModel = new JSONModel(oData)
+
+                let iCardCount = 0;
+                const aCard = this.getView().findAggregatedObjects(true, function (oControl) {
+                    return oControl.isA("sap.ui.integration.widgets.Card");
+                });
+
+                aCard.forEach(oCard => {
+                    iCardCount++;
+                })
+                this.iCardCount = iCardCount;
+
+            },
+
+            onDateChange: function (oEvent) {
+                let oSource = oEvent.getSource();
+
+                let isValidValue1 = /** @type {sap.m.Input} */ (oSource).isValidValue();
+                let isValidValue2 = oSource.getDateValue();
+                if (!isValidValue1 || !isValidValue2) {
+                    oEvent.getSource().setValueState("Error");
+                    return;
+                } else {
+                    oEvent.getSource().setValueState("None");
+
+                    // 검색 조건 변경 EventBus Publish
+                    let oSelectedDate = this.getView().getModel("ui").getData();
+
+                    //세션 스토리지 데이터 가져오기
+                    let oSessionData = JSON.parse(sessionStorage.getItem("aiReport"))
+
+                    //세션 스토리지 업데이트
+                    sessionStorage.setItem("aiReport", JSON.stringify({
+                        orgId: oSessionData.orgId,
+                        type: oSessionData.type,
+                        title: oSessionData.title,
+                        year: oSelectedDate.date.getFullYear(),
+                        month: String(oSelectedDate.date.getMonth() + 1).padStart(2, "0"),
+                    }));
+                    this.getView().getModel("ui").setProperty("/month", oSelectedDate.date.getMonth() + 1)
+                    this._oEventBus.publish("aireport", "infoSet");
+                };
+            },
+            onPDF: async function () {
+                this.byId("carousel").setBusy(true);
+                try {
+                    const oCarousel = this.byId("carousel")
+                    const pageId = oCarousel.getPages().map(page => page.getId());
+
+                    let currentPageId = oCarousel.getActivePage();
+                    let activeIdx = pageId.indexOf(currentPageId);
+                    if (activeIdx === -1) activeIdx = 0;
+                    const pdf = new window.jspdf.jsPDF({
+                        orientation: "portrait",
+                        unit: "mm",
+                        format: "a4"
+                    })
+                    for (let i = 0; i < pageId.length; i++) {
+                        oCarousel.setActivePage(pageId[i]);
+
+                        await new Promise(res => setTimeout(res, 200));
+
+                        const currPageDom = sap.ui.getCore().byId(pageId[i]).getDomRef();
+                        const canvas = await html2canvas(currPageDom, { scale: 2 })
+                        const imgData = canvas.toDataURL("image/png");
+                        const imgProps = pdf.getImageProperties(imgData);
+                        const pdfWidth = pdf.internal.pageSize.getWidth();
+                        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                        if (i > 0) pdf.addPage();
+                        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+                    }
+                    pdf.save("capture.pdf");
+                    oCarousel.setActivePage(pageId[activeIdx])
+                } catch (e) {
+                    console.error("PDF 생성 오류", e)
+                }
+                this.byId("carousel").setBusy(false);
+            },
+            _setModel: async function (sChannelId, sEventId, oData) {
+              
+                switch (sEventId) {
+                    case "newMonthData": this.getView().setModel(new JSONModel(oData), "newData")
+                        break;
+                    case "deselMonthData": this.getView().setModel(new JSONModel(oData), "deselData")
+                        break;
+                    case "negoMonthData": this.getView().setModel(new JSONModel(oData), "negoData")
+                        break;
+                    case "comMonthData": this.getView().setModel(new JSONModel(oData), "comData")
+                        break;
+                }
+            },
+
+            onChange: function (oEvent) {
+                const sSelectedKey = oEvent.getParameter("selectedItem").getProperty("key");
+                const aPages = this.byId("carousel").getPages();
+                const sSelectedPage = aPages.find(sId => sId.getId().split("--").pop() === "vbox" + sSelectedKey)
+                const sSelectedId = sSelectedPage.getId().split("--").pop();
+                if (sSelectedPage) {
+                    this.byId("carousel").setActivePage(sSelectedPage);
+                }
+            },
+            onCancel: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteMain")
+            },
+            onPageChanged: function (oEvent) {
+                // 초기 페이지 라우팅시 다른페이지 테이블은 병합이 되지않아 // 테이블 페이지 이동 시 재호출
+                const checkPageId = String(oEvent.getParameter("activePages"))
+                if (checkPageId === "3") {  // 테이블이 있는 페이지 index  
+                    this._oEventBus.publish("aireport", "infoSet")
+                }
+            }
+        });
+    });

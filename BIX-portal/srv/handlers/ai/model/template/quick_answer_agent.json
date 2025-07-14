@@ -1,0 +1,133 @@
+{
+  "agent_id": "quick_answer_agent",
+  "processing_flow": {
+    "flow_type": "langchain_sequential",
+    "execution_mode": "sequential",
+    "steps": [
+      {
+        "step_id": "get_meta_table_list",
+        "step_sequence": 1,
+        "component": {
+          "id": "tool_01",
+          "type": "tool",
+          "description": "메타 테이블 리스트 조회",
+          "tool_file": "meta_table_list_tool",
+          "input_variables": {
+            "function_params": "$input:function_params"
+          },
+          "output_variable": "tables_info"
+        }
+      },
+      {
+        "step_id": "table_selector",
+        "step_sequence": 2,
+        "component": {
+          "id": "prompt_01",
+          "type": "prompt",
+          "description": "테이블 선택자",
+          "template": {
+            "type": "static",
+            "path": "quickAnswerAgent.static.tableSelector"
+          },
+          "model_config": {
+            "model_id": "model_01",
+            "model_name": "gemini-1.5-flash",
+            "model_params": {
+                "temperature": 0.3,
+                "max_tokens": 4000
+            },
+            "model_version": "002"
+          },
+          "input_variables":{
+            "user_input": "$input:user_input",
+            "tables_info": "$var:tables_info"
+          },
+          "output_variable": "relevant_tables"
+        }
+      },
+      {
+        "step_id": "extract_meta_schema_info",
+        "step_sequence": 3,
+        "component": {
+          "id": "tool_02",
+          "type": "tool",
+          "description": "메타 스키마 정보 추출",
+          "tool_file": "meta_schema_extract_tool",
+          "input_variables": {
+            "relevant_tables": "$var:relevant_tables"
+          },
+          "output_variable": "selected_tables_schema"
+        }
+      },
+      {
+        "step_id": "sql_query_generator",
+        "step_sequence": 4,
+        "component": {
+          "id": "prompt_02",
+          "type": "prompt",
+          "description": "sql 쿼리 생성",
+          "template": {
+            "type": "static",
+            "path": "quickAnswerAgent.static.sqlQueryGenerator"
+          },
+          "model_config": {
+            "model_id": "model_02",
+            "model_name": "gpt-4.1-mini",
+            "model_params": {
+                "temperature": 0.3,
+                "max_tokens": 4000
+            },
+            "model_version": "2025-04-14"
+          },
+          "input_variables":{
+            "user_input": "$input:user_input",
+            "selected_tables_schema": "$var:selected_tables_schema"
+          },
+          "output_variable": "generate_query"
+        }
+      },
+      {
+        "step_id": "execute_query",
+        "step_sequence": 5,
+        "component": {
+          "id": "tool_03",
+          "type": "tool",
+          "description": "쿼리 수행",
+          "tool_file": "query_execute_tool",
+          "input_variables": {
+            "generate_query": "$var:generate_query"
+          },
+          "output_variable": "query_result"
+        }
+      },
+      {
+        "step_id": "interpretation",
+        "step_sequence": 6,
+        "component": {
+          "id": "prompt_03",
+          "type": "prompt",
+          "description": "결과 해석",
+          "template": {
+            "type": "static",
+            "path": "quickAnswerAgent.static.interpretation"
+          },
+          "model_config": {
+            "model_id": "model_02",
+            "model_name": "gpt-4.1-mini",
+            "model_params": {
+                "temperature": 0.3,
+                "max_tokens": 4000
+            },
+            "model_version": "2025-04-14"
+          },
+          "input_variables":{
+            "user_input": "$input:user_input",
+            "generate_query": "$var:generate_query",
+            "query_result": "$var:query_result"
+          },
+          "output_variable": "final"
+        }
+      }
+    ]
+  }
+}

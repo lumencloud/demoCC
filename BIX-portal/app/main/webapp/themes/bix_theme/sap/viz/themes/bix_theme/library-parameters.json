@@ -1,0 +1,20 @@
+{
+	"sapVizChartBackgroundColor": "#f7f9fb",
+	"sapVizChartErrorColor": "#333",
+	"sapVizChartTooltipBackgroundColor": "#f7f9fb",
+	"sapVizChartBackgroundStroke": "#d8d8d8",
+	"sapVizChartPieSectorStroke": "#f7f9fb",
+	"sapVizChartHoverColor": "#CCCCCC",
+	"sapVizChartHoverline": "#CCCCCC",
+	"sapVizChartHoverShadow": "#CCCCCC",
+	"sapVizChartHoverShadowMouseDown": "#808080",
+	"sapVizChartInnerWhisker": "#000000",
+	"sapVizChartTitleColor": "#212121",
+	"sapVizChartLabelColor": "#212121",
+	"sapVizChartAxisColor": "#212121",
+	"sapVizChartAxisGridlineColor": "#d8d8d8",
+	"sapVizChartTooltipBorderStroke": "#d8d8d8",
+	"sapVizChartHiddenTitleColor": "#a6a6a6",
+	"sapFieldBorderWidth": ".0625rem",
+	"sapUiChartFocusWidth": "2px"
+}

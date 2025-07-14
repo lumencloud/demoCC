@@ -1,0 +1,37 @@
+<mvc:View xmlns:layout="sap.ui.layout" controllerName="bix.card.aiInsightBau.card"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form" height="100%" width="100%" displayBlock="true">
+    <form:SimpleForm id="cardContent" class="custom-back-white">
+        <form:content>
+            <VBox class="ai-report-box2">
+                <HBox width="100%" class="custom-ai-report-subtitle-box">
+                    <Text text=" AI Insight" class="custom-ai-report-subtitle-box"/>
+                </HBox>
+                <VBox width="100%" class="custom-card-box-padding">
+                    <HBox width="100%" class="custom-card-box-padding">
+                        <core:Icon src="sap-icon://circle-task-2" class="custom-ai-report-test-aiIcon2 sapUiTinyMarginEnd" size="7px"/>
+                        <Text text="DT Pipeline :" wrapping="false" class="custom-ai-report-test-card-content" />
+                        <Text text="{LLMModel>/dtSight}" wrapping="true" class="custom-ai-report-test-card-content"/>
+                    </HBox>
+                    <HBox width="100%">
+                        <core:Icon src="sap-icon://circle-task-2" class="custom-ai-report-test-aiIcon2 sapUiTinyMarginEnd" size="7px"/>
+                        <Text text="BAU Pipeline :" wrapping="false" class="custom-ai-report-test-card-content" />
+                        <Text text="{LLMModel>/bauSight}" wrapping="true" class="custom-ai-report-test-card-content"/>
+                    </HBox>
+
+                    <!-- <List items="{LLMModel>/}" showSeparators="None" backgroundDesign="Transparent">
+                        <CustomListItem >
+                            <HBox width="100%">
+                                <core:Icon src="sap-icon://circle-task-2" class="custom-ai-report-test-aiIcon sapUiTinyMarginEnd" size="7px"/>
+                                <Text text="{LLMModel>insight}" wrapping="true" class="custom-ai-report-test-card-content"/>
+                            </HBox>
+                        </CustomListItem>
+                    </List> -->
+                </VBox>
+            </VBox>
+        </form:content>
+    </form:SimpleForm>
+</mvc:View>

@@ -1,0 +1,17 @@
+<mvc:View xmlns:tnt="sap.tnt"
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.deliveryMonthlyContent3_2.Main"
+>
+    <VBox id="cardContent" class="custom-ai-report-test-delivery-content3_2-container">
+        <VBox class="title-wrapper">
+            <!--Title text="Preview:"/-->
+            <Title text="{LLMModel>/title}"/>
+            <Text text="{LLMModel>/full}" />
+        </VBox>
+    </VBox>
+</mvc:View>

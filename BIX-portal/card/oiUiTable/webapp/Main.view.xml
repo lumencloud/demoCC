@@ -1,0 +1,249 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:tnt="sap.tnt"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.oiUiTable.Main"
+>
+    <table:Table id="oIUiTable"
+        class="custom-table-container custom-table-header custom-table-body custom-pl-table custom-table-first-emphasis custom-uiTable-selection custom-inherit-height" 
+        selectionMode="Single" 
+        rowSelectionChange="onRowSelectionChange"
+        selectionBehavior="RowOnly" 
+        enableColumnReordering="false"
+        fixedColumnCount="1" 
+        alternateRowColors= "true">
+
+        <table:extension>
+            <OverflowToolbar width="100%" height="2rem" style="Standard" class="custom-pl-table-bar">
+                <Title text="OI"/>
+                <ToolbarSpacer />
+                <!-- <Button text="전체보기" icon="sap-icon://menu2" press="" type="Transparent" class="customTableButton"/>
+                <ToolbarSeparator /> -->
+                <Text text="단위 (억)" />
+            </OverflowToolbar>
+            <SegmentedButton selectedKey="{tableColumnSet>/PL_Column}" class="custom-segment-btn-intable" width="100%">
+                <items>
+                    <SegmentedButtonItem text="실적" key="valueGap"/>
+                    <SegmentedButtonItem text="진척도" key="progressGap"/>
+                </items>
+            </SegmentedButton>
+        </table:extension>
+        
+        <table:rowMode>
+            <rowmodes:Fixed rowCount="5" />
+        </table:rowMode>
+
+        <table:columns>
+            <table:Column hAlign="Center" width="6rem" resizable="false">
+                <Label text="구분" wrapping="true"/>
+                <table:template>
+                    <Text text="{type}" wrapping="false" width="100%" textAlign="Begin"/>
+                </table:template>
+                <table:customData>
+                    <core:CustomData key="mergeKey" value="type" />
+                </table:customData>
+            </table:Column>
+            <table:Column hAlign="Center" width="6rem" resizable="false" >
+                <table:multiLabels>
+                    <Label text='연간 목표' wrapping="false"/>
+                </table:multiLabels>
+                <table:template>
+                    
+                    <Text text="{
+                            parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'target_curr_y_value', targetType: 'any' },
+                                {value:''},
+                                {value:'target'}
+
+                            ],
+                            formatter: '.onFormatPerformance'
+                        }" 
+                        tooltip="{parts: [
+                                {path: 'type', targetType: 'any' },
+                                {path: 'target_curr_y_value', targetType: 'any' },
+                                {value:''},
+                                {value:'targetTooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        class="fixed-empty-plan-oi"
+                        wrapping="false" width="90%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+            <table:Column hAlign="Center" width="auto" resizable="false" visible="{= ${tableColumnSet>/PL_Column} === 'valueGap'}">
+                <Label text="당월 누계" textAlign="Center" width="100%"/>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {path: 'type', targetType: 'any' },
+                            {path: 'actual_curr_ym_value', targetType: 'any' }
+                        ],
+                        formatter: '.onFormatPerformance'
+                    }" 
+                    tooltip="{parts: [
+                            {path: 'type', targetType: 'any' },
+                            {path: 'actual_curr_ym_value', targetType: 'any' },
+                            {value:''},
+                            {value:'tooltip'}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                    class="fixed-empty-plan-oi"
+                    wrapping="false" width="90%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+            <table:Column hAlign="Center" width="auto" resizable="false" visible="{= ${tableColumnSet>/PL_Column} === 'valueGap'}">
+                <Label text="전년 동기"/>
+                <table:template>
+                    <Text
+                    text="{
+                        parts: [
+                            {path: 'type', targetType: 'any' },
+                            {path: 'actual_last_ym_value', targetType: 'any'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                    }"
+                    tooltip="{parts: [
+                            {path: 'type', targetType: 'any' },
+                            {path: 'actual_last_ym_value', targetType: 'any' },
+                            {value:''},
+                            {value:'tooltip'}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                    class="fixed-empty-plan-oi"
+                    wrapping="false" width="90%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+            <table:Column hAlign="Center" width="auto" resizable="false" visible="{= ${tableColumnSet>/PL_Column} === 'valueGap'}">
+                <Label text="GAP"/>
+                <table:template>
+                    <tnt:InfoLabel text="{
+                        parts: [
+                            {path: 'type', targetType: 'any' },
+                            {path: 'actual_curr_ym_value', targetType: 'any' },
+                            {path: 'actual_last_ym_value', targetType: 'any' },
+                            {value:'infoLabel'}
+                        ],
+                        formatter: '.onFormatPerformance'
+                    }" 
+                    tooltip="{parts: [
+                            {path: 'type', targetType: 'any' },
+                            {path: 'actual_curr_ym_value', targetType: 'any' },
+                            {path: 'actual_last_ym_value', targetType: 'any' },
+                            {value:'tooltip'}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                    colorScheme="{
+                        parts: [
+                            {path: 'actual_curr_ym_value', targetType: 'any' },
+                            {path: 'actual_last_ym_value', targetType: 'any' },
+                            {value: ''}
+                        ],
+                        formatter: '.onFormatInfoLabel'}"
+                    icon="{
+                        parts: [
+                            {path: 'actual_curr_ym_value', targetType: 'any' },
+                            {path: 'actual_last_ym_value', targetType: 'any' },
+                            {value: 'icon'}
+                        ],
+                        formatter: '.onFormatInfoLabel'}"
+                    class="fixed-empty-plan-oi custom-pl-cell-color"
+                    width="90%"/>
+                </table:template>
+            </table:Column>
+
+            <table:Column hAlign="Center" width="auto" resizable="false" visible="{= ${tableColumnSet>/PL_Column} === 'progressGap'}">
+                <Label text="당월 누계" wrapping="true"/>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {value:'percent'},
+                            {path: 'actual_curr_ym_rate', targetType: 'any' },
+                            {value:''},
+                            {value:''}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                        tooltip="{
+                            parts: [
+                                {value:'percent'},
+                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        class="fixed-empty-plan-oi"
+                        wrapping="false" width="90%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+            <table:Column hAlign="Center" width="auto" resizable="false" visible="{= ${tableColumnSet>/PL_Column} === 'progressGap'}">
+                <Label text="전년 동기"/>
+                <table:template>
+                    <Text text="{
+                        parts: [
+                            {value:'percent'},
+                            {path: 'actual_last_ym_rate', targetType: 'any' },
+                            {value:''},
+                            {value:'percent'}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                        tooltip="{
+                            parts: [
+                                {value:'percent'},
+                                {path: 'actual_last_ym_rate', targetType: 'any' },
+                                {value:''},
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                    class="fixed-empty-plan-oi"
+                    wrapping="false" width="90%" textAlign="End" emptyIndicatorMode="On"/>
+                </table:template>
+            </table:Column>
+
+            <table:Column hAlign="Center" width="auto" resizable="false" visible="{= ${tableColumnSet>/PL_Column} === 'progressGap'}">
+                <Label text="GAP"/>
+                <table:template>
+                    <tnt:InfoLabel text="{
+                        parts: [
+                            {value:'percent'},
+                            {path: 'actual_curr_ym_rate', targetType: 'any' },
+                            {path: 'actual_last_ym_rate', targetType: 'any' },
+                            {value:'infoLabel'}
+                        ],
+                        formatter: '.onFormatPerformance'}"
+                        tooltip="{
+                            parts: [
+                                {value:'percent'},
+                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                {path: 'actual_last_ym_rate', targetType: 'any' },
+                                {value:'tooltip'}
+                            ],
+                            formatter: '.onFormatPerformance'}"
+                        colorScheme="{
+                            parts: [
+                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                {path: 'actual_last_ym_rate', targetType: 'any' },
+                                {value: ''}
+                            ],
+                        formatter: '.onFormatInfoLabel'}"
+                        icon="{
+                            parts: [
+                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                {path: 'actual_last_ym_rate', targetType: 'any' },
+                                {value: 'icon'}
+                            ],
+                            formatter: '.onFormatInfoLabel'}"
+                        class="fixed-empty-plan-oi custom-pl-cell-color"
+                        width="90%"/>
+                </table:template>
+            </table:Column>
+        </table:columns>
+    </table:Table>
+</mvc:View>

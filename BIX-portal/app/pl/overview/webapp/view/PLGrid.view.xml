@@ -1,0 +1,57 @@
+<mvc:View controllerName="bix.pl.overview.controller.PLGrid"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:w="sap.ui.integration.widgets"
+	xmlns:card="sap.f.cards"
+	xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    busyIndicatorDelay="0"
+    displayBlock="true"
+    width="100%"
+    height="100%"
+>   
+    <!-- <f:GridContainer id="demoGrid" columnsChange=".onGridColumnsChange" class="center">
+        <f:layout>
+            <f:GridContainerSettings rowSize="0.5rem" columnSize="19rem" gap="0.5rem" />
+        </f:layout>
+        <f:layoutXS>
+            <f:GridContainerSettings rowSize="0.5rem" columnSize="5rem" gap="0.5rem" />
+        </f:layoutXS>
+        <w:Card manifest="../bix/card/plGrid1/manifest.json" width="100%"/>
+        <w:Card manifest="../bix/card/plGrid2/manifest.json" width="100%"/>
+        <w:Card manifest="../bix/card/plGrid3/manifest.json" width="100%"/>
+        <w:Card manifest="../bix/card/plGrid4/manifest.json" width="100%"/>
+        <w:Card manifest="../bix/card/plGrid5/manifest.json" width="100%"/>
+        <w:Card manifest="../bix/card/plGrid6/manifest.json" width="100%"/>
+    </f:GridContainer> -->
+
+    <form:SimpleForm layout="ResponsiveGridLayout" editable="true" class="custom-card-form">
+        <w:Card manifest="../bix/card/plGrid1/manifest.json" width="100%" class="sapUiSmallMarginBottom">
+            <w:layoutData><layout:GridData span="XL6 L6 M6 S12" /></w:layoutData>
+        </w:Card>
+        
+        <w:Card manifest="../bix/card/plGrid2/manifest.json" width="100%" class="sapUiSmallMarginBottom">
+            <w:layoutData><layout:GridData span="XL6 L6 M6 S12" /></w:layoutData>
+        </w:Card>
+
+        <w:Card manifest="../bix/card/plGrid3/manifest.json" width="100%" class="sapUiSmallMarginBottom">
+            <w:layoutData><layout:GridData span="XL6 L6 M6 S12" /></w:layoutData>
+        </w:Card>
+
+        <w:Card manifest="../bix/card/plGrid4/manifest.json" width="100%" class="sapUiSmallMarginBottom">
+            <w:layoutData><layout:GridData span="XL6 L6 M6 S12" /></w:layoutData>
+        </w:Card>
+
+        <w:Card manifest="../bix/card/plGrid5/manifest.json" width="100%" class="sapUiSmallMarginBottom">
+            <w:layoutData><layout:GridData span="XL6 L6 M6 S12" /></w:layoutData>
+        </w:Card>
+
+        <w:Card manifest="../bix/card/plGrid6/manifest.json" width="100%" class="sapUiSmallMarginBottom">
+            <w:layoutData><layout:GridData span="XL6 L6 M6 S12" /></w:layoutData>
+        </w:Card>
+        
+        <form:layoutData><FlexItemData growFactor="1"></FlexItemData></form:layoutData>
+    </form:SimpleForm>
+</mvc:View>

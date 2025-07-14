@@ -1,0 +1,11 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.testCard.Main"
+>
+    <Text text="테스트용 카드입니다[해당 카드경로 : BIX-portal/card/testCard]"/>
+</mvc:View>

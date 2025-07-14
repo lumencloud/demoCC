@@ -1,0 +1,134 @@
+<mvc:View controllerName="bix.sga.labor.controller.BillingRate1"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    busyIndicatorDelay="0"
+    displayBlock="true"
+    width="100%"
+    height="100%"
+>   
+    <VBox id="_IDGenVBox" width="100%" height="100%" >
+    
+        <form:SimpleForm id="_IDGenSimpleForm1" width="100%" editable="true">
+            <!-- 년월 -->
+            <VBox id="_IDGenVBox1" width="100%">
+                <Label id="_IDGenLabel" text="년월" required="true"/>
+                <DatePicker id="searchMonthYear" 
+                    value="{
+                        path: 'searchModel>/yearMonth',
+                        type: 'sap.ui.model.type.Date',
+                        formatOptions: {
+                            format: 'yyyyMM',
+                            pattern: 'yyyy-MM'
+                        }
+                    }"
+                    fieldGroupIds="Search,Required" change="onChangeSearch($event,'month')"/>
+                <layoutData><layout:GridData id="_IDGenGridData" span="XL2 L3 M4 S6" /></layoutData>
+            </VBox>
+
+            <!-- 매출조직명 -->
+            <VBox id="_IDGenVBox2" width="100%">
+                <Label id="_IDGenLabel1" text="매출조직명" required="true"/>
+                <MultiInput id="_IDGenMultiInput2" 
+                    width="100%" showValueHelp="true" valueHelpRequest=".onOrgSingleSelectDialogOpen($event,'Department')" 
+                    showSuggestion="false"
+                    value="{searchModel>/orgNm}" name="{searchModel>/orgId}"
+                    fieldGroupIds="Search,Required" showValueStateMessage="false"/>
+                <layoutData><layout:GridData id="_IDGenGridData1" span="XL2 L3 M4 S6" /></layoutData>
+            </VBox>
+
+            <HBox id="_IDGenHBox" width="100%" height="54px" alignItems="End" justifyContent="End" >
+                <Button id="_IDGenButton" type="Emphasized" text="검색" press=".onSearch($event,'Search')"/>
+                <Button id="_IDGenButton1" text="초기화" press="onSearch($event,'Refresh')" class="sapUiTinyMarginBegin" />
+                <layoutData><layout:GridData id="_IDGenGridData2" span="XL8 L6 M4 S12" /></layoutData>
+            </HBox>
+        </form:SimpleForm>
+
+        <table:Table id="table"
+            selectionMode="None"
+            firstVisibleRowChanged="onFirstVisibleRowChanged"
+            busyIndicatorDelay="0"
+            rows="{path:'brTableModel>/'}"            
+            >
+            <table:rowMode>
+                        <rowmodes:Auto />
+                    </table:rowMode>
+
+            <table:columns>
+                <table:Column  hAlign="Center" width="15rem" autoResizable="true" class="custom-colspan2" visible="{tableVisibleModel>/div}">
+                    <table:multiLabels>
+                        <Label text="부문" wrapping="true"/>
+                        <Label  text=""/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text text="{brTableModel>div_name}" wrapping="false" width="100%" textAlign="Center"/>
+                    </table:template>
+                </table:Column>
+
+                <table:Column hAlign="Center" width="15rem" autoResizable="true" visible="{tableVisibleModel>/hdqt}">
+                    <table:multiLabels>
+                        <Label text="본부" wrapping="true"/>
+                        <Label text=""/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text  text="{brTableModel>hdqt_name}" wrapping="false" width="100%" textAlign="Center"/>
+                    </table:template>
+                </table:Column>
+
+                <table:Column  hAlign="Center" width="15rem" autoResizable="true" visible="{tableVisibleModel>/team}"> 
+                    <table:multiLabels>
+                        <Label  text="조직" wrapping="true"/>
+                        <Label text=""/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text  text="{brTableModel>team_name}" wrapping="false" width="100%" textAlign="Center"/>
+                    </table:template>
+                </table:Column>
+
+                <table:Column  hAlign="Center" width="12rem" autoResizable="true">
+                    <table:multiLabels>
+                        <Label  text="팀별 BR실적 (목표)" wrapping="true"/>
+                        <Label  text=""/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text emptyIndicatorMode="Auto" text="{brTableModel>target}" wrapping="false" width="100%" textAlign="End"/>
+                    </table:template>
+                </table:Column>
+
+                <table:Column  hAlign="Center" width="8rem" autoResizable="true" headerSpan="3">
+                    <table:multiLabels>
+                        <Label text="팀별 BR 추정" wrapping="true"/>
+                        <Label  text="전체BR 추정"/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text  text="{brTableModel>forecast_value}" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On" />
+                    </table:template>
+                </table:Column>
+
+                <table:Column  hAlign="Center" width="8rem" autoResizable="true" headerSpan="3">
+                    <table:multiLabels>
+                        <Label  text="팀별 BR 추정" wrapping="true"/>
+                        <Label  text="확보 추정"/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text  text="{brTableModel>secured_value}" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On" />
+
+                    </table:template>
+                </table:Column>
+
+                <table:Column id="_IDGenColumn6" hAlign="Center" width="8rem" autoResizable="true" headerSpan="3">
+                    <table:multiLabels>
+                        <Label id="_IDGenLabel14" text="팀별 BR 추정" wrapping="true"/>
+                        <Label id="_IDGenLabel15" text="미확보 추정"/>
+                    </table:multiLabels>
+                    <table:template>
+                        <Text  text="{brTableModel>not_secured_value}" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On" />
+                    </table:template>
+                </table:Column>                   
+            </table:columns>            
+        </table:Table>
+    </VBox>
+</mvc:View>

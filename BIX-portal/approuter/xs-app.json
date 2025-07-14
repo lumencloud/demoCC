@@ -1,0 +1,93 @@
+{
+  "welcomeFile": "/main/index.html",
+  "authenticationMethod": "route",
+  "logout": {
+    "logoutEndpoint": "/logout"
+  },
+  "routes": [
+    {
+      "source": "^/ui5/(.*)$",
+      "target": "$1",
+      "destination": "ui5",
+      "csrfProtection": false,
+      "authenticationType": "none"
+    },
+    {
+      "source": "^/favicon.ico$",
+      "localDir": "./resources/",
+      "csrfProtection": false,
+      "authenticationType": "none"
+    },
+    {
+      "source": "^/themes_/(.*)$",
+      "target": "$1",
+      "service": "com.sap.ui.theming",
+      "endpoint": "runtime",
+      "authenticationType": "xsuaa"
+    },
+    {
+      "source": "^/user-api(.*)",
+      "target": "$1",
+      "service": "sap-approuter-userapi"
+    },
+    {
+      "source": "^/?odata/(.*)$",
+      "target": "/odata/$1",
+      "destination": "srv-api",
+      "csrfProtection": false,
+      "authenticationType": "xsuaa"
+    },
+    { 
+      "source": "^/sap/(.*)$",
+      "target": "/sap/$1",
+      "destination": "ERP_HTTP_DEST",
+      "authenticationType": "xsuaa"
+    },
+    {
+      "source": "^/http/(.*)$",
+      "target": "/http/$1",
+      "destination": "ERP_IT_CAP",
+      "authenticationType": "xsuaa"
+    },
+    {
+      "source": "^/bix/portal/i18n/(.*)$",
+      "target": "$1",
+      "localDir": "./resources/i18n",
+      "cacheControl": "no-cache, no-store, must-revalidate",
+      "authenticationType": "none",
+      "csrfProtection": true
+    },
+    {
+      "source": "^/cardcomponent/(.*)$",
+      "target": "bixcard$1",
+      "service": "html5-apps-repo-rt",
+      "cacheControl": "no-cache, no-store, must-revalidate",
+      "authenticationType": "xsuaa",
+      "csrfProtection": true
+    },
+    {
+      "source": "^/bix/card/(.*)$",
+      "target": "/bixcard$1",
+      "service": "html5-apps-repo-rt",
+      "cacheControl": "no-cache, no-store, must-revalidate",
+      "authenticationType": "xsuaa",
+      "csrfProtection": true
+    },
+    {
+      "source": "^/main/(.*)$",
+      "target": "/bixmain/$1",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa",
+      "cacheControl": "no-cache, no-store, must-revalidate",
+      "csrfProtection": true
+    },
+    {
+      "source": "^/([^/]+)/(.*)$",
+      "target": "/bix$1$2",
+      "service": "html5-apps-repo-rt",
+      "cacheControl": "no-cache, no-store, must-revalidate",
+      "authenticationType": "xsuaa",
+      "csrfProtection": true
+    }
+  ]
+}

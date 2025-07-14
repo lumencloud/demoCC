@@ -1,0 +1,74 @@
+<mvc:View xmlns:layout="sap.ui.layout" controllerName="bix.card.monthlyNewRegist.card"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    height="100%"
+    width="100%"
+    displayBlock="true"
+>   
+    <form:SimpleForm id="cardContent" class="custom-back-white">
+        <form:content>
+            <VBox>                 
+
+                <VBox class="custom-card-box-padding">
+
+                <HBox visible="{=!!${Model>/first}}" wrap="Wrap" class="sapUiTinyMarginBottom">                    
+                    <HBox>
+                        <VBox justifyContent="Center">
+                            <core:Icon src="sap-icon://circle-task-2" size="0.5rem"/>
+                        </VBox>
+                        <Text emptyIndicatorMode="On" text="{Model>/first/biz_tp_account_nm} {Model>/first/biz_opp_nm} " class="sapUiTinyMarginBegin"/>                        
+                    </HBox>
+                    <HBox>
+                        <Text emptyIndicatorMode="On" text="({path: 'Model>/first/rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                    </HBox>
+                </HBox>
+
+                <HBox visible="{=!!${Model>/second}}" wrap="Wrap" class="sapUiTinyMarginBottom">                    
+                    <HBox>
+                        <VBox justifyContent="Center">
+                            <core:Icon src="sap-icon://circle-task-2" size="0.5rem"/>
+                        </VBox>
+                        <Text emptyIndicatorMode="On" text="{Model>/second/biz_tp_account_nm} {Model>/second/biz_opp_nm} " class="sapUiTinyMarginBegin"/>                        
+                    </HBox>
+                    <HBox>
+                        <Text emptyIndicatorMode="On" text="({path: 'Model>/second/rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                    </HBox>
+                </HBox>
+
+                <HBox visible="{=!!${Model>/third}}" wrap="Wrap" class="sapUiTinyMarginBottom">                    
+                    <HBox>
+                        <VBox justifyContent="Center">
+                            <core:Icon src="sap-icon://circle-task-2" size="0.5rem"/>
+                        </VBox>
+                        <Text emptyIndicatorMode="On" text="{Model>/third/biz_tp_account_nm} {Model>/third/biz_opp_nm} " class="sapUiTinyMarginBegin"/>                        
+                    </HBox>
+                    <HBox>
+                        <Text emptyIndicatorMode="On" text="({path: 'Model>/third/rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                    </HBox>
+                </HBox>
+
+                <HBox visible="{=!!${Model>/forth}}" wrap="Wrap" class="sapUiTinyMarginBottom">                    
+                    <HBox>
+                        <VBox justifyContent="Center">
+                            <core:Icon src="sap-icon://circle-task-2" size="0.5rem"/>
+                        </VBox>
+                        <Text emptyIndicatorMode="On" text="{Model>/forth/biz_tp_account_nm} {Model>/third/biz_opp_nm} " class="sapUiTinyMarginBegin"/>                        
+                    </HBox>
+                    <HBox>
+                        <Text emptyIndicatorMode="On" text="({path: 'Model>/forth/rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                    </HBox>
+                </HBox>
+
+                <HBox visible="{=!!${Model>/account1thName}}">                    
+                    <HBox>                        
+                        <Text emptyIndicatorMode="On" text="기타 : {Model>/account1thName}({Model>/account1thCount}건), {Model>/account2ndName}({Model>/account2ndCount}건) 등"/>                        
+                    </HBox>                    
+                </HBox>
+            </VBox>
+            </VBox>
+        </form:content>
+    </form:SimpleForm>         
+</mvc:View>

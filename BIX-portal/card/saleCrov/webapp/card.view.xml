@@ -1,0 +1,152 @@
+<mvc:View
+    xmlns:layout="sap.ui.layout"
+    controllerName="bix.card.saleCrov.card"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    height="100%"
+    width="100%"
+    displayBlock="true"
+>
+    <form:SimpleForm id="cardContent" class="custom-back-white">
+        <form:content>
+            <HBox
+                width="100%"
+                justifyContent="SpaceBetween"
+            >
+                <VBox width="65%">
+                    <core:HTML id="html0" />
+                </VBox>
+                <VBox
+                    id="sideBox"
+                    width="35%"
+                    justifyContent="Center"
+                >
+                    <HBox
+                        justifyContent="SpaceBetween"
+                        alignItems="Center"
+                        width="100%"
+                    >
+                        <VBox
+                            width="65%"
+                            justifyContent="Center"
+                            alignContent="Center"
+                            height="100%"
+                            class="custom-donut-right-text"
+                        >
+                            <Text
+                                textAlign="End"
+                                class="custom-donught-sub-title"
+                                emptyIndicatorMode="On"
+                                text="{
+                                        parts:[
+                                            {path:'model>/new', targetType: 'any'},
+                                            {value:'billion'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                        }"
+                                tooltip="{
+                                        parts:[
+                                            {path:'model>/new', targetType: 'any'},
+                                            {value:'tooltip'}                                     
+                                        ],
+                                        formatter: '.onFormatPerformance'                                
+                                        }"
+                                wrapping="false"
+                                width="100%"
+                            />
+                        </VBox>
+                        <VBox
+                            width="30%"
+                            justifyContent="Center"
+                        >
+                            <Text
+                                emptyIndicatorMode="On"
+                                class="custom-donught-sub-title2"
+                                text="({
+                                        parts:[
+                                            {path:'model>/newRate', targetType: 'any'},
+                                            {value:'percent'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                    })"
+                                tooltip="{
+                                        parts:[
+                                            {path:'model>/newRate', targetType: 'any'},
+                                            {value:'percent_tooltip'}                                      
+                                        ],
+                                        formatter: '.onFormatPerformance'                                
+                                    }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Begin"
+                            />
+                        </VBox>
+                    </HBox>
+
+                    <HBox
+                        justifyContent="SpaceBetween"
+                        alignItems="Center"
+                        width="100%"
+                    >
+                        <VBox
+                            width="65%"
+                            justifyContent="Center"
+                            height="100%"
+                        >
+                            <Text
+                                textAlign="End"
+                                class="custom-donught-sub-title"
+                                emptyIndicatorMode="On"
+                                text="{
+                                        parts:[
+                                            {path:'model>/crov', targetType: 'any'},
+                                            {value:'billion'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                        }"
+                                tooltip="{
+                                        parts:[
+                                            {path:'model>/crov', targetType: 'any'},
+                                            {value:'tooltip'}                                     
+                                        ],
+                                        formatter: '.onFormatPerformance'                                
+                                        }"
+                                wrapping="false"
+                                width="100%"
+                            />
+                        </VBox>
+                        <VBox
+                            width="30%"
+                            justifyContent="Center"
+                        >
+                            <Text
+                                emptyIndicatorMode="On"
+                                class="custom-donught-sub-title2"
+                                text="({
+                                        parts:[
+                                            {path:'model>/crovRate', targetType: 'any'},
+                                            {value:'percent'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                    })"
+                                tooltip="{
+                                        parts:[
+                                            {path:'model>/crovRate', targetType: 'any'},
+                                            {value:'percent_tooltip'}                                      
+                                        ],
+                                        formatter: '.onFormatPerformance'                                
+                                    }"
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Begin"
+                            />
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </HBox>
+        </form:content>
+    </form:SimpleForm>
+</mvc:View>

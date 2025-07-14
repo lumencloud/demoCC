@@ -1,0 +1,68 @@
+<mvc:View xmlns:layout="sap.ui.layout" controllerName="bix.card.monthlyScheduledBiddingProjects.card"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes" height="100%" width="100%" displayBlock="true">
+    <form:SimpleForm id="cardContent" class="custom-back-white sapUiNoContentPadding">
+        <form:content>
+            <VBox width="100%" height="100%">
+                <table:Table id="table" class="custom-ai-report-test-card-box2 custom-table-container custom-table-header custom-table-body custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-selection-radius" selectionMode="None" busyIndicatorDelay="0" noData=" " rows="{path:'model>/'}">
+                    <table:columns>
+                        <!-- <table:Column hAlign="Center" width="15%" resizable="false" name="type">
+                        <Label text="고객사" wrapping="true"/>
+                        <table:template>
+                            <Text text="{model>biz_tp_account_nm}" wrapping="false" width="100%" textAlign="Center" emptyIndicatorMode="On" />
+                        </table:template>
+                    </table:Column>             -->
+
+                        <table:Column hAlign="Center" resizable="false" width="15%">
+                            <Label text="Account 부문" wrapping="true"/>
+                            <table:template>
+                                <Text text="{model>account_div_name}" tooltip="{model>account_div_name}" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" resizable="false" width="15%">
+                            <Label text="Delivery 부문" wrapping="true"/>
+                            <table:template>
+                                <Text text="{model>delivery_div_name}" tooltip="{model>delivery_div_name}" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" resizable="false">
+                            <Label text="사업명" wrapping="true"/>
+                            <table:template>
+                                <HBox alignContent="Start">
+                                    <VBox justifyContent="Center" width="15%" class="custom-card-circle-box red">
+                                        <Text emptyIndicatorMode="On" text="{model>biz_tp_account_nm}" textAlign="Center" width="100%"/>
+                                    </VBox>
+                                    <HBox width="100%" class="custom-card-box-one-line sapUiTinyMarginBegin">
+                                        <Text emptyIndicatorMode="On" text="{model>biz_opp_nm}"/>
+                                        <Text emptyIndicatorMode="On" text="({path: 'model>rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state"/>
+                                    </HBox>
+                                </HBox>
+                            </table:template>
+                        </table:Column>
+                        <table:Column hAlign="Center" width="15%" resizable="false" name="type">
+                            <Label text="예상 계약일" wrapping="true"/>
+                            <table:template>
+                                <Text text="{model>expected_contract_date}" wrapping="false" width="100%" textAlign="Center" emptyIndicatorMode="On" />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+                </table:Table>
+                <HBox id="schedulebottomHBox" visible="{= !!${model>/majorAccount}}">
+                    <VBox justifyContent="Center">
+                        <core:Icon src="sap-icon://circle-task-2" size="0.5rem"/>
+                    </VBox>
+                    <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin" >
+                        <Text emptyIndicatorMode="On" text="기타" textAlign="Center" width="100%"/>
+                        <Text emptyIndicatorMode="On" text=" {model>/majorAccount} 등 {model>/count}건" />
+                        <Text emptyIndicatorMode="On" text="({model>/total}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
+                    </HBox>
+                </HBox>
+            </VBox>
+        </form:content>
+    </form:SimpleForm>
+</mvc:View>

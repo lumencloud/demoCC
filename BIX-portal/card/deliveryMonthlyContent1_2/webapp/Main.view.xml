@@ -1,0 +1,227 @@
+<mvc:View xmlns:tnt="sap.tnt"
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.deliveryMonthlyContent1_2.Main"
+>
+    <VBox class="custom-ai-report-test-delivery-content1_2-container">
+        <HBox class="title">
+            <Title text="당월 누계 실적"/>
+        </HBox>
+        <VBox id="cardContent" class="table-wrapper">
+            <HBox class="table-header" alignItems="Center">
+                <Text text="" textAlign="Center"/>
+                <Text text="억 (원)/%" width="100%" textAlign="Center"/>
+                <Text text="YoY(%)" width="100%" textAlign="Center"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="매출"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/sale'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <tnt:InfoLabel text="{
+                    parts: [
+                        {path: 'Model>/sale_yoy'},
+                        {value: 'percent'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    colorScheme="{= ${Model>/sale_yoy} === 0 ? 1 :
+                        ${Model>/sale_yoy} > 0 ? 8 : 2}" width="100%"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="마진"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/margin'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <tnt:InfoLabel text="{
+                    parts: [
+                        {path: 'Model>/margin_yoy'},
+                        {value: 'percent'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    colorScheme="{= ${Model>/margin_yoy} === 0 ? 1 :
+                        ${Model>/margin_yoy} > 0 ? 8 : 2}" width="100%"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="마진율"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/margin_rate'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <tnt:InfoLabel text="{
+                    parts: [
+                        {path: 'Model>/margin_rate_yoy'},
+                        {value: 'percent'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    colorScheme="{= ${Model>/margin_rate_yoy} === 0 ? 1 :
+                        ${Model>/margin_rate_yoy} > 0 ? 8 : 2}" width="100%"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="SG&amp;A"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/sga'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <tnt:InfoLabel text="{
+                    parts: [
+                        {path: 'Model>/sga_yoy'},
+                        {value: 'percent'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    colorScheme="{= ${Model>/sga_yoy} === 0 ? 1 :
+                        ${Model>/sga_yoy} > 0 ? 8 : 2}" width="100%"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="공헌이익"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/contribytion'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <tnt:InfoLabel text="{
+                    parts: [
+                        {path: 'Model>/contribytion_yoy'},
+                        {value: 'percent'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    colorScheme="{= ${Model>/contribytion_yoy} === 0 ? 1 :
+                        ${Model>/contribytion_yoy} > 0 ? 8 : 2}"
+                         width="100%"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center" visible="{viewModel>/profitVisible}">
+                <Text text="영업이익"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/profit'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <tnt:InfoLabel text="{
+                    parts: [
+                        {path: 'Model>/profit_yoy'},
+                        {value: 'percent'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    colorScheme="{= ${Model>/profit_yoy} === 0 ? 1 :
+                        ${Model>/profit_yoy} > 0 ? 8 : 2}" width="100%"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center" visible="{viewModel>/profitVisible}">
+                <Text text="영업이익률"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/profit_rate'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <tnt:InfoLabel text="{
+                    parts: [
+                        {path: 'Model>/profit_rate_yoy'},
+                        {value: 'percent'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    colorScheme="{= ${Model>/profit_rate_yoy} === 0 ? 1 :
+                        ${Model>/profit_rate_yoy} > 0 ? 8 : 2}" width="100%"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="BR"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/br'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <tnt:InfoLabel text="{
+                    parts: [
+                        {path: 'Model>/br_yoy'},
+                        {value: 'percent'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    colorScheme="{= ${Model>/br_yoy} === 0 ? 1 :
+                        ${Model>/br_yoy} > 0 ? 8 : 2}" width="100%"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="RoHC"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/rohc'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <tnt:InfoLabel text="{
+                    parts: [
+                        {path: 'Model>/rohc_yoy'},
+                        {value: 'percent'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    colorScheme="{= ${Model>/rohc_yoy} === 0 ? 1 :
+                        ${Model>/rohc_yoy} > 0 ? 8 : 2}" width="100%"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="DT매출"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/dt'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <tnt:InfoLabel text="{
+                    parts: [
+                        {path: 'Model>/dt_yoy'},
+                        {value: 'percent'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    colorScheme="{= ${Model>/dt_yoy} === 0 ? 1 :
+                        ${Model>/dt_yoy} > 0 ? 8 : 2}" width="100%"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="Offshoring"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/offshoring'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <tnt:InfoLabel text="{
+                    parts: [
+                        {path: 'Model>/offshoring_yoy'},
+                        {value: 'percent'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    colorScheme="{= ${Model>/offshoring_yoy} === 0 ? 1 :
+                        ${Model>/offshoring_yoy} > 0 ? 8 : 2}" width="100%"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="Nom-MM"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/nonMM'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <tnt:InfoLabel text="{
+                    parts: [
+                        {path: 'Model>/nonMM_yoy'},
+                        {value: 'percent'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    colorScheme="{= ${Model>/nonMM_yoy} === 0 ? 1 :
+                        ${Model>/nonMM_yoy} > 0 ? 8 : 2}" width="100%"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</mvc:View>

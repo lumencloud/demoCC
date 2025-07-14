@@ -1,0 +1,181 @@
+<mvc:View controllerName="bix.sga.integration.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:unified="sap.ui.unified"
+    xmlns:uxap="sap.uxap"
+    busyIndicatorDelay="0"
+    width="100%"
+    height="100%" >   
+    <uxap:ObjectPageLayout upperCaseAnchorBar="false" subSectionLayout="TitleOnLeft"
+        showTitleInHeaderContent="true" showAnchorBar="false" useIconTabBar="true" >
+		<uxap:headerTitle>
+            <uxap:ObjectPageDynamicHeaderTitle >
+                <uxap:expandedHeading>
+                    <Title text="다국어 설정" />
+                </uxap:expandedHeading>
+            </uxap:ObjectPageDynamicHeaderTitle>
+		</uxap:headerTitle>
+
+        <!-- 헤더 콘텐트 -->
+        <uxap:headerContent>
+            <form:SimpleForm editable="true">
+                <form:content>
+                    <VBox width="100%">
+                        <Label text="연월" />
+                        <DatePicker 
+                            id="rodr_esmt_y"
+                            value="{
+                                path: 'exeSearchModel>/rodr_esmt_y',
+                                type: 'sap.ui.model.type.Date',
+                                formatOptions: {
+                                    'pattern': 'yyyy'
+                                }
+                            }" fieldGroupIds="Search" />
+                        <layoutData><layout:GridData span="XL2 L3 M4 S6" /></layoutData>
+                    </VBox>
+
+                    <VBox width="100%">
+                        <Label text="매출조직명" required="true" />
+                        <MultiInput width="100%" showValueHelp="true" valueHelpRequest=".onOrgSingleSelectDialogOpen" 
+                            liveChange="onAddDepInputLiveChange" showSuggestion="false" maxTokens="1" 
+                            selectedKey="{exeSearchModel>/sale_org_rid}" tokenUpdate="onAddDepTokenUpdate"
+                            fieldGroupIds="Search,Required" showValueStateMessage="false"/>
+                        <layoutData><layout:GridData span="XL2 L3 M4 S6" /></layoutData>
+                    </VBox>
+
+                    <HBox width="100%" alignItems="End" justifyContent="End" class="sapUiTinyMarginTop">
+                        <Button type="Emphasized" text="조회" press=".onSearch"/>
+                        <layoutData><layout:GridData span="XL12 L12 M12 S12" linebreak="true"/></layoutData>
+                    </HBox>
+                </form:content>
+            </form:SimpleForm>
+        </uxap:headerContent>
+
+        <uxap:sections>
+            <uxap:ObjectPageSection >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection >
+                        <uxap:blocks>
+                            <VBox height="100%" renderType="Bare" fitContainer="true">
+                                <table:Table 
+                                    id="integrationTable"
+                                    selectionMode="None"
+                                    threshold="10"
+                                    rowsUpdated="onRowsUpdated" 
+                                    fixedColumnCount="2"
+                                    busyIndicatorDelay="0"
+                                    enableBusyIndicator="true"
+                                    noData="검색 조건 입력 후 검색해주세요.">
+
+                                    <table:rowMode>
+                                        <rowmodes:Fixed rowCount="10" />
+                                    </table:rowMode>
+
+                                    <!-- <table:layoutData>
+                                        <FlexItemData growFactor="1" />
+                                    </table:layoutData> -->
+
+                                    <table:extension>
+                                        <OverflowToolbar>
+                                            <ToolbarSpacer />
+                                            <Button icon="sap-icon://download" text="엑셀" press="onExcelDownload" />
+                                        </OverflowToolbar>
+                                    </table:extension>
+                                    
+                                    <table:columns>
+                                        <table:Column hAlign="Center" width="6rem" autoResizable="true">
+                                            <table:multiLabels>
+                                                <Label text="조직" wrapping="true"/>
+                                                <Label text=""/>
+                                            </table:multiLabels>
+                                            <table:template>
+                                                <Text text="{plUiTableModel>type}" wrapping="false" width="100%" textAlign="Center"/>
+                                            </table:template>
+                                        </table:Column>
+                                        <table:Column hAlign="Center" width="100%" autoResizable="true" >
+                                            <table:multiLabels>
+                                                <Label id="columnLabel" wrapping="true"/>
+                                                <Label text="연간 목표"/>
+                                            </table:multiLabels>
+                                            <table:template>
+                                                <Text text="{plUiTableModel>goal}" wrapping="false" width="100%" textAlign="End" />
+                                            </table:template>
+                                        </table:Column>
+                                        <table:Column hAlign="Begin" headerSpan="3" width="100%" autoResizable="true">
+                                            <table:multiLabels>
+                                                <Label text="당월 실적" wrapping="true"/>
+                                                <Label text=""/>
+                                            </table:multiLabels>
+                                            <table:template>
+                                                <Text text="{plUiTableModel>performanceCurrentYearMonth}" wrapping="false" width="100%" textAlign="End" />
+                                            </table:template>
+                                        </table:Column>
+                                        <table:Column hAlign="Center" width="100%" autoResizable="true">
+                                            <table:multiLabels>
+                                                <Label text="당월 실적" wrapping="true"/>
+                                                <Label text="전년 동기"/>
+                                            </table:multiLabels>
+                                            <table:template>
+                                                <Text text="{plUiTableModel>performanceLastYearMonth}" wrapping="false" width="100%" textAlign="End" />
+                                            </table:template>
+                                        </table:Column>
+                                        <table:Column hAlign="Center" width="100%" autoResizable="true">
+                                            <table:multiLabels>
+                                                <Label text="당월 실적" wrapping="true"/>
+                                                <Label text="차이"/>
+                                            </table:multiLabels>
+                                            <table:template>
+                                                <Text text="{plUiTableModel>performanceYearMonthGap}" wrapping="false" width="100%" textAlign="End" />
+                                            </table:template>
+                                        </table:Column>
+                                        <table:Column hAlign="Begin" headerSpan="3" width="100%" autoResizable="true">
+                                            <table:multiLabels>
+                                                <Label text="진척도" wrapping="true"/>
+                                                <Label text=""/>
+                                            </table:multiLabels>
+                                            <table:template>
+                                                <Text text="{plUiTableModel>performanceAttainmentRateCurrentYear}" wrapping="false" width="100%" textAlign="End" />
+                                            </table:template>
+                                        </table:Column>
+                                        <table:Column hAlign="Center" width="100%" autoResizable="true">
+                                            <table:multiLabels>
+                                                <Label text="진척도" wrapping="true"/>
+                                                <Label text="전년 동기"/>
+                                            </table:multiLabels>
+                                            <table:template>
+                                                <Text text="{plUiTableModel>performanceAttainmentRateLastYear}" wrapping="false" width="100%" textAlign="End" />
+                                            </table:template>
+                                        </table:Column>
+                                        <table:Column hAlign="Center" width="100%" autoResizable="true">
+                                            <table:multiLabels>
+                                                <Label text="진척도" wrapping="true"/>
+                                                <Label text="차이"/>
+                                            </table:multiLabels>
+                                            <table:template>
+                                                <Text text="{plUiTableModel>performanceAttainmentRategap}" wrapping="false" width="100%" textAlign="End" />
+                                            </table:template>
+                                        </table:Column>
+                                    </table:columns>
+                                </table:Table>
+                            </VBox>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+
+            <!-- UI 조정을 위한 더미 섹션 -->
+            <uxap:ObjectPageSection >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection title="Connect" titleUppercase="false">
+						<Text text="Test" />
+					</uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+        </uxap:sections>
+	</uxap:ObjectPageLayout>
+</mvc:View>

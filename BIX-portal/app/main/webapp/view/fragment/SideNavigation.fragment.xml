@@ -1,0 +1,25 @@
+<core:FragmentDefinition xmlns:tnt="sap.tnt" xmlns:rowmodes="sap.ui.table.rowmodes" 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:w="sap.ui.integration.widgets"
+	xmlns:card="sap.f.cards"
+	busyIndicatorDelay="0">
+    <Dialog showHeader="false">
+        <content>
+            <FlexBox direction="Column" justifyContent="End" fitContainer="true">
+                    <HBox justifyContent="End">
+                        <Button id="sideNavCloseButton" icon="sap-icon://decline" press="onNavClose"/>
+                    </HBox>
+                    <tnt:SideNavigation id="sideNav2"
+                        expanded="true"
+                        selectedKey="{menuStr>/sideSelectedkey}"
+                        itemSelect=".onItemSelect"
+                        width="10rem"
+                        design="Decorated"
+                    >
+                        <tnt:NavigationList id="navList2"/>
+                    </tnt:SideNavigation>
+            </FlexBox>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>

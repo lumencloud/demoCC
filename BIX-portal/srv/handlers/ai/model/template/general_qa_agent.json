@@ -1,0 +1,77 @@
+{
+  "agent_id": "quick_answer_agent",
+  "processing_flow": {
+    "flow_type": "langchain_sequential",
+    "execution_mode": "sequential",
+    "steps": [
+      {
+        "step_id": "term_extractor",
+        "step_sequence": 1,
+        "component": {
+          "id": "prompt_01",
+          "type": "prompt",
+          "description": "용어 추출자",
+          "template": {
+            "type": "static",
+            "path": "generalQaAgent.static.termExtractor"
+          },
+          "model_config": {
+            "model_id": "model_01",
+            "model_name": "gemini-1.5-flash",
+            "model_params": {
+                "temperature": 0.3,
+                "max_tokens": 4000
+            },
+            "model_version": "002"
+          },
+          "input_variables":{
+            "user_input": "$input:user_input"
+          },
+          "output_variable": "relevant_terms"
+        }
+      },
+      {
+        "step_id": "extract_meta_term_info",
+        "step_sequence": 2,
+        "component": {
+          "id": "tool_01",
+          "type": "tool",
+          "description": "메타 용어 정보 추출",
+          "tool_file": "meta_term_extract_tool",
+          "input_variables": {
+            "relevant_terms": "$var:relevant_terms"
+          },
+          "output_variable": "selected_terms"
+        }
+      },
+      {
+        "step_id": "generate_answer",
+        "step_sequence": 3,
+        "component": {
+          "id": "prompt_02",
+          "type": "prompt",
+          "description": "답변 생성자",
+          "template": {
+            "type": "static",
+            "path": "generalQaAgent.static.answerGenerator"
+          },
+          "model_config": {
+            "model_id": "model_02",
+            "model_name": "gpt-4.1-mini",
+            "model_params": {
+                "temperature": 0.3,
+                "max_tokens": 4000
+            },
+            "model_version": "2025-04-14"
+          },
+          "input_variables":{
+            "user_input": "$input:user_input",
+            "business_context": "$input:business_context",
+            "selected_terms": "$var:selected_terms"
+          },
+          "output_variable": "final"
+        }
+      }
+    ]
+  }
+}

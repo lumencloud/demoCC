@@ -1,0 +1,93 @@
+{
+  "requires": {
+    "[hybrid]": {
+      "db": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.ap12.hana.ondemand.com",
+          "org": "SKCC_dev-skerp1",
+          "space": "BIX",
+          "instance": "bix-portal-db",
+          "key": "bix-portal-db-key",
+          "resolved": false
+        },
+        "kind": "hana",
+        "vcap": {
+          "name": "db"
+        }
+      },
+      "custom-service:bix-theme": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.ap12.hana.ondemand.com",
+          "org": "SKCC_dev-skerp1",
+          "space": "BIX",
+          "instance": "bix-theme",
+          "key": "bix-theme-key",
+          "resolved": false
+        },
+        "vcap": {
+          "name": "custom-service:bix-theme"
+        }
+      },
+      "custom-service:bix-portal-html5-runtime": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.ap12.hana.ondemand.com",
+          "org": "SKCC_dev-skerp1",
+          "space": "BIX",
+          "instance": "bix-portal-html5-runtime",
+          "key": "bix-portal-html5-runtime-key",
+          "resolved": false
+        },
+        "vcap": {
+          "name": "custom-service:bix-portal-html5-runtime"
+        }
+      },
+      "auth": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.ap12.hana.ondemand.com",
+          "org": "SKCC_dev-skerp1",
+          "space": "BIX",
+          "instance": "bix-portal-auth",
+          "key": "bix-portal-auth-key",
+          "resolved": false
+        },
+        "kind": "xsuaa-auth",
+        "vcap": {
+          "name": "auth"
+        }
+      },
+      "destinations": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.ap12.hana.ondemand.com",
+          "org": "SKCC_dev-skerp1",
+          "space": "BIX",
+          "instance": "bix-portal-destination-service",
+          "key": "bix-portal-destination-service-key",
+          "resolved": false
+        },
+        "kind": "destinations",
+        "vcap": {
+          "name": "destinations"
+        }
+      },
+      "connectivity": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.ap12.hana.ondemand.com",
+          "org": "SKCC_dev-skerp1",
+          "space": "BIX",
+          "instance": "bix-portal-connectivity",
+          "key": "bix-portal-connectivity-key"
+        },
+        "kind": "connectivity",
+        "vcap": {
+          "name": "connectivity"
+        }
+      }
+    }
+  }
+}

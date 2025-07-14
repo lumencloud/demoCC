@@ -1,0 +1,90 @@
+{
+  "xsappname": "bix-portal-auth",
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.bix-portal-display",
+      "description": "조회 권한"
+    },
+    {
+      "name": "$XSAPPNAME.bix-portal-company-viewer",
+      "description": "전사 조회 권한"
+    },
+    {
+      "name": "$XSAPPNAME.bix-portal-manage",
+      "description": "Manage 권한"
+    },
+    {
+      "name": "$XSAPPNAME.bix-portal-system-admin",
+      "description": "관리 권한"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "emp_no",
+      "description": "Employee Number",
+      "valueType": "string"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "bix-portal-user",
+      "description": "BIX Portal USER",
+      "scope-references": [
+        "$XSAPPNAME.bix-portal-display"
+      ],
+      "attribute-references": [
+        "emp_no"
+      ]
+    },
+    {
+      "name": "bix-portal-company-viewer",
+      "description": "BIX Portal 전사 조회 권한",
+      "scope-references": [
+        "$XSAPPNAME.bix-portal-company-viewer"
+      ],
+      "attribute-references": [
+        "emp_no"
+      ]
+    },
+    {
+      "name": "bix-portal-admin",
+      "description": "BIX Portal ADMIN",
+      "scope-references": [
+        "$XSAPPNAME.bix-portal-display",
+        "$XSAPPNAME.bix-portal-manage",
+        "$XSAPPNAME.bix-portal-system-admin"
+      ],
+      "attribute-references": [
+        "emp_no"
+      ]
+    },
+    {
+      "name": "bix-portal-manager",
+      "description": "BIX Portal Manger",
+      "scope-references": [
+        "$XSAPPNAME.bix-portal-display",
+        "$XSAPPNAME.bix-portal-manage"
+      ],
+      "attribute-references": [
+        "emp_no"
+      ]
+    }
+  ],
+  "role-collections": [],
+  "oauth2-configuration": {
+    "token-validity": 43200,
+    "refresh-token-validity": 604800,
+    "credential-types": [
+      "binding-secret",
+      "instance-secret",
+      "x509"
+    ],
+    "redirect-uris": [
+      "https://*.cfapps.ap12.hana.ondemand.com/**",
+      "https://*.ap12.applicationstudio.cloud.sap/**",
+      "https://*.skcc.com/**",
+      "https://*.skax.com/**",
+      "https://*.skax.co.kr/**"
+    ]
+  }
+}

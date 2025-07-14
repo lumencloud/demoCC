@@ -1,0 +1,91 @@
+<mvc:View xmlns:tnt="sap.tnt"
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.deliveryMonthlyContent3_1.Main"
+>
+    <VBox  class="custom-ai-report-test-delivery-content3_1-container">
+        <HBox class="title">
+            <Title text="당해년도 실적 추정"/>
+        </HBox>
+        <VBox id="cardContent" class="table-wrapper">
+            <HBox class="table-header" alignItems="Center">
+                <Text text="" textAlign="Center"/>
+                <Text text="억 (원)/%" width="100%" textAlign="Center"/>
+                <Text text="YoY(%)" width="100%" textAlign="Center"/>
+            </HBox>
+            <HBox class="table-subheader" alignItems="Center">
+                <Text text="" textAlign="Center"/>
+                <Text text="연간 추정" width="100%" textAlign="Center"/>
+                <Text text="미확보" width="100%" textAlign="Center"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="매출"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/0/forecast_value'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/0/not_secured_value'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    width="100%" textAlign="End"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="마진"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/1/forecast_value'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/1/not_secured_value'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    width="100%" textAlign="End"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="마진율"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/2/forecast_value'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/2/not_secured_value'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    width="100%" textAlign="End"/>
+            </HBox>
+            <HBox class="table-content" alignItems="Center">
+                <Text text="DT매출"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/3/forecast_value'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                <Text text="{
+                    parts: [
+                        {path: 'Model>/3/not_secured_value'},
+                        {value: 'number'}
+                    ],
+                    formatter: '.onFormatPerformance'}" 
+                    width="100%" textAlign="End"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</mvc:View>

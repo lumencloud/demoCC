@@ -1,0 +1,11 @@
+<mvc:View controllerName="bix.pl.overview.controller.App"
+    displayBlock="true"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns="sap.m"
+    width="100%"
+    height="100%">
+    <App id="app" height="100%">
+        <f:FlexibleColumnLayout id="fcl" stateChange="onStateChanged" layout="{viewControl>/layout}" backgroundDesign="Solid" />
+    </App>
+</mvc:View>

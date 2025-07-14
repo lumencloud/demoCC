@@ -1,0 +1,190 @@
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    width="100%"
+    height="100%"
+    displayBlock="true"
+    controllerName="bix.card.monthlySaleDetailTable.Main"
+    
+>
+    <table:Table id="MonthlySaleDetailTable"
+            class="custom-table custom-uiTable-selection custom-inherit-height" 
+            rows="{path: 'SaleDetailTreeModel>/'}"
+            enableBusyIndicator="true"  
+            selectionMode="None"   
+            firstVisibleRowChanged="onFirstVisibleRowChanged"
+            fixedColumnCount="1"
+            busyIndicatorDelay="0">
+            <table:extension>
+                <OverflowToolbar >
+                    <ToolbarSpacer />
+                    <Button text="매출/마진" icon="sap-icon://excel-attachment" press="onExcelDownload" type="Transparent"/>
+                </OverflowToolbar>
+            </table:extension>
+
+            <table:rowMode>
+                <rowmodes:Fixed rowCount="8"/>
+            </table:rowMode>
+
+            <table:columns >
+                <table:Column hAlign="Center" width="8rem">
+                    <Label text="조직 구분"/>
+                    <table:template>
+                        <Text text="{SaleDetailTreeModel>div}"/>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="8rem">
+                    <Label text="구분"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="Center">
+                            <Text text="{SaleDetailTreeModel>type}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="8rem">
+                    <Label text="연 목표"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>target', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="월 진척률"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>progress', formatter:'.formatPercent'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="1월"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>month1', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="2월"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>month2', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="3월"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>month3', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="4월"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>month4', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="5월"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>month5', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="6월"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>month6', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="7월"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>month7', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="8월"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>month8', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="9월"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>month9', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="10월"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>month10', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="11월"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>month11', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+            <table:columns>
+                <table:Column hAlign="Center" width="7rem">
+                    <Label text="12월"/>
+                    <table:template>
+                        <HBox width="100%" justifyContent="End">
+                            <Text text="{path:'SaleDetailTreeModel>month12', formatter:'.formatNumber'}"/>
+                        </HBox>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+        </table:Table>
+</mvc:View>

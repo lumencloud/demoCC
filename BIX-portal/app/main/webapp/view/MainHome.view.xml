@@ -1,0 +1,9 @@
+<mvc:View controllerName="bix.main.controller.MainHome"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="page" showHeader="false" backgroundDesign="Solid">
+        <FlexBox >
+        
+        </FlexBox>
+    </Page>
+</mvc:View>

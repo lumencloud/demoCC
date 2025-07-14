@@ -1,0 +1,237 @@
+<mvc:View
+    controllerName="bix.card.actualSMAccountChartContainer.card"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:microchart="sap.suite.ui.microchart"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    width="100%"
+    height="100%"
+    displayBlock="true"
+>
+    <HBox justifyContent="Center">
+        <VBox
+            id="vBox"
+            items="{model>/}"
+            width="95%"
+        >
+            <Panel
+                class="custom-panel-repeat"
+                width="100%"
+            >
+                <VBox
+                    justifyContent="Center"
+                    alignContent="Center"
+                    alignItems="Center"
+                >
+                    <HBox
+                        width="100%"
+                        alignContent="Center"
+                        alignItems="Center"
+                    >
+                        <VBox
+                            width="10%"
+                            justifyContent="Start"
+                        >
+                            <Title
+                                text="{model>org_name}"
+                                
+                            />
+                        </VBox>
+                        <HBox width="18%">
+                            <HBox
+                                width="20%"
+                                alignItems="Center"
+                            >
+                                <Text
+                                    text="매출"
+                                    width="100%"
+                                />
+                            </HBox>
+                            <HBox
+                                width="80%"
+                                alignItems="Center"
+                                visible="{=${model>type}===true}"
+                            >
+                                <HBox
+                                    width="90%"
+                                    class="custom-green-box"
+                                >
+                                    <Text
+                                        text="실적:{model>curr_sale}"
+                                        emptyIndicatorMode="On"
+                                    />
+                                </HBox>
+                                <HBox
+                                    width="10%"
+                                    height="100%"
+                                    class="custom-gray-box"
+                                />
+                            </HBox>
+
+                            <HBox
+                                width="80%"
+                                visible="{=${model>type}===false}"
+                            >
+                                <HBox
+                                    width="85%"
+                                    class="custom-orange-box1"
+                                >
+                                    <Text
+                                        text="실적:{model>curr_sale}"
+                                        emptyIndicatorMode="On"
+                                    />
+                                </HBox>
+                                <HBox
+                                    width="5%"
+                                    class="custom-orange-box2"
+                                />
+                                <HBox
+                                    width="10%"
+                                    class="custom-gray-box"
+                                />
+                            </HBox>
+                        </HBox>
+
+                        <HBox width="12%">
+                            <HBox
+                                width="100%"
+                                visible="{=${model>type}===true}"
+                                justifyContent="Center"
+                            >
+                                <core:Icon
+                                    src="sap-icon://trend-up"
+                                    class="custom-positive-state"
+                                />
+                                <Text
+                                    text="{model>sale_contrast} 전년대비"
+                                    class="custom-positive-state sapUiTinyMarginBegin"
+                                />
+                            </HBox>
+                            <HBox
+                                width="100%"
+                                visible="{=${model>type}===false}"
+                                justifyContent="Center"
+                            >
+                                <core:Icon
+                                    src="sap-icon://trend-down"
+                                    class="custom-negative-state"
+                                />
+                                <Text
+                                    text="{model>sale_contrast} 전년대비"
+                                    class="custom-negative-state sapUiTinyMarginBegin"
+                                />
+                            </HBox>
+                        </HBox>
+
+                        <HBox width="18%">
+                            <HBox
+                                width="20%"
+                                alignItems="Center"
+                            >
+                                <Text
+                                    text="마진"
+                                    width="100%"
+                                />
+                            </HBox>
+                            <HBox
+                                width="80%"
+                                alignItems="Center"
+                                visible="{=${model>type2}===true}"
+                            >
+                                <HBox
+                                    width="90%"
+                                    class="custom-green-box"
+                                >
+                                    <Text
+                                        text="실적:{model>curr_margin}"
+                                        emptyIndicatorMode="On"
+                                    />
+                                </HBox>
+                                <HBox
+                                    width="10%"
+                                    height="100%"
+                                    class="custom-gray-box"
+                                />
+                            </HBox>
+
+                            <HBox
+                                width="80%"
+                                visible="{=${model>type2}===false}"
+                            >
+                                <HBox
+                                    width="85%"
+                                    class="custom-orange-box1"
+                                >
+                                    <Text
+                                        text="실적:{model>curr_margin}"
+                                        emptyIndicatorMode="On"
+                                    />
+                                </HBox>
+                                <HBox
+                                    width="5%"
+                                    class="custom-orange-box2"
+                                />
+                                <HBox
+                                    width="10%"
+                                    class="custom-gray-box"
+                                />
+                            </HBox>
+                        </HBox>
+
+                        <HBox width="12%">
+                            <HBox
+                                width="100%"
+                                visible="{=${model>type2}===true}"
+                                justifyContent="Center"
+                            >
+                                <core:Icon
+                                    src="sap-icon://trend-up"
+                                    class="custom-positive-state"
+                                />
+                                <Text
+                                    text="{model>margin_contrast} 전년대비"
+                                    class="custom-positive-state sapUiTinyMarginBegin"
+                                />
+                            </HBox>
+                            <HBox
+                                width="100%"
+                                visible="{=${model>type2}===false}"
+                                justifyContent="Center"
+                            >
+                                <core:Icon
+                                    src="sap-icon://trend-down"
+                                    class="custom-negative-state"
+                                />
+                                <Text
+                                    text="{model>margin_contrast} 전년대비"
+                                    class="custom-negative-state sapUiTinyMarginBegin"
+                                />
+                            </HBox>
+                        </HBox>
+
+                        <HBox width="30%">
+                            <HBox width="30%"  alignItems="Center" justifyContent="Center">
+                                <Text text="마진율(%)" width="100%"/>
+                            </HBox>
+                            <HBox width="30%" height="30%" class="custom-gray-box2" alignItems="Center" >
+                                <Text text="목표 : {model>target}" />
+                            </HBox>
+                            <HBox width="30%" height="30%" class="custom-blue-box sapUiTinyMarginBegin" alignItems="Center" visible="{=${model>type3}===true}">
+                                <Text text="실적 : {model>margin_rate}"  class="custom-blue-state"></Text>
+                            </HBox>
+
+                            <HBox width="30%" height="30%" class="custom-red-box sapUiTinyMarginBegin" alignItems="Center" visible="{=${model>type3}===false}">
+                                <Text text="실적 : {model>margin_rate}"  class="custom-negative-state"></Text>
+                            </HBox>
+                            
+                        
+                        </HBox>
+                    </HBox>
+                </VBox>
+            </Panel>
+        </VBox>
+    </HBox>
+</mvc:View>

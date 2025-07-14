@@ -1,0 +1,164 @@
+<mvc:View xmlns:launchpad="sap.ushell.ui.launchpad" controllerName="bix.ai.list.controller.PipelineWeekly"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:w="sap.ui.integration.widgets"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout" height="100%">
+    <Page class="sapUiContentPadding custom-ai-report-test-container detail" id="carouselPage" showHeader="false" showFooter="true">
+        <content>
+            <form:SimpleForm editable="true" class="sapUiSmallMarginBottom">
+                <OverflowToolbar class="custom-toolbar sapUiSmallMarginBegin sapUiSmallMarginEnd" style="Clear">
+                    <core:Icon src="sap-icon://undo" press=".onCancel" width="36px" height="36px" class="back-icon"/>
+                    <Title id="detailTitle" text="Pipeline 주간 리포트" class="custom-mg-title sapUiSmallMarginBegin" visible="{= !${ui>/edit}}"/>
+                    <ToolbarSpacer />
+                    <Select selectedKey="{dateModel>/seletedKey}" change="onChange" id="selectId5" items="{path:'dateModel>/'}">
+                        <core:Item text="{dateModel>weekName}" key="{dateModel>end_date}" />
+                    </Select>
+                    <Button text="PDF 다운로드" class="custom-text-semibold" icon="sap-icon://pdf-attachment" type="Neutral" press="onPDF" />
+                </OverflowToolbar>
+            </form:SimpleForm>
+            <VBox alignItems="Center" height="100%" width="100%">
+                <Carousel width="1000px" height="1414px" id="carousel">
+                    <VBox alignItems="Center" id="vbox1" class="page1" renderType="Bare">
+                        <HBox width="95%" justifyContent="Center" class="custom-ai-report-test-title-box">
+                            <Label text="{= (${dateModel>/weekName} || '') + ' Pipeline 주간 리포트'}" /> // 제목 대문자 수정
+                        </HBox>
+                        <!-- <HBox width="95%" height="50px" backgroundDesign="Transparent" class="custom-ai-report-test-bau-box">
+                            <Text text="DT Pipeline :" class="custom-ai-report-test-bau-text" />
+                            <Text text=" 총 사업규모 1조 7,314억  / 681건 (전주대비)" />
+                            <Text text="+36억 / +7억" class="custom-ai-report-test-bau-text" />
+                            <Text text=")" />
+                        </HBox> -->
+                        <VBox width="95%" class="sapUiNoContentPadding" height="285px">
+                            <w:Card manifest="../bix/card/aiReport/manifest.json" overflow="Default" />
+                        </VBox>
+                        <VBox width="95%" height="30px" backgroundDesign="Transparent" alignItems="Center" justifyContent="Center" class="custom-ai-report-test-box">
+                            <Text class="custom-ai-report-test-text" text="금주 DT Pipeline 변동 현황" />
+                        </VBox>
+                        <HBox width="95%">
+                            <VBox width="45%" class="custom-ai-report-test-card-box1">
+                                <HBox class="custom-ai-report-test-header-box" width="100%">
+                                    <Text text="신규등록" />
+                                    <Text text="{='(총 ' + ${newData>/iAmount} +'억원 / '  + ${newData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                </HBox>
+                                <w:Card id="newRegist" class="custom-ai-report-test-card-content" manifest="../bix/card/newRegist/manifest.json" height="230px" overflow="Default" />
+                            </VBox>
+                            <VBox width="65%" class="custom-ai-report-test-card-box2">
+                                <HBox class="custom-ai-report-test-header-box" width="100%">
+                                    <Text text="Deal Lost / Deselected" />
+                                    <Text text="{='(총 ' + ${deselData>/iAmount} +'억원 / '  + ${deselData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                </HBox>
+                                <w:Card id="deselected" class="custom-ai-report-test-card-content" manifest="../bix/card/deselected/manifest.json" height="230px" overflow="Default" />
+                            </VBox>
+                        </HBox>
+                        <VBox width="95%" height="30px" backgroundDesign="Transparent" alignItems="Center" justifyContent="Center" class="custom-ai-report-test-box">
+                            <Text class="custom-ai-report-test-text" text="금주 DT Pipeline 실적" />
+                        </VBox>
+                        <HBox width="95%">
+                            <VBox width="50%" class="custom-ai-report-test-card-box1">
+                                <HBox class="custom-ai-report-test-header-box">
+                                    <Text text="우선 협상 단계" />
+                                    <Text text="{='(총 ' + ${negoData>/iAmount} +'억원 / '  + ${negoData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                </HBox>
+                                <w:Card id="negotiationStage" class="custom-ai-report-test-card-content" manifest="../bix/card/negotiationStage/manifest.json" width="100%" height="230px" overflow="Default" />
+                            </VBox>
+                            <VBox width="50%" class="custom-ai-report-test-card-box2">
+                                <HBox class="custom-ai-report-test-header-box">
+                                    <Text text="계약 완료" />
+                                    <Text text="{='(총 ' + ${comData>/iAmount} +'억원 / '  + ${comData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                </HBox>
+                                <w:Card id="completedContract" class="custom-ai-report-test-card-content" manifest="../bix/card/completedContract/manifest.json" width="100%" height="230px" overflow="Default" />
+                            </VBox>
+                        </HBox>
+                        <VBox width="95%" height="30px" backgroundDesign="Transparent" alignItems="Center" justifyContent="Center" class="custom-ai-report-test-box">
+                            <Text class="custom-ai-report-test-text" text="상반기 입찰 예정 사업" />
+                        </VBox>
+                        <VBox width="95%">
+                            <w:Card id="scheduledBiddingProjects" class="custom-ai-report-test-card-content" manifest="../bix/card/scheduledBiddingProjects/manifest.json" width="100%" height="230px" overflow="Default" />
+                        </VBox>
+                        <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
+                            <Text text="1"/>
+                            <Image src="./resource/image/sk.svg"/>
+                        </HBox>
+
+                    // BAU Pipeline
+                    </VBox>
+                    <VBox alignItems="Center"   class="page2" renderType="Bare">
+                        <!-- <HBox width="95%" justifyContent="Center" class="custom-ai-report-test-bau-box">
+                            <Label text="Bau pipeline" />
+                            <Text text=" : 총 사업규모 3.486억 / 11건 (전주대비" />
+                            <Text text=" +12억 / +1억" class="custom-ai-report-test-bau-text" />
+                            <Text text=")" />
+                        </HBox> -->
+                        <VBox width="95%">
+                            <w:Card manifest="../bix/card/aiReportBau/manifest.json" height="280px" overflow="Default" />
+                        </VBox>
+                        <VBox width="95%" height="30px" backgroundDesign="Transparent" alignItems="Center" justifyContent="Center" class="custom-ai-report-test-box">
+                            <Text class="custom-ai-report-test-text" text="금주 Bau Pipeline 변동 현황" />
+                        </VBox>
+                        <HBox width="95%">
+                            <VBox width="45%" class="custom-ai-report-test-card-box1">
+                                <HBox class="custom-ai-report-test-header-box" width="100%">
+                                    <Text text="신규등록" />
+                                    <Text text="{='(총 ' + ${newBauData>/iAmount} +'억원 / '  + ${newBauData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                </HBox>
+                                <w:Card id="newRegistBautesttest" class="custom-ai-report-test-card-content" manifest="../bix/card/newRegistBautesttesttesttesttesttesttesttesttesttesttest/manifest.json" height="230px" overflow="Default" />
+                            </VBox>
+                            <VBox width="65%" class="custom-ai-report-test-card-box2">
+                                <HBox class="custom-ai-report-test-header-box" width="100%">
+                                    <Text text="Deal Lost / Deselected" />
+                                    <Text text="{='(총 ' + ${deselBauData>/iAmount} +'억원 / '  + ${deselBauData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                </HBox>
+                                <w:Card id="deselectedBau" class="custom-ai-report-test-card-content" manifest="../bix/card/deselectedBau/manifest.json" height="230px" overflow="Default" />
+                            </VBox>
+                        </HBox>
+                        <VBox width="95%" height="30px" backgroundDesign="Transparent" alignItems="Center" justifyContent="Center" class="custom-ai-report-test-box">
+                            <Text class="custom-ai-report-test-text" text="금주 Bau Pipeline 실적" />
+                        </VBox>
+                        <HBox width="95%">
+                            <VBox width="50%" class="custom-ai-report-test-card-box1">
+                                <HBox class="custom-ai-report-test-header-box">
+                                    <Text text="우선 협상 단계" />
+                                    <Text text="{='(총 ' + ${negoBauData>/iAmount} +'억원 / '  + ${negoBauData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                </HBox>
+                                <w:Card id="negotiationStagebau" class="custom-ai-report-test-card-content" manifest="../bix/card/negotiationStageBau/manifest.json" width="100%" height="230px" overflow="Default" />
+                            </VBox>
+                            <VBox width="50%" class="custom-ai-report-test-card-box2">
+                                <HBox class="custom-ai-report-test-header-box">
+                                    <Text text="계약완료" />
+                                    <Text text="{='(총 ' + ${comBauData>/iAmount} +'억원 / '  + ${comBauData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                </HBox>
+                                <w:Card id="completedContractbau" class="custom-ai-report-test-card-content" manifest="../bix/card/completedContractBau/manifest.json" width="100%" height="230px" overflow="Default" />
+                            </VBox>
+                        </HBox>
+                        <VBox width="95%" height="30px" backgroundDesign="Transparent" alignItems="Center" justifyContent="Center" class="custom-ai-report-test-box">
+                            <Text class="custom-ai-report-test-text" text="차주 입찰 예정 사업" />
+                        </VBox>
+                        <VBox width="95%">
+                            <w:Card id="scheduledBiddingProjectsbau" class="custom-ai-report-test-card-content" manifest="../bix/card/scheduledBiddingProjectsBau/manifest.json" height="140px" overflow="Default" />
+                        </VBox>
+                        <VBox width="95%">
+                            <w:Card id="aiInsightBau" class="sapUiSmallMarginTop" manifest="../bix/card/aiInsightBau/manifest.json" height="180px" overflow="Default" />
+                        </VBox>
+                        <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
+                            <Text text="2"/>
+                            <Image src="./resource/image/sk.svg"/>
+                        </HBox>
+                    </VBox>
+                </Carousel>
+            </VBox>
+        </content>
+        <footer>
+            <OverflowToolbar style="Clear" class="sapUiTinyMargin custom-mg-footer">
+                <ToolbarSpacer />
+                <Button class="custom-mg-btn" icon="sap-icon://cancel" text="{i18n>cancel}" tooltip="{i18n>cancel}" press=".onCancel">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+            </OverflowToolbar>
+        </footer>
+    </Page>
+</mvc:View>

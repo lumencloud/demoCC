@@ -1,0 +1,527 @@
+<mvc:View
+    controllerName="bix.card.planSMTypeChartContainer.card"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:microchart="sap.suite.ui.microchart"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    width="100%"
+    height="100%"
+    displayBlock="true"
+>
+    <Panel id="flexBox" class="sapUiTinyMarginTop"
+       backgroundDesign="Solid">
+        <OverflowToolbar style="Clear" width="100%" height="2.5rem" class="sapUiMediumMarginBottom">
+            <ToolbarSpacer />
+
+            <SegmentedButton
+                id="detailSelect"
+                selectionChange=".onUiChange"
+                selectedKey="{uiModel>/key}"
+                class="custom-detail-select-btn"
+                items="{path: 'selectModel>/'}">
+                    <items>
+                        <SegmentedButtonItem key="{selectModel>key}" text="{selectModel>name}"/>
+                    </items>
+            </SegmentedButton>
+        </OverflowToolbar>
+        <HBox justifyContent="Center" width="100%" visible='{=${uiModel>/key}==="Account"}'>
+
+        <VBox
+            id="vBox2"
+            items="{model2>/}"
+            width="100%"
+            gap="5px"
+            
+        >
+           
+            <items>
+            <Panel
+                class="custom-panel-repeat"
+                width="100%"
+            >
+                <VBox
+                    justifyContent="Center"
+                    alignContent="Center"
+                    alignItems="Center"                    
+                >
+                    <HBox
+                        width="100%"
+                        alignContent="Center"
+                        alignItems="Center"
+                    >
+                        <VBox
+                            width="15%"
+                            justifyContent="Start"
+                        >
+                            <Title text="{model2>org_name}" />
+                        </VBox>
+                        <VBox width="30%">
+                            <VBox
+                                width="100%"
+                                height="80%"
+                                class="dotted-box"
+                            >
+                                <VBox
+                                    class="dotted-cross1"
+                                />
+                                <VBox class="dotted-cross2" />
+                                <VBox class="cross" />
+                                
+                                <HBox width="100%">
+                                    <HBox
+                                        width="20%"
+                                        alignItems="Center"
+                                    >
+                                        <Text
+                                            text="확보"
+                                            width="100%"
+                                        />
+                                    </HBox>
+
+                                    <VBox
+                                        width="100%"
+                                        class="custom-base-box"
+                                        visible="{=${model2>sale_type}===true}"
+                                    >
+                                        <HBox
+                                            width="100%"
+                                            height="100%"
+                                            alignItems="Center"
+                                        >
+                                            <HBox
+                                                width="{model2>sale_size}"
+                                                height="100%"
+                                                class="custom-sale-box sky"
+                                            />
+                                        </HBox>
+
+                                        <HBox
+                                            class="custom-box-text sky"
+                                            width="100%"
+                                        >
+                                            <Text
+                                                text="실적 : {model2>curr_sale}"
+                                                emptyIndicatorMode="On"
+                                            />
+                                        </HBox>
+                                    </VBox>
+
+                                    <VBox
+                                        width="100%"
+                                        class="custom-base-box"
+                                        visible="{=${model2>sale_type}===false}"
+                                    >
+                                        <HBox
+                                            width="100%"
+                                            height="100%"
+                                            alignItems="Center"
+                                        >
+                                            <HBox
+                                                width="{model2>sale_size}"
+                                                height="100%"
+                                                class="custom-sale-box coral"
+                                            />
+                                            <HBox
+                                                width="{model2>sale_size2}"
+                                                height="100%"
+                                                class="custom-sale-box coral2"
+                                            />
+                                        </HBox>
+
+                                        <HBox
+                                            class="custom-box-text coral"
+                                            width="100%"
+                                        >
+                                            <Text
+                                                text="실적 : {model2>curr_sale}"
+                                                emptyIndicatorMode="On"
+                                            />
+                                        </HBox>
+                                    </VBox>
+                                </HBox>
+
+                                
+
+                                
+                            </VBox>
+                        </VBox>
+
+                        <VBox width="20%" class="sapUiSmallMarginBegin">
+                            <VBox
+                                width="80%"
+                                height="80%"
+                            >
+                                <HBox class="custom-sale-margin-text-box" justifyContent="Center">
+                                    <Text text="목표 : {model2>sale_target} / 잔여 : {model2>sale_difference}" width="100%" textAlign="Center"/>
+                                </HBox>                                
+                                
+                            </VBox>
+                        </VBox>
+
+                        <VBox width="15%" class="sapUiSmallMarginBegin">
+                            <VBox
+                                width="80%"
+                                height="80%"
+                            >
+                                <HBox width="100%" class="custom-sale-margin-text-box2 blue" visible="{=${model2>yoy_sale_type}===true}" justifyContent="Center">
+                                    <Text text="전년대비" textAlign="Center"/>
+                                    <Text class="custom-text-bold sapUiTinyMarginBegin" text="{model2>yoy_sale_rate}" textAlign="Center"/>
+                                </HBox>
+
+                                <HBox class="custom-sale-margin-text-box2 red" visible="{=${model2>yoy_sale_type}===false}" justifyContent="Center">
+                                    <Text text="전년대비" textAlign="Center"/>
+                                    <core:Icon src="sap-icon://up" class="sapUiTinyMarginBegin"/>
+                                    <Text class="custom-text-bold " text="{model2>yoy_sale_rate}" textAlign="Center"/>
+                                </HBox>                               
+
+                            </VBox>
+                        </VBox>
+
+
+                        <HBox width="25%" class="sapUiSmallMarginBegin" alignItems="Center">
+                            <VBox
+                                width="100%"
+                                height="80%"
+                                class="sapUiTinyMarginBegin"
+                            >
+                                <HBox width="100%" class="custom-sale-margin-text-box3 white" justifyContent="Center">
+                                    <Text text="계획비 : {model2>planRatio}" textAlign="Center"/>                                    
+                                </HBox>      
+
+                                <HBox height="0.5rem">
+                                    <HBox width="20%" />
+                                    <HBox width="80%" />
+                                </HBox>
+
+                                <HBox width="100%" class="custom-sale-margin-text-box3 blue" visible="{=${model2>yoy_sale_type}===true}" justifyContent="Center">
+                                    <Text text="전년비 : {model2>yoy_sale_rate}" textAlign="Center"/>
+                                </HBox>
+
+                                <HBox width="100%" class="custom-sale-margin-text-box3 red" visible="{=${model2>yoy_sale_type}===false}" justifyContent="Center">
+                                    <Text text="전년비 : " textAlign="Center"/>
+                                    <core:Icon src="sap-icon://up" class="sapUiTinyMarginBegin"/>
+                                    <Text text="{model2>yoy_sale_rate}" textAlign="Center"/>
+                                </HBox>
+
+                            </VBox>
+                        </HBox>
+                    </HBox>
+                </VBox>
+            </Panel>
+            </items>
+        </VBox>
+
+        </HBox>
+        <HBox visible='{=${uiModel>/key}==="org"}' justifyContent="Center">
+        
+        <VBox
+            id="vBox"
+            items="{model>/}"
+            width="100%"
+            gap="5px"
+        >
+            <items>
+            <Panel
+                class="custom-panel-repeat"
+                width="100%"
+            >
+                <VBox
+                    justifyContent="Center"
+                    alignContent="Center"
+                    alignItems="Center"                    
+                >
+                    <HBox
+                        width="100%"
+                        alignContent="Center"
+                        alignItems="Center"
+                    >
+                        <VBox
+                            width="15%"
+                            justifyContent="Start"
+                        >
+                            <Title text="{model>org_name}" />
+                        </VBox>
+                        <VBox width="30%">
+                            <VBox
+                                width="100%"
+                                height="80%"
+                                class="dotted-box"
+                            >
+                                <VBox
+                                    class="dotted-cross1"
+                                />
+                                <VBox class="dotted-cross2" />
+
+                                <HBox class="marginRate-talking-bar">
+                                        <VBox width="{model>talkingRate}" />
+                                        <VBox class="marginRate-talking blue"  alignItems="Center" justifyContent="Center"  visible="{=${model>marginRate_type}===true}">
+                                            <Text text="{model>marginRate}" textAlign="Center"/>
+                                        </VBox>
+                                        <VBox class="marginRate-talking red"  alignItems="Center" justifyContent="Center"  visible="{=${model>marginRate_type}===false}">
+                                            <HBox visible="{=${model>marginRate_type}===false}" justifyContent="Center" alignItems="Center">
+                                                <core:Icon src="sap-icon://up"/>
+                                                <Text text="{model>marginRate}"/>
+                                            </HBox>
+                                        </VBox>
+                                </HBox>
+
+                                <HBox  visible="{=${model>marginRate_type}===true}" class="marginRate-circle-bar">
+                                    <VBox width="{model>circleRate}" />
+                                    <VBox class="marginRate-circle blue" />
+                                </HBox>
+
+                                <HBox  visible="{=${model>marginRate_type}===false}" class="marginRate-circle-bar">
+                                    <VBox width="{model>circleRate}" />
+                                    <VBox class="marginRate-circle red" />
+                                </HBox>
+
+                                <HBox width="100%">
+                                    <HBox
+                                        width="20%"
+                                        alignItems="Center"
+                                    >
+                                        <Text
+                                            text="확보"
+                                            width="100%"
+                                        />
+                                    </HBox>
+
+                                    <VBox
+                                        width="100%"
+                                        class="custom-base-box"
+                                        visible="{=${model>sale_type}===true}"
+                                    >
+                                        <HBox
+                                            width="100%"
+                                            height="100%"
+                                            alignItems="Center"
+                                        >
+                                            <HBox
+                                                width="{model>sale_size}"
+                                                height="100%"
+                                                class="custom-sale-box sky"
+                                            />
+                                        </HBox>
+
+                                        <HBox
+                                            class="custom-box-text sky"
+                                            width="100%"
+                                        >
+                                            <Text
+                                                text="실적 : {model>curr_sale}"
+                                                emptyIndicatorMode="On"
+                                            />
+                                        </HBox>
+                                    </VBox>
+
+                                    <VBox
+                                        width="100%"
+                                        class="custom-base-box"
+                                        visible="{=${model>sale_type}===false}"
+                                    >
+                                        <HBox
+                                            width="100%"
+                                            height="100%"
+                                            alignItems="Center"
+                                        >
+                                            <HBox
+                                                width="{model>sale_size}"
+                                                height="100%"
+                                                class="custom-sale-box coral"
+                                            />
+                                            <HBox
+                                                width="{model>sale_size2}"
+                                                height="100%"
+                                                class="custom-sale-box coral2"
+                                            />
+                                        </HBox>
+
+                                        <HBox
+                                            class="custom-box-text coral"
+                                            width="100%"
+                                        >
+                                            <Text
+                                                text="실적 : {model>curr_sale}"
+                                                emptyIndicatorMode="On"
+                                            />
+                                        </HBox>
+                                    </VBox>
+                                </HBox>
+
+                                <HBox height="0.5rem">
+                                    <HBox width="20%" />
+                                    <HBox width="80%" />
+                                </HBox>
+
+                                <HBox width="100%">
+                                    <HBox
+                                        width="20%"
+                                        alignItems="Center"
+                                    >
+                                        <Text
+                                            text="마진"
+                                            width="100%"
+                                        />
+                                    </HBox>
+
+                                    <VBox
+                                        width="100%"
+                                        class="custom-base-box"
+                                        visible="{=${model>margin_type}===true}"
+                                    >
+                                        <HBox
+                                            width="100%"
+                                            height="100%"
+                                            alignItems="Center"
+                                        >
+                                            <HBox
+                                                width="{model>margin_size}"
+                                                height="100%"
+                                                class="custom-sale-box sky"
+                                            />
+                                        </HBox>
+
+                                        <HBox
+                                            class="custom-box-text sky"
+                                            width="100%"
+                                        >
+                                            <Text
+                                                text="실적 : {model>curr_margin}"
+                                                emptyIndicatorMode="On"
+                                            />
+                                        </HBox>
+                                    </VBox>
+
+                                    <VBox
+                                        width="100%"
+                                        class="custom-base-box"
+                                        visible="{=${model>margin_type}===false}"
+                                    >
+                                        <HBox
+                                            width="100%"
+                                            height="100%"
+                                            alignItems="Center"
+                                        >
+                                            <HBox
+                                                width="{model>margin_size}"
+                                                height="100%"
+                                                class="custom-sale-box coral"
+                                            />
+                                            <HBox
+                                                width="{model>margin_size2}"
+                                                height="100%"
+                                                class="custom-sale-box coral2"
+                                            />
+                                        </HBox>
+
+                                        <HBox
+                                            class="custom-box-text coral"
+                                            width="100%"
+                                        >
+                                            <Text
+                                                text="실적 : {model>curr_margin}"
+                                                emptyIndicatorMode="On"
+                                            />
+                                        </HBox>
+                                    </VBox>
+                                </HBox>
+                            </VBox>
+                        </VBox>
+
+                        <VBox width="20%" class="sapUiSmallMarginBegin">
+                            <VBox
+                                width="80%"
+                                height="80%"
+                            >
+                                <HBox class="custom-sale-margin-text-box" justifyContent="Center">
+                                    <Text text="목표 : {model>sale_target} / 잔여 : {model>sale_difference}" width="100%" textAlign="Center"/>
+                                </HBox>
+
+                                <HBox height="0.5rem">
+                                    <HBox width="20%" />
+                                    <HBox width="80%" />
+                                </HBox>
+
+                               <HBox class="custom-sale-margin-text-box" justifyContent="Center">
+                                    <Text text="목표 : {model>margin_target} / 잔여 : {model>margin_difference}" width="100%" textAlign="Center"/>
+                                </HBox>
+                                
+                            </VBox>
+                        </VBox>
+
+                        <VBox width="15%" class="sapUiSmallMarginBegin">
+                            <VBox
+                                width="80%"
+                                height="80%"
+                            >
+                                <HBox width="100%" class="custom-sale-margin-text-box2 blue" visible="{=${model>yoy_sale_type}===true}" justifyContent="Center">
+                                    <Text text="전년대비" textAlign="Center"/>
+                                    <Text class="custom-text-bold sapUiTinyMarginBegin" text="{model>yoy_sale_rate}" textAlign="Center"/>
+                                </HBox>
+
+                                <HBox class="custom-sale-margin-text-box2 red" visible="{=${model>yoy_sale_type}===false}" justifyContent="Center">
+                                    <Text text="전년대비" textAlign="Center"/>
+                                    <core:Icon src="sap-icon://up" class="sapUiTinyMarginBegin"/>
+                                    <Text class="custom-text-bold " text="{model>yoy_sale_rate}" textAlign="Center"/>
+                                </HBox>
+
+                                <HBox height="0.5rem">
+                                    <HBox width="20%" />
+                                    <HBox width="80%" />
+                                </HBox>
+
+                                <HBox width="100%" class="custom-sale-margin-text-box2 blue" visible="{=${model>yoy_margin_type}===true}" justifyContent="Center">
+                                    <Text text="전년대비" textAlign="Center"/>
+                                    <Text class="custom-text-bold sapUiTinyMarginBegin" text="{model>yoy_margin_rate}" textAlign="Center"/>
+                                </HBox>
+
+                                <HBox class="custom-sale-margin-text-box2 red" visible="{=${model>yoy_margin_type}===false}" justifyContent="Center">
+                                    <Text text="전년대비" textAlign="Center"/>
+                                    <core:Icon src="sap-icon://up" class="sapUiTinyMarginBegin"/>
+                                    <Text class="custom-text-bold" text="{model>yoy_margin_rate}" textAlign="Center"/>
+                                </HBox>
+
+                               
+                                
+                            </VBox>
+                        </VBox>
+
+
+                        <HBox width="25%" class="sapUiSmallMarginBegin" alignItems="Center">
+                            <VBox
+                                width="100%"
+                                height="80%"
+                                class="sapUiTinyMarginBegin"
+                            >
+                                <HBox width="100%" class="custom-sale-margin-text-box3 white" justifyContent="Center">
+                                    <Text text="계획비 : {model>planRatio}" textAlign="Center"/>                                    
+                                </HBox>      
+
+                                <HBox height="0.5rem">
+                                    <HBox width="20%" />
+                                    <HBox width="80%" />
+                                </HBox>
+
+                                <HBox width="100%" class="custom-sale-margin-text-box3 blue" visible="{=${model>yoy_sale_type}===true}" justifyContent="Center">
+                                    <Text text="전년비 : {model>yoy_sale_rate}" textAlign="Center"/>
+                                </HBox>
+
+                                <HBox class="custom-sale-margin-text-box3 red" visible="{=${model>yoy_sale_type}===false}" justifyContent="Center">
+                                    <Text text="전년비 : " textAlign="Center"/>
+                                    <core:Icon src="sap-icon://up" class="sapUiTinyMarginBegin"/>
+                                    <Text text="{model>yoy_sale_rate}" textAlign="Center"/>
+                                </HBox>
+
+                            </VBox>
+                        </HBox>
+                    </HBox>
+                </VBox>
+            </Panel>
+            </items>
+            </VBox>
+            </HBox>
+    </Panel>
+</mvc:View>

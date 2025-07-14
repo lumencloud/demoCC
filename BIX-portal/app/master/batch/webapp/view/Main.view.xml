@@ -1,0 +1,177 @@
+<mvc:View 
+    id="Main"
+    xmlns:simple="sap.gantt.simple" controllerName="bix.master.batch.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    busyIndicatorDelay="0" width="100%">
+    <Page class="sapUiContentPadding" showFooter="true" showHeader="false">
+        <content>
+            <form:SimpleForm  editable="true" class="custom-search-container">
+                <form:content>
+                    <HeaderContainer id="headerContainer" content="{categoryModel>/}" showDividers="false" width="100%" class="depth-container sapUiSmallMarginBottom">
+                        <!-- <ToggleButton text="월 배치" id="PLButton" press=".onTogglePress" class="custom-depth-btn sapUiTinyMarginEnd" pressed="true"/>
+                        <ToggleButton text="주간 Pipeline" press=".onTogglePress" class="custom-depth-btn sapUiTinyMarginEnd" /> -->
+                        <ToggleButton text="{categoryModel>text}" press=".onTogglePress($event,${categoryModel>key})" 
+                            pressed="{= ${searchModel>/category} === ${categoryModel>key}}"
+                            class="custom-pl-depth-btn"/>
+                    
+                        <layoutData>
+                            <layout:GridData span="XL12 L12 M12 S12" />
+                        </layoutData>
+                    </HeaderContainer>
+
+                    <HBox class="custom-search-field-box" alignItems="Center">
+                        <Label text="기간" labelFor="dateRange" wrapping="false" tooltip="기간" />
+                        <DatePicker id="datePicker" fieldGroupIds="Search,Required" class="sapUiSmallarginEnd"
+                            value="{searchModel>/yearMonth}"
+                            change=".onDateChange" displayFormat="yyyy" valueFormat="yyyy"/>
+                        <layoutData>
+                            <layout:GridData span="XL3 L3 M3 S12" />
+                        </layoutData>
+                    </HBox>
+
+                    <HBox class="custom-search-field-box" alignItems="Center">
+                        <Label text="버전" labelFor="version" wrapping="false" tooltip="버전" />
+                        <ComboBox id="version" selectedKey="{searchModel>/ver}" width="100%" showClearIcon="true"
+                            items="{verModel>/}">
+                            <core:Item key="{verModel>ver}" text="{verModel>ver}" />
+                        </ComboBox>
+                        <layoutData>
+                            <layout:GridData span="XL3 L3 M3 S12" />
+                        </layoutData>
+                    </HBox>
+                    
+                    <HBox width="100%" justifyContent="End" class="custom-search-btn-container">
+                        <Button text="신규 배치 실행" type="Accept" class="custom-mg-small-btn" 
+                            icon="sap-icon://media-play" press=".onExecuteNewBatch"/>
+                        <Button id="SearchButton" text="조회" type="Accept" press=".onSearch" class="custom-mg-small-btn"  icon="sap-icon://search"/>
+                        <layoutData>
+                            <layout:GridData span="XL12 L12 M12 S12" />
+                        </layoutData>
+                    </HBox>
+                </form:content>
+            </form:SimpleForm>
+        
+            <Panel width="100%" height="calc(100% - 13rem)" class="sapUiSmallMarginTop" >
+                <table:Table id="batchTable"
+                    class="custom-mg-uiTable custom-selection-uiTable custom-table-rounding-border" 
+                    selectionMode="MultiToggle" 
+                    selectionBehavior="Row" 
+                    busyIndicatorDelay="0"
+                    rowActionCount="1"
+                    rowSelectionChange=".onRowSelectionChange">
+                    <table:extension>
+                        <OverflowToolbar width="100%" height="3rem" style="Clear">                                
+                            <ToolbarSpacer />
+                            <Button text="배치 재실행" type="Accept" class="custom-mg-small-btn" enabled="{selectModel>/selectedIndices}"
+                                press=".onExecuteReBatch" visible="{= ${searchModel>/category} === 'month'}" />
+                            
+                            <Select selectedKey="{searchModel>/success_yn}" 
+                                change=".onSelectionChange"
+                                items="{statusModel>/}" 
+                                class="custom-mg-select">
+                                <core:Item key="{statusModel>key}" text="{statusModel>name}" />
+                                <layoutData>
+                                    <layout:GridData span="XL2 L2 M2 S12" />
+                                </layoutData>
+                            </Select>
+                        </OverflowToolbar>
+                        <ToolbarSpacer />
+                    </table:extension>
+
+                    <table:rowMode>
+                        <rowmodes:Auto />
+                    </table:rowMode>
+
+                    <table:columns>
+                        <table:Column width="6rem" hAlign="Center" autoResizable="true">
+                            <Label text="상태" wrapping="true"/>
+                            <table:template>
+                                <Button 
+                                    visible="{= %{confirm_yn} !== null }" 
+                                    text="{= %{confirm_yn} === true ? '완료' : '확인'}" 
+                                    press=".onConfirm" enabled="{= !%{confirm_yn}}"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="6rem" hAlign="Center" autoResizable="true">
+                            <Label text="성공 여부" wrapping="true"/>
+                            <table:template>
+                                <core:Icon 
+                                    src="{= %{success_yn} === true ? 'sap-icon://accept' : 
+                                        %{success_yn} === false ? 'sap-icon://decline' : null}" 
+                                    color="{= %{success_yn} === true ? 'green' : 
+                                        %{success_yn} === false ? 'red' : null}" /> 
+                            </table:template>
+                        </table:Column>
+                    
+                        <table:Column width="7rem" hAlign="Center" autoResizable="true">
+                            <Label text="버전"   wrapping="true"/>
+                            <table:template>
+                                <Text text="{ver}" wrapping="false" tooltip="{ver}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="8rem" hAlign="Center" autoResizable="true">
+                            <Label text="인터페이스"   wrapping="true"/>
+                            <table:template>
+                                <Text text="{if_step}" wrapping="false" tooltip="{if_step}" />
+                            </table:template>
+                        </table:Column>
+
+                        <!-- <table:Column width="25%" hAlign="Center" autoResizable="true">
+                            <Label text="데이터 출처"   wrapping="true"/>
+                            <table:template>
+                                <Text text="{source}" wrapping="false" tooltip="{source}" />
+                            </table:template>
+                        </table:Column> -->
+
+                        <table:Column width="25%" hAlign="Center" autoResizable="true">
+                            <Label text="대상테이블"   wrapping="true"/>
+                            <table:template>
+                                <Text text="{table_name}" wrapping="false" tooltip="{table_name}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="50%" hAlign="Center" autoResizable="true">
+                            <Label text="프로시저명"   wrapping="true"/>
+                            <table:template>
+                                <Text text="{procedure_name}" wrapping="false" tooltip="{procedure_name}" />
+                            </table:template>
+                        </table:Column>
+
+                        <!-- <table:Column width="auto" hAlign="Center" autoResizable="true" >
+                            <Label text="내용"   wrapping="true"/>
+                            <table:template>
+                                <VBox width="100%" height="100%" >
+                                    <Text text="{log}"  wrapping="false" />
+                                </VBox>
+                            </table:template>
+                        </table:Column> -->
+
+                        <!-- <table:Column width="8rem" hAlign="Center" autoResizable="true" >
+                            <Label text="건수"    wrapping="true"/>
+                            <table:template>
+                                <VBox width="100%" height="100%" >
+                                    <Text text="{row_count}"  wrapping="false" tooltip="{row_count}"/>
+                                </VBox>
+                            </table:template>
+                        </table:Column> -->
+                    </table:columns>
+
+                    <table:rowActionTemplate>
+                        <table:RowAction>
+                            <table:RowActionItem type="Navigation" press=".onDetail" />
+                        </table:RowAction>
+                    </table:rowActionTemplate>
+                </table:Table>
+            </Panel>
+        </content>
+    </Page>
+</mvc:View>

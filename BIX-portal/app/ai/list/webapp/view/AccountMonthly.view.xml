@@ -1,0 +1,201 @@
+<mvc:View xmlns:launchpad="sap.ushell.ui.launchpad" controllerName="bix.ai.list.controller.AccountMonthly"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:w="sap.ui.integration.widgets"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout" height="100%">
+    <Page class="sapUiContentPadding custom-ai-report-test-container detail" id="workpagesBuilder" showHeader="false" showFooter="true">
+        <content>
+            <!-- <form:SimpleForm editable="true" class="sapUiSmallMarginBottom">
+                <OverflowToolbar class="custom-toolbar sapUiSmallMarginBegin sapUiSmallMarginEnd" style="Clear">
+                    <core:Icon src="sap-icon://undo" press=".onCancel" width="36px" height="36px" class="back-icon"/>
+                    <Title id="detailTitle" text="Account 월마감 리포트" class="custom-mg-title sapUiSmallMarginBegin" visible="{= !${ui>/edit}}"/>
+                    <ToolbarSpacer/>
+                    <HBox width="200px" alignContent="Center" alignItems="Center" justifyContent="Center" class="custom-ai-report-box">
+                        <Select items="{path:'selectModel>/'}" change="onChange" selectedKey="{selectModel>/selectedKey}">
+                            <core:Item key="{selectModel>org_id}" text="{selectModel>org_name}"></core:Item>
+                        </Select>
+                    </HBox>
+                    <HBox width="200px" alignContent="Center" alignItems="Center" justifyContent="Center" class="custom-ai-report-box">
+                        <DatePicker id="datePicker" class="sapUiSmallarginEnd" fieldGroupIds="Search,Required" value="{
+                            path: 'ui>/date',
+                            type: 'sap.ui.model.type.Date',
+                            formatOptions: {
+                                format: 'yyyyMM',
+                                pattern: 'yyyy-MM'
+                            }
+                        }" change="onDateChange"/>
+
+                    </HBox>
+                    <Button text="PDF 다운로드" class="custom-text-semibold" icon="sap-icon://pdf-attachment" type="Neutral" press="onPDF" visible="{= ${envModel>/env} === 'QA' ? false : true}"/>
+                </OverflowToolbar>
+            </form:SimpleForm> -->
+            <VBox alignItems="Center" height="100%" width="100%">
+                <Carousel width="1000px" height="1457px" id="carousel" pageChanged="onPageChanged">
+                    <VBox id="vbox1" class="ai-report-page">
+                        <HBox class="ai-report-page-header" justifyContent="End">
+                            <Text text=""/>
+                        </HBox>
+                        <HBox justifyContent="SpaceBetween" renderType="Bare">
+                            <VBox width="33%" gap="5px">
+                                <w:Card manifest="../bix/card/deliveryMonthlyTitle1/manifest.json" height="380px" overflow="Default"/>
+                                <w:Card manifest="../bix/card/deliveryMonthlyContent1_2/manifest.json" height="500px" overflow="Default"/>
+                                <VBox class="custom-ai-report-test-card-container border-gray" height="360px">
+                                    <Title text="전년동기 대비 진척도 Gap 비교" width="100%" textAlign="Center" class="bottom-spacing"/>
+                                    <w:Card manifest="../bix/card/deliveryMonthlyContent1_3/manifest.json" height="330px" overflow="Default"/>
+                                </VBox>
+                            </VBox>
+                            <VBox width="66%">
+                                <w:Card manifest="../bix/card/deliveryMonthlyTitle2/manifest.json" height="160px" overflow="Default"/>
+                                <w:Card manifest="../bix/card/deliveryMonthlyContent1_1/manifest.json" height="1080px" overflow="Default"/>
+                            </VBox>
+                        </HBox>
+                        <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
+                            <Text text="1"/>
+                            <Image src="./resource/image/sk.svg"/>
+                        </HBox>
+                    </VBox>
+                    <VBox alignItems="Center" renderType="Bare" class="ai-report-page"  >
+                        <HBox class="ai-report-page-header" justifyContent="End">
+                            <Text text="{ui>/month}월 Monthly Report"/>
+                        </HBox>
+                        <VBox width="100%" class="custom-ai-report-test-card-container" height="500px">
+                            <Title text="그림 1. Account 별 매출 현황"/>
+                            <w:Card manifest="../bix/card/allMonthlyContent2_1/manifest.json" height="440px" overflow="Default"/>
+                        </VBox>
+                        <VBox width="100%" class="custom-ai-report-test-card-container" height="390px">
+                            <Title text="그림 2. 당월 본부 별 수주 매출 현황"/>
+                            <VBox alignItems="Center" height="330px">
+                                <w:Card manifest="../bix/card/acountMonthlyContent2_2/manifest.json" overflow="Default"/>
+                            </VBox>
+                        </VBox>
+                        <VBox width="100%" class="custom-ai-report-test-card-container" height="500px">
+                            <Title text="그림 3. 부문 SG&amp;A 상세"/>
+                            <w:Card manifest="../bix/card/deliveryMonthlyContent2_4/manifest.json" height="440px" overflow="Default"/>
+                        </VBox>
+                        <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
+                            <Text text="2"/>
+                            <Image src="./resource/image/sk.svg"/>
+                        </HBox>
+                    </VBox>
+                    <VBox alignItems="Center" renderType="Bare" class="ai-report-page"  >
+                        <w:Card manifest="../bix/card/allMonthlyContent2_1/manifest.json" height="500px" overflow="Default"/>
+                        <w:Card manifest="../bix/card/allMonthlyContent2_2/manifest.json" height="500px" overflow="Default"/>
+                        <w:Card manifest="../bix/card/deliveryMonthlyContent2_4/manifest.json" height="390px" overflow="Default"/>
+                        <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
+                            <Text text="2"/>
+                            <Image src="./resource/image/sk.svg"/>
+                        </HBox>
+                    </VBox>
+                    <VBox alignItems="Center" renderType="Bare" class="ai-report-page"  >
+                        <HBox class="ai-report-page-header" justifyContent="End">
+                            <Text text="{ui>/month}월 Monthly Report"/>
+                        </HBox>
+                        <HBox width="100%" class="content-layout-1-2" justifyContent="SpaceBetween">
+                            <w:Card manifest="../bix/card/deliveryMonthlyContent3_1/manifest.json" height="520px" overflow="Default"/>
+                            <w:Card manifest="../bix/card/deliveryMonthlyContent3_2/manifest.json" height="520px" overflow="Default"/>
+                        </HBox>
+                        <VBox width="100%" class="custom-ai-report-test-card-container" height="460px">
+                            <Title text="그림 4. 당해년도 실적 추정"/>
+                            <w:Card manifest="../bix/card/deliveryMonthlyContent3_3/manifest.json" overflow="Default" height="400px"/>
+                        </VBox>
+                        <HBox width="100%" class="content-layout-1-1" justifyContent="SpaceBetween">
+                            <VBox class="custom-ai-report-test-card-container" height="300px">
+                                <Title text="그림 5. Deal Stage 별 Pipiline 현황"/>
+                                <w:Card manifest="../bix/card/allMonthlyContent3_4/manifest.json" overflow="Default" height="260px"/>
+                            </VBox>
+                            <VBox class="custom-ai-report-test-card-container" height="300px">
+                                <Title text="그림 6. 수주 금액 별 Pipeline 현황"/>
+                                <w:Card manifest="../bix/card/allMonthlyContent3_5/manifest.json" overflow="Default" height="260px"/>
+                            </VBox>
+                        </HBox>
+                        <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
+                            <Text text="3"/>
+                            <Image src="./resource/image/sk.svg"/>
+                        </HBox>
+                    </VBox>
+                    <VBox alignItems="Center" id="vbox4" class="ai-report-page" renderType="Bare" height="100%">
+                        <HBox class="ai-report-page-header" justifyContent="End">
+                            <Text text="{ui>/month}월 Monthly Report"/>
+                        </HBox>
+                        <VBox width="100%" height="360px" class="custom-ai-report-test-card-container" backgroundDesign="Transparent">
+                            <Title text="표 2. 당월 Pipeline 실적" />
+                            <HBox width="100%" class="inner-spacing">
+                                <VBox width="50%" class="custom-ai-report-test-card-box1">
+                                    <HBox class="custom-ai-report-test-header-box">
+                                        <Text text="우선 협상 단계" />
+                                        <Text text="{='(총 ' + ${negoData>/iAmount} +'억원 / '  + ${negoData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                    </HBox>
+                                    <w:Card id="negotiationStage" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyNegotiationStage/manifest.json" width="100%" height="255px" overflow="Default" />
+                                </VBox>
+                                <VBox width="50%" class="custom-ai-report-test-card-box2">
+                                    <HBox class="custom-ai-report-test-header-box">
+                                        <Text text="계약 완료" />
+                                        <Text text="{='(총 ' + ${comData>/iAmount} +'억원 / '  + ${comData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                    </HBox>
+                                    <w:Card id="completedContract" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyCompletedContract/manifest.json" width="100%" height="255px" overflow="Default" />
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                        <VBox width="100%" height="360px" backgroundDesign="Transparent" class="custom-ai-report-test-card-container">
+                            <Title text="표 3. 당월 Pipeline 변동 현황" />
+                            <HBox width="100%">
+                                <VBox width="45%" class="custom-ai-report-test-card-box1">
+                                    <HBox class="custom-ai-report-test-header-box" width="100%">
+                                        <Text text="신규등록" />
+                                        <Text text="{='(총 ' + ${newData>/iAmount} +'억원 / '  + ${newData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                    </HBox>
+                                    <w:Card id="newRegist" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyNewRegist/manifest.json" height="255px" overflow="Default" />
+                                </VBox>
+                                <VBox width="65%" class="custom-ai-report-test-card-box2">
+                                    <HBox class="custom-ai-report-test-header-box" width="100%">
+                                        <Text text="Deal Lost / Deselected" />
+                                        <Text text="{='(총 ' + ${deselData>/iAmount} +'억원 / '  + ${deselData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                    </HBox>
+                                    <w:Card id="deselected" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyDeselected/manifest.json" height="255px" overflow="Default" />
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                        <VBox width="100%" height="360px" backgroundDesign="Transparent" class="custom-ai-report-test-card-container">
+                            <Title text="표 4. 입찰 예정 사업" />
+                            <VBox width="100%">
+                                <w:Card id="scheduledBiddingProjects" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyScheduledBiddingProjects/manifest.json" width="100%" height="255px" overflow="Default" />
+                            </VBox>
+                        </VBox>
+                        <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
+                            <Text text="4"/>
+                            <Image src="./resource/image/sk.svg"/>
+                        </HBox>
+                    </VBox>
+                    <VBox alignItems="Center"   class="ai-report-page" renderType="Bare" height="100%">
+                        <HBox class="ai-report-page-header" justifyContent="End">
+                            <Text text="{ui>/month}월 Monthly Report"/>
+                        </HBox>
+                        <VBox width="100%" class="custom-ai-report-test-card-container">
+                            <w:Card manifest="../bix/card/aiReportMonthlyAiInsight/manifest.json" width="100%" overflow="Default" />
+                        </VBox>
+                        <!--VBox width="100%" class="custom-ai-report-test-card-container">
+                            <w:Card manifest="../bix/card/aiReportMonthlyAiInsightSmry/manifest.json" width="100%" overflow="Default" />
+                        </VBox-->
+                        <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
+                            <Text text="5"/>
+                            <Image src="./resource/image/sk.svg"/>
+                        </HBox>
+                    </VBox>
+                </Carousel>
+            </VBox>
+        </content>
+        <!-- <footer>
+            <OverflowToolbar style="Clear" class="sapUiTinyMargin custom-mg-footer">
+                <ToolbarSpacer />
+                <Button class="custom-mg-btn" icon="sap-icon://cancel" text="{i18n>cancel}" tooltip="{i18n>cancel}" press=".onCancel">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+            </OverflowToolbar>
+        </footer> -->
+    </Page>
+</mvc:View>

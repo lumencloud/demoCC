@@ -1,0 +1,28 @@
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:viz="sap.viz.ui5.controls" 
+	xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:form="sap.ui.layout.form"
+    controllerName="bix.card.salesProgress.card"
+    height="100%"
+	width="100%"
+>
+    <HBox justifyContent="SpaceBetween" height="6.25rem">
+        <VBox justifyContent="Center">
+            <HBox width="8rem">
+                <Text emptyIndicatorMode="On" text="{chartModel>/value}" class="custom-card-content-title"/>
+                <core:Icon id="plGrid1ChartIcon" size="1rem"/>
+                <!-- <core:Icon src="sap-icon://trend-up" size="1rem" color="Positive"/>     -->
+            </HBox>
+            <Text emptyIndicatorMode="On" text="{chartModel>/date}" />
+        </VBox>
+        <core:HTML id="html" />
+    </HBox>
+
+       
+
+
+</mvc:View>

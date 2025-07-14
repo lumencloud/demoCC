@@ -1,0 +1,173 @@
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:viz="sap.viz.ui5.controls" 
+	xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    controllerName="bix.card.salesPerformance.card"
+    xmlns:w="sap.ui.integration.widgets"
+	xmlns:card="sap.f.cards"
+    height="100%"
+	width="100%"
+>
+    <HBox justifyContent="Center" renderType="Bare">
+        <!-- <Panel 
+            height="100%"
+            width="100%"
+            > -->
+            <Carousel id="salesCarousel" backgroundDesign="Solid" height="100%" width="100%" loop="true" 
+                arrowsPlacement="PageIndicator">
+                <VBox alignItems="Center" width="100%" >
+                    <VBox alignItems="Center" class="sapUiSmallMarginBottom">
+                        <Title text="매출 추이" class="custom-card-salesPerformance-title"/>
+                        <Text text="{chartModel>/date}" />
+                    </VBox>
+
+
+                    <VBox fitContainer="true" width="100%" height="100%"> 
+                        <w:Card manifest="../bix/card/homeYoYSale/manifest.json"/>                       
+                    </VBox>
+                    
+                    
+                    <!-- <form:SimpleForm class="sapUiSmallMarginTop">
+                        <form:content>
+                            <Title text="30%" titleStyle="H3">
+                                <layoutData>
+                                    <layout:GridData span="XL3 L3 M3 S3"/>
+                                </layoutData>
+                            </Title>
+                            <Text text="매출 실적이 지난달 대비 30% 향상되었습니다." wrapping="true">
+                                <layoutData>
+                                    <layout:GridData span="XL9 L9 M9 S9"/>
+                                </layoutData>
+                            </Text>
+                        </form:content>
+                    </form:SimpleForm> -->
+                </VBox>
+
+                <VBox alignItems="Center" width="100%">
+                <VBox alignItems="Center" class="sapUiSmallMarginBottom">
+                    <Title text="마진 추이" class="custom-card-salesPerformance-title"/>
+                    <Text text="{chartModel>/date}"/>
+                </VBox>
+                    <VBox fitContainer="true" width="100%" height="100%"> 
+                        <w:Card manifest="../bix/card/homeYoYMargin/manifest.json"/>                       
+                    </VBox>
+                        
+                    <!-- <form:SimpleForm class="sapUiSmallMarginTop">
+                        <form:content>
+                            <Title text="30%" titleStyle="H3">
+                                <layoutData>
+                                    <layout:GridData span="XL3 L3 M3 S3"/>
+                                </layoutData>
+                            </Title>
+                            <Text text="매출 실적이 지난달 대비 30% 향상되었습니다." wrapping="true">
+                                <layoutData>
+                                    <layout:GridData span="XL9 L9 M9 S9"/>
+                                </layoutData>
+                            </Text>
+                        </form:content>
+                    </form:SimpleForm> -->
+                </VBox>
+
+                <VBox alignItems="Center" width="100%">
+                <VBox alignItems="Center" class="sapUiSmallMarginBottom">
+                    <Title text="공헌이익 추이" class="custom-card-salesPerformance-title"/>
+                    <Text text="{chartModel>/date}"/>
+                </VBox>
+                    <VBox fitContainer="true" width="100%" height="100%"> 
+                        <w:Card manifest="../bix/card/homeYoYCont/manifest.json"/>                       
+                    </VBox>
+                       
+                    <!-- <form:SimpleForm class="sapUiSmallMarginTop">
+                        <form:content>
+                            <Title text="30%" titleStyle="H3">
+                                <layoutData>
+                                    <layout:GridData span="XL3 L3 M3 S3"/>
+                                </layoutData>
+                            </Title>
+                            <Text text="매출 실적이 지난달 대비 30% 향상되었습니다." wrapping="true">
+                                <layoutData>
+                                    <layout:GridData span="XL9 L9 M9 S9"/>
+                                </layoutData>
+                            </Text>
+                        </form:content>
+                    </form:SimpleForm> -->
+                </VBox>
+
+                <!-- <VBox alignItems="Center" width="100%">
+                    <Title text="전년 동월 대비 영업이익 GAP"/>
+                    <Text text="4월 30일 - 5월 30일" class="sapUiMediumMarginTopBottom"/>
+                    <VBox>
+                        <core:HTML
+                        content="&lt;canvas id=&quot;salesPerformance1&quot; &gt;&lt;/canvas&gt;"/>
+                    </VBox>
+                    <form:SimpleForm class="sapUiSmallMarginTop">
+                        <form:content>
+                            <Title text="30%" titleStyle="H3">
+                                <layoutData>
+                                    <layout:GridData span="XL3 L3 M3 S3"/>
+                                </layoutData>
+                            </Title>
+                            <Text text="매출 실적이 지난달 대비 30% 향상되었습니다." wrapping="true">
+                                <layoutData>
+                                    <layout:GridData span="XL9 L9 M9 S9"/>
+                                </layoutData>
+                            </Text>
+                        </form:content>
+                    </form:SimpleForm>
+                </VBox> -->
+
+                <!-- <VBox justifyContent="Center" alignItems="Center">
+                    <VBox class="sapUiContentPadding" alignItems="Center">
+                        <Title text="전년 동월 대비 전사SG&amp;A GAP"/>
+                        <Text text="4월 30일 - 5월 30일" class="sapUiMediumMarginTopBottom"/>
+                        <core:HTML
+                        content="&lt;canvas id=&quot;salesPerformance2&quot; &gt;&lt;/canvas&gt;"/>
+                        <form:SimpleForm class="sapUiSmallMarginTop">
+                            <form:content>
+                                <Title text="55%" titleStyle="H3">
+                                    <layoutData>
+                                        <layout:GridData span="XL3 L3 M3 S3"/>
+                                    </layoutData>
+                                </Title>
+                                <Text text="매출 실적이 지난달 대비 55% 향상되었습니다." wrapping="true">
+                                    <layoutData>
+                                        <layout:GridData span="XL9 L9 M9 S9"/>
+                                    </layoutData>
+                                </Text>
+                            </form:content>
+                        </form:SimpleForm>
+                    </VBox>
+                </VBox> -->
+
+                <!-- <VBox justifyContent="Center" alignItems="Center">
+                    <VBox class="sapUiContentPadding" alignItems="Center">
+                        <Title text="전년 동월 대비 전사SG&amp;A GAP"/>
+                        <Text text="4월 30일 - 5월 30일" class="sapUiMediumMarginTopBottom"/>
+                        <core:HTML
+                        content="&lt;canvas id=&quot;salesPerformance3&quot; &gt;&lt;/canvas&gt;"/>
+                        <form:SimpleForm class="sapUiSmallMarginTop">
+                            <form:content>
+                                <Title text="45%" titleStyle="H3">
+                                    <layoutData>
+                                        <layout:GridData span="XL3 L3 M3 S3"/>
+                                    </layoutData>
+                                </Title>
+                                <Text text="매출 실적이 지난달 대비 45% 향상되었습니다." wrapping="true">
+                                    <layoutData>
+                                        <layout:GridData span="XL9 L9 M9 S9"/>
+                                    </layoutData>
+                                </Text>
+                            </form:content>
+                        </form:SimpleForm>
+                    </VBox>
+                </VBox> -->
+            </Carousel>
+        <!-- </Panel> -->
+    </HBox>
+</mvc:View>

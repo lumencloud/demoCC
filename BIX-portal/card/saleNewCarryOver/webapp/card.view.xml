@@ -1,0 +1,125 @@
+<mvc:View
+    controllerName="bix.card.saleNewCarryOverCard.card"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    width="100%"
+    height="100%"
+    displayBlock="true"
+>
+    <Panel
+        expandable="false"
+        expanded="true"
+        width="auto"
+        height="auto"
+    >
+        <content>
+            <VBox fitContainer="true">
+                <FlexBox
+                    alignItems="Center"
+                    justifyContent="Center"
+                    fitContainer="true"
+                >
+                    <core:HTML id="html0" />
+                </FlexBox>
+
+                <FlexBox fitContainer="true" class="sapUiSmallMarginTop">
+                    <VBox width="100%" class="custom-card-vbox">
+                        <HBox class="custom-pipeline-title" width="100%" justifyContent="Center">
+                            <Title text="Pipeline 총계" width="100%" />
+                        </HBox>
+                        <HBox  width="100%" justifyContent="SpaceBetween">
+                            <HBox width="30%" alignItems="Center" justifyContent="Center">
+                                <VBox  class="custom-pipeline-icon totalTake" >
+                                    <Image src="./resource/icon/dashboard/icon01.png"/>
+                                </VBox>
+                                <VBox >
+                                    <Label text="총 수주액"/>
+                                    <Text emptyIndicatorMode="On"                                 
+                                    text="{
+                                        parts:[
+                                            {path:'PipelineTotalModel>/totalTake', targetType: 'any'},
+                                            {value:'억'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                    }"
+                                    tooltip="{
+                                        parts:[
+                                            {path:'PipelineTotalModel>/totalTake', targetType: 'any'},
+                                            {value:''}
+                                        ],
+                                        formatter: '.onFormatPerformance'                                
+                                    }"
+                                    wrapping="false"
+                                    width="100%"
+                                    textAlign="Center"
+                                        class="custom-pipeline-state"
+
+                                    />
+                                </VBox>
+                            </HBox>
+                            <HBox width="30%" alignItems="Center" justifyContent="Center">
+                                <VBox  class="custom-pipeline-icon totalSale" >
+                                    <Image src="./resource/icon/dashboard/icon02.png"/>
+                                </VBox>
+                                <VBox >
+                                    <Label text="총 매출액" />
+                                    <Text emptyIndicatorMode="On"
+                                        text="{
+                                            parts:[
+                                                {path:'PipelineTotalModel>/totalSale', targetType: 'any'},
+                                                {value:'억'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                        }"
+                                        tooltip="{
+                                            parts:[
+                                                {path:'PipelineTotalModel>/totalSale', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                        }"
+                                        wrapping="false"
+                                        width="100%"
+                                        textAlign="Center"
+                                        class="custom-pipeline-state"
+                                    />
+                                </VBox>
+                            </HBox>
+                            <HBox width="30%"  alignItems="Center" justifyContent="Center">
+                                <VBox  class="custom-pipeline-icon totalChance" >
+                                    <Image src="./resource/icon/dashboard/icon03.png"/>
+                                </VBox>
+                                <VBox >
+                                    <Label text="총 건수" />
+                                     <Text emptyIndicatorMode="On"
+                                        text="{
+                                        parts:[
+                                            {path:'PipelineTotalModel>/totalChance', targetType: 'any'},
+                                            {value:'건수'}
+                                        ],
+                                        formatter: '.onFormatPerformance'
+                                    }"
+                                    tooltip="{
+                                        parts:[
+                                            {path:'PipelineTotalModel>/totalChance', targetType: 'any'},
+                                            {value:''}
+                                        ],
+                                        formatter: '.onFormatPerformance'                                
+                                    }"
+                                    wrapping="false"
+                                    width="100%"
+                                    textAlign="Center"
+                                        class="custom-pipeline-state"
+                                    />
+                                </VBox>
+                            </HBox>
+                        </HBox>                  
+                    </VBox>
+                </FlexBox>
+                           
+            </VBox>
+        </content>
+    </Panel>
+</mvc:View>

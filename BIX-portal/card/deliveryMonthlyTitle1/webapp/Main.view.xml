@@ -1,0 +1,24 @@
+<mvc:View
+    xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    width="100%"
+    displayBlock="true"
+    controllerName="bix.card.deliveryMonthlyTitle1.Main"
+>
+    <VBox id="cardContent" class="custom-ai-report-test-delivery-title-board-container">
+        <VBox class="title-board">
+            <HBox justifyContent="Center" alignItems="Center" class="logo-wrapper">
+                <Image src="./resource/image/sk.svg" class="logo"/>
+            </HBox>
+            <VBox class="borad-title">
+                <Title text="Monthly Report"/>
+                <Text text="{ui>/date}" />
+            </VBox>
+            <HBox justifyContent="Center" alignItems="Center" class="board-footer">
+                <Link text="경영정보 시스템 Portal Link" press="onPressLink" />
+            </HBox >
+        </VBox>
+    </VBox>
+</mvc:View>

@@ -1,0 +1,78 @@
+<mvc:View xmlns:layout="sap.ui.layout" controllerName="bix.card.negotiationStage.card"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    height="100%"
+    width="100%"
+    displayBlock="true"
+>   
+    <form:SimpleForm id="cardContent" class="custom-back-white">
+        <form:content>
+            <VBox>            
+                <VBox class="custom-card-box-padding" visible="{=!!${Model>/first}}">                    
+                    <HBox>
+                        <VBox class="custom-card-circle-box red" width="15%">
+                            <Text emptyIndicatorMode="On" text="{Model>/first/biz_tp_account_nm}" textAlign="Center" width="100%"/>
+                        </VBox>
+                        <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin" wrap="Wrap" renderType="Bare" alignContent="Center">
+                            <Text emptyIndicatorMode="On" text=" {Model>/first/biz_opp_nm}" tooltip="{Model>/first/biz_opp_nm}"/>                        
+                            <Text emptyIndicatorMode="On" text="({path: 'Model>/first/total_target_amt', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/first/total_target_amt', formatter: '._formatTotal'}억)"  class="custom-negative-state sapUiTinyMarginBegin"/>
+                        </HBox>
+                    </HBox>                    
+                </VBox>
+
+                <VBox class="custom-card-box-padding" visible="{=!!${Model>/second}}">                    
+                    <HBox>
+                        <VBox class="custom-card-circle-box red" width="15%">
+                            <Text emptyIndicatorMode="On" text="{Model>/second/biz_tp_account_nm}" textAlign="Center" width="100%"/>
+                        </VBox>
+                        <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin" wrap="Wrap" renderType="Bare" alignContent="Center">
+                            <Text emptyIndicatorMode="On" text=" {Model>/second/biz_opp_nm}" tooltip="{Model>/second/biz_opp_nm}"/>                        
+                            <Text emptyIndicatorMode="On" text="({path: 'Model>/second/total_target_amt', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/second/total_target_amt', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
+                        </HBox>
+                    </HBox>                    
+                </VBox>
+
+                <VBox class="custom-card-box-padding" visible="{=!!${Model>/third}}">                    
+                    <HBox>
+                        <VBox class="custom-card-circle-box red" width="15%">
+                            <Text emptyIndicatorMode="On" text="{Model>/third/biz_tp_account_nm}" textAlign="Center" width="100%"/>
+                        </VBox>
+                        <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin" wrap="Wrap" renderType="Bare" alignContent="Center">
+                            <Text emptyIndicatorMode="On" text=" {Model>/third/biz_opp_nm}" tooltip="{Model>/third/biz_opp_nm}"/>                        
+                            <Text emptyIndicatorMode="On" text="({path: 'Model>/third/total_target_amt', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/third/total_target_amt', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
+                        </HBox> 
+                    </HBox>                    
+                </VBox>
+
+                <VBox class="custom-card-box-padding" visible="{=!!${Model>/forth}}">                    
+                    <HBox>
+                        <VBox class="custom-card-circle-box red" width="15%">
+                            <Text emptyIndicatorMode="On" text="{Model>/forth/biz_tp_account_nm}" textAlign="Center" width="100%"/>
+                        </VBox>
+                        <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin"  wrap="Wrap" renderType="Bare" alignContent="Center">
+                            <Text emptyIndicatorMode="On" text=" {Model>/forth/biz_opp_nm}" tooltip="{Model>/forth/biz_opp_nm}"/>                        
+                            <Text emptyIndicatorMode="On" text="({path: 'Model>/forth/total_target_amt', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/forth/total_target_amt', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
+                        </HBox>
+                    </HBox>                    
+                </VBox>
+
+                <VBox class="custom-card-box-padding" visible="{=!!${Model>/etcName}}">                    
+                    <HBox>
+                        <VBox class="custom-card-circle-box gray" width="15%">
+                            <Text emptyIndicatorMode="On" text="기타" textAlign="Center" width="100%"/>
+                        </VBox>                        
+                        <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin" wrap="Wrap" renderType="Bare" alignContent="Center">
+                            <Text emptyIndicatorMode="On" text="{Model>/etcName} 등 {Model>/etcCount}건" tooltip="{Model>/etcName} 등 {Model>/etcCount}건"/>                        
+                            <Text emptyIndicatorMode="On" text="({path: 'Model>/etcAmount', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/etcAmount', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
+                        </HBox>
+                    </HBox>                    
+                </VBox>
+
+                
+            </VBox>
+        </form:content>
+    </form:SimpleForm>         
+</mvc:View>

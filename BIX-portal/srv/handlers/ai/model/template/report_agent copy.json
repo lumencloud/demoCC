@@ -1,0 +1,79 @@
+{
+  "agent_id": "report_agent",
+  "processing_flow": {
+    "flow_type": "langchain_sequential",
+    "execution_mode": "sequential",
+    "steps": [
+      {
+        "step_id": "extract_meta_multi_view_schema_info",
+        "step_sequence": 1,
+        "component": {
+          "id": "tool_01",
+          "type": "tool",
+          "description": "메타 다중 뷰 스키마 정보 추출",
+          "tool_file": "meta_view_schema_extract_tool",
+          "input_variables": {
+            "table_names": "$var:table_names"
+          },
+          "output_variable": "table_schema"
+        }
+      },
+      {
+        "step_id": "get_multi_data",
+        "step_sequence": 2,
+        "component": {
+          "id": "tool_02",
+          "type": "tool",
+          "description": "다중 데이터 조회",
+          "tool_file": "data_multi_fetch_tool",
+          "input_variables": {
+            "functions": "$input:functions",
+            "global_params": "$input:global_params"
+          },          
+          "output_variable": "collected_data"
+        }
+      },
+      {
+        "step_id": "transform_data",
+        "step_sequence": 3,
+        "component": {
+          "id": "tool_03",
+          "type": "tool",
+          "description": "데이터 변환",
+          "tool_file": "data_transform_tool",
+          "input_variables": {
+            "table_schema": "$var:table_schema",
+            "collected_data": "$var:collected_data"
+          },
+          "output_variable": "transform_data"
+        }
+      },
+      {
+        "step_id": "create_comprehensive_report",
+        "step_sequence": 4,
+        "component": {
+          "id": "prompt_01",
+          "type": "prompt",
+          "description": "보고서 컨텐츠 생성",
+          "template": {
+            "type": "dynamic",
+            "path": "reportAgent"
+          },
+          "model_config": {
+            "model_id": "model_01",
+            "model_name": "gpt-4.1-mini",
+            "model_params": {
+              "temperature": 0.3,
+              "max_tokens": 30000
+            },
+            "model_version": "2025-04-14"
+          },
+          "input_variables": {
+            "collected_data": "$var:collected_data"
+          },
+          "output_variable": "final"
+        }
+      }
+    ]
+  }
+}

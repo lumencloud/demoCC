@@ -1,0 +1,195 @@
+{
+  "_version": "1.65.0",
+  "sap.app": {
+    "id": "bix.ai.list",
+    "type": "application",
+    "i18n": {
+      "bundleUrl": "../../bix/portal/i18n/i18n.properties",
+      "supportedLocales": [
+        "ko",
+        "en"
+      ],
+      "fallbackLocale": "ko"
+    },
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.16.5",
+      "toolsId": "3df907c1-95f6-455b-beaf-196522c4bd9f"
+    },
+    "dataSources": {
+      "v4Service": {
+        "uri": "../../odata/v4/cm/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.134.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleUrl": "../../bix/portal/i18n/i18n.properties",
+          "supportedLocales": [
+            "ko",
+            "en"
+          ],
+          "fallbackLocale": "ko"
+        }
+      },
+      "": {
+        "dataSource": "v4Service",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "../../main/css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "bix.ai.list.view"
+      },
+      "routes": [
+        {
+          "name": "RouteMain",
+          "pattern": ":?query:",
+          "target": [
+            "Main"
+          ]
+        },
+        {
+          "name": "PipelineWeekly",
+          "pattern": "PipelineWeekly/:year:/:month:/:weekNo:",
+          "target": [
+            "PipelineWeekly"
+          ]
+        },
+        {
+          "name": "DeliveryMonthly",
+          "pattern": "DeliveryMonthly",
+          "target": [
+            "DeliveryMonthly"
+          ]
+        },
+        {
+          "name": "CloudMonthly",
+          "pattern": "CloudMonthly",
+          "target": [
+            "CloudMonthly"
+          ]
+        },
+        {
+          "name": "AllMonthly",
+          "pattern": "AllMonthly",
+          "target": [
+            "AllMonthly"
+          ]
+        },
+        {
+          "name": "AccountMonthly",
+          "pattern": "AccountMonthly",
+          "target": [
+            "AccountMonthly"
+          ]
+        },
+        {
+          "name": "MainMonthly",
+          "pattern": "MainMonthly",
+          "target": [
+            "MainMonthly"
+          ]
+        }
+      ],
+      "targets": {
+        "Main": {
+          "id": "Main",
+          "name": "Main"
+        },
+        "PipelineWeekly": {
+          "id": "PipelineWeekly",
+          "name": "PipelineWeekly"
+        },
+        "DeliveryMonthly": {
+          "id": "DeliveryMonthly",
+          "name": "DeliveryMonthly"
+        },
+        "AccountMonthly": {
+          "id": "AccountMonthly",
+          "name": "AccountMonthly"
+        },
+        "AllMonthly": {
+          "id": "AllMonthly",
+          "name": "AllMonthly"
+        },
+        "CloudMonthly": {
+          "id": "CloudMonthly",
+          "name": "CloudMonthly"
+        },
+        "MainMonthly": {
+          "id": "MainMonthly",
+          "name": "MainMonthly"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "bix.ai.list.view.App",
+      "type": "XML",
+      "id": "App"
+    }
+  },
+  "sap.card": {
+    "type": "Component",
+    "header": {}
+  }
+}

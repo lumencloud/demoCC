@@ -1,0 +1,60 @@
+<core:FragmentDefinition xmlns:rowmodes="sap.ui.table.rowmodes" 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:w="sap.ui.integration.widgets"
+	xmlns:card="sap.f.cards"
+	busyIndicatorDelay="0">
+    <Dialog class="sapUiContentPadding custom-aireport" draggable="true" resizable="false" showHeader="false" contentWidth="90rem" contentHeight="85vh" maxHeight="800px">
+        <content>
+			<VBox width="100%" height="100%" class="sapUiNoContentPadding">
+				<!-- 상단 헤더 영역 -->
+				<OverflowToolbar  width="100%" height="2rem" style="Clear" >
+					<HBox width="100%" justifyContent="SpaceBetween" alignItems="Center">
+						<HBox alignItems="Center" >
+							<Title text="경영 현황 요약 리포트" class="custom-ai-popup-header" />
+							<Tokenizer id="searchTokenizer" class="custom-ai-tokenizer" width="100%" editable="false" />
+						</HBox>
+						<Button id="aiAgentButton" icon="sap-icon://manager-insight" text="AI 에이전트" type="Ghost" class="custom-button-color" />
+					</HBox>
+					
+					
+				</OverflowToolbar>
+				<OverflowToolbar width="100%" height="2rem" style="Standard" class="custom-dialog-toolbar">
+
+				</OverflowToolbar>
+				
+				<!-- 메인 컨텐츠 영역 -->
+				<HBox width="100%" height="500px" class="sapUiContentPadding">
+					<!-- 왼쪽: 세부 데이터 영역 -->
+					<VBox width="50%" height="100%" class="sapUiTinyMarginEnd custom-aireport-content-box">
+					
+						<Panel width="100%" height="500px" class="sapUiNoMarginTop custom-aireport-panel">
+							<w:Card id="card" width="100%" height="100%" class="custom-no-box-shadow custom-aireport-card-panel">
+							</w:Card>							
+						</Panel>
+					</VBox>
+					
+					<!-- 오른쪽: AI 현황 하이라이트 영역 -->
+					<VBox width="50%" height="100%" class="sapUiTinyMarginStart custom-aireport-content-box">
+						<Panel width="100%" height="500px" class="sapUiNoMarginTop custom-aireport-panel">
+							<HBox alignItems="Center" gap="3px" class="highlight-title">
+								<Image src="./resource/image/ai_icon.png" width="14px"/>
+								<Text text="AI 현황 하이라이트"></Text>							
+							</HBox>
+							<VBox width="100%" height="calc(100% - 30px)" class="custom-formattedText-background sapMFontSizeXLarge">
+								<core:HTML id="highlightText"/>
+							</VBox>
+
+						</Panel>
+					</VBox>
+				</HBox>
+				
+				<!-- 하단 버튼 영역 -->
+				<HBox width="100%" height="100px" alignItems="Center" justifyContent="End" class="sapUiContentPadding sapUiMediumMarginTop">
+					<Button id="downloadButton" visible="false" type="Emphasized" text="PDF 다운로드" class="custom-button-color custom-button-size sapUiTinyMarginEnd" />
+					<Button id="cancelButton" type="Ghost" text="닫기" class="custom-button-color custom-button-size" />
+				</HBox>
+			</VBox>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>

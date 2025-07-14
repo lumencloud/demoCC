@@ -1,0 +1,23 @@
+<mvc:View xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes" width="100%" height="100%" displayBlock="true" controllerName="bix.card.actualDTSalesTable_test.controller.Main">
+    <Panel expandable="false" expanded="true" width="auto" height="100%" class="sapUiNoContentPadding custom-card-size">
+        <content>
+            <OverflowToolbar width="100%" height="2.6rem" class="custom-overflow-toolbar">
+                <ToolbarSpacer />
+                <HBox class="custom-select-box" width="30%" justifyContent="End">
+                    <Select id="detailSelect" change=".onUiChange" width="100%" selectedKey="{uiModel>/tableKind}" items="{path: 'selectModel>/'}">
+                        <items>
+                            <core:ListItem key="{selectModel>sub_key}" text="{selectModel>sub_text}" />
+                        </items>
+                    </Select>
+                </HBox>
+            </OverflowToolbar>
+            <mvc:XMLView viewName="bix.card.actualDTSalesTable_test.view.Org"  async="true" visible="{=${uiModel>/tableKind} === 'org'}" height="100%"/> 
+            <mvc:XMLView viewName="bix.card.actualDTSalesTable_test.view.Account"  async="true" visible="{=${uiModel>/tableKind} === 'account'}" height="100%"/>
+            <mvc:XMLView viewName="bix.card.actualDTSalesTable_test.view.Task"  async="true" visible="{=${uiModel>/tableKind} === 'task'}" height="100%"/>
+        </content>
+    </Panel>
+</mvc:View>

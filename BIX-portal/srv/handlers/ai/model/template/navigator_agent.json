@@ -1,0 +1,62 @@
+{
+  "agent_id": "navigator_agent",
+  "processing_flow": {
+    "flow_type": "langchain_sequential",
+    "execution_mode": "sequential",
+    "steps": [
+      {
+        "step_id": "get_meta_menu_list",
+        "step_sequence": 1,
+        "component": {
+          "id": "tool_01",
+          "type": "tool",
+          "description": "메타 메뉴 리스트 조회",
+          "tool_file": "menu_list_tool",
+          "input_variables": {},
+          "output_variable": "menus_info"
+        }
+      },
+      {
+        "step_id": "menu_matcher",
+        "step_sequence": 2,
+        "component": {
+          "id": "prompt_01",
+          "type": "prompt",
+          "description": "메뉴매칭",
+          "template": {
+            "type": "static",
+            "path": "navigatorAgent.static.menuMatcher"
+          },
+          "model_config": {
+            "model_id": "model_01",
+            "model_name": "gemini-1.5-flash",
+            "model_params": {
+                "temperature": 0.3,
+                "max_tokens": 4000
+            },
+            "model_version": "002"
+          },
+          "input_variables":{
+            "user_input": "$input:user_input",
+            "menus_info": "$var:menus_info"
+          },
+          "output_variable": "selected_menus"
+        }
+      },
+      {
+        "step_id": "extract_meta_navigation_route",
+        "step_sequence": 3,
+        "component": {
+          "id": "tool_02",
+          "type": "tool",
+          "description": "메타 네비게이션 경로 추출",
+          "tool_file": "menu_route_extract_tool",
+          "input_variables": {
+            "selected_menus": "$var:selected_menus"
+          },
+          "output_variable": "final"
+        }
+      }
+    ]
+  }
+}
