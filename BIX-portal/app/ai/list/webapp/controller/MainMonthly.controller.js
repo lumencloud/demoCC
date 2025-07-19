@@ -39,16 +39,13 @@ sap.ui.define([
                 if (oCarousel) {
                     oCarousel.setActivePage(oCarousel.getPages()[0]);
                 }
-                // const oPage = this.byId("aiMonthlyReport")
-                // if (oPage) { oPage.scrollTo(0); }
-
                 await this._setModel();
 
                 let oToday = new Date();
                 let sYear = String(oToday.getFullYear());
                 let sMonth = String(oToday.getMonth()).padStart(2, "0");
                 const oData = this.getView().getModel("topOrgModel").getData();
-                this._setSessionItem(oData, sYear, sMonth);
+                // this._setSessionItem(oData, sYear, sMonth);
 
                 /**
                  *  첫 페이지에 있는 카드들의 subscribe하는 시점보다 메인 controller 
@@ -66,30 +63,39 @@ sap.ui.define([
                 this._oEventBus.subscribe("aiReport", "negoMonthData", this._setChartHeaderModel, this)
                 this._oEventBus.subscribe("aiReport", "comMonthData", this._setChartHeaderModel, this)
 
-                if (!this._isSubscribed) {
-                    this._oEventBus.subscribe("CardChannel", "CardFullLoad", this._onCardReady, this);
-                    this._isSubscribed = true;
-                }
+
+            },
+            onBeforeRendering: function () {
+                this._countViewContainCard();
             },
 
-            _onCardReady: function (sChannelId, sEventId, oData) {
+            _onCardReady: async function (sChannelId, sEventId, oData) {
+               
+
                 this._iCardReady++;
                 if (this._iCardReady === this.iCardCount) {
                     this.getView().getModel("ui").setProperty("/bPdfFlag", true)
                     this.getView().getModel("ui").setProperty("/busyFlag", false)
-                } else if (this._iCardReady === 1) {
+                    console.warn("카드로딩", this._iCardReady)
+                    this._iCardReady = 0;
+                    return;
+                } else if (this._iCardReady === 2 && !this._isCardLoaded) {
                     /**
-                     *  안전하게 카드가 로딩된 후 (subscribe) publish 날릴 수 있게 1개(카드 갯수)로 설정 
-                     */
+                     *  안전하게 카드가 로딩된 후 (subscribe) publish 날릴 수 있게 2개(카드 갯수)로 설정 
+                    */
                     const oSelect = this.byId("selectType");
                     oSelect.fireChange({
                         selectedItem: oSelect.getSelectedItem()
                     })
+                    this._isCardLoaded = true;
                 }
             },
 
             onAfterRendering: function () {
-                this._countViewContainCard();
+                if (!this._isSubscribed) {
+                    this._oEventBus.subscribe("CardChannel", "CardFullLoad", this._onCardReady, this);
+                    this._isSubscribed = true;
+                }
             },
 
             /**
@@ -107,6 +113,7 @@ sap.ui.define([
                     iCardCount++;
                 })
                 this.iCardCount = iCardCount;
+                console.warn(this.iCardCount);
             },
 
             /**
@@ -116,17 +123,18 @@ sap.ui.define([
              * @param {*} ThirdData 
              */
             _requestData: async function (firstData, secondData, ThirdData) {
-
+                this._countViewContainCard();
                 const aFirstResult = await this._callApiGroup(firstData);
                 this._eventBusToCard(aFirstResult);
-                
+
                 const aSecondResult = await this._callApiGroup(secondData);
                 this._eventBusToCard(aSecondResult);
-                
-                const aThirdResult = await this._callApiGroup(ThirdData);
-                this._eventBusToCard(aThirdResult);
-                
-                this._countViewContainCard();
+
+                if (ThirdData) {
+                    const aThirdResult = await this._callApiGroup(ThirdData);
+                    this._eventBusToCard(aThirdResult);
+                }
+                console.count("callAPi")
             },
             /**
              * 그룹으로 넘어온 api Path 값 promise all 로 한번에 return
@@ -158,7 +166,7 @@ sap.ui.define([
                     operationMode: "Server"
                 });
                 try {
-                    console.count("callAPi")
+
                     const oData = await oModel.bindContext(sPath).requestObject();
                     return oData.value
                 } catch (oError) {
@@ -218,20 +226,14 @@ sap.ui.define([
                 }
             },
 
-            /**
-             * @param {Array} aData  각 카드로 보낼 데이터를 모은 배열
-             */
-            _eventBusToCard: function (aData) {
-                aData.forEach((oData) => {
-                    this._oEventBus.publish("aireport", oData.eventId, oData);
-                })
-            },
 
             /**
              * 첫번째 셀렉트 이벤트 (전사, Cloud, Account, Delivery)
              * @param {*} oEvent 
              */
             onSelectTypeChange: function (oEvent) {
+                this.getView().getModel("ui").setProperty("/bPdfFlag", false)
+                this.getView().getModel("ui").setProperty("/busyFlag", true)
                 // 조직 데이터 세팅
                 const oTopOrgData = this.getView().getModel("topOrgModel").getData();
                 const oCloudOrgData = this.getView().getModel("cloudOrgModel").getData();
@@ -263,8 +265,8 @@ sap.ui.define([
                             }
                         case "cloud":
                             {
-                                const { first, second, third } = this._changeApiPath(oCloudData, sYear, sMonth);
-                                this._requestData(first, second, third)
+                                const { first, second } = this._changeApiPath(oCloudData, sYear, sMonth);
+                                this._requestData(first, second)
                                 this._setSessionItem(oCloudData, sYear, sMonth);
                                 break;
                             }
@@ -278,14 +280,13 @@ sap.ui.define([
                             }
                         case "delivery":
                             {
-                                const { first, second, third } = this._changeApiPath(oDeliveryData, sYear, sMonth);
-                                this._requestData(first, second, third)
+                                const { first, second } = this._changeApiPath(oDeliveryData, sYear, sMonth);
+                                this._requestData(first, second)
                                 this._setSessionItem(oDeliveryData, sYear, sMonth);
                                 this._setSelectModel(sPageId);
                                 break;
                             }
                     }
-                    // const sSelectedKey = this.byId("selectType")?.getSelectedKey() || "all"
                     const sSelectedView = this.byId(sPageId);
                     const oCarousel = sSelectedView.byId("carousel");
                     const sFirstPageId = oCarousel.getPages()[0].getId()
@@ -293,7 +294,6 @@ sap.ui.define([
                     // select 선택 시 첫페이지로 이동
                     oCarousel.setActivePage(sFirstPageId);
                     navCon.to(oPage); // container page 이동
-                    // this._oEventBus.publish("aireport", "uiSelectModel", {sSelectedId : sPageId})
                 }
             },
 
@@ -331,11 +331,11 @@ sap.ui.define([
              */
             _setSessionItem: function (oData, year, month) {
                 sessionStorage.setItem("aiReport", JSON.stringify({
-                    orgId: '5',
-                    type: '',
+                    orgId: oData.org_id,
+                    type: oData.org_tp,
                     title: oData.org_name,
-                    year: '2025',
-                    month: '06',
+                    year: year,
+                    month: month
                 }));
                 this._oEventBus.publish("aireport", "infoSet");
             },
@@ -474,13 +474,14 @@ sap.ui.define([
                     let oSelectedDate = this.getView().getModel("ui").getData();
                     let sYear = String(oSelectedDate.date.getFullYear());
                     let sMonth = String(oSelectedDate.date.getMonth() + 1).padStart(2, '0');
-                    let orgTopData = this.getView().getModel("topOrgModel").getData();
+                    const orgTopData = this.getView().getModel("topOrgModel").getData();
+                    const oCloudOrgData = this.getView().getModel("cloudOrgModel").getData();
 
                     const sCurrPage = this.byId("selectType").getSelectedKey();
                     switch (sCurrPage) {
                         case 'all': orgData = { org_id: orgTopData.org_id, org_tp: '' }
                             break;
-                        case 'cloud': orgData = { org_id: '6193', org_tp: '' }
+                        case 'cloud': orgData = { org_id: oCloudOrgData.org_id, org_tp: '' }
                             break;
                         case 'account': orgData = { org_id: orgTopData.org_id, org_tp: 'account' }
                             break;
@@ -502,6 +503,8 @@ sap.ui.define([
                         year: oSelectedDate.date.getFullYear(),
                         month: String(oSelectedDate.date.getMonth() + 1).padStart(2, "0"),
                     }));
+                    this._oEventBus.publish("aireport", "infoSet");
+
                     this.getView().getModel("ui").setProperty("/month", oSelectedDate.date.getMonth() + 1)
                 };
             },
@@ -548,19 +551,15 @@ sap.ui.define([
                     }
 
                     const oSessionData = JSON.parse(sessionStorage.getItem("aiReport"))
-                    // const sTitle = oSessionData.title;
-                    // const iYear = oSessionData.year;
-                    // const sMonth = oSessionData.month;
+                    const sTitle = oSessionData.title;
+                    const iYear = oSessionData.year;
+                    const sMonth = oSessionData.month;
 
-                    /**
-                     * 하드코딩 되어있음  ↓↓↓↓
-                     */
-                    // const pdfFileName = iYear + "년" + "\n" + sMonth + "월" + "\n" + sTitle + "\n" + "AI 리포트.pdf"
-                    const pdfFileName = "2025년" + "\n" + "6월" + "\n" + "SK주식회사 AX" + "\n" + "AI 리포트.pdf"
+
+                    const pdfFileName = iYear + "년" + "\n" + sMonth + "월" + "\n" + sTitle + "\n" + "AI 리포트.pdf"
+                    // const pdfFileName = "2025년" + "\n" + "6월" + "\n" + "SK주식회사 AX" + "\n" + "AI 리포트.pdf"
                     pdf.save(pdfFileName);
-                    /**
-                     * 하드코딩 되어있음  ↑↑↑↑
-                     */
+
 
                     let activeIdx = pageId.indexOf(currentPageId);
                     if (activeIdx === -1) activeIdx = 0;
@@ -585,6 +584,14 @@ sap.ui.define([
                     case "comMonthData": this.getView().setModel(new JSONModel(oData), "comData")
                         break;
                 }
+            },
+            /**
+             * @param {Array} aData  각 카드로 보낼 데이터를 모은 배열
+             */
+            _eventBusToCard: function (aData) {
+                aData.forEach((oData) => {
+                    this._oEventBus.publish("aireport", oData.eventId, oData);
+                })
             },
             onCancel: function () {
                 this.getOwnerComponent().getRouter().navTo("RouteMain")
