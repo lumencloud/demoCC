@@ -17,8 +17,10 @@ sap.ui.define([
   "bix/common/library/control/Modules",
   "sap/f/library",
   "bix/main/util/SessionTimeoutHandler",
+  "sap/ui/core/Element"
 ], (BaseController, MessageToast, MessageBox, ResourceModel, JSONModel, Fragment,
-  Popover, Button, library, Filter, FilterOperator, Component, ComponentContainer, EventBus, HashChanger, Modules, fioriLibrary, SessionTimeoutHandler) => {
+  Popover, Button, library, Filter, FilterOperator, Component, ComponentContainer, EventBus,
+  HashChanger, Modules, fioriLibrary, SessionTimeoutHandler, Element) => {
   "use strict";
   let LayoutType = fioriLibrary.LayoutType;
   let ButtonType = library.ButtonType,
@@ -65,14 +67,20 @@ sap.ui.define([
       };
     },
 
+    /**
+     * 전역 로딩 처리
+     */
     _setBusyControl(sChannel, sEvent, oData) {
       if (oData.loaded) {
         this.oFCL.setBusy(false);
       }
     },
 
+    /**
+     * 로그아웃 처리
+     */
     doLogout() {
-      window.location.replace('/logout')
+      window.location.replace('/logout');
     },
 
     onBeforeRendering() {
@@ -169,7 +177,7 @@ sap.ui.define([
     },
 
     onAfterRendering() {
-      // this.byId("fcl").getDomRef().addEventListener("click", this._onDocumnetClick.bind(this))
+      this.byId("fcl").getDomRef().addEventListener("click", this._onDocumnetClick.bind(this))
       // 화면 랜더링 실패 시 메시지 처리 & busy 해제
       // const oLoadFailed = setTimeout((() => {
       //   // MessageBox.error("화면호출 실패"); // busy 컨트롤 일괄 적용 후 메시지 처리
@@ -182,28 +190,39 @@ sap.ui.define([
       //   }
       // }, this);
 
-      //   /**
-      //    * mouse over 이벤트
-      //    */
-      //   let oSide = this.byId("sideNav"),
-      //       oNavList = this.byId("navList"),
-      //       oSideMenu = oSide.getDomRef();
+      /**
+       * mouse over 이벤트
+       */
 
-      //   oSideMenu.addEventListener("mouseenter", ()=>{oSide.setExpanded(true)});
-      //   // 메뉴 선택하지 않고 마우스 이동시 메뉴 닫힘
-      //   oSideMenu.addEventListener("mouseleave", ()=>{
-      //     if(!oSide.getSelectedItem() || ( oSide.getSelectedItem() && !oNavList.getSelectedItem().getDomRef().contains(document.activeElement) )) {
-      //       oSide.setExpanded(false)}});
-      //   // 메뉴 선택 후 업무단 클릭시 (포커스 이동시) 메뉴 닫힘
-      //   oSide.attachBrowserEvent("focusout", ()=>{if(oSide.getSelectedItem() && !oSideMenu.matches(':hover')) {oSide.setExpanded(false)}});
+      const oIconHeader = this.byId("iconTab");
+      const oDomRef = oIconHeader.getDomRef();
 
-      // setTimeout(()=>{
-      //   this.getView().getModel("menuStr").setProperty("/sideVisible", false);
-      // }, 500)
+      // const oMenuModel = this.getOwnerComponent().getModel("main_menuModel").getProperty("/");
+      // const oFolder = oMenuModel.filter(o => o.isApp === 'none');
+      // const oApp = oMenuModel.filter(o => o.isApp !== 'none');
+
+      // oFolder.forEach((item) => {
+      //   const oItem = oIconHeader.getItems().find(o => o.getKey() === item.ID);
+      //   oItem.getDomRef().addEventListener("mouseenter", () => {
+      //     oIconHeader.setSelectedKey(item.ID);
+      //     oIconHeader.fireSelect({ item: oItem, key: item.ID });
+      //   });
+      // });
+
+      // oApp.forEach((item) => {
+      //   const oItem = oIconHeader.getItems().find(o => o.getKey() === item.ID);
+      //   oItem.getDomRef().addEventListener("mouseenter", () => {
+      //     oIconHeader.setSelectedKey(item.ID);
+      //     if(this._pPopover) this._pPopover.then((oPopover)=>{oPopover.close()});
+      //   });
+      // });
+
+      oDomRef.addEventListener("mouseleave", () => {
+        this._setTopIconBarSelection();
+      });
     },
 
     onPressHome() {
-      // MessageToast.show(this.oBundle.getText("p_m_goToHome"));
       this.oRouter.navTo("RouteHome", {}, { "bix.admin.menu": { route: "Detail" } })
       let sSelectedKey = this.getOwnerComponent().getModel("main_menuModel").getProperty("/")[0].ID;
       this.getOwnerComponent().getModel("tabState").setProperty("/selectedTab", sSelectedKey);
@@ -379,7 +398,95 @@ sap.ui.define([
       this.oSF.suggest();
     },
 
+    _openSideMenuPopover(sKey) {
+      let oView = this.getView();
+      let oPin = this.byId("pinBox");
+      let bInit = false;
+      if (!this._pPopover) {
+        this._pPopover = Fragment.load({
+          id: oView.getId(),
+          name: "bix.main.view.SideMenu",
+          controller: this
+        }).then(function (oPopover) {
+          oView.addDependent(oPopover);
+          return oPopover;
+        });
+
+        bInit = true;
+      }
+
+      this._pPopover.then(function (oPopover) {
+        const oTree = oPopover.getContent()[0].getItems()[0];
+        oTree.collapseAll();
+
+        let oItem = oTree.getItems().find(o => o.getContent()[0].getItems()[0].getCustomData()[0].getValue() === sKey);
+
+        const oIndex = oTree.indexOfItem(oItem);
+        if (oIndex) oTree.expand(oIndex);
+
+        oPopover.openBy(oPin);
+        if (bInit) oPopover.getDomRef().addEventListener("mouseleave", () => { oPopover.close() });
+      });
+    },
+
+    _navToDirect(oMenuModel, sKey) {
+      let oInfo, sCode, sRouteName, sTargetName;
+      let oComponentTargetInfo = {};
+
+      oInfo = oMenuModel.find(o => o.ID === sKey);
+
+      if (oInfo) {
+        oInfo = oInfo;
+        sCode = oInfo.code;
+        sRouteName = "Route." + oInfo.category + "." + oInfo.code;
+        sTargetName = "Target." + oInfo.category + "." + oInfo.code;
+      } else {
+        for (const menu of oMenuModel) {
+          if (menu.Child && menu.Child.length > 1 && menu.Child.find(o => o.ID === sKey)) {
+            oInfo = menu.Child.find(o => o.ID === sKey);
+            sCode = oInfo.code;
+            sRouteName = "Route." + oInfo.category + "." + oInfo.code;
+            sTargetName = "Target." + oInfo.category + "." + oInfo.code;
+          }
+        }
+      }
+
+      if (oInfo.route) {
+        oComponentTargetInfo = { [sTargetName]: { route: oInfo.route } }
+      }
+      if (oInfo.page_path) {
+        let sRoute = "";
+        if (oInfo.page_path === "actual") sRoute = "RouteActual";
+        if (oInfo.page_path === "plan") sRoute = "RoutePlan";
+        oComponentTargetInfo = { [sTargetName]: { route: sRoute } };
+      }
+      if (sCode) {
+        this.getOwnerComponent().getRouter().navTo(sRouteName, {}, oComponentTargetInfo);
+      }
+
+      this._setTopIconBarSelection();
+    },
+
     onNavToApp(oEvent) {
+      const sKey = oEvent.getParameter("item")?.getKey() || oEvent.getSource().getCustomData()[0].getValue();
+      const oMenuModel = this.getOwnerComponent().getModel("main_menuModel").getProperty("/");
+      const oInfo = oMenuModel.find(o => o.ID === sKey);
+
+      if (!oInfo || oInfo.isApp !== 'none') {
+        this._navToDirect(oMenuModel, sKey);
+        if (this._pPopover) {
+          this._pPopover.then(function (oPopover) {
+            oPopover.close();
+          });
+        }
+      } else if (oInfo.isApp === 'none') {
+
+        this._openSideMenuPopover(sKey);
+      }
+    },
+
+
+    onNavToApp3(oEvent) {
       let oInfo, sCode, sRouteName, sTargetName, sComponent, bCheck = true;
       const sKey = oEvent.getParameter("item").getKey();
       const oData = this.getOwnerComponent().getModel("main_menuModel").getProperty("/");
@@ -421,7 +528,7 @@ sap.ui.define([
 
         let bSide = oModel.getProperty("/sideVisible");
 
-         if (!(oEvent.getParameter("previousKey") !== sKey && bSide)) oModel.setProperty("/sideVisible", !bSide);
+        if (!(oEvent.getParameter("previousKey") !== sKey && bSide)) oModel.setProperty("/sideVisible", !bSide);
 
         //////// 사이드 네비게이션 프래그먼트 띄우는 로직 테스트중 ///////
         // this.onSideDialogOpen(oEvent);
@@ -451,6 +558,7 @@ sap.ui.define([
         }
       }
     },
+
     //////// 사이드 네비게이션 프래그먼트 띄우는 로직 테스트중 ///////
     onSideDialogOpen: async function (oEvent) {
       if (!this._oSideDialog) {

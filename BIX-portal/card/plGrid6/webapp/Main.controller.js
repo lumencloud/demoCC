@@ -105,7 +105,7 @@ sap.ui.define([
             let aChartData6 = aResults.map(oResult => oResult.value.find(oData => oData.display_order == "7").actual_curr_ym_value);
 
             // 차트 제목 및 주요지표 설정
-            let oNumberFormat = NumberFormat.getIntegerInstance({
+            let oNumberFormat = NumberFormat.getFloatInstance({
                 groupingEnabled: true,
                 groupingSeparator: ','
             });

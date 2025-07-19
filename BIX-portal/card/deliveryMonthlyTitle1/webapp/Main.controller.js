@@ -16,7 +16,7 @@ sap.ui.define([
 			let oDateInfo = JSON.parse(sessionStorage.getItem("aiReport"));
 
 			let oInfoData = {
-				date: oDateInfo.year + "." + (String)(Number(oDateInfo.month) + 1).padStart(2, "0") + "." + "01"
+				date: String(oDateInfo.year) + "." + String(Number(oDateInfo.month) + 1).padStart(2, "0") + "." + "01"
 			}
 
 			this.getView().setModel(new JSONModel({ date: oInfoData.date }), "ui");
@@ -33,7 +33,10 @@ sap.ui.define([
 		},
 
 		onPressLink: function () {
-			this.getOwnerComponent().getRouter().navTo("RouteHome");
+			const sHash = window.location.origin;
+ 
+            window.open(sHash + "/main/index.html#", "_blank");
+ 
 		}
 	});
 });

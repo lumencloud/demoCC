@@ -92,6 +92,14 @@ sap.ui.define(
 
               options: {
                 cutout: '40%',
+                layout:{
+                  padding: {
+                      top: 20,
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                  }
+              },
                 responsive: true,
                 maintainAspectRatio: false,                
                 tooltip: {
@@ -106,7 +114,7 @@ sap.ui.define(
                     },
                     labels: {
                       font: {
-                        size: 13,
+                        size: 14,
                         weight: '550'
                       },
                       usePointStyle: true,
@@ -119,7 +127,8 @@ sap.ui.define(
                     clip:false,                    
                     color: "#1768FA",
                     anchor: 'end',
-                    align: 'top',                    
+                    align: 'top',    
+                    clamp: true,                
                     font: {
                       weight: 'bold',
                       size: 14,
@@ -130,7 +139,7 @@ sap.ui.define(
                     borderColor: "#d1d3d3",
                     borderWidth: 0.5,
                     borderRadius: 23.16,
-                    padding : 7,
+                    padding : 5,
                     
                     formatter: function (value) {
                       if (value) {
@@ -152,7 +161,7 @@ sap.ui.define(
               },
               plugins: [ChartDataLabels],
             })
-            this._ovserveResize(this.byId(this._aContainerId[i]), i)
+            //this._ovserveResize(this.byId(this._aContainerId[i]), i)
 
           }.bind(this));
 

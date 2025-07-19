@@ -27,7 +27,7 @@ module.exports = (srv) => {
              */
             const pl_view = db.entities('pl').wideview_org_view;
             //org_tp:account, hybrid일 경우 사용
-            const account_pl_view = db.entities('pl').wideview_account_view;
+            const account_pl_view = db.entities('pl').wideview_account_org_view;
             /**
              * sga.wideview_view [sg&a 집계]
              * [부문/본부/팀 + 년,month_amt,금액] 프로젝트 판관비 집계 뷰
@@ -54,21 +54,13 @@ module.exports = (srv) => {
              * org_id 파라미터값으로 조직정보 조회
              * 
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_id'
-                when lv2_id = '${org_id}' THEN 'lv2_id'
-                when lv3_id = '${org_id}' THEN 'lv3_id'
-                when div_id = '${org_id}' THEN 'div_id'
-                when hdqt_id = '${org_id}' THEN 'hdqt_id'
-                when team_id = '${org_id}' THEN 'team_id'
-                end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd', 'org_name', 'org_tp'])
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_level', 'org_ccorg_cd', 'org_name', 'org_tp', 'lv3_ccorg_cd'])
                 .where({ 'org_id': org_id });
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             // 조직 정보를 where 조건에 추가
-            let org_col_nm = orgInfo.org_level;
+            let org_col_nm = orgInfo.org_level+'_id';
 
             // QUERY 공통 파라미터 선언
             /**
@@ -115,7 +107,7 @@ module.exports = (srv) => {
             const rsp_where_conditions = { 'year': { in: [year, last_year] }, [org_col_nm]: org_id, is_delivery: true };
 
             // 선택한 조직에 따른 조직 호출 (부문보다 높을 시 부문 단위, 부문일 때 본부 단위, 본부일 때 팀 단위)
-            let org_where = { [org_col_nm]: orgInfo.org_ccorg_cd };
+            let org_where = { [org_col_nm]: orgInfo.org_ccorg_cd};
             if (org_col_nm.includes("lv")) {    // 부문보다 높은 조직은 부문 목록 반환
                 org_where["org_level"] = "div";
             } else if (org_col_nm.includes("div")) {    // 부문은 부문 하위의 본부 목록 반환
@@ -148,7 +140,7 @@ module.exports = (srv) => {
             const org_query = await SELECT.from(org_full_level).orderBy('org_order');
             let org_query_data = [];
             org_query.forEach(data=>{
-                if(data[org_col_nm] === org_id){
+                if(data[org_col_nm] === org_id && data.org_tp === 'delivery'){
                     org_query_data.push(data)
                 };
             })
@@ -175,8 +167,8 @@ module.exports = (srv) => {
                 SELECT.from(rsp_view).columns(rsp_column).where(rsp_where).groupBy(...rsp_groupBy)
             ]);
             let target_data = target_query.filter(data=>data[org_ccorg_col] === org_ccorg);
-
-            if(!pl_data.length && !sga_data.length && !rsp_data.length && !account_pl_data.length){
+            
+            if(!pl_data.length && !sga_data.length && !account_pl_data.length){
                 //return req.res.status(204).send();
                 return []
             }
@@ -186,7 +178,7 @@ module.exports = (srv) => {
             let ac_map = [];
             let ackerton_org;
             let o_data = {}
-            if(orgInfo.org_level === 'lv1_id' || orgInfo.org_level === 'lv2_id'){
+            if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
                 ackerton_org = org_query.find(data=>data.org_ccorg_cd === '610000');
                 org_query.forEach(data=>{
                     if (!ackerton_list.find(data2 => data2.id === data[search_org]) && data[search_org] && data['lv3_ccorg_cd'] === '610000') {
@@ -194,7 +186,8 @@ module.exports = (srv) => {
                             id: data[search_org],
                             name: data[search_org_name],
                             ccorg: data[search_org_ccorg],
-                            org_order: data['org_order']
+                            org_order: data['org_order'],
+                            lv3_ccorg_cd : data['lv3_ccorg_cd']
                         };
                         ac_map.push(data[search_org])
                         ackerton_list.push(oTemp);
@@ -262,10 +255,11 @@ module.exports = (srv) => {
                         name: data[search_org_name],
                         ccorg: data[search_org_ccorg],
                         org_order: data['org_order'],
-                        org_tp: data['org_tp']
+                        org_tp: data['org_tp'],
+                        lv3_ccorg_cd : data['lv3_ccorg_cd']
                     };
                     
-                    if(orgInfo.org_level === 'lv1_id' || orgInfo.org_level === 'lv2_id'){
+                    if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
                         if(!ackerton_list.find(data3 => data3.ccorg === oTemp.ccorg)){
                             org_list.push(oTemp);
                         };
@@ -275,13 +269,14 @@ module.exports = (srv) => {
                 };
             });
 
-            if(orgInfo.org_level === 'lv1_id' || orgInfo.org_level === 'lv2_id'){
+            if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
                 let oTemp = {
                     id: ackerton_org.org_id,
                     name: ackerton_org.org_name,
                     ccorg: ackerton_org.org_ccorg_cd,
                     org_order: ackerton_org.org_order,
-                    org_tp: ackerton_org.org_tp
+                    org_tp: ackerton_org.org_tp,
+                    lv3_ccorg_cd : ackerton_org.lv3_ccorg_cd
                 };
                 org_list.push(oTemp);
             };
@@ -304,22 +299,28 @@ module.exports = (srv) => {
                 })
             }
             
-            if(account_pl_data.length > 0){
-                account_pl_data.forEach(o_acc_pl => {
-                    if(!ac_map.includes(o_acc_pl['id'])){
-                        if (!o_data[`${o_acc_pl.id}`]) {
-                            const o_curr_target = a_curr_target.find(o_target => o_target.org_id === o_acc_pl.id)
-                            o_data[`${o_acc_pl.id}`] = { id: o_acc_pl.id, name: o_acc_pl.name, curr_target: o_curr_target?.target_rohc ?? 0 }
-                        }
-                        if (o_acc_pl.year === year) {
-                            o_data[`${o_acc_pl.id}`]['curr_acc_pl_margin'] = (o_acc_pl?.margin_amount_sum ?? 0)
-                        } else if (o_acc_pl.year === last_year) {
-                            o_data[`${o_acc_pl.id}`]['last_acc_pl_margin'] = (o_acc_pl?.margin_amount_sum ?? 0)
-                            o_data[`${o_acc_pl.id}`]['last_acc_pl_margin_sum'] = (o_acc_pl?.margin_total_amount_sum ?? 0)
-                        }
+            if(orgInfo.org_level !== 'lv1' && orgInfo.org_level !== 'lv2'){
+                console.log(1)
+                if(account_pl_data.length > 0){
+                    if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.lv3_ccorg_cd === '237100' || orgInfo.org_tp === 'account'){
+                        account_pl_data.forEach(o_acc_pl => {
+                            if(!ac_map.includes(o_acc_pl['id'])){
+                                if (!o_data[`${o_acc_pl.id}`]) {
+                                    const o_curr_target = a_curr_target.find(o_target => o_target.org_id === o_acc_pl.id)
+                                    o_data[`${o_acc_pl.id}`] = { id: o_acc_pl.id, name: o_acc_pl.name, curr_target: o_curr_target?.target_rohc ?? 0 }
+                                }
+                                if (o_acc_pl.year === year) {
+                                    o_data[`${o_acc_pl.id}`]['curr_margin'] = (o_acc_pl?.margin_amount_sum ?? 0)
+                                } else if (o_acc_pl.year === last_year) {
+                                    o_data[`${o_acc_pl.id}`]['last_margin'] = (o_acc_pl?.margin_amount_sum ?? 0)
+                                    o_data[`${o_acc_pl.id}`]['last_margin_sum'] = (o_acc_pl?.margin_total_amount_sum ?? 0)
+                                }
+                            }
+                        })
                     }
-                })
+                }
             }
+            
 
             if(rsp_data.length > 0){
                 rsp_data.forEach(o_rsp => {
@@ -354,35 +355,25 @@ module.exports = (srv) => {
                     }
                 })
             }
-            
+
             // 합계 로직
             let a_data = Object.values(o_data);
             let o_total = { "display_order": 0, "org_id": 'total', "org_name": org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? org_col_nm_name : '합계' };
             let org_data = [];
             org_list.forEach((data) => {
                 let o_rohc_data = a_data.find(o_data => o_data.id === data.id);
-                let curr_margin, last_margin, last_margin_sum;
-                if(data.org_tp === 'hybrid' || data.org_tp === 'account'){
-                    curr_margin = 'curr_acc_pl_margin';
-                    last_margin = 'last_acc_pl_margin';
-                    last_margin_sum = 'last_acc_pl_margin_sum';
-                }else{
-                    curr_margin = 'curr_margin';
-                    last_margin = 'last_margin';
-                    last_margin_sum = 'last_margin_sum';
-                }
                 if (o_rohc_data) {
                     org_data.push({
                         "display_order": data.org_order,
                         "org_id": data.id,
                         "org_name": data.name,
                         "target_curr_y_value": o_rohc_data?.curr_target ?? 0,
-                        "actual_curr_ym_value": (o_rohc_data?.curr_total_year_amt ?? 0) === 0 ? 0 : ((o_rohc_data?.[curr_margin] ?? 0) - (o_rohc_data?.curr_amount_sum ?? 0)) / o_rohc_data.curr_total_year_amt,
-                        "actual_last_ym_value": (o_rohc_data?.last_total_year_amt ?? 0) === 0 ? 0 : ((o_rohc_data?.[last_margin] ?? 0) - (o_rohc_data?.last_amount_sum ?? 0)) / o_rohc_data.last_total_year_amt,
-                        "actual_curr_ym_rate": (o_rohc_data?.curr_target ?? 0) === 0 || (o_rohc_data?.curr_total_year_amt ?? 0) === 0 ? 0 : (((o_rohc_data?.[curr_margin] ?? 0) - (o_rohc_data?.curr_amount_sum ?? 0)) / o_rohc_data.curr_total_year_amt) / (o_rohc_data.curr_target),
-                        "actual_last_ym_rate": (o_rohc_data?.last_year_total_year_amt ?? 0) === 0 || (o_rohc_data?.last_total_year_amt ?? 0) === 0 ? 0 : (((o_rohc_data?.[last_margin] ?? 0) - (o_rohc_data?.last_amount_sum ?? 0)) / o_rohc_data.last_total_year_amt) / (((o_rohc_data?.[last_margin_sum] ?? 0) - (o_rohc_data?.last_amount_total_sum ?? 0)) / o_rohc_data.last_year_total_year_amt),
-                        "actual_curr_ym_value_gap": ((o_rohc_data?.curr_total_year_amt ?? 0) === 0 ? 0 : ((o_rohc_data?.[curr_margin] ?? 0) - (o_rohc_data?.curr_amount_sum ?? 0)) / o_rohc_data.curr_total_year_amt) - ((o_rohc_data?.last_total_year_amt ?? 0) === 0 ? 0 : ((o_rohc_data?.[last_margin] ?? 0) - (o_rohc_data?.last_amount_sum ?? 0)) / o_rohc_data.last_total_year_amt),
-                        "actual_curr_ym_rate_gap": ((o_rohc_data?.curr_target ?? 0) === 0 || (o_rohc_data?.curr_total_year_amt ?? 0) === 0 ? 0 : (((o_rohc_data?.[curr_margin] ?? 0) - (o_rohc_data?.curr_amount_sum ?? 0)) / o_rohc_data.curr_total_year_amt) / (o_rohc_data.curr_target)) - ((o_rohc_data?.last_year_total_year_amt ?? 0) === 0 || (o_rohc_data?.last_total_year_amt ?? 0) === 0 ? 0 : (((o_rohc_data?.[last_margin] ?? 0) - (o_rohc_data?.last_amount_sum ?? 0)) / o_rohc_data.last_total_year_amt) / (((o_rohc_data?.[last_margin_sum] ?? 0) - (o_rohc_data?.last_amount_total_sum ?? 0)) / o_rohc_data.last_year_total_year_amt))
+                        "actual_curr_ym_value": (o_rohc_data?.curr_total_year_amt ?? 0) === 0 ? 0 : ((o_rohc_data?.curr_margin ?? 0) - (o_rohc_data?.curr_amount_sum ?? 0)) / o_rohc_data.curr_total_year_amt,
+                        "actual_last_ym_value": (o_rohc_data?.last_total_year_amt ?? 0) === 0 ? 0 : ((o_rohc_data?.last_margin ?? 0) - (o_rohc_data?.last_amount_sum ?? 0)) / o_rohc_data.last_total_year_amt,
+                        "actual_curr_ym_rate": (o_rohc_data?.curr_target ?? 0) === 0 || (o_rohc_data?.curr_total_year_amt ?? 0) === 0 ? 0 : (((o_rohc_data?.curr_margin ?? 0) - (o_rohc_data?.curr_amount_sum ?? 0)) / o_rohc_data.curr_total_year_amt) / (o_rohc_data.curr_target),
+                        "actual_last_ym_rate": (o_rohc_data?.last_year_total_year_amt ?? 0) === 0 || (o_rohc_data?.last_total_year_amt ?? 0) === 0 ? 0 : (((o_rohc_data?.last_margin ?? 0) - (o_rohc_data?.last_amount_sum ?? 0)) / o_rohc_data.last_total_year_amt) / (((o_rohc_data?.last_margin_sum ?? 0) - (o_rohc_data?.last_amount_total_sum ?? 0)) / o_rohc_data.last_year_total_year_amt),
+                        "actual_curr_ym_value_gap": ((o_rohc_data?.curr_total_year_amt ?? 0) === 0 ? 0 : ((o_rohc_data?.curr_margin ?? 0) - (o_rohc_data?.curr_amount_sum ?? 0)) / o_rohc_data.curr_total_year_amt) - ((o_rohc_data?.last_total_year_amt ?? 0) === 0 ? 0 : ((o_rohc_data?.last_margin ?? 0) - (o_rohc_data?.last_amount_sum ?? 0)) / o_rohc_data.last_total_year_amt),
+                        "actual_curr_ym_rate_gap": ((o_rohc_data?.curr_target ?? 0) === 0 || (o_rohc_data?.curr_total_year_amt ?? 0) === 0 ? 0 : (((o_rohc_data?.curr_margin ?? 0) - (o_rohc_data?.curr_amount_sum ?? 0)) / o_rohc_data.curr_total_year_amt) / (o_rohc_data.curr_target)) - ((o_rohc_data?.last_year_total_year_amt ?? 0) === 0 || (o_rohc_data?.last_total_year_amt ?? 0) === 0 ? 0 : (((o_rohc_data?.last_margin ?? 0) - (o_rohc_data?.last_amount_sum ?? 0)) / o_rohc_data.last_total_year_amt) / (((o_rohc_data?.last_margin_sum ?? 0) - (o_rohc_data?.last_amount_total_sum ?? 0)) / o_rohc_data.last_year_total_year_amt))
                     });
                 }
             });
@@ -408,30 +399,37 @@ module.exports = (srv) => {
                 return iSum;
             }, 0);
 
+            if(orgInfo.lv3_ccorg_cd === '237100'){
+                actual_curr_total_margin = 0;
+                actual_last_total_margin = 0;
+                actual_last_total_margin_sum = 0;
+            }
             
-            let actual_curr_acc_total_margin = account_pl_data.reduce((iSum, oData) => {
-                if (oData.year == year) {
-                    iSum += parseInt(oData.margin_amount_sum)
-                }
-                return iSum;
-            }, 0);
-            actual_curr_total_margin += (actual_curr_acc_total_margin ?? 0);
+            if(orgInfo.org_level !== 'lv1' && orgInfo.org_level !== 'lv2'){
+                let actual_curr_acc_total_margin = account_pl_data.reduce((iSum, oData) => {
+                    if (oData.year == year) {
+                        iSum += parseInt(oData.margin_amount_sum)
+                    }
+                    return iSum;
+                }, 0);
+                actual_curr_total_margin += (actual_curr_acc_total_margin ?? 0);
 
-            let actual_last_acc_total_margin = account_pl_data.reduce((iSum, oData) => {
-                if (oData.year == last_year) {
-                    iSum += parseInt(oData.margin_amount_sum)
-                }
-                return iSum;
-            }, 0);
-            actual_last_total_margin += (actual_last_acc_total_margin ?? 0);
+                let actual_last_acc_total_margin = account_pl_data.reduce((iSum, oData) => {
+                    if (oData.year == last_year) {
+                        iSum += parseInt(oData.margin_amount_sum)
+                    }
+                    return iSum;
+                }, 0);
+                actual_last_total_margin += (actual_last_acc_total_margin ?? 0);
 
-            let actual_last_acc_total_margin_sum = account_pl_data.reduce((iSum, oData) => {
-                if (oData.year == last_year) {
-                    iSum += parseInt(oData.margin_total_amount_sum)
-                }
-                return iSum;
-            }, 0);
-            actual_last_total_margin_sum += (actual_last_acc_total_margin_sum ?? 0);
+                let actual_last_acc_total_margin_sum = account_pl_data.reduce((iSum, oData) => {
+                    if (oData.year == last_year) {
+                        iSum += parseInt(oData.margin_total_amount_sum)
+                    }
+                    return iSum;
+                }, 0);
+                actual_last_total_margin_sum += (actual_last_acc_total_margin_sum ?? 0);
+            }
 
             let actual_curr_total_sga = sga_data.reduce((iSum, oData) => {
                 if (oData.year == year) {

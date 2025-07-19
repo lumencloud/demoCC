@@ -9,7 +9,7 @@
     displayBlock="true"
     controllerName="bix.card.oiUiTable.Main"
 >
-    <table:Table id="oIUiTable"
+    <table:Table id="table"
         class="custom-table-container custom-table-header custom-table-body custom-pl-table custom-table-first-emphasis custom-uiTable-selection custom-inherit-height" 
         selectionMode="Single" 
         rowSelectionChange="onRowSelectionChange"
@@ -71,7 +71,7 @@
                                 {value:'targetTooltip'}
                             ],
                             formatter: '.onFormatPerformance'}"
-                        class="fixed-empty-plan-oi"
+                        class="fixed-empty-actual-oi"
                         wrapping="false" width="90%" textAlign="End" emptyIndicatorMode="On"/>
                 </table:template>
             </table:Column>
@@ -93,7 +93,7 @@
                             {value:'tooltip'}
                         ],
                         formatter: '.onFormatPerformance'}"
-                    class="fixed-empty-plan-oi"
+                    class="fixed-empty-actual-oi"
                     wrapping="false" width="90%" textAlign="End" emptyIndicatorMode="On"/>
                 </table:template>
             </table:Column>
@@ -116,7 +116,7 @@
                             {value:'tooltip'}
                         ],
                         formatter: '.onFormatPerformance'}"
-                    class="fixed-empty-plan-oi"
+                    class="fixed-empty-actual-oi"
                     wrapping="false" width="90%" textAlign="End" emptyIndicatorMode="On"/>
                 </table:template>
             </table:Column>
@@ -154,7 +154,7 @@
                             {value: 'icon'}
                         ],
                         formatter: '.onFormatInfoLabel'}"
-                    class="fixed-empty-plan-oi custom-pl-cell-color"
+                    class="fixed-empty-actual-oi custom-pl-cell-color"
                     width="90%"/>
                 </table:template>
             </table:Column>
@@ -178,7 +178,7 @@
                                 {value:'tooltip'}
                             ],
                             formatter: '.onFormatPerformance'}"
-                        class="fixed-empty-plan-oi"
+                        class="fixed-empty-actual-oi"
                         wrapping="false" width="90%" textAlign="End" emptyIndicatorMode="On"/>
                 </table:template>
             </table:Column>
@@ -202,7 +202,7 @@
                                 {value:'tooltip'}
                             ],
                             formatter: '.onFormatPerformance'}"
-                    class="fixed-empty-plan-oi"
+                    class="fixed-empty-actual-oi"
                     wrapping="false" width="90%" textAlign="End" emptyIndicatorMode="On"/>
                 </table:template>
             </table:Column>
@@ -240,7 +240,7 @@
                                 {value: 'icon'}
                             ],
                             formatter: '.onFormatInfoLabel'}"
-                        class="fixed-empty-plan-oi custom-pl-cell-color"
+                        class="fixed-empty-actual-oi custom-pl-cell-color"
                         width="90%"/>
                 </table:template>
             </table:Column>

@@ -73,7 +73,7 @@ entity Menu {
         description             : String(1000)  @title: '메뉴설명'          @description: '메뉴의 기능과 용도에 대한 설명';
         trigger_patterns        : String(1000)  @title: '트리거패턴'        @description: '메뉴 키워드 정보';
         route_template          : String(500)   @title: '라우트템플릿'      @description: 'URL 경로의 템플릿 패턴';
-        available_items         : String(50)    @title: '사용가능항목'      @description: '해당 메뉴에서 사용 가능한 item 파라미터 목록';
+        available_items         : String(200)   @title: '사용가능항목'      @description: '해당 메뉴에서 사용 가능한 item 파라미터 목록';
         is_use                  : Boolean       @title: '사용여부'          @description: '사용 여부';
         is_system               : Boolean       @title: '시스템여부'        @description: '시스템 메뉴 여부';
         last_mod_dt             : Date          @title: '최종변경일'        @description: '최종 변경일';

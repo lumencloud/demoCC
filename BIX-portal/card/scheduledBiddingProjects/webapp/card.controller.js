@@ -11,15 +11,18 @@ sap.ui.define(
     "use strict";
     return BaseController.extend("bix.card.scheduledBiddingProjects.card", {
       _oEventBus: EventBus.getInstance(),
+      _bFlag: true,// 페이지 체인지 데이터 재요청으로 인해 카드 로딩되는 카운트가 늘어 분기처리
 
       onInit: function () {
         this._dataSetting();
-        this._oEventBus.subscribe("aiReport", "dateData", this._dataSetting, this)
+        this._oEventBus.subscribe("aiReport", "dateDataTable", this._dataSetting, this)
       },
 
-      _dataSetting: async function (oEvent, sEventId, oData) {
+      _dataSetting: async function (oEvent, sEventId) {
         this.byId("cardContent").setBusy(true);
         let { monday, sunday } = this._setDate();
+
+        let oData = JSON.parse(sessionStorage.getItem("aiWeekReport"));
 
         const oModel = new ODataModel({
           serviceUrl: "../odata/v4/ai-api/",
@@ -32,14 +35,14 @@ sap.ui.define(
 
         await oModel.bindContext(sPath).requestObject().then(
           function (aResult) {
-            Module.displayStatusForEmpty(this.byId("table"),aResult.value, this.byId("cardContent"));
+            Module.displayStatusForEmpty(this.byId("table"), aResult.value, this.byId("cardContent"));
             this._modelSetting(aResult.value);
-            this.dataLoad();
+           
           }.bind(this))
           .catch((oErr) => {
-              Module.displayStatus(this.getOwnerComponent().oCard,oErr.error.code, this.byId("cardContent"));
+            Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
           });
-          this.byId("cardContent").setBusy(false);
+        this.byId("cardContent").setBusy(false);
       },
 
       _modelSetting: function (aResult) {
@@ -64,8 +67,12 @@ sap.ui.define(
           })
         }
         // Account 코드 삭제
-        oModel.forEach(a => {
-          a.biz_tp_account_nm = a.biz_tp_account_nm.slice(4)
+        aResult.forEach(a => {
+          if (a.biz_tp_account_nm) {
+            a.biz_tp_account_nm = a.biz_tp_account_nm.slice(4)
+          } else {
+            a.biz_tp_account_nm = ''
+          }
         })
 
         if (oModel[4]) {
@@ -76,13 +83,16 @@ sap.ui.define(
         }
         this.getView().setModel(new JSONModel(oModel), "model");
         let oTable = this.byId("table")
+
         Module.setTableMerge(oTable, "model", 3);
+
+        if (this._bFlag) {
+          this.dataLoad();
+        }
+
         oTable.setVisibleRowCountMode("Fixed")
         oTable.setVisibleRowCount(oModel.length)
-        // oTable.setNoData("상반기 입찰 예정 건이 없습니다.")
-        // if (iCount < 4) {
-        //   this.byId("schedulebottomHBox").setVisible(false)
-        // }
+        oTable.setNoData("상반기 입찰 예정 건이 없습니다.")
 
         let subTitle = `(총 ${iAmount.toFixed(2)}억원 / ${iCount}건)`
         if (this.getOwnerComponent().oCard.getAggregation("_header")) {
@@ -118,7 +128,7 @@ sap.ui.define(
 
         let fNumber = parseFloat(sValue);
         if (Number.isInteger(fNumber)) {
-          let oFormatter = NumberFormat.getIntegerInstance({
+          let oFormatter = NumberFormat.getFloatInstance({
             groupingEnabled: true
           });
           return oFormatter.format(fNumber);
@@ -133,9 +143,10 @@ sap.ui.define(
         }
       },
       dataLoad: function () {
-          this._oEventBus.publish("CardWeekChannel", "CardWeekFullLoad", {
-              cardId: this.getView().getId()
-          })
+        this._oEventBus.publish("CardWeekChannel", "CardWeekFullLoad", {
+          cardId: this.getView().getId()
+        })
+        this._bFlag = false;
       },
     })
   }

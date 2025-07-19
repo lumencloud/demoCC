@@ -5,14 +5,14 @@ sap.ui.define([
     "sap/ui/model/odata/v4/ODataModel",
     "sap/ui/core/format/NumberFormat",
     "sap/ui/core/EventBus",
-], function (Controller, JSONModel, Module, ODataModel, NumberFormat, EventBus ) {
+], function (Controller, JSONModel, Module, ODataModel, NumberFormat, EventBus) {
     "use strict";
 
     return Controller.extend("bix.card.deliveryMonthlyContent3_3.card", {
         _aCanvasId: [],
         _aContainerId: [],
         _oEventBus: EventBus.getInstance(),
-        _oMyChart : [],
+        _oMyChart: [],
 
 
         onInit: function () {
@@ -20,12 +20,9 @@ sap.ui.define([
             this._createId();
 
             // 차트 설정
-            this._setChart();
+            // this._setChart();
 
-            this._oEventBus.subscribe("aireport", "infoSet", this._updateChart, this);	
-
-
-
+            this._oEventBus.subscribe("aireport", "deliContent3_3", this._setChart, this);
         },
         /**
          * Component별 유일한 ID 생성
@@ -40,9 +37,9 @@ sap.ui.define([
             this._iMinHeight = 400;
         },
 
-        _updateChart: async function () {
-            this.byId("cardContent").setBusy(true)
-            let aResults = await this._dataSetting();
+        _updateChart: async function (sChannel, sEventId, oDataResult) {
+            this.getOwnerComponent().oCard.setBusy(true);
+            let aResults = await this._dataSetting(oDataResult.data);
 
             this._oMyChart[0].data.labels = aResults.aLabel
             this._oMyChart[0].data.datasets[0].data = aResults.aEmpty
@@ -54,59 +51,57 @@ sap.ui.define([
             let oData = JSON.parse(sessionStorage.getItem("aiReport"));
             let sMonth = Number(oData.month)
             let actualText, planText;
-            if(sMonth === 1){
+            if (sMonth === 1) {
                 actualText = `실적(${sMonth}월)`
-                planText = `추정치(${Number(sMonth)+1}~12월)`
-            } else if(sMonth === 12){
+                planText = `추정치(${Number(sMonth) + 1}~12월)`
+            } else if (sMonth === 12) {
                 actualText = `실적(1~${sMonth}월)`
                 planText = `추정치(-)`
             } else {
                 actualText = `실적(1~${sMonth}월)`
-                planText = `추정치(${Number(sMonth)+1}~12월)`
+                planText = `추정치(${Number(sMonth) + 1}~12월)`
             }
 
-            this._oMyChart[0].options.plugins.legend.labels.generateLabels = 
-            function(chart){
-                return[
-                    {
-                        text:'목표치',
-                        fillStyle:'red',
-                        strokeStyle: 'red',
-                        lineWidth: 1,
-                        hidden: false,
-                        datasetIndex: 0,
-                        pointStyle: 'rect'
-                    },
-                    {
-                        text: actualText                                                    ,
-                        fillStyle:'pink',
-                        strokeStyle: 'pink',
-                        lineWidth: 1,
-                        hidden: false,
-                        datasetIndex: 1,
-                        pointStyle: 'rect'
-                    },
-                    {
-                        text:planText,
-                        fillStyle: '#ddd',
-                        strokeStyle: '#ddd',
-                        lineWidth: 1,
-                        hidden: false,
-                        datasetIndex: 2,
-                        pointStyle: 'rect'
-                    }
-                ]
-            }
-
-
-
-
-            
+            this._oMyChart[0].options.plugins.legend.labels.generateLabels =
+                function (chart) {
+                    return [
+                        {
+                            text: '목표치',
+                            fillStyle: 'red',
+                            strokeStyle: 'red',
+                            lineWidth: 1,
+                            hidden: false,
+                            datasetIndex: 0,
+                            pointStyle: 'rect'
+                        },
+                        {
+                            text: actualText,
+                            fillStyle: 'pink',
+                            strokeStyle: 'pink',
+                            lineWidth: 1,
+                            hidden: false,
+                            datasetIndex: 1,
+                            pointStyle: 'rect'
+                        },
+                        {
+                            text: planText,
+                            fillStyle: '#ddd',
+                            strokeStyle: '#ddd',
+                            lineWidth: 1,
+                            hidden: false,
+                            datasetIndex: 2,
+                            pointStyle: 'rect'
+                        }
+                    ]
+                }
+            this.dataLoad();
             this._oMyChart[0].update();
-            this.byId("cardContent").setBusy(false)
+            setTimeout(() => {
+                this.getOwnerComponent().oCard.setBusy(false);
+            }, 300)
         },
 
-        _setChart: async function () {
+        _setChart: async function (sChannel, sEventId, oDataResult) {
             this.byId("cardContent").setBusy(true)
             // 카드
             const oCard = this.getOwnerComponent().oCard;
@@ -118,21 +113,21 @@ sap.ui.define([
             let iBoxHeight = Math.floor(oParentElement.clientHeight / window.innerHeight * 90);
 
             //커스텀 플러그인: 막대의 윗부분에서 오른쪽으로 선 긋기
-            let connectorPlugin={
+            let connectorPlugin = {
                 id: 'barConnector',
-                afterDatasetsDraw(chart){
-                    let {ctx, chartArea: {top, bottom}, scales: {x,y}} = chart;
-                    
+                afterDatasetsDraw(chart) {
+                    let { ctx, chartArea: { top, bottom }, scales: { x, y } } = chart;
+
                     let datasetMeta = chart.getDatasetMeta(1);
                     let datasetMeta2 = chart.getDatasetMeta(2);
                     ctx.save();
                     ctx.strokeStyle = '#ddd';
-                    ctx.setLineDash([2,2])
+                    ctx.setLineDash([2, 2])
                     ctx.lineWidth = 1;
 
-                    for(let i = 0; i<datasetMeta.data.length - 1; i++){
+                    for (let i = 0; i < datasetMeta.data.length - 1; i++) {
                         let curr = datasetMeta.data[i];
-                        let next = datasetMeta.data[i+1];
+                        let next = datasetMeta.data[i + 1];
 
                         let currX = curr.x + curr.width / 2;
                         let currY = curr.y;
@@ -145,9 +140,9 @@ sap.ui.define([
                         ctx.stroke();
                     }
 
-                    for(let i = 0; i<datasetMeta2.data.length - 1; i++){
+                    for (let i = 0; i < datasetMeta2.data.length - 1; i++) {
                         let curr = datasetMeta2.data[i];
-                        let next = datasetMeta2.data[i+1];
+                        let next = datasetMeta2.data[i + 1];
 
                         let currX = curr.x + curr.width / 2;
                         let currY = curr.y;
@@ -169,94 +164,91 @@ sap.ui.define([
             let oData = JSON.parse(sessionStorage.getItem("aiReport"));
             let sMonth = Number(oData.month)
             let actualText, planText;
-            if(sMonth === 1){
+            if (sMonth === 1) {
                 actualText = `실적(${sMonth}월)`
-                planText = `추정치(${Number(sMonth)+1}~12월)`
-            } else if(sMonth === 12){
+                planText = `추정치(${Number(sMonth) + 1}~12월)`
+            } else if (sMonth === 12) {
                 actualText = `실적(1~${sMonth}월)`
                 planText = `추정치(-)`
             } else {
                 actualText = `실적(1~${sMonth}월)`
-                planText = `추정치(${Number(sMonth)+1}~12월)`
+                planText = `추정치(${Number(sMonth) + 1}~12월)`
             }
 
-
-
-
-
+            this._oEventBus.subscribe("aireport", "deliContent3_3", this._updateChart, this);
 
             for (let i = 0; i < this._aCanvasId.length; i++) {
                 let oHTML = this.byId("html" + i);
                 oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:950px; height:380px; min-height:380px'><canvas id='${this._aCanvasId[i]}' /></div>`);
-                oHTML.attachEvent("afterRendering", async function () {                                       
+                oHTML.attachEvent("afterRendering", async function () {
                     // 차트 구성
                     const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[i])).getContext("2d");
                     //데이터 요청
-                    let aData = await this._dataSetting();
+                    let aData = await this._dataSetting(oDataResult.data);
                     this._oMyChart[i] = new Chart(ctx, {
                         type: "bar",
                         data: {
                             labels: aData.aLabel,
-                            datasets: [      
+                            datasets: [
                                 {
                                     label: "Empty",
                                     data: aData.aEmpty,
                                     backgroundColor: "transparent",
                                     yAxisID: "y",
-                                    stack:1,                                 
+                                    stack: 1,
 
-                                },                          
+                                },
                                 {
                                     label: "실적",
                                     data: aData.aActual,
                                     backgroundColor: "pink",
-                                    yAxisID : "y",
-                                    stack:1,
-                                    datalabels:{
-                                        color: "pink",                                        
-                                        size:12,                                                                                                 
-                                    },    
+                                    yAxisID: "y",
+                                    stack: 1,
+                                    datalabels: {
+                                        color: "pink",
+                                        size: 12,
+                                    },
                                 },
                                 {
                                     label: "추정치",
                                     data: aData.aPlan,
                                     backgroundColor: "#ddd",
                                     yAxisID: "y",
-                                    stack:1,
-                                    datalabels:{
-                                        color: "#ddd",                                        
-                                        size:12,                                                                                                 
+                                    stack: 1,
+                                    datalabels: {
+                                        color: "#ddd",
+                                        size: 12,
                                     },
                                 },
-                                
+
                                 {
                                     label: "목표치",
                                     data: aData.aTotal,
                                     backgroundColor: "red",
-                                    yAxisID : "y",
-                                    stack:1, 
+                                    yAxisID: "y",
+                                    stack: 1,
                                 },
-                                
-                                
-                                
+
+
+
 
                             ]
                         },
 
-                        options: {                            
+                        options: {
                             responsive: true,
-                            maintainAspectRatio: false,       
-                            plugins:{                                                                
+                            maintainAspectRatio: false,
+                            plugins: {
                                 legend: {
                                     display: true,
                                     position: 'bottom',
-                                    labels:{
+                                    labels: {
                                         usePointStyle: true,
-                                        generateLabels(chart){
-                                            return[
+                                        generateLabels(chart) {
+                                            return [
                                                 {
-                                                    text:'목표치',
-                                                    fillStyle:'red',
+                                                    text: '목표치',
+                                                    fillStyle: 'red',
                                                     strokeStyle: 'red',
                                                     lineWidth: 1,
                                                     hidden: false,
@@ -264,8 +256,8 @@ sap.ui.define([
                                                     pointStyle: 'rect'
                                                 },
                                                 {
-                                                    text: actualText                                                    ,
-                                                    fillStyle:'pink',
+                                                    text: actualText,
+                                                    fillStyle: 'pink',
                                                     strokeStyle: 'pink',
                                                     lineWidth: 1,
                                                     hidden: false,
@@ -273,7 +265,7 @@ sap.ui.define([
                                                     pointStyle: 'rect'
                                                 },
                                                 {
-                                                    text:planText,
+                                                    text: planText,
                                                     fillStyle: '#ddd',
                                                     strokeStyle: '#ddd',
                                                     lineWidth: 1,
@@ -283,44 +275,47 @@ sap.ui.define([
                                                 }
                                             ]
                                         }
-                                    }                                    
-                                                             
+                                    }
+
                                 },
-                                datalabels:{
-                                    clip:false,
+                                tooltip: {
+                                    enabled: false
+                                },
+                                datalabels: {
+                                    clip: false,
                                     display:
-                                    function(context){ 
-                                        if(context.dataset.label === 'Empty'){
+                                        function (context) {
+                                            if (context.dataset.label === 'Empty') {
                                                 return false
                                             } else {
                                                 return true
                                             }
-                                    },
+                                        },
                                     color: 'red',
                                     anchor: 'end',
                                     align: 'top',
-                                    font:{
+                                    font: {
                                         weight: 'bold',
                                         size: 12
                                     },
                                     offset: -3,
-                                    formatter: function(value){                                          
-                                            var oNumberFormat = NumberFormat.getIntegerInstance({
-                                                groupingEnabled: true,
-                                                groupingSeparator: ',',
-                                                groupingSize: 3,
-                                                decimals: 0
-                                            });
-                                            return oNumberFormat.format(value);                                                
-                                        }
-                                }                            
-                            },                     
+                                    formatter: function (value) {
+                                        var oNumberFormat = NumberFormat.getFloatInstance({
+                                            groupingEnabled: true,
+                                            groupingSeparator: ',',
+                                            groupingSize: 3,
+                                            decimals: 0
+                                        });
+                                        return oNumberFormat.format(value);
+                                    }
+                                }
+                            },
                             scales: {
                                 x: {
                                     stacked: true,
                                     barPercentage: 1,
-                                    categoryPercentage : 1,
-                                    border:{
+                                    categoryPercentage: 1,
+                                    border: {
                                     },
                                     grid: {
                                         display: false
@@ -335,109 +330,109 @@ sap.ui.define([
                                     }
                                 },
                                 y: {
-                                    type:"linear",
+                                    type: "linear",
                                     display: true,
                                     position: 'left',
-                                    stacked:true,
+                                    stacked: true,
                                     ticks: {
                                         callback: function (value) {
-                                            var oNumberFormat = NumberFormat.getIntegerInstance({
+                                            var oNumberFormat = NumberFormat.getFloatInstance({
                                                 groupingEnabled: true,
                                                 groupingSeparator: ',',
                                                 groupingSize: 3,
                                                 decimals: 0
                                             });
-                                            return oNumberFormat.format(value)+"억";  
+                                            return oNumberFormat.format(value) + "억";
                                         }
                                     },
-                                    beginAtZero:true,
-                                    min:0,
-                                    title:{
-                                        display:false,
+                                    beginAtZero: true,
+                                    min: 0,
+                                    max: 40000,
+                                    title: {
+                                        display: false,
                                         text: '금액(억원)',
                                         padding: {
-                                            top : 0,
-                                            bottom: 0,                                            
+                                            top: 0,
+                                            bottom: 0,
                                         }
-                                        
-                                      
+
+
                                     },
-                                }          
+                                }
                             }
                         },
                         plugins: [ChartDataLabels, connectorPlugin],
 
                     })
 
-                    
-                    this.dataLoad();
 
-                    this._ovserveResize(this.byId(this._aContainerId[i]), i)
+
+                    //this._ovserveResize(this.byId(this._aContainerId[i]), i)
                 }.bind(this));
-                
-``            }
-        this.byId("cardContent").setBusy(false)
+
+
+            }
+            this.dataLoad();
+            this.byId("cardContent").setBusy(false)
         },
 
-		dataLoad : function(){
-			const oEventBus = sap.ui.getCore().getEventBus();
-			oEventBus.publish("CardChannel","CardFullLoad",{
-				cardId:this.getView().getId()
-			})
-		},
+        dataLoad: function () {
+            const oEventBus = sap.ui.getCore().getEventBus();
+            oEventBus.publish("CardChannel", "CardFullLoad", {
+                cardId: this.getView().getId()
+            })
+        },
 
-        _ovserveResize: function(oElement, i){
+        _ovserveResize: function (oElement, i) {
 
-            if(!this._resizeObserver){
-                this._resizeObserver = new ResizeObserver(()=> {
+            if (!this._resizeObserver) {
+                this._resizeObserver = new ResizeObserver(() => {
                     this._oMyChart[i].resize()
                 })
-                   
             }
         },
 
-        _dataSetting: async function () {
-            let aResults = await this._setData();
+        _dataSetting: async function (oData) {
+            // let aResults = await this._setData();
+            let aResults = oData[0];
             let aData;
 
-            let aLabel=[];
+            let aLabel = [];
             let aActual = [];
             let aEmpty = [];
-            let aPlan=[];
+            let aPlan = [];
             let aTotal = [];
 
-            for(let i = 1; i<13; i++){                
-                aLabel.push(i+"월")
+            for (let i = 1; i < 13; i++) {
+                aLabel.push(i + "월")
                 aTotal.push(null)
 
-                if(aResults["m_"+i+"_type"] === "actual"){                    
-                    aActual.push(aResults["m_"+i+"_sale"])
+                if (aResults["m_" + i + "_type"] === "actual") {
+                    aActual.push(aResults["m_" + i + "_sale"])
                     aPlan.push(null)
-                } else if (aResults["m_"+i+"_type"] === "plan"){                    
+                } else if (aResults["m_" + i + "_type"] === "plan") {
                     aActual.push(null)
-                    aPlan.push(aResults["m_"+i+"_sale"])
+                    aPlan.push(aResults["m_" + i + "_sale"])
                 }
 
                 let iEmpty = 0;
-                for(let j=1; j<i; j++){
-                    iEmpty = iEmpty + aResults["m_"+j+"_sale"]
+                for (let j = 1; j < i; j++) {
+                    iEmpty = iEmpty + aResults["m_" + j + "_sale"]
                 }
                 aEmpty.push(iEmpty)
             }
-
-
 
             aLabel.push("Total")
             aActual.push(null)
             aPlan.push(null)
             aEmpty.push(null)
-            aTotal.push(aResults.target)            
-            
-            aData = {aLabel, aActual, aPlan, aEmpty, aTotal}
+            aTotal.push(aResults.target)
+
+            aData = { aLabel, aActual, aPlan, aEmpty, aTotal }
             return aData;
         },
 
-        _setData: async function(){
+        _setData: async function () {
             let oData = JSON.parse(sessionStorage.getItem("aiReport"));
 
             // 파라미터
@@ -445,27 +440,27 @@ sap.ui.define([
             let sMonth = oData.month
             let sOrgId = oData.orgId;
             let sType = oData.type;
-            
+
             const oModel = new ODataModel({
                 serviceUrl: "../odata/v4/pl_api/",
                 synchronizationMode: "None",
                 operationMode: "Server",
-              });
+            });
 
-              let sPath = `/get_ai_forecast_m_pl(year='${iYear}',month='${sMonth}',org_id='${sOrgId}',org_tp='${sType}')`
-            
-            let aData ;
-           await Promise.all([
-                    oModel.bindContext(sPath).requestObject(),                
-                ]).then(function(aResults){        
-                    aData = aResults[0].value[0]                
-                }.bind(this))
+            let sPath = `/get_ai_forecast_m_pl(year='${iYear}',month='${sMonth}',org_id='${sOrgId}',org_tp='${sType}')`
+
+            let aData;
+            await Promise.all([
+                oModel.bindContext(sPath).requestObject(),
+            ]).then(function (aResults) {
+                aData = aResults[0].value[0]
+            }.bind(this))
                 .catch((oErr) => {
-                    Module.displayStatus(this.getOwnerComponent().oCard,oErr.error.code, this.byId("cardContent"));
+                    Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
                 });
             return aData;
         },
 
-        
+
     });
 });           

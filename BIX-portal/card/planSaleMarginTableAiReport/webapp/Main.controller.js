@@ -33,16 +33,21 @@ sap.ui.define([
          */
         _sTableId: undefined,
 
-        onInit: async function () {
-            // 초기 JSON 모델 설정
-            await this._setModel();
-
-            // 테이블 바인딩
-            this._bindTable();
+        onInit: function () {
+            this._asyncInit();
             this._oEventBus.subscribe("pl", "search", this._bindTable, this);
 
             this._aiPopupManager = new AIPopupManager();
         },
+
+        _asyncInit: async function () {
+            
+            // 초기 JSON 모델 설정
+            await this._setModel();
+            // 테이블 바인딩
+            this._bindTable();
+        },
+
 
         /**
          * JSON 모델 설정
@@ -58,7 +63,7 @@ sap.ui.define([
             // 화면에 보일 테이블을 전역 변수에 저장
             this.getView().getControlsByFieldGroupId("content").forEach(object => {
                 if (object.isA("sap.ui.table.Table") && object.getFieldGroupIds().length > 0) {
-                    let sub_key = object.getFieldGroupIds().find(sId => sId === oAiData.aiSubKey);
+                    let sub_key = object.getFieldGroupIds().find(sId => sId === oAiData.subKey);
 
                     // sub_key가 일치하는 테이블의 로컬 ID를 저장
                     if (!!sub_key) {
@@ -98,7 +103,7 @@ sap.ui.define([
             HashChanger.getInstance().setHash(sNewHash);
 
             // PL에 detailSelect 해시 변경 EventBus 전송
-            this._oEventBus.publish("pl", "setHashModel");
+            this._oEventBus.publish("pl", "setHashModel", {system: true});
         },
 
         _setBusy: async function (bType) {
@@ -108,6 +113,10 @@ sap.ui.define([
         },
 
         _bindTable: async function (sChannelId, sEventId, oData) {
+            // DOM이 없는 경우 Return
+            let oDom = this.getView().getDomRef();
+            if (!oDom) return;
+            
             // 검색 조건
             let oAiData = this.getView().getModel("uiModel").getData();
             let oSearchData = this.getView().getModel("searchModel").getData();
@@ -122,20 +131,20 @@ sap.ui.define([
             const oPlModel = this.getOwnerComponent().getModel("pl");
 
             // sub_key에 따른 api 변경
-            let sKey = oAiData.aiSubKey;
+            let sKey = oAiData.subKey;
             let sBindingPath;
             if (sKey === "org") {
-                sBindingPath = `/get_forecast_pl_sale_margin_org_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}')`;
+                sBindingPath = `/get_forecast_pl_sale_margin_org_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}')`;
             } else if (sKey === "org_delivery") {
-                sBindingPath = `/get_forecast_pl_sale_margin_org_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}',org_tp='delivery')`;
+                sBindingPath = `/get_forecast_pl_sale_margin_org_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}',org_tp='delivery')`;
             } else if (sKey === "org_account") {
-                sBindingPath = `/get_forecast_pl_sale_margin_org_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}',org_tp='account')`;
+                sBindingPath = `/get_forecast_pl_sale_margin_org_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}',org_tp='account')`;
             } else if (sKey === "account") {
-                sBindingPath = `/get_plan_cstco_by_biz_account(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}',account_cd='${oAiData.aiAccountCd}')`
+                sBindingPath = `/get_plan_cstco_by_biz_account(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}',account_cd='${oAiData.accountCd}')`
             } else if (sKey === "relsco") { 
-                sBindingPath = `/get_forecast_pl_sale_margin_relsco_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}')`
+                sBindingPath = `/get_forecast_pl_sale_margin_relsco_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}')`
             } else if (sKey === "crov") { 
-                sBindingPath = `/get_forecast_pl_sale_margin_crov_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}')`
+                sBindingPath = `/get_forecast_pl_sale_margin_crov_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}')`
             }
 
             await Promise.all([
@@ -145,12 +154,17 @@ sap.ui.define([
                 // aResults[1].value = aResults[1].value.sort((a, b) => a.display_order - b.display_order); // display_order 로 정렬
                 
                 // type별로 필터링
-                if (oAiData.aiSubKey === "org_delivery" || oAiData.aiSubKey === "org_account") {
-                    aResults[0].value = aResults[0].value.filter(item => item.type === oAiData.aiType)
+                if (oAiData.subKey === "org_delivery" || oAiData.subKey === "org_account") {
+                    aResults[0].value = aResults[0].value.filter(item => item.type === oAiData.type)
                 }
-                
+
+                //가져온 데이터가 없는경우 확인후 출력
+                const oTable = this.byId(this._sTableId);
+                const oBox = oTable.getParent();
+                Module.displayStatusForEmpty(oTable, aResults[0].value, oBox);
+
+
                 // 테이블의 이름 없는 빈 모델에 데이터 저장
-                let oTable = this.byId(this._sTableId);
                 oTable.setModel(new JSONModel(aResults[0].value));
 
                 // this 변수에 테이블에 바인딩된 path 저장
@@ -175,7 +189,7 @@ sap.ui.define([
 
             // 처음 화면 렌더링시 table의 visibleCountMode auto 와 <FlexItemData growFactor="1"/>상태에서
             // 화면에 꽉 찬 테이블의 row 갯수를 전역변수에 저장하기 위함
-            if (oTable) {
+            if (oTable && !oTable?.mEventRegistry?.cellContextmenu) {
                 oTable.attachCellClick(this.onCellClick, this);
                 oTable.attachCellContextmenu(this.onCellContextmenu, this);
             }
@@ -247,7 +261,6 @@ sap.ui.define([
          */
         onRowSelectionChange: function (oEvent) {
             let aRowMergeInfo = Module._tableRowGrouping(oEvent.getSource());
-            Module.setMergeTableRowClick(oEvent.getSource(), aRowMergeInfo);
         },
 
         /**
@@ -268,15 +281,15 @@ sap.ui.define([
             const oAnalysisData = this._prepareAnalysisData();
 
             let oUiData = this.getView().getModel("uiModel").getData();
-            this._selectedSubTitle = oUiData.aiSubTitle;
+            this._selectedSubTitle = oUiData.subTitle;
 
             sessionStorage.setItem("aiModel",
                 JSON.stringify({
-                    aiOrgId: this._selectedOrgId,
-                    aiOrgName: this._selectedOrgName,
-                    aiType: this._selectedType,
-                    aiSubTitle: this._selectedSubTitle,
-                    aiSubKey : oUiData.aiSubKey
+                    orgId: this._selectedOrgId,
+                    orgNm: this._selectedOrgName,
+                    type: this._selectedType,
+                    subTitle: this._selectedSubTitle,
+                    subKey : oUiData.subKey
                 })
             )
 
@@ -308,17 +321,17 @@ sap.ui.define([
                 orgName: this._selectedOrgName || oSearchData.orgNm,
                 menuName: "매출/마진 상세",
                 type: this._selectedType,
-                subTitle: oUiData.aiSubTitle
+                subTitle: oUiData.subTitle
             };
 
             // sub_key가 account일 때
-            if (oUiData.aiSubKey === "account") {
+            if (oUiData.subKey === "account") {
                 tokenData = {
                     yearMonth: dYearMonth,
                     orgName: this._selectedOrgName || oSearchData.orgNm,
                     menuName: "매출/마진 상세",
-                    type: oUiData.aiSubKey,
-                    subTitle: oUiData.aiSubTitle
+                    type: oUiData.subKey,
+                    subTitle: oUiData.subTitle
                 };
             }
 
@@ -453,8 +466,8 @@ sap.ui.define([
          * @param {String} sTooltip 
          * @param {*} iValue 기본값
          */
-        onFormatPerformance: function (iValue, sTooltip) {
-            return Modules.valueFormat('', iValue, '', sTooltip)
+        onFormatPerformance: function (iValue, sType, sTooltip) {
+            return Modules.valueFormat(sType, iValue, '', sTooltip)
         },
     });
 });

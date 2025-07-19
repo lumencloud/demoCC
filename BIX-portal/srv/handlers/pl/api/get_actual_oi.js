@@ -39,7 +39,6 @@ module.exports = (srv) => {
              * [부문/본부/팀 + 년,month_amt,금액] 프로젝트 판관비 집계 뷰
              */
             const sga_view = db.entities('sga').wideview_view;
-
             const rsp_view = db.entities('rsp').wideview_view;
             const oi_view = db.entities('oi').wideview_view;
 
@@ -126,21 +125,13 @@ module.exports = (srv) => {
             /**
              * org_id 파라미터값으로 조직정보 조회
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_ccorg_cd'
-                when lv2_id = '${org_id}' THEN 'lv2_ccorg_cd'
-                when lv3_id = '${org_id}' THEN 'lv3_ccorg_cd'
-                when div_id = '${org_id}' THEN 'div_ccorg_cd'
-                when hdqt_id = '${org_id}' THEN 'hdqt_ccorg_cd'
-                when team_id = '${org_id}' THEN 'team_ccorg_cd'
-                end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd', 'org_tp'])
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_level', 'org_ccorg_cd', 'org_tp', 'lv3_ccorg_cd'])
                 .where({ 'org_id': org_id });
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             // 조직 정보를 where 조건에 추가
-            let org_level = orgInfo.org_level;
+            let org_level = orgInfo.org_level+'_ccorg_cd';
             let org_ccorg_cd = orgInfo.org_ccorg_cd;
 
             // 선택한 조직에 따른 조직 호출 (부문보다 높을 시 부문 단위, 부문일 때 본부 단위, 본부일 때 팀 단위)
@@ -187,11 +178,11 @@ module.exports = (srv) => {
             let pl_view_selec;
             let dt_view_selec;
             let nonmm_view_select;
-            if((org_level !== 'lv1_ccorg_cd' || org_level !== 'lv2_ccorg_cd') && orgInfo.org_tp === 'hybrid' || orgInfo.org_tp === 'account'){
+            if((org_level !== 'lv1_ccorg_cd' || org_level !== 'lv2_ccorg_cd') && orgInfo.lv3_ccorg_cd === '237100' || orgInfo.org_tp === 'account'){
                 pl_view_selec = account_pl_view;
                 dt_view_selec = account_dt_view;
                 nonmm_view_select = account_nonmm_view;
-            }else if(org_level === 'lv1_ccorg_cd' || org_level === 'lv2_ccorg_cd'|| orgInfo.org_tp === 'delivery'){
+            }else{
                 pl_view_selec = pl_view;
                 dt_view_selec = dt_view;
                 nonmm_view_select = non_mm_view;

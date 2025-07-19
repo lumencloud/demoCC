@@ -9,10 +9,15 @@ sap.ui.define([
     "bix/common/ai/util/InteractionUtils",
     "bix/common/ai/service/AgentService",
     "bix/common/library/customDialog/AIPopupManager",
-    "sap/m/MessageBox"
-], function (Controller, JSONModel, Module, ODataModel, NumberFormat, EventBus, Modules, InteractionUtils, AgentService, AIPopupManager, MessageBox) {
+    "sap/m/MessageBox",
+    "sap/ui/core/routing/HashChanger",
+], function (Controller, JSONModel, Module, ODataModel, NumberFormat, EventBus, Modules, InteractionUtils, AgentService, AIPopupManager, MessageBox,HashChanger) {
     "use strict";
 
+    /**
+     * @typedef {sap.ui.base.Event} Event
+     * @typedef {sap.m.Select} Select
+     */
     return Controller.extend("bix.card.planBrTable.Main", {
         /**
          * @type {sap.ui.core.EventBus} 글로벌 이벤트버스
@@ -29,29 +34,98 @@ sap.ui.define([
          */
         _oSearchData: {},
 
+        /**
+         * @type {Array} View의 모든 테이블 배열
+         */
+        _aTableLists: [],
+
+
         onInit: function () {
-            this._setUiModel();
-            this._bindTable();
+            this._asyncInit();
             this._oEventBus.subscribe("pl", "search", this._bindTable, this);
 
             this._aiPopupManager = new AIPopupManager();
         },
+        _asyncInit: async function () {
+            await this._setUiModel();
+            this._bindTable();
+        },
+        _setUiModel:async function () {
+            // 데이터 불러오기 전에 모든 테이블이 보여서 먼저 선언
+            this.getView().setModel(new JSONModel({}), "uiModel");
 
-        _setUiModel: function () {
-            this.getView().setModel(new JSONModel({
-                tableKind: "org"
-            }), "uiModel");
+            // 현재 해시를 기준으로 DB에서 Select에 들어갈 카드 정보를 불러옴
+            let oHashData = this.getOwnerComponent().oCard.getModel("hashModel").getData();
 
+            let sSelectPath = `/pl_content_view(page_path='${oHashData.page}',position='detail',grid_layout_info=null,detail_path='${oHashData.detail}',detail_info='${oHashData.detailType}')/Set`;
+            const oListBinding = this.getOwnerComponent().getModel("cm").bindList(sSelectPath, null, null, null, {
+                $filter: `length(sub_key) gt 0`
+            });
+            let aSelectContexts = await oListBinding.requestContexts();
+            let aSelectData = aSelectContexts.map(oContext => oContext.getObject());
+
+            // 카드 정보를 selectModel로 설정 (sub_key, sub_text)
+            this.getView().setModel(new JSONModel(aSelectData), "selectModel");
+
+            // 기본적으로 첫 번째 항목의 테이블을 보여줌
+            this.getView().setModel(new JSONModel({ tableKind: aSelectData[0].sub_key }), "uiModel");
+
+            // this._aTableLists에 fieldGroupId가 content인 요소 및 SelectModel에 포함된 테이블의 localId를 담음
+            this._aTableLists = [];
+            this.getView().getControlsByFieldGroupId("content").forEach(object => {
+                if (object.isA("sap.ui.table.Table") && object.getFieldGroupIds().length > 0) {
+                    let sub_key = object.getFieldGroupIds().find(sId => !!aSelectData.find(oData => oData.sub_key === sId));
+
+                    if (!!sub_key) {
+                        let sLocalId = this.getView().getLocalId(object.getId());
+
+                        this._aTableLists.push(sLocalId);
+                    }
+                }
+            })
         },
 
-        onUiChange: function (oEvent) {
+        /**
+         * Select 변경 이벤트
+         * @param {Event} oEvent 
+         */
+        onUiChange: async function (oEvent) {
+            // 선택한 key로 화면에 보여줄 테이블을 결정
+            let oSelect = /** @type {Select} */ (oEvent.getSource());
+            let sKey = (oSelect).getSelectedKey();
             let oUiModel = this.getView().getModel("uiModel");
-            oUiModel.setProperty("/tableKind", oEvent.getSource().getSelectedKey())
+            oUiModel.setProperty("/tableKind", sKey);
 
+            // detailCard Component 반환
+            let oCard = this.getOwnerComponent().oCard;
+            let oCardComponent = oCard._oComponent;
+
+            // PL 실적 hashModel에 detailSelect 업데이트
+            let oHashModel = oCardComponent.getModel("hashModel");
+            oHashModel.setProperty("/detailSelect", sKey);
+
+            // PL 실적 Manifest Routing
+            let oHashData = oHashModel.getData();
+            let sRoute = (oHashData["page"] === "actual" ? "RouteActual" : "RoutePlan");
+            oCardComponent.getRouter().navTo(sRoute, {
+                pageView: oHashData["pageView"],
+                detail: oHashData["detail"],
+                detailType: oHashData["detailType"],
+                orgId: oHashData["orgId"],
+                detailSelect: oHashData["detailSelect"],
+            });
+
+            // 선택한 항목의 테이블만 병합
+            let oItem = oEvent.getParameters()["item"];
+            let iTableIndex = oSelect.indexOfItem(oItem);
+            await this._setTableMerge([this._aTableLists[iTableIndex]]);
         },
-
 
         _bindTable: async function (sChannelId, sEventId, oData) {
+            // DOM이 없는 경우 Return
+            let oDom = this.getView().getDomRef();
+            if (!oDom) return;
+            
             // 새로운 검색 조건이 같은 경우 return
             oData = JSON.parse(sessionStorage.getItem("initSearchModel"));
             let aKeys = Object.keys(oData);
@@ -74,47 +148,66 @@ sap.ui.define([
                 operationMode: "Server"
             });
 
-            let sOrgPath = `/get_forecast_br_org_detail(year='${iYear}',org_id='${sOrgId}')`
-
-            await Promise.all([
-                oModel.bindContext(sOrgPath).requestObject(),
-            ]).then(function (aResults) {
-                Module.displayStatusForEmpty(this.byId("planBrTable1"),aResults[0].value, this.byId("planBrBox1"));
-                
+            let aBindingPath = [];
+            aBindingPath.push(`/get_forecast_br_org_detail(year='${iYear}',org_id='${sOrgId}')`)
 
 
-                this.getView().setModel(new JSONModel(aResults[0].value), "oBrTableModel")
+            await Promise.all(
+                aBindingPath.map(sPath => oModel.bindContext(sPath).requestObject()))
+                .then((aResults) => {
+
+                    // Empty 상태 설정 및 BindingPath를 테이블 변수 _sBindingPath로 설정
+                    // 모델바인딩 (테이블 당 하나의 모델만 사용하므로 따로 view에 모델을 선언하지 않고 각 테이블에 JSONModel을 바인딩)
+                    this._aTableLists.forEach((sTableId, index) => {
+                        let oTable = this.byId(sTableId);
+                        let oBox = oTable.getParent();
+
+                        // Empty 상태 설정
+                        Module.displayStatusForEmpty(oTable, aResults[index].value, oBox);
+
+                        // _sBindingPath 설정
+                        oTable._sBindingPath = aBindingPath[index];
+
+                        // 테이블에 모델 바인딩
+                        oTable.setModel(new JSONModel(aResults[index].value));
+                    })
 
 
-                // 테이블 로우 셋팅
-                this._setVisibleRowCount(aResults);
+                    // 테이블 로우 셋팅
+                    this._setVisibleRowCount(aResults);
+                })
+                .catch((oErr) => {
+                    // 추후 호출 분리 필요
+                    this._aTableLists.forEach((sTableId, index) => {
+                        let oTable = this.byId(sTableId);
+                        let oBox = oTable.getParent();
+                        Module.displayStatus(oTable, oErr.error.code, oBox);
+                    })
+                });
 
-            }.bind(this))
-            .catch((oErr) => {
-                Modules.displayStatus(this.byId("planBrTable1"),oErr.error.code, this.byId("planBrBox1"));
-            });
-            this._setTableMerge();
+            await this._setTableMerge(this._aTableLists);
 
-            this.byId("planBrBox1").setBusy(false);
+            this._setBusy(false);
 
         },
 
         _setBusy: function (bFlag) {
-            let aBoxLists = ["planBrBox1"];
-            aBoxLists.forEach((sBoxId) => this.byId(sBoxId).setBusy(bFlag))
+            // 모든 박스 setBusy 설정
+            this._aTableLists.forEach(sTableId => {
+                let oBox = this.byId(sTableId).getParent();
+                oBox.setBusy(bFlag);
+            })
         },
 
         _setVisibleRowCount: function (aResults) {
-            //테이블 리스트
-            let aTableLists = ["planBrTable1"]
 
-            for (let i = 0; i < aTableLists.length; i++) {
+            for (let i = 0; i < this._aTableLists.length; i++) {
                 // 테이블 아이디로 테이블 객체
-                let oTable = this.byId(aTableLists[i])
+                let oTable = this.byId(this._aTableLists[i])
                 // 처음 화면 렌더링시 table의 visibleCountMode auto 와 <FlexItemData growFactor="1"/>상태에서
                 // 화면에 꽉 찬 테이블의 row 갯수를 전역변수에 저장하기 위함
 
-                if (oTable) {
+                if (oTable && !oTable?.mEventRegistry?.cellContextmenu) {
                     oTable.attachCellClick(this.onCellClick, this);
                     oTable.attachCellContextmenu(this.onCellContextmenu, this);
                 }
@@ -122,6 +215,7 @@ sap.ui.define([
                 if (this._iColumnCount === null) {
                     this._iColumnCount = oTable.getVisibleRowCount();
                 }
+
                 // 전역변수의 row 갯수 기준을 넘어가면 rowcountmode를 자동으로 하여 넘치는것을 방지
                 // 전역변수의 row 갯수 기준 이하면 rowcountmode를 수동으로 하고, 각 데이터의 길이로 지정
                 if (aResults[i].value.length > this._iColumnCount) {
@@ -134,24 +228,16 @@ sap.ui.define([
             }
         },
 
-        _setTableMerge: function () {
-            let oTable1 = this.byId("planBrTable1")
-            Module.setTableMergeWithAltColor(oTable1, "oBrTableModel");
 
+        _setTableMerge: function (aTableList) {
+            for (let i = 0; i < aTableList.length; i++) {
+                const oTable = this.byId(aTableList[i]);
 
+                Module.setTableMergeWithAltColor(oTable);
+            }
         },
 
-        onAfterRendering: function () {
-            let aTableList = ["planBrTable1"]
-            aTableList.forEach(
-                function (sTableId) {
-                    let oTable = this.byId(sTableId);
-                    //this._tableHeaderSetting(oTable, []);
-                }.bind(this)
-            )
 
-
-        },
 
         /**
          * 셀 클릭 이벤트 핸들러
@@ -184,7 +270,8 @@ sap.ui.define([
             if (result.cellInfo && result.cellInfo.columnIndex === 0) {
                 this._excludeClick = true;
             }
-
+            
+            this._excludeClick = !Module.checkAiPopupDisplay(oRowData,["forecast_value","secured_value","not_secured_value"]);
         },
 
         /**
@@ -211,9 +298,9 @@ sap.ui.define([
             //aireport에서 불러들일 값을 sessionStorage에 저장
             sessionStorage.setItem("aiModel",
                 JSON.stringify({
-                    aiOrgId: this._selectedOrgId,
-                    aiOrgName: this._selectedOrgName,
-                    aiType: this._selectedType
+                    orgId: this._selectedOrgId,
+                    orgNm: this._selectedOrgName,
+                    type: this._selectedType
                 })
             )
 

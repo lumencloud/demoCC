@@ -61,8 +61,8 @@ sap.ui.define([
             this._myChart2.data.labels = aData.aLabel
             this._myChart2.data.datasets[0].data = aData.aMarginRate
 
-            console.log(this._myChart1.data)
-            console.log(this._myChart2.data)
+            //console.log(this._myChart1.data)
+            //console.log(this._myChart2.data)
 
             
             try{

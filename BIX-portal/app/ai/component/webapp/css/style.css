@@ -477,3 +477,21 @@
 .ai-agent-badge-text {
     white-space: nowrap;
 }
+
+.custom-send-button,
+.custom-stop-button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.custom-send-button:hover,
+.custom-stop-button:hover {
+    background: transparent !important;
+}
+
+.custom-send-button:focus,
+.custom-stop-button:focus {
+    background: transparent !important;
+    outline: none !important;
+}

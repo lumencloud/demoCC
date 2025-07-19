@@ -13,8 +13,8 @@ sap.ui.define(
       _oEventBus: EventBus.getInstance(),
 
       onInit: function () {
-        this._dataSetting();
-        this._oEventBus.subscribe("aireport", "infoSet", this._dataSetting, this)
+        // this._dataSetting();
+        this._oEventBus.subscribe("aireport", "new", this._modelSetting, this)
       },
 
       _dataSetting: async function () {
@@ -56,7 +56,8 @@ sap.ui.define(
         })
       },
 
-      _modelSetting: function (aResult) {
+      _modelSetting: function (sChannel, sEventId, oData) {
+        let aResult = oData.data
         // 총 건수
         let iCount = aResult.length;
 
@@ -101,7 +102,7 @@ sap.ui.define(
         // 모델용 객체 생성
         let oModel = {
           iCount: aResult[4]?.rodr_cnt || iCount,
-          iAmount: iAmount.toFixed(0) || 0,
+          iAmount: this._formatTotal(iAmount.toFixed()) || 0,
           first: aResult[0] || null,
           second: aResult[1] || null,
           third: aResult[2] || null,
@@ -117,6 +118,7 @@ sap.ui.define(
           oModel["account2ndCount"] = aGroupedArray[1].length
         }
 
+        this.dataLoad();
         this._oEventBus.publish("aiReport", "newMonthData", oModel)
         this.getOwnerComponent().setModel(new JSONModel(oModel), "Model");
 
@@ -157,7 +159,7 @@ sap.ui.define(
 
         let fNumber = parseFloat(sValue);
         if (Number.isInteger(fNumber)) {
-          let oFormatter = NumberFormat.getIntegerInstance({
+          let oFormatter = NumberFormat.getFloatInstance({
             groupingEnabled: true
           });
           return oFormatter.format(fNumber);

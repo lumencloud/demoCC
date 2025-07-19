@@ -120,23 +120,33 @@ module.exports = (srv) => {
             let o_result = {}
             
             let o_total = {
-                'sale':{"display_order": 1, "item_order" : 1, "type": "매출", "org_id":"합계", "org_name" : '합계'},
-                'margin':{"display_order": 1, "item_order" : 2, "type": "마진", "org_id":"합계", "org_name" : '합계'}
+                'sale':{"display_order": 0, "item_order" : 1, "type": "매출", "org_id":"합계", "org_name" : '합계'},
+                'margin':{"display_order": 0, "item_order" : 2, "type": "마진", "org_id":"합계", "org_name" : '합계'},
+                'margin_rate':{"display_order": 0, "item_order" : 3, "type": "마진율", "org_id":"합계", "org_name" : '합계'}
             }
             o_total[`sale`]['curr_secured_value'] = a_curr_pl.reduce((iSum, oData) => iSum += oData.secured_sale, 0)
-            o_total[`margin`]['curr_secured_value'] = a_curr_pl.reduce((iSum, oData) => iSum += oData.secured_margin, 0)
             o_total[`sale`]['curr_not_secured_value'] = a_curr_pl.reduce((iSum, oData) => iSum += oData.not_secured_sale, 0)
-            o_total[`margin`]['curr_not_secured_value'] = a_curr_pl.reduce((iSum, oData) => iSum += oData.not_secured_margin, 0)
             o_total[`sale`]['curr_forecast_value'] = a_curr_pl.reduce((iSum, oData) => iSum += oData.secured_sale+oData.not_secured_sale, 0)
-            o_total[`margin`]['curr_forecast_value'] = a_curr_pl.reduce((iSum, oData) => iSum += oData.secured_margin+oData.not_secured_margin, 0)
             o_total[`sale`]['last_secured_value'] = a_last_pl.reduce((iSum, oData) => iSum += oData.secured_sale, 0)
-            o_total[`margin`]['last_secured_value'] = a_last_pl.reduce((iSum, oData) => iSum += oData.secured_margin, 0)
             o_total[`sale`]['last_not_secured_value'] = a_last_pl.reduce((iSum, oData) => iSum += oData.not_secured_sale, 0)
-            o_total[`margin`]['last_not_secured_value'] = a_last_pl.reduce((iSum, oData) => iSum += oData.not_secured_margin, 0)
             o_total[`sale`]['last_forecast_value'] = a_last_pl.reduce((iSum, oData) => iSum += oData.secured_sale+oData.not_secured_sale, 0)
             o_total[`sale`]['yoy'] = o_total[`sale`]['curr_forecast_value'] - o_total[`sale`]['last_forecast_value']
+
+            o_total[`margin`]['curr_secured_value'] = a_curr_pl.reduce((iSum, oData) => iSum += oData.secured_margin, 0)
+            o_total[`margin`]['curr_not_secured_value'] = a_curr_pl.reduce((iSum, oData) => iSum += oData.not_secured_margin, 0)
+            o_total[`margin`]['curr_forecast_value'] = a_curr_pl.reduce((iSum, oData) => iSum += oData.secured_margin+oData.not_secured_margin, 0)
+            o_total[`margin`]['last_secured_value'] = a_last_pl.reduce((iSum, oData) => iSum += oData.secured_margin, 0)
+            o_total[`margin`]['last_not_secured_value'] = a_last_pl.reduce((iSum, oData) => iSum += oData.not_secured_margin, 0)
             o_total[`margin`]['last_forecast_value'] = a_last_pl.reduce((iSum, oData) => iSum += oData.secured_margin+oData.not_secured_margin, 0)
             o_total[`margin`]['yoy'] = o_total[`margin`]['curr_forecast_value'] - o_total[`margin`]['last_forecast_value']
+
+            o_total['margin_rate']['curr_secured_value'] = o_total[`sale`]['curr_secured_value'] === 0 ? 0 : o_total[`margin`]['curr_secured_value']/o_total[`sale`]['curr_secured_value']
+            o_total['margin_rate']['curr_not_secured_value'] = o_total[`sale`]['curr_not_secured_value'] === 0 ? 0 : o_total[`margin`]['curr_not_secured_value']/o_total[`sale`]['curr_not_secured_value']
+            o_total['margin_rate']['curr_forecast_value'] = o_total[`sale`]['curr_forecast_value'] === 0 ? 0 : o_total[`margin`]['curr_forecast_value']/o_total[`sale`]['curr_forecast_value']
+            o_total['margin_rate']['last_secured_value'] = o_total[`sale`]['last_secured_value'] === 0 ? 0 : o_total[`margin`]['last_secured_value']/o_total[`sale`]['last_secured_value']
+            o_total['margin_rate']['last_not_secured_value'] = o_total[`sale`]['last_not_secured_value'] === 0 ? 0 : o_total[`margin`]['last_not_secured_value']/o_total[`sale`]['last_not_secured_value']
+            o_total['margin_rate']['last_forecast_value'] = o_total[`sale`]['last_forecast_value'] === 0 ? 0 : o_total[`margin`]['last_forecast_value']/o_total[`sale`]['last_forecast_value']
+            o_total[`margin_rate`]['yoy'] = o_total['margin_rate']['curr_forecast_value'] - o_total['margin_rate']['last_forecast_value']
             
             code_item_data.forEach(code => {
                 let o_curr_pl = a_curr_pl.find(pl => pl.bd_n2_cd === code.name);
@@ -144,26 +154,61 @@ module.exports = (srv) => {
                 if(!o_result[`${code.value}_sale`]){
                     o_result[`${code.value}_sale`]={display_order : code.sort_order, item_order : 1, org_name : code.value, org_id : code.name, type: "매출"}
                     o_result[`${code.value}_margin`]={display_order : code.sort_order, item_order : 2, org_name : code.value, org_id : code.name, type: "마진"}
+                    o_result[`${code.value}_margin_rate`]={display_order : code.sort_order, item_order : 3, org_name : code.value, org_id : code.name, type: "마진율"}
                 }
                 o_result[`${code.value}_sale`]['curr_secured_value'] = (o_curr_pl?.secured_sale ?? 0)
-                o_result[`${code.value}_margin`]['curr_secured_value'] = (o_curr_pl?.secured_margin ?? 0)
                 o_result[`${code.value}_sale`]['curr_not_secured_value'] = (o_curr_pl?.not_secured_sale ?? 0)
                 o_result[`${code.value}_sale`]['curr_forecast_value'] = (o_curr_pl?.secured_sale ?? 0) + (o_curr_pl?.not_secured_sale ?? 0)
-                o_result[`${code.value}_margin`]['curr_not_secured_value'] = (o_curr_pl?.not_secured_margin ?? 0)
-                o_result[`${code.value}_margin`]['curr_forecast_value'] = (o_curr_pl?.secured_margin ?? 0) + (o_curr_pl?.not_secured_margin ?? 0)
                 o_result[`${code.value}_sale`]['last_secured_value'] = (o_last_pl?.secured_sale ?? 0)
                 o_result[`${code.value}_sale`]['last_not_secured_value'] = (o_last_pl?.not_secured_sale ?? 0)
                 o_result[`${code.value}_sale`]['last_forecast_value'] = (o_last_pl?.secured_sale ?? 0) + (o_last_pl?.not_secured_sale ?? 0)
                 o_result[`${code.value}_sale`]['yoy'] = o_result[`${code.value}_sale`]['curr_forecast_value'] - o_result[`${code.value}_sale`]['last_forecast_value']
+
+                o_result[`${code.value}_margin`]['curr_secured_value'] = (o_curr_pl?.secured_margin ?? 0)
+                o_result[`${code.value}_margin`]['curr_not_secured_value'] = (o_curr_pl?.not_secured_margin ?? 0)
+                o_result[`${code.value}_margin`]['curr_forecast_value'] = (o_curr_pl?.secured_margin ?? 0) + (o_curr_pl?.not_secured_margin ?? 0)
                 o_result[`${code.value}_margin`]['last_secured_value'] = (o_last_pl?.secured_margin ?? 0)
                 o_result[`${code.value}_margin`]['last_not_secured_value'] = (o_last_pl?.not_secured_margin ?? 0)
                 o_result[`${code.value}_margin`]['last_forecast_value'] = (o_last_pl?.secured_margin ?? 0) + (o_last_pl?.not_secured_margin ?? 0)
                 o_result[`${code.value}_margin`]['yoy'] = o_result[`${code.value}_margin`]['curr_forecast_value'] - o_result[`${code.value}_margin`]['last_forecast_value']
+                
+                o_result[`${code.value}_margin_rate`]['curr_secured_value'] = o_result[`${code.value}_sale`]['curr_secured_value'] === 0 ? 0 : o_result[`${code.value}_margin`]['curr_secured_value']/o_result[`${code.value}_sale`]['curr_secured_value']
+                o_result[`${code.value}_margin_rate`]['curr_not_secured_value'] = o_result[`${code.value}_sale`]['curr_not_secured_value'] === 0 ? 0 : o_result[`${code.value}_margin`]['curr_not_secured_value']/o_result[`${code.value}_sale`]['curr_not_secured_value']
+                o_result[`${code.value}_margin_rate`]['curr_forecast_value'] = o_result[`${code.value}_sale`]['curr_forecast_value'] === 0 ? 0 : o_result[`${code.value}_margin`]['curr_forecast_value']/o_result[`${code.value}_sale`]['curr_forecast_value']
+                o_result[`${code.value}_margin_rate`]['last_secured_value'] = o_result[`${code.value}_sale`]['last_secured_value'] === 0 ? 0 : o_result[`${code.value}_margin`]['last_secured_value']/o_result[`${code.value}_sale`]['last_secured_value']
+                o_result[`${code.value}_margin_rate`]['last_not_secured_value'] = o_result[`${code.value}_sale`]['last_not_secured_value'] === 0 ? 0 : o_result[`${code.value}_margin`]['last_not_secured_value']/o_result[`${code.value}_sale`]['last_not_secured_value']
+                o_result[`${code.value}_margin_rate`]['last_forecast_value'] = o_result[`${code.value}_sale`]['last_forecast_value'] === 0 ? 0 : o_result[`${code.value}_margin`]['last_forecast_value']/o_result[`${code.value}_sale`]['last_forecast_value']
+                o_result[`${code.value}_margin_rate`]['yoy'] = o_result[`${code.value}_margin_rate`]['curr_forecast_value'] - o_result[`${code.value}_margin_rate`]['last_forecast_value']
             })
 
             const a_result = Object.values(o_result)
             const a_total = Object.values(o_total)
             oResult.push(...a_total,...a_result)
+            
+            let aSortFields = [
+                { field: "display_order", order: "asc" },
+                { field: "item_order", order: "asc" },
+            ];
+            oResult.sort((oItem1, oItem2) => {
+                for (const { field, order } of aSortFields) {
+                    // 필드가 null일 때
+                    if (oItem1[field] === null && oItem2[field] !== null) return -1;
+                    if (oItem1[field] !== null && oItem2[field] === null) return 1;
+                    if (oItem1[field] === null && oItem2[field] === null) continue;
+
+                    if (typeof oItem1[field] === "string") {    // 문자일 때 localeCompare
+                        var iResult = oItem1[field].localeCompare(oItem2[field]);
+                    } else if (typeof oItem1[field] === "number") { // 숫자일 때
+                        var iResult = oItem1[field] - oItem2[field];
+                    }
+
+                    if (iResult !== 0) {
+                        return (order === "asc") ? iResult : -iResult;
+                    }
+                }
+                return 0;
+            })
+            
             return oResult
         } catch(error) { 
             console.error(error); 

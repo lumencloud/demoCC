@@ -20,12 +20,9 @@ sap.ui.define([
             this._createId();
 
             // 차트 설정
-            this._setChart();
+            // this._setChart();
 
-            this._oEventBus.subscribe("aireport", "infoSet", this._updateChart, this);
-
-
-
+            this._oEventBus.subscribe("aireport", "deliContent2_4", this._setChart, this);
         },
         /**
          * Component별 유일한 ID 생성
@@ -40,9 +37,9 @@ sap.ui.define([
             this._iMinHeight = 400;
         },
 
-        _updateChart: async function () {
-            this.byId("cardContent").setBusy(true)
-            let aResults = await this._dataSetting();
+        _updateChart: async function (sChannel, sEventId, oData) {
+            this.getOwnerComponent().oCard.setBusy(true);
+            let aResults = await this._dataSetting(oData.data);
 
             this._oMyChart[0].data.labels = aResults.aLabel
             this._oMyChart[0].data.datasets[0].data = aResults.aLabor
@@ -52,11 +49,14 @@ sap.ui.define([
             this._oMyChart[0].config._config.options.plugins.groupLabels.labels = aResults.aTotal
             // this._oMyChart[0]._total = aResults.aTotal;
             this._oMyChart[0].update();
-            this.byId("cardContent").setBusy(false)
+            this.dataLoad();
+            setTimeout(() => {
+                this.getOwnerComponent().oCard.setBusy(false);
+            }, 300)
         },
 
 
-        _setChart: async function () {
+        _setChart: async function (sChannel, sEventId, oData) {
             this.byId("cardContent").setBusy(true)
             // 카드
             const oCard = this.getOwnerComponent().oCard;
@@ -79,7 +79,7 @@ sap.ui.define([
                         if (aTotal && aTotal[i] !== undefined) {
                             const x = xScale.getPixelForTick(i);
                             const y = xScale.bottom + 5;
-                            const val = (aTotal[i] / 10000000).toFixed(0).toLocaleString() + "억";
+                            const val = (aTotal[i] / 100000000).toFixed(0).toLocaleString() + "억";
                             ctx.fillText(val, x, y)
                         }
                     })
@@ -93,6 +93,10 @@ sap.ui.define([
             let iBoxWidth = Math.floor(oParentElement.clientWidth / window.innerWidth * 90);
             let iBoxHeight = Math.floor(oParentElement.clientHeight / window.innerHeight * 90);
 
+            let red = "#EA002d"
+            let orange = "#ff7a01"
+            let pink = "#ffbd98"
+
             for (let i = 0; i < this._aCanvasId.length; i++) {
                 let oHTML = this.byId("html" + i);
                 oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:950px; height:380px; min-height:380px'><canvas id='${this._aCanvasId[i]}' /></div>`);
@@ -100,7 +104,7 @@ sap.ui.define([
                     // 차트 구성
                     const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[i])).getContext("2d");
                     //데이터 요청
-                    let aData = await this._dataSetting();
+                    let aData = await this._dataSetting(oData.data);
                     this._oMyChart[i] = new Chart(ctx, {
                         type: "bar",
                         data: {
@@ -110,7 +114,7 @@ sap.ui.define([
                                 {
                                     label: "NB 인건비",
                                     data: aData.aLabor,
-                                    backgroundColor: "red",
+                                    backgroundColor: red,
                                     yAxisID: "y",
                                     order: 1
 
@@ -118,14 +122,14 @@ sap.ui.define([
                                 {
                                     label: "투자비",
                                     data: aData.aInvest,
-                                    backgroundColor: "#d85871",
+                                    backgroundColor: orange,
                                     yAxisID: "y",
                                     order: 2
                                 },
                                 {
                                     label: "경비",
                                     data: aData.aExpense,
-                                    backgroundColor: "pink",
+                                    backgroundColor: pink,
                                     yAxisID: "y",
                                     order: 2
                                 },
@@ -163,8 +167,8 @@ sap.ui.define([
                                             return [
                                                 {
                                                     text: 'NB 인건비',
-                                                    fillStyle: 'red',
-                                                    strokeStyle: 'red',
+                                                    fillStyle: red,
+                                                    strokeStyle: red,
                                                     lineWidth: 1,
                                                     hidden: false,
                                                     datasetIndex: 0,
@@ -172,8 +176,8 @@ sap.ui.define([
                                                 },
                                                 {
                                                     text: '투자비',
-                                                    fillStyle: '#d85871',
-                                                    strokeStyle: '#d85871',
+                                                    fillStyle: orange,
+                                                    strokeStyle: orange,
                                                     lineWidth: 1,
                                                     hidden: false,
                                                     datasetIndex: 1,
@@ -181,8 +185,8 @@ sap.ui.define([
                                                 },
                                                 {
                                                     text: '경비',
-                                                    fillStyle: 'pink',
-                                                    strokeStyle: 'pink',
+                                                    fillStyle: pink,
+                                                    strokeStyle: pink,
                                                     lineWidth: 1,
                                                     hidden: false,
                                                     datasetIndex: 2,
@@ -192,17 +196,20 @@ sap.ui.define([
                                         }
                                     }
                                 },
+                                tooltip: {
+                                    enabled: false
+                                },
                                 datalabels: {
                                     clip: false,
                                     color: function (context) {
                                         if (context.dataset.label === 'Total') {
                                             return "black"
                                         } else if (context.dataset.label === '경비') {
-                                            return "pink"
+                                            return pink
                                         } else if (context.dataset.label === '투자비') {
-                                            return "#d85871"
+                                            return orange
                                         } else if (context.dataset.label === 'NB 인건비') {
-                                            return "red"
+                                            return red
                                         }
                                     },
                                     anchor: 'end',
@@ -233,7 +240,7 @@ sap.ui.define([
                                         }
                                     },
                                     formatter: function (value, context) {
-                                        var oNumberFormat = NumberFormat.getIntegerInstance({
+                                        var oNumberFormat = NumberFormat.getFloatInstance({
                                             groupingEnabled: true,
                                             groupingSeparator: ',',
                                             groupingSize: 3,
@@ -300,18 +307,17 @@ sap.ui.define([
                         plugins: [ChartDataLabels, aTotal],
 
                     })
-                    this.dataLoad();
 
-                    this._ovserveResize(this.byId(this._aContainerId[i]), i)
+                    //this._ovserveResize(this.byId(this._aContainerId[i]), i)
                 }.bind(this));
 
             }
+            this.dataLoad();
             this.byId("cardContent").setBusy(false)
         },
 
         dataLoad: function () {
-            const oEventBus = sap.ui.getCore().getEventBus();
-            oEventBus.publish("CardChannel", "CardFullLoad", {
+            this._oEventBus.publish("CardChannel", "CardFullLoad", {
                 cardId: this.getView().getId()
             })
         },
@@ -321,12 +327,13 @@ sap.ui.define([
                 this._resizeObserver = new ResizeObserver(() => {
                     this._oMyChart[i].resize()
                 })
-                   
+
             }
         },
 
-        _dataSetting: async function () {
-            let aResults = await this._setData();
+        _dataSetting: async function (oData) {
+            // let aResults = await this._setData();
+            let aResults = oData;
             let aData;
             let aLabel = [];
             let aLabor = [];

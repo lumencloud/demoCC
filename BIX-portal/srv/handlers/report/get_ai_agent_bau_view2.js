@@ -14,8 +14,8 @@ module.exports = function (srv) {
             
             return result;
         } catch (error) {
-            console.error('AI Agent BAU View2 조회 실패:', error);
-            throw error;
+            console.error('View 조회 실패:', error);
+            return [];
         }
     });
 };

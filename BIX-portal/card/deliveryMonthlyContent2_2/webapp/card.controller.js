@@ -20,9 +20,9 @@ sap.ui.define([
             this._createId();
 
             // 차트 설정
-            this._setChart();
+            // this._setChart();
 
-            this._oEventBus.subscribe("aireport", "infoSet", this._updateChart, this);
+            this._oEventBus.subscribe("aireport", "deliContent2_2", this._setChart, this);
 
 
 
@@ -40,19 +40,23 @@ sap.ui.define([
             this._iMinHeight = 400;
         },
 
-        _updateChart: async function () {
-            this.byId("cardContent").setBusy(true)
-            let aResults = await this._dataSetting();
+        _updateChart: async function (sChannel, sEventId, oData) {
+            this.getOwnerComponent().oCard.setBusy(true);
+
+            let aResults = await this._dataSetting(oData.data);
 
             this._oMyChart[0].data.labels = aResults.aLabel
             this._oMyChart[0].data.datasets[0].data = aResults.aBRmm
             this._oMyChart[0].data.datasets[1].data = aResults.aBRCost
             this._oMyChart[0].update();
-            this.byId("cardContent").setBusy(false)
+            this.dataLoad();
+            setTimeout(() => {
+                this.getOwnerComponent().oCard.setBusy(false);
+            }, 300)
         },
 
 
-        _setChart: async function () {
+        _setChart: async function (sChannel, sEventId, oData) {
             this.byId("cardContent").setBusy(true)
             // 카드
             const oCard = this.getOwnerComponent().oCard;
@@ -63,14 +67,19 @@ sap.ui.define([
             let iBoxWidth = Math.floor(oParentElement.clientWidth / window.innerWidth * 90);
             let iBoxHeight = Math.floor(oParentElement.clientHeight / window.innerHeight * 90);
 
+            let orange = "#ff7a01"
+            let red = "#ea002d"
+
+            this._oEventBus.subscribe("aireport", "deliContent2_2", this._updateChart, this);
+
             for (let i = 0; i < this._aCanvasId.length; i++) {
                 let oHTML = this.byId("html" + i);
-                oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:600px; height:300px; min-height:300px'><canvas id='${this._aCanvasId[i]}' /></div>`);
+                oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:600px; height:280px; min-height:280px'><canvas id='${this._aCanvasId[i]}' /></div>`);
                 oHTML.attachEvent("afterRendering", async function () {
                     // 차트 구성
                     const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[i])).getContext("2d");
                     //데이터 요청
-                    let aData = await this._dataSetting();
+                    let aData = await this._dataSetting(oData.data);
                     this._oMyChart[i] = new Chart(ctx, {
                         type: "line",
                         data: {
@@ -81,18 +90,34 @@ sap.ui.define([
                                     label: "BR(MM)",
                                     data: aData.aBRmm,
                                     borderRadius: 3,
-                                    backgroundColor: "Red",
-                                    borderColor: "Red",
+                                    backgroundColor: red,
+                                    borderColor: red,
                                     yAxisID: "y",
+                                    fill: false,
+                                    pointBackgroundColor: red,
+                                    pointBorderColor: "white",
+                                    pointBorderWidth: 3,
+                                    pointRadius: 6,
+                                    dataLabels: {
+                                        color: red
+                                    }
 
                                 },
                                 {
                                     label: "BR(Cost)",
                                     data: aData.aBRCost,
                                     borderRadius: 3,
-                                    backgroundColor: "Pink",
-                                    borderColor: "Pink",
+                                    backgroundColor: orange,
+                                    borderColor: orange,
                                     yAxisID: "y",
+                                    fill: false,
+                                    pointBackgroundColor: orange,
+                                    pointBorderColor: "white",
+                                    pointBorderWidth: 3,
+                                    pointRadius: 6,
+                                    dataLabels: {
+                                        color: orange
+                                    }
                                 }
 
 
@@ -103,17 +128,40 @@ sap.ui.define([
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
+                                tooltip: {
+                                    enabled: false
+                                },
                                 legend: {
                                     display: true,
                                     position: 'bottom',
                                     labels: {
                                         usePointStyle: true,
-                                        pointStyle: "line",
+                                        generateLabels(chart) {
+                                            return [
+                                                {
+                                                    text: 'BR(MM)',
+                                                    fillStyle: red,
+                                                    strokeStyle: red,
+                                                    lineWidth: 1,
+                                                    hidden: false,
+                                                    datasetIndex: 0,
+                                                    pointStyle: 'line'
+                                                },
+                                                {
+                                                    text: 'BR(Cost)',
+                                                    fillStyle: orange,
+                                                    strokeStyle: orange,
+                                                    lineWidth: 1,
+                                                    hidden: false,
+                                                    datasetIndex: 1,
+                                                    pointStyle: 'line'
+                                                }
+                                            ]
+                                        }
                                     },
                                 },
                                 datalabels: {
                                     display: true,
-                                    color: 'red',
                                     // anchor: function (context) {
                                     //     if (context.dataIndex === context.dataset.data.length) {
                                     //         return 'start'
@@ -190,14 +238,13 @@ sap.ui.define([
                         },
                         plugins: [ChartDataLabels]
                     })
-
-                    this.dataLoad();
-
-                    this._ovserveResize(this.byId(this._aContainerId[i]), i)
+                    
+                    
+                    //this._ovserveResize(this.byId(this._aContainerId[i]), i)
                 }.bind(this));
-
-                ``
+                
             }
+            this.dataLoad();
             this.byId("cardContent").setBusy(false)
         },
 
@@ -214,12 +261,13 @@ sap.ui.define([
                 this._resizeObserver = new ResizeObserver(() => {
                     this._oMyChart[i].resize()
                 })
-                this._resizeObserver.observe(oElement)
+
             }
         },
 
-        _dataSetting: async function () {
-            let aResults = await this._setData();
+        _dataSetting: async function (oData) {
+            // let aResults = await this._setData();
+            let aResults = oData;
             let aData;
             let aBRCost = [];
             let aBRmm = [];

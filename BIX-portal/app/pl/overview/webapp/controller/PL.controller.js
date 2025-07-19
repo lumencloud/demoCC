@@ -5,13 +5,16 @@ sap.ui.define([
     "bix/common/library/customDialog/OrgSingleSelect",
     'sap/m/Panel',
     "sap/ui/integration/widgets/Card",
-], function (Controller, MessageToast, EventBus, OrgSingleSelect, Panel, Card) {
+    "../../../main/util/Module",
+], function (Controller, MessageToast, EventBus, OrgSingleSelect, Panel, Card, Modules) {
     "use strict";
 
     return Controller.extend("bix.pl.overview.controller.PL", {
         _oEventBus: EventBus.getInstance(),
 
         onInit: function () {
+            this.bInit = true;
+
             const oRouteActual = this.getOwnerComponent().getRouter().getRoute("RouteActual");
             oRouteActual.attachPatternMatched(this.onMyRoutePatternMatched, this);
 
@@ -20,6 +23,7 @@ sap.ui.define([
 
             // 해시 모델을 기준으로 PL Card 설정
             this._oEventBus.subscribe("pl", "page", this._setCard, this);
+            this._oEventBus.subscribe("pl", "selectMasterTable", this._setCard, this);
         },
 
         onMyRoutePatternMatched: async function () {
@@ -29,9 +33,14 @@ sap.ui.define([
         onAfterRendering: function () {
             let oSegmentedButton = this.byId("plTypeButton");
             let oSelectedButton = oSegmentedButton.getItems().find(oButton => oButton.getId() === oSegmentedButton.getSelectedItem());
-            oSegmentedButton.fireSelectionChange({
-                item: oSelectedButton
-            });
+
+            // 최초 구동시에만 처리 되도록
+            if(this.bInit){
+                this.bInit = false;
+                oSegmentedButton.fireSelectionChange({
+                    item: oSelectedButton
+                });
+            }
         },
 
         onExpandAI() {
@@ -46,10 +55,8 @@ sap.ui.define([
          */
         onSwitchPL: function (oEvent, sFlag) {
             if (sFlag) {
-                // this.getOwnerComponent().getModel("hashModel").setProperty("/pageView", sFlag);
-                this._oEventBus.publish("pl", "setHashModel", { pageView: sFlag });
-
-                // this._setCard();
+                this.getOwnerComponent().getModel("hashModel").setProperty("/pageView", sFlag);
+                this._oEventBus.publish("pl", "setHashModel", {system: true});
             }
         },
 
@@ -74,236 +81,60 @@ sap.ui.define([
         /**
          * PL 엑셀 다운로드
          */
-        onExcelDownload: async function () {
+        onExcelDownload: async function (oEvent) {
             // 검색 조건 반환
-            let oSearchData = this.getOwnerComponent().getModel("searchModel").getData();
-            let sOrgId = `${oSearchData.orgId}`;
-            let dYearMonth = oSearchData.yearMonth;
-            let iYear = dYearMonth.getFullYear();
-            let iMonth = String(dYearMonth.getMonth() + 1).padStart(2, "0");
+            // 새로운 검색 조건이 같은 경우 return
+            // let oData = JSON.parse(sessionStorage.getItem("initSearchModel"));
+            // let aKeys = Object.keys(oData);
+            // let isDiff = aKeys.find(sKey => oData[sKey] !== this._oSearchData[sKey]);
+            // if (!isDiff) return;
 
+            // Select모델 다시 설정
+            // await this._setModel();
+
+            // detailSelect 해시에 따른 Select 선택
+            // let oSelect = this.byId("detailSelect");
+            // let aHash = Modules.getHashArray();
+            // let sDetailKey = aHash?.[4];
+            // if (sDetailKey) {   // 해시가 있는 경우 Select 설정
+            //     oSelect.setSelectedKey(sDetailKey);
+            // } else {    // 없는 경우 첫 번째 Select 항목 선택
+            //     let oFirstDetailKey = this.getView().getModel("selectModel").getProperty("/0/sub_key");
+            //     oSelect.setSelectedKey(oFirstDetailKey);
+            // }
+
+            // 새로운 검색 조건 저장
+            // this._oSearchData = oData;
+
+            // 검색 파라미터
+            // this._setBusy(true);
+
+            // let dYearMonth = new Date(oData.yearMonth);
+            // let iYear = dYearMonth.getFullYear();
+            // let sMonth = String(dYearMonth.getMonth() + 1).padStart(2, "0");
+
+            const oBtn = oEvent.getSource();
+            MessageToast.show("엑셀 다운로드 중 입니다!")
+            oBtn?.setBusy(true);
+            
             // 데이터 반환
-            const oPlModel = this.getOwnerComponent().getModel("pl_api");
-            const oPlBindingContext = oPlModel.bindContext(`/get_actual_pl_excel(year='${iYear}',month='${iMonth}',org_id='${sOrgId}')`);
-
-            const oSgaModel = this.getOwnerComponent().getModel("sga");
-            const oSgaBindingContext = oSgaModel.bindContext(`/get_actual_sga_excel(year='${iYear}',month='${iMonth}',org_id='${sOrgId}')`);
-
-            const oRspModel = this.getOwnerComponent().getModel("rsp");
-            const oRspBindingContext = oRspModel.bindContext(`/get_actual_rsp_excel(year='${iYear}',month='${iMonth}',org_id='${sOrgId}')`);
+            const oPlModel = this.getOwnerComponent().getModel("pl");
+            const oPlBindingContext = oPlModel.bindContext(`/get_pl_excel()`);
 
             // Excel Workbook 생성
             const workbook = new ExcelJS.Workbook();
 
             await Promise.all([
-                oPlBindingContext.requestObject(),
-                oSgaBindingContext.requestObject(),
-                oRspBindingContext.requestObject(),
+                oPlBindingContext.requestObject()
             ]).then(function (aResult) {
-                let fnSetWorksheet = function (sSheetName, aData) {
-                    // Sheet 추가
-                    const worksheet = workbook.addWorksheet(sSheetName);
-
-                    // 컬럼 설정
-                    let aColumns = [];
-                    for (let sKey in aData[0]) {
-                        let oColumn = {
-                            key: sKey,
-                            header: sKey,
-                        };
-
-                        aColumns.push(oColumn);
-                    }
-
-                    worksheet.columns = aColumns;
-
-                    // 데이터 설정
-                    for (let i = 0; i < aData.length; i++) {
-                        worksheet.addRow(aData[i]);
-                    }
-                };
-
-                fnSetWorksheet("PL", aResult[0].value);
-                fnSetWorksheet("SGA", aResult[1].value);
-                fnSetWorksheet("RSP", aResult[2].value);
+                //excel download 데이터 및 파일 네임 넘김.
+                Modules.rowExcelDownload(aResult[0].value[0], `BIX_raw_data.xlsx`);
             }.bind(this));
 
-            // let currentRow = 1;
+            MessageToast.show("엑셀 다운로드 완료 되었습니다")
+            oBtn?.setBusy(false);
 
-            // function insertHeader(ws, row, titleName) {
-            //     const title = row;
-            //     const headerRow = row + 1;
-            //     const headerRow2 = row + 2;
-            //     const titleCell = worksheet.getCell(title, 1);
-            //     titleCell.value = titleName;
-            //     titleCell.fill = {
-            //         type: "pattern",
-            //         pattern: "solid",
-            //         fgColor: { argb: "FFFFFF00" }
-            //     }
-            //     titleCell.alignment = { horizontal: "center", vertical: "middle" };
-            //     worksheet.getCell(title, 1).border = {
-            //         top: { style: 'thin' },
-            //         bottom: { style: 'thin' },
-            //         left: { style: 'thin' },
-            //         right: { style: 'thin' }
-            //     }
-
-            //     const subHeader = ["구분", "목표", "", "전년비", "전년누계", "", "전년비", "전년진척률"];
-            //     for (let i = 1; i <= 8; i++) {
-            //         worksheet.getCell(headerRow2, i).value = subHeader[i - 1];
-            //     }
-            //     for (let i = 9; i <= 20; i++) {
-            //         worksheet.getCell(headerRow2, i).value = `${i - 8}월`;
-            //     }
-            //     worksheet.getCell(headerRow2, 21).value = "1Q";
-            //     worksheet.getCell(headerRow2, 22).value = "2Q";
-            //     worksheet.getCell(headerRow2, 23).value = "3Q";
-            //     worksheet.getCell(headerRow2, 24).value = "4Q";
-            //     worksheet.getCell(headerRow, 25).value = "연간 실적";
-
-            //     for (let col = 1; col <= 25; col++) {
-            //         const c1 = worksheet.getCell(headerRow, col);
-            //         const c2 = worksheet.getCell(headerRow2, col);
-            //         [c1, c2].forEach(cell => {
-            //             cell.fill = {
-            //                 type: "pattern",
-            //                 pattern: "solid",
-            //                 fgColor: { argb: "E6EAF0" }
-            //             }
-            //             cell.alignment = { horizontal: "center", vertical: "middle" };
-            //         })
-            //     }
-            //     for (let col = 9; col <= 24; col++) {
-            //         const c2 = worksheet.getCell(headerRow2, col);
-            //         c2.fill = {
-            //             type: "pattern",
-            //             pattern: "solid",
-            //             fgColor: { argb: "FFFFE7D8" }
-            //         }
-            //     }
-
-
-            //     for (let col = 1; col <= 25; col++) {
-            //         worksheet.getCell(headerRow, col).border = {
-            //             top: { style: 'thin' },
-            //             bottom: { style: 'thin' },
-            //             left: { style: 'thin' },
-            //             right: { style: 'thin' }
-            //         }
-            //         worksheet.getCell(headerRow2, col).border = {
-            //             top: { style: 'thin' },
-            //             bottom: { style: 'thin' },
-            //             left: { style: 'thin' },
-            //             right: { style: 'thin' }
-            //         }
-            //     }
-            //     return row + 3;
-            // }
-
-            // currentRow = insertHeader(worksheet, currentRow, "PL");
-            // aExportData.forEach(row => {
-            //     worksheet.getCell(currentRow, 1).value = row["type"];
-            //     worksheet.getCell(currentRow, 1).alignment = { horizontal: "center" };
-
-            //     if (row["type"] === "마진율" || row["type"] === "영업이익률") {
-            //         worksheet.getCell(currentRow, 2).value = row["goal"] / 100;
-            //         worksheet.getCell(currentRow, 3).value = row["performanceCurrentYearMonth"] / 100;
-            //         worksheet.getCell(currentRow, 4).value = (row["performanceCurrentYearMonth"] - row["performanceLastYearMonth"]) / 100;
-            //         worksheet.getCell(currentRow, 5).value = row["performanceLastYearMonth"] / 100;
-            //         for (let i = 2; i <= 5; i++) {
-            //             worksheet.getCell(currentRow, i).numFmt = "0.0%";
-            //         }
-            //         worksheet.getCell(currentRow, 25).value = row["yearValue"] / 100;
-            //         worksheet.getCell(currentRow, 25).numFmt = "0.0%";
-            //     } else {
-            //         worksheet.getCell(currentRow, 2).value = row["goal"];
-            //         worksheet.getCell(currentRow, 3).value = row["performanceCurrentYearMonth"];
-            //         worksheet.getCell(currentRow, 4).value = row["performanceCurrentYearMonth"] - row["performanceLastYearMonth"];
-            //         worksheet.getCell(currentRow, 5).value = row["performanceLastYearMonth"];
-            //         for (let i = 2; i <= 5; i++) {
-            //             worksheet.getCell(currentRow, i).numFmt = "#,##0";
-            //         }
-            //         worksheet.getCell(currentRow, 25).value = row["yearValue"];
-            //         worksheet.getCell(currentRow, 25).numFmt = "#,##0";
-
-            //     }
-
-
-            //     worksheet.getCell(currentRow, 6).value = row["performanceAttainmentRateCurrentYear"] / 100;
-            //     worksheet.getCell(currentRow, 6).numFmt = "0.0%";
-
-            //     worksheet.getCell(currentRow, 7).value = (row["performanceAttainmentRateCurrentYear"] - row["performanceAttainmentRateLastYear"]) / 100;
-            //     worksheet.getCell(currentRow, 7).numFmt = "0.0%";
-
-            //     worksheet.getCell(currentRow, 8).value = row["performanceAttainmentRateLastYear"] / 100;
-            //     worksheet.getCell(currentRow, 8).numFmt = "0.0%";
-
-
-            //     worksheet.getCell(currentRow, 8).numFmt = "0.0%";
-            //     for (let i = 9; i <= 20; i++) {
-            //         if (row["type"] === "마진율" || row["type"] === "영업이익률") {
-            //             worksheet.getCell(currentRow, i).value = row["month" + String(i - 8).padStart(2, "0")] / 100;
-            //             worksheet.getCell(currentRow, i).numFmt = "0.0%";
-            //         } else {
-            //             worksheet.getCell(currentRow, i).value = row["month" + String(i - 8).padStart(2, "0")];
-            //             worksheet.getCell(currentRow, i).numFmt = "#,##0";
-            //         }
-            //     }
-            //     for (let i = 21; i <= 24; i++) {
-            //         if (row["type"] === "마진율" || row["type"] === "영업이익률") {
-            //             worksheet.getCell(currentRow, i).value = row["quarter" + String(i - 20)] / 100;
-            //             worksheet.getCell(currentRow, i).numFmt = "0.0%";
-            //         } else {
-            //             worksheet.getCell(currentRow, i).value = row["quarter" + String(i - 20)];
-            //             worksheet.getCell(currentRow, i).numFmt = "#,##0";
-            //         }
-            //     }
-
-            //     for (let i = 2; i <= 25; i++) {
-            //         worksheet.getCell(currentRow, i).alignment = { horizontal: "right" };
-            //     }
-
-
-            //     // 너비 설정
-            //     worksheet.getColumn(1).width = 15;
-            //     for (let i = 2; i <= 25; i++) {
-            //         worksheet.getColumn(i).width = 20;
-            //     }
-            //     for (let i = 6; i <= 8; i++) {
-            //         worksheet.getColumn(i).width = 10;
-            //     }
-            //     //테두리 설정
-            //     for (let col = 1; col <= 25; col++) {
-            //         worksheet.getCell(currentRow, col).border = {
-            //             top: { style: 'thin' },
-            //             bottom: { style: 'thin' },
-            //             left: { style: 'thin' },
-            //             right: { style: 'thin' }
-            //         }
-            //     }
-
-            //     currentRow++;
-            // });
-            // currentRow++;
-            // currentRow = insertHeader(worksheet, currentRow, "OI");
-            // aExportData.forEach(row => {
-            //     worksheet.addRow(row)
-            //     currentRow++;
-            // });
-
-            const buffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([buffer], {
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            });
-            const url = URL.createObjectURL(blob);
-
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `PL Raw Data_${iYear}-${iMonth}.xlsx`;
-            link.click();
-
-            setTimeout(() => { URL.revokeObjectURL(url) }, 100);
+            // this._setBusy(false);
         },
 
         /**
@@ -323,20 +154,19 @@ sap.ui.define([
 
                 // 검색 조건 변경 EventBus Publish
                 let oSearchData = this.getOwnerComponent().getModel("searchModel").getData();
-                let oEventData = {
-                    year: oSearchData.yearMonth.getFullYear(),
-                    month: String(oSearchData.yearMonth.getMonth() + 1).padStart(2, "0"),
-                    orgId: oSearchData.orgId,
-                }
+                // let oEventData = {
+                //     year: oSearchData.yearMonth.getFullYear(),
+                //     month: String(oSearchData.yearMonth.getMonth() + 1).padStart(2, "0"),
+                //     orgId: oSearchData.orgId,
+                // }
 
                 // 초기 차트 데이터용 세션 업데이트
-                sessionStorage.setItem("initSearchModel",
-                    JSON.stringify({
-                        yearMonth: new Date(oSearchData.yearMonth),
-                        orgId: oSearchData.orgId
-                    })
-                )
-                this._oEventBus.publish("pl", "search", oEventData);
+                let oSessionData = JSON.parse(sessionStorage.getItem("initSearchModel"));
+                oSessionData.yearMonth = new Date(oSearchData.yearMonth);
+                sessionStorage.setItem("initSearchModel", JSON.stringify(oSessionData));
+
+                // 검색 이벤트버스 실행
+                this._oEventBus.publish("pl", "search");
             };
         },
 
@@ -361,13 +191,13 @@ sap.ui.define([
 
                 // 검색 EventBus Publish
                 let oSearchData = this.getOwnerComponent().getModel("searchModel").getData();
-                let oEventData = {
-                    year: oSearchData.yearMonth.getFullYear(),
-                    month: String(oSearchData.yearMonth.getMonth() + 1).padStart(2, "0"),
-                    orgId: sOrgId,
-                    orgType: oSearchData.orgType,
-                    org_level: oSearchData.org_level
-                }
+                // let oEventData = {
+                //     year: oSearchData.yearMonth.getFullYear(),
+                //     month: String(oSearchData.yearMonth.getMonth() + 1).padStart(2, "0"),
+                //     orgId: sOrgId,
+                //     orgType: oSearchData.orgType,
+                //     org_level: oSearchData.org_level
+                // }
 
                 // 초기 차트 데이터용 세션 업데이트
                 sessionStorage.setItem("initSearchModel",
@@ -386,7 +216,7 @@ sap.ui.define([
                 this._oEventBus.publish("pl", "setHash");
 
                 // 검색 이벤트버스 실행
-                this._oEventBus.publish("pl", "search", oEventData);
+                this._oEventBus.publish("pl", "search");
             }
         },
 
@@ -423,8 +253,8 @@ sap.ui.define([
                     //sgaDetailTable ai관련 orgId 초기화
                     sessionStorage.setItem("aiModel",
                         JSON.stringify({
-                            aiOrgId: "",
-                            aiType: "",
+                            orgId: "",
+                            type: "",
                             org_level: ""
                         })
                     )
@@ -495,16 +325,20 @@ sap.ui.define([
         },
 
         _cardSetting: function (oData) {
+            let oCard = new Card({
+                manifest: `../bix/card/${oData.card_info}/manifest.json`,
+                width: "100%",
+                height: "100%"
+            });
+
+            oCard._oComponent = this.getOwnerComponent();
+
             let oPanel = new Panel({
                 expandable: false,
                 expanded: true,
                 width: "100%",
                 busy: true,
-                content: new Card({
-                    manifest: `../bix/card/${oData.card_info}/manifest.json`,
-                    width: "100%",
-                    height: "100%"
-                })
+                content: oCard
             })
 
             oPanel.addStyleClass("custom-panel-border custom-panel-no-content-padding");

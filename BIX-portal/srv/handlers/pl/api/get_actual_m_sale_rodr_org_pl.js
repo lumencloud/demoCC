@@ -25,7 +25,6 @@ module.exports = (srv) => {
              * [실적]
              * [부문/본부/팀 + 년,month_amt,금액] 팀,본부 단위의 프로젝트 실적비용 집계 뷰
              */
-            // const pl_view = db.entities('pl').wideview_org_view;
             //org_tp:account, hybrid일 경우 사용
             const pl_view = db.entities('pl').wideview_account_org_view;
             const pipeline_view = db.entities('pl').pipeline_view;
@@ -44,23 +43,13 @@ module.exports = (srv) => {
             /**
              * org_id 파라미터값으로 조직정보 조회
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_id'
-                when lv2_id = '${org_id}' THEN 'lv2_id'
-                when lv3_id = '${org_id}' THEN 'lv3_id'
-                when div_id = '${org_id}' THEN 'div_id'
-                when hdqt_id = '${org_id}' THEN 'hdqt_id'
-                when team_id = '${org_id}' THEN 'team_id'
-                end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd', "lv1_name","lv2_name","lv3_name","div_name","hdqt_name","team_name"]).where({ 'org_id': org_id });
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_level', 'org_ccorg_cd', "lv1_name","lv2_name","lv3_name","div_name","hdqt_name","team_name"]).where({ 'org_id': org_id });
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             //조직 정보를 where 조건에 추가
-            let org_col_nm = orgInfo.org_level;
+            let org_col_nm = orgInfo.org_level+'_id';
             let org_col_nm_name = orgInfo[org_col_nm.split('_',1) + '_name'];
-            let org_ccorg = orgInfo.org_ccorg_cd;
-            let org_ccorg_col = org_col_nm.split('_',1) + '_ccorg_cd';
             let search_org, search_org_name, search_org_ccorg;
 
             let a_sale_column = [];
@@ -91,7 +80,6 @@ module.exports = (srv) => {
             }else{return;};
 
             const org_query = await SELECT.from(org_full_level).columns([search_org, search_org_name, search_org_ccorg, 'org_order']).where({ [org_col_nm]: org_id, 'org_tp' : 'account' }).orderBy('org_order');
-// return org_query
 
             //조직 리스트
             let org_list = [];
@@ -106,7 +94,7 @@ module.exports = (srv) => {
                     org_list.push(oTemp);
                 };
             });
-    // return org_list
+    
             /**
              * DT 매출 조회용 SELECT 컬럼 - 전사, 부문, 본부 공통으로 사용되는 컬럼 조건 (+ 연, 월, 부문, 본부 조건별 추가)
              */
@@ -114,7 +102,6 @@ module.exports = (srv) => {
             pl_col_list.push(...aAddList);
             pipeline_column.push(...aAddList);
             const pl_where_conditions = { 'year': { in: [year, last_year] }};
-            // const pl_where_conditions = { 'year': { in: [year, last_year] }, 'org_tp' : 'account'};
             let pl_where =  org_col_nm === 'lv1_id' ? pl_where_conditions : { ...pl_where_conditions, [org_col_nm]: org_id };
             const pl_groupBy_cols = ['year', search_org, search_org_name];
 

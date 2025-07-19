@@ -888,12 +888,21 @@ sap.ui.define([
     Modules.valueFormat = function (sType, iValue1, iValue2, tooltipType) {
         // 값이 없을 때 return
         // infoLabel로 텍스트 커스텀할 경우 emptyIndicatroMode "–"표시용으로 tooltipType 응용
-        if (!iValue1 && tooltipType === "infoLabel") return "–";
-        if (!iValue1) return;
+        if (!iValue1 && !iValue2 && tooltipType === "infoLabel") return "–";
+        if (!iValue1 && !iValue2) return;
 
         // iValue2가 있을 때 iValue2 - iValue1
         let iNewValue = (iValue2 && !isNaN(iValue2)) ? (iValue1 - iValue2) : iValue1;
+        let sAddText = "";
+        console.log(tooltipType);
         if (tooltipType === "infoLabel") {
+            console.log("밸류 두개",iValue1,iValue2);
+            // 양수일 시 텍스트에 + 추가
+            if (iNewValue > 0) {
+                sAddText = "+ ";
+            }
+            // 기호 표시하기 위해 절대값 처리
+            console.log("계산값",iNewValue);
             iNewValue = Math.abs(iNewValue);
         }
         if (sType === "마진율" || sType === "영업이익률" || sType === "BR" || sType === "percent") {
@@ -926,8 +935,7 @@ sap.ui.define([
                     groupingSize: 3,
                     decimals: 2,
                 });
-
-                return oNumberFormat.format(iNewValue);
+                return sAddText + oNumberFormat.format(iNewValue);
             }
         } else if (sType === "RoHC") {
             if (tooltipType === 'tooltip') {
@@ -954,7 +962,7 @@ sap.ui.define([
                     groupingSize: 3,
                     decimals: 2,
                 });
-                return oNumberFormat.format(iNewValue);
+                return sAddText + oNumberFormat.format(iNewValue);
             }
         } else if (sType === "건수") {
             var oNumberFormat = NumberFormat.getIntegerInstance({
@@ -962,7 +970,7 @@ sap.ui.define([
                 groupingSeparator: ',',
                 groupingSize: 3,
             });
-            return oNumberFormat.format(iNewValue);
+            return sAddText + oNumberFormat.format(iNewValue);
         } else if (tooltipType === "tooltip") {
             var oNumberFormat = NumberFormat.getIntegerInstance({
                 groupingEnabled: true,
@@ -998,23 +1006,26 @@ sap.ui.define([
                 groupingSize: 3,
                 decimals: 0
             });
-            return oNumberFormat.format(iNewValue / 100000000);
+            return sAddText + oNumberFormat.format(iNewValue / 100000000);
         }
     };
 
+    // 커스텀한 InfoLabel 색상 및 icon 포맷팅 (적용컬럼 : GAP)
     Modules.infoLabelFormat= function (iValue1, iValue2, sType) {
-        if (!iValue1 && sType === "icon") return "";
-        if (!iValue1) return 1;
+        if (!iValue1 && !iValue2 && sType === "icon") return "";
+        if (!iValue1 && !iValue2) return 1;
 
         let iNewValue = (iValue2 && !isNaN(iValue2)) ? (iValue1 - iValue2) : iValue1;
 
         if (sType === "icon") {
+            // 음수 일시 빨강색 삼각형 표시
             if (iNewValue < 0) {
                 return "sap-icon://up";
-            } else {
+            } else {  
                 return "";
             }
         } else {
+            // colorScheme => 양수 : 8, 음수: 2, 0: 1
             if (iNewValue === 0) {
                 return 1
             } else if (iNewValue > 0){
@@ -1030,8 +1041,11 @@ sap.ui.define([
      * @returns {Array}
      */
     Modules.getHashArray = function () {
-        let sCurrHash = HashChanger.getInstance().getHash();
-        let aHash = sCurrHash.split("#")[1]?.split("/");
+        // HashChanger의 getHash 메소드가 이전 URL 해시를 불러오는 경우가 있어서 보류
+        // let sCurrHash = HashChanger.getInstance().getHash();
+        let sCurrHash = location.hash;
+        // let aHash = sCurrHash.split("#")[1]?.split("/");
+        let aHash = sCurrHash.split("#")[2]?.split("/");
         if (aHash.length > 0) {
             aHash.shift();
         }

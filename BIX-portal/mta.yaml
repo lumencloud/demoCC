@@ -27,6 +27,9 @@ modules:
     parameters:
       buildpack: nodejs_buildpack
       instances: 1
+      health-check-timeout: 120
+      health-check-type: http
+      health-check-http-endpoint: /health
       env:
         # SAP AI Core 설정
         SAP_AI_CLIENT_ID: sb-1e1765d3-0f79-4890-8fc8-46cab70cdb51!b24275|aicore!b44
@@ -153,4 +156,3 @@ parameters:
   enable-parallel-deployments: true
   # HANA DB 내의 Schema 명
   schema-name: bix_portal
-

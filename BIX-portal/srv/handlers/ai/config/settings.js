@@ -138,7 +138,7 @@ const PROMPT_TEMPLATE_SETTINGS = {
             menuMatcher: {
                 name: 'navigator-menu_matcher',
                 scenario: 'foundation-models',
-                version: '1.0.0'
+                version: '1.0.1'
             }
         }
     },
@@ -164,33 +164,44 @@ const PROMPT_TEMPLATE_SETTINGS = {
         }
     },
     
-    // 리포트 에이전트 템플릿
+    // 보고서 에이전트 템플릿
     reportAgent: {
+        static: {
+            navigator: {
+                name: 'report-navigator',
+                scenario: 'foundation-models',
+                version: '0.0.1'
+            }
+        }
+    },
+    
+    // 보고서 컨텐츠 에이전트 템플릿
+    reportContentAgent: {
         dynamic: {
             'aiReportView': {
                 name: 'report_content_weekly',
                 scenario: 'foundation-models',
-                version: '1.0.0'
+                version: '1.0.1'
             },
             'aiReportBauView': {
                 name: 'report_content_weekly',
                 scenario: 'foundation-models',
-                version: '1.0.0'
+                version: '1.0.1'
             },
             'deliveryMonthlyContent1_1View': {
                 name: 'report_content_monthly_now',
                 scenario: 'foundation-models',
-                version: '1.0.0'
+                version: '1.0.2'
             },
             'deliveryMonthlyContent3_2View': {
                 name: 'report_content_monthly_forecast',
                 scenario: 'foundation-models',
-                version: '1.0.0'
+                version: '1.0.2'
             },
             'aiReportMonthlyAiInsightView': {
                 name: 'report_content_monthly_insight',
                 scenario: 'foundation-models',
-                version: '1.0.0'
+                version: '1.0.2'
             }
         }
     }
@@ -203,6 +214,7 @@ const AGENT_CLASSIFICATION_SETTINGS = {
     quickAnswer: ['quick_answer_agent'],
     navigation: ['navigator_agent'],
     analysis: ['analysis_agent'],
+    report: ['report_agent'],
     reportContent: ['report_content_agent']
 };
 
@@ -232,15 +244,11 @@ const MENU_SETTINGS = {
 // 데이터 조회 설정 
 const DATA_FETCHER_SETTINGS = {
     apis: {
+        // 리포트
         'get_actual_m_pl_oi': {
             description: '당월 실적 현황 조회',
             params: ['year', 'month', 'org_id', 'org_tp'],
             handlerPath: '../../pl/api/get_actual_m_pl_oi'
-        },
-        'get_actual_m_rate_gap_pl_oi': {
-            description: '전년동기 대비 목표 진척도 Gap 조회',
-            params: ['year', 'month', 'org_id', 'org_tp'],
-            handlerPath: '../../pl/api/get_actual_m_rate_gap_pl_oi'
         },
         'get_actual_m_account_sale_pl': {
             description: '당월 고객사 별 매출/마진/마진율 현황 조회',
@@ -251,16 +259,6 @@ const DATA_FETCHER_SETTINGS = {
             description: '당월 조직 별 매출/마진/마진율 현황 조회',
             params: ['year', 'month', 'org_id', 'org_tp'],
             handlerPath: '../../pl/api/get_actual_m_sale_org_pl'
-        },
-        'get_actual_m_br_org_detail': {
-            description: '당월 조직 별 BR 현황 조회',
-            params: ['year', 'month', 'org_id', 'org_tp'],
-            handlerPath: '../../pl/api/get_actual_m_br_org_detail'
-        },
-        'get_actual_m_rohc_org_oi': {
-            description: '당월 조직 별 RoHC 현황 조회',
-            params: ['year', 'month', 'org_id', 'org_tp'],
-            handlerPath: '../../pl/api/get_actual_m_rohc_org_oi'
         },
         'get_ai_forecast_pl': {
             description: '당해년도 추정(연간 목표, 미확보 현황) 조회',
@@ -273,29 +271,14 @@ const DATA_FETCHER_SETTINGS = {
             handlerPath: '../../pl/api/get_ai_forecast_m_pl'
         },
         'get_ai_forecast_deal_pipeline': {
-            description: '당월 DealStage 별 Pipeline 현황 조회',
+            description: 'Deal Stage 별 사업기회 수주액/매출액/건 수 조회',
             params: ['year', 'month', 'org_id', 'org_tp'],
             handlerPath: '../../pl/api/get_ai_forecast_deal_pipeline'
         },
         'get_ai_forecast_rodr_pipeline': {
-            description: '당월 수주금액 별 Pipeline 현황 조회',
+            description: '수주 금액 별 사업기회 수주액/매출액/건 수 조회',
             params: ['year', 'month', 'org_id', 'org_tp'],
             handlerPath: '../../pl/api/get_ai_forecast_rodr_pipeline'
-        },
-        'get_ai_forecast_deal_type_pl': {
-            description: '당월 DealStage 별 사업기회 상세 테이블',
-            params: ['year', 'month', 'org_id', 'deal_stage_cd', 'org_tp'],
-            handlerPath: '../../pl/api/get_ai_forecast_deal_type_pl'
-        },
-        'get_actual_m_sga': {
-            description: '당월 조직 별 SG&A 현황 조회',
-            params: ['year', 'month', 'org_id', 'org_tp'],
-            handlerPath: '../../pl/api/get_actual_m_sga'
-        },
-        'get_actual_m_sale_rodr_org_pl': {
-            description: '당월 해당 조직에서 관리하는 Account(고객사) 별 수주액/매출액 현황 조회',
-            params: ['year', 'month', 'org_id'],
-            handlerPath: '../../pl/api/get_actual_m_sale_rodr_org_pl'
         },
         'get_ai_agent_view_lead_now': {
             description: '금주 신규 등록된 DT 프로젝트 현황 조회',
@@ -407,73 +390,75 @@ const DATA_FETCHER_SETTINGS = {
             params: ['org_name'],
             handlerPath: '../../function/get_available_org_list'
         },
+        'get_forecast_m_pl': {
+            description: '월별 추정 미확보PL 데이터 조회',
+            params: ['year', 'month', 'org_id'],
+            handlerPath: '../../pl/api/get_forecast_m_pl'
+        },
+        // 현황분석
+        // [1] 실적PL 매출/마진
         'get_actual_sale_org_pl': {
-            description: '실적PL 매출/마진-조직별 데이터 조회',
+            description: '실적PL 매출/마진-조직별 조회',
             params: ['year', 'month', 'org_id'],
             handlerPath: '../../pl/api/get_actual_sale_org_pl'
         },
-        'get_cstco_by_biz_account': {
-            description: '매출/마진-Account 데이터 조회',
-            params: ['year', 'month', 'org_id', 'account_cd'],
-            handlerPath: '../../pl/api/get_cstco_by_biz_account'
-        },
-        /*
         'get_actual_sale_account_pl': {
-            description: '실적PL 매출/마진-Account 데이터 조회',
+            description: '실적PL 매출/마진-Account 조회',
             params: ['year', 'month', 'org_id'],
             handlerPath: '../../pl/api/get_actual_sale_account_pl'
         },
-        */
+        'get_cstco_by_biz_account': {
+            description: '실적PL 매출/마진-Account 조회',
+            params: ['year', 'month', 'org_id', 'account_cd'],
+            handlerPath: '../../pl/api/get_cstco_by_biz_account'
+        },
         'get_actual_sale_relsco_pl': {
-            description: '실적PL 매출/마진-대내/대외 데이터 조회',
+            description: '실적PL 매출/마진-대내/대외 조회',
             params: ['year', 'month', 'org_id'],
             handlerPath: '../../pl/api/get_actual_sale_relsco_pl'
         },
-        'get_actual_sale_crov_pl': {
-            description: '실적PL 매출/마진-신규/이월 조회',
-            params: ['year', 'month', 'org_id'],
-            handlerPath: '../../pl/api/get_actual_sale_crov_pl'
-        },
+        // [2] SG&A
         'get_actual_sga': {
             description: '실적PL SG&A 데이터 조회',
             params: ['year', 'month', 'org_id'],
             handlerPath: '../../sga/api/get_actual_sga'
         },
+        // [3] DT매출
         'get_actual_dt_org_oi': {
             description: '실적PL DT 매출-조직별 조회',
             params: ['year', 'month', 'org_id'],
             handlerPath: '../../pl/api/get_actual_dt_org_oi'
-        },
-        'get_cstco_by_biz_account_dt': {
-            description: 'DT 매출-Account 데이터 조회',
-            params: ['year', 'month', 'org_id', 'account_cd'],
-            handlerPath: '../../pl/api/get_cstco_by_biz_account_dt'
         },
         'get_actual_dt_account_oi': {
             description: '실적PL DT 매출-Account 조회',
             params: ['year', 'month', 'org_id'],
             handlerPath: '../../pl/api/get_actual_dt_account_oi'
         },
+        'get_cstco_by_biz_account_dt': {
+            description: '실적PL DT 매출-Account 조회',
+            params: ['year', 'month', 'org_id', 'account_cd'],
+            handlerPath: '../../pl/api/get_cstco_by_biz_account_dt'
+        },
+        // [4] BR
         'get_actual_br_org_detail': {
             description: '실적PL BR 조회',
             params: ['year', 'month', 'org_id'],
             handlerPath: '../../pl/api/get_actual_br_org_detail'
         },
+        // [5] RoHC
         'get_actual_rohc_org_oi': {
             description: '실적PL RoHC 조회',
             params: ['year', 'month', 'org_id'],
             handlerPath: '../../pl/api/get_actual_rohc_org_oi'
         },
-        'get_forecast_m_pl': {
-            description: '월별 추정 미확보PL 데이터 조회',
-            params: ['year', 'month', 'org_id'],
-            handlerPath: '../../pl/api/get_forecast_m_pl'
-        },
+        // 추정PL
+        // [1] 전사 Pipeline 상세
         'get_forecast_pl_pipeline_detail': {
             description: '추정PL 전사 Pipeline 상세 조회',
             params: ['year', 'month', 'org_id', 'type'],
             handlerPath: '../../pl/api/get_forecast_pl_pipeline_detail'
         },
+        // [2] 부문 Pipeline 상세
         'get_forecast_pl_pipeline_org_detail': {
             description: '추정PL 부문 Pipeline 상세 조회',
             params: ['year', 'month', 'org_id'],
@@ -481,6 +466,7 @@ const DATA_FETCHER_SETTINGS = {
             category: 'forecast_pl',
             tags: ['forecast', 'pipeline']
         },
+        // [3] 매출/마진
         'get_forecast_pl_sale_margin_org_detail': {
             description: '추정PL 매출/마진-조직별 조회',
             params: ['year', 'month', 'org_id'],
@@ -491,16 +477,17 @@ const DATA_FETCHER_SETTINGS = {
             params: ['year', 'month', 'org_id'],
             handlerPath: '../../pl/api/get_forecast_pl_sale_margin_account_detail'
         },
-        'get_forecast_pl_sale_margin_crov_detail': {
-            description: '추정PL 매출/마진-대내/대외 조회',
-            params: ['year', 'month', 'org_id'],
-            handlerPath: '../../pl/api/get_forecast_pl_sale_margin_crov_detail'
+        'get_plan_cstco_by_biz_account': {
+            description: '추정PL 매출/마진-Account조회',
+            params: ['year', 'month', 'org_id', 'account_cd'],
+            handlerPath: '../../pl/api/get_plan_cstco_by_biz_account'
         },
         'get_forecast_pl_sale_margin_relsco_detail': {
             description: '추정PL 매출/마진-신규/이월 조회',
             params: ['year', 'month', 'org_id'],
             handlerPath: '../../pl/api/get_forecast_pl_sale_margin_relsco_detail'
         },
+        // [4] DT매출
         'get_forecast_dt_org_oi': {
             description: '추정PL DT 매출-조직별 조회',
             params: ['year', 'month', 'org_id'],
@@ -511,30 +498,27 @@ const DATA_FETCHER_SETTINGS = {
             params: ['year', 'month', 'org_id'],
             handlerPath: '../../pl/api/get_forecast_dt_account_oi'
         },
-        'get_forecast_br_org_detail': {
-            description: '추정PL BR 조회',
-            params: ['year', 'month', 'org_id'],
-            handlerPath: '../../pl/api/get_forecast_br_org_detail'
-        },
-        'get_forecast_pl_pipeline_account': {
-            description: '추정PL Account 상세 조회',
-            params: ['year', 'month', 'org_id'],
-            handlerPath: '../../pl/api/get_forecast_pl_pipeline_account',
-            category: 'forecast_pl',
-            tags: ['forecast', 'pipeline']
-        },
         'get_plan_cstco_by_biz_account_dt': {
             description: '추정PL DT 매출-Account 데이터 조회',
             params: ['year', 'month', 'org_id', 'account_cd'],
             handlerPath: '../../pl/api/get_plan_cstco_by_biz_account_dt'
         },
-        'get_cstco_by_biz_account_dt': {
-            description: '실적PL DT 매출-Account 데이터 조회',
-            params: ['year', 'month', 'org_id', 'account_cd'],
-            handlerPath: '../../pl/api/get_cstco_by_biz_account_dt'
+        // [5] BR
+        'get_forecast_br_org_detail': {
+            description: '추정PL BR 조회',
+            params: ['year', 'month', 'org_id'],
+            handlerPath: '../../pl/api/get_forecast_br_org_detail'
+        },
+        // [6] Account 상세
+        'get_forecast_pl_pipeline_account': {
+            description: '추정PL Account상세 조회',
+            params: ['year', 'month', 'org_id'],
+            handlerPath: '../../pl/api/get_forecast_pl_pipeline_account',
+            category: 'forecast_pl',
+            tags: ['forecast', 'pipeline']
         },
         'get_plan_account_by_cstco': {
-            description: '추정PL Account상세 데이터 조회',
+            description: '추정PL Account상세 조회',
             params: ['year', 'month', 'org_id', 'account_cd', 'type'],
             handlerPath: '../../pl/api/get_plan_account_by_cstco'
         }

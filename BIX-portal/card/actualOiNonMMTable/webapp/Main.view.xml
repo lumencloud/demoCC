@@ -37,15 +37,16 @@
                         </SegmentedButton>
                 </OverflowToolbar>
 
-        <VBox height="100%" id="actualOiNonMMBox1" visible="{=${uiModel>/tableKind} === 'account'}" busyIndicatorDelay="0" 
+        <VBox height="100%" visible="{=${uiModel>/tableKind} === 'account'}" busyIndicatorDelay="0" 
             class="custom-vbox-wrap-table"
         >
             <table:Table
                 id="actualOiNonMMTable1"
-                fieldGroupIds="content"
-                rows="{path:'oAccountTableModel>/'}"
+                fieldGroupIds="content,account"
+                rows="{path:'/'}"
                 class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
-                selectionMode="None"
+                selectionMode="Single" 
+                selectionBehavior="RowOnly" 
                 fixedColumnCount="2"
                 busyIndicatorDelay="0"
                 visibleRowCountMode="Auto"
@@ -71,8 +72,8 @@
                             />
                         <table:template>
                             <Text emptyIndicatorMode="On"
-                                text="{oAccountTableModel>account_nm}"
-                                tooltip="{oAccountTableModel>account_nm}"
+                                text="{account_nm}"
+                                tooltip="{account_nm}"
                                 wrapping="false"
                                 width="100%"
                                 textAlign="Begin"
@@ -95,8 +96,8 @@
                         />
                         <table:template>
                             <Text emptyIndicatorMode="On"
-                                text="{oAccountTableModel>type}"
-                                tooltip="{oAccountTableModel>type}"
+                                text="{type}"
+                                tooltip="{type}"
                                 wrapping="false"
                                 width="100%"
                                 textAlign="Center"
@@ -129,26 +130,26 @@
                     >
                         <table:multiLabels>
                             <Label
-                                text="당월 실적"
+                                text="당월 누계 실적"
                                 wrapping="true"
                             />
-                            <Label text="당월" textAlign="Center" width="100%"/>
+                            <Label text="당월 누계" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
                             <Text emptyIndicatorMode="On"
                                   text="{
                                     parts:[
-                                        {path:'oAccountTableModel>actual_curr_ym_value', targetType: 'any'},
-                                        {path:'', targetType: 'any'},
-                                        {path:'oAccountTableModel>type',  targetType: 'any'}
+                                        {path:'actual_curr_ym_value', targetType: 'any'},
+                                        {value:''},
+                                        {path:'type',  targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oAccountTableModel>actual_curr_ym_value', targetType: 'any'},
+                                        {path:'actual_curr_ym_value', targetType: 'any'},
                                         {value:''},
-                                        {path:'oAccountTableModel>type',  targetType: 'any'},
+                                        {path:'type',  targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                
@@ -265,7 +266,7 @@
             </table:Table>
 
             </VBox>
-             <VBox fitContainer="true" id="actualOiNonMMBox2" visible="{=${uiModel>/tableKind} === 'lob'}" busyIndicatorDelay="0"
+             <VBox fitContainer="true" visible="{=${uiModel>/tableKind} === 'lob'}" busyIndicatorDelay="0"
                         class="custom-vbox-wrap-table"
                          height="100%"
                 >
@@ -273,10 +274,11 @@
 
             <table:Table
                 id="actualOiNonMMTable2"
-                fieldGroupIds="content"
-                rows="{path:'oLobTableModel>/'}"
+                fieldGroupIds="content,lob"
+                rows="{path:'/'}"
                 class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
-                selectionMode="None"
+                selectionMode="Single" 
+                selectionBehavior="RowOnly" 
                 fixedColumnCount="2"
                 busyIndicatorDelay="0"
                 visibleRowCountMode="Auto"
@@ -303,8 +305,8 @@
                         />
                         <table:template>
                             <Text emptyIndicatorMode="On"
-                                text="{oLobTableModel>lob_name}"
-                                tooltip="{oLobTableModel>lob_name}"
+                                text="{lob_name}"
+                                tooltip="{lob_name}"
                                 wrapping="false"
                                 width="100%"
                                 textAlign="Begin"
@@ -327,8 +329,8 @@
                         />
                         <table:template>
                             <Text emptyIndicatorMode="On"
-                                text="{oLobTableModel>type}"
-                                tooltip="{oLobTableModel>type}"
+                                text="{type}"
+                                tooltip="{type}"
                                 wrapping="false"
                                 width="100%"
                                 textAlign="Center"
@@ -360,26 +362,26 @@
                     >
                         <table:multiLabels>
                             <Label
-                                text="당월 실적"
+                                text="당월 누계 실적"
                                 wrapping="true"
                             />
-                            <Label text="당월" textAlign="Center" width="100%"/>
+                            <Label text="당월 누계" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
                             <Text emptyIndicatorMode="On"
                                   text="{
                                     parts:[
-                                        {path:'oLobTableModel>actual_curr_ym_value', targetType: 'any'},
+                                        {path:'actual_curr_ym_value', targetType: 'any'},
                                         {value:''},
-                                        {path:'oLobTableModel>type',  targetType: 'any'}
+                                        {path:'type',  targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oLobTableModel>actual_curr_ym_value', targetType: 'any'},
+                                        {path:'actual_curr_ym_value', targetType: 'any'},
                                         {value:''},
-                                        {path:'oLobTableModel>type',  targetType: 'any'},
+                                        {path:'type',  targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                

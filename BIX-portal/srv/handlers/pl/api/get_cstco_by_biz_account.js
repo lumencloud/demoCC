@@ -79,7 +79,7 @@ module.exports = (srv) => {
                 `case when sum(${s_sum_sale}) = 0 then 0 else sum(${s_sum_margin}) / sum(${s_sum_sale}) end as margin_rate`
             ];
             const pl_where = { 'year': { in: [year, last_year] }, cstco_cd: { '!=': null }, [orgInfo.org_level]: orgInfo.org_ccorg_cd, 
-                biz_tp_account_cd: account_cd, 'length(cstco_name)': {'>' : 0} };
+                biz_tp_account_cd: account_cd, 'length(cstco_name)': {'>' : 0}, 'src_type': { 'not in': ['WO', 'D']} };
             const pl_groupBy = ['year', 'cstco_cd', 'cstco_name'];
 
             // DB 쿼리 실행 (병렬)

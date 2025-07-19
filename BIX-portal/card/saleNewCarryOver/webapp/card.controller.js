@@ -208,7 +208,7 @@ sap.ui.define([
                             }
                         }
                     })
-                    this._ovserveResize(this.byId(this._aContainerId[i]), i)
+                    //this._ovserveResize(this.byId(this._aContainerId[i]), i)
 
                 }.bind(this));
                 

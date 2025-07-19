@@ -39,73 +39,72 @@ module.exports = (srv) => {
             let a_labor_columns = [];
             let a_iv_columns = [];
             for(let i=1; i<=i_month; i++){
-                a_exp_columns.push(`sum(exp_m${i}_amt) as exp_m${i}_amt`);
-                a_labor_columns.push(`sum(labor_m${i}_amt) as labor_m${i}_amt`);
-                a_iv_columns.push(`sum(iv_m${i}_amt) as iv_m${i}_amt`);
+                a_exp_columns.push(`sum(exp_m${i}_amt)`);
+                a_labor_columns.push(`sum(labor_m${i}_amt)`);
+                a_iv_columns.push(`sum(iv_m${i}_amt)`);
             }
+            let s_exp_columns = "(" + a_exp_columns.join(' + ') + ') as exp_amount_sum';
+            let s_labor_columns = "(" + a_labor_columns.join(' + ') + ') as labor_amount_sum';
+            let s_iv_columns = "(" + a_iv_columns.join(' + ') + ') as iv_amount_sum';
 
-            const sga_col_list = ['year', ...a_exp_columns, ...a_labor_columns, ...a_iv_columns];
+            const sga_col_list = ['year', 'ccorg_cd', 'lv3_ccorg_cd', 'ifnull(sum(labor_year_amt), 0) as labor_y_sum', 'ifnull(sum(exp_year_amt), 0) + ifnull(sum(iv_year_amt), 0) as ex_iv_y_sum', s_exp_columns, s_labor_columns, s_iv_columns];
             const sga_where_conditions = { 'year': { in: [year, last_year] } };
-            const sga_groupBy_cols = ['year'];
+            const sga_groupBy_cols = ['year', 'ccorg_cd', 'lv3_ccorg_cd'];
                 
             /**
              * org_id 파라미터값으로 조직정보 조회
              * 
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_id'
-                when lv2_id = '${org_id}' THEN 'lv2_id'
-                when lv3_id = '${org_id}' THEN 'lv3_id'
-                when div_id = '${org_id}' THEN 'div_id'
-                when hdqt_id = '${org_id}' THEN 'hdqt_id'
-                when team_id = '${org_id}' THEN 'team_id'
-                end as org_level`;
-            // let orgInfo = await SELECT.one.from(org_full_level).columns([org_col]).where`org_id = ${org_id}`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd', "org_name"]).where({ 'org_id': org_id });
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_ccorg_cd', "org_name", 'org_level']).where({ 'org_id': org_id });
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             // 조직 정보를 where 조건에 추가
-            let org_col_nm = orgInfo.org_level;
+            let org_col_nm = orgInfo.org_level + '_ccorg_cd';
             let org_col_nm_name = orgInfo.org_name;
-            let search_org, search_org_name, search_org_ccorg
+            let search_org, search_org_name, search_org_ccorg, child_level
 
             let sga_column = sga_col_list;
-            let sga_where = org_col_nm.includes('lv1') ? sga_where_conditions : { ...sga_where_conditions, [org_col_nm]: org_id };
+            let sga_where = (org_col_nm.includes('lv1') || org_col_nm.includes('lv2')) ? sga_where_conditions : { ...sga_where_conditions, [org_col_nm]: orgInfo.org_ccorg_cd };
             let sga_groupBy = sga_groupBy_cols;
 
             // 조회 조건 별 하위 집계대상 (전사~ 부문 상위 - 부문 / 부문 - 본부 / 본부 - 팀)
-            if (org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id' || org_col_nm === 'lv3_id') {
+            if (org_col_nm === 'lv1_ccorg_cd' || org_col_nm === 'lv2_ccorg_cd' || org_col_nm === 'lv3_ccorg_cd') {
                 search_org = 'div_id';
                 search_org_name = 'div_name';
                 search_org_ccorg = 'div_ccorg_cd';
-                sga_column = [...sga_col_list, 'div_id as org_id'];
-                sga_groupBy = [...sga_groupBy, 'div_id'];
-            } else if (org_col_nm === 'div_id') {
+                child_level = 'div';
+            } else if (org_col_nm === 'div_ccorg_cd') {
                 search_org = 'hdqt_id';
                 search_org_name = 'hdqt_name';
                 search_org_ccorg = 'hdqt_ccorg_cd';
-                sga_column = [...sga_col_list, 'hdqt_id as org_id'];
-                sga_groupBy = [...sga_groupBy, 'hdqt_id'];
-            } else if (org_col_nm === 'hdqt_id') {
+                child_level = 'hdqt';
+            } else if (org_col_nm === 'hdqt_ccorg_cd') {
                 search_org = 'team_id';
                 search_org_name = 'team_name';
                 search_org_ccorg = 'team_ccorg_cd';
-                sga_column = [...sga_col_list, 'team_id as org_id'];
-                sga_groupBy = [...sga_groupBy, 'team_id'];
+                child_level = 'team';
             }
+            sga_column = [...sga_col_list, `${search_org_ccorg} as org_ccorg_cd`];
+            sga_groupBy = [...sga_groupBy, search_org_ccorg];
 
-            const org_query = await SELECT.from(org_full_level).orderBy('org_order');
-            // const org_query = await SELECT.from(org_full_level).columns([search_org, search_org_name, search_org_ccorg, 'org_order']).where({ [org_col_nm]: org_id }).orderBy('org_order');
+            const org_query = await SELECT.from(org_full_level);
             let org_query_data = [];
+            let ackerton_list = [];
             org_query.forEach(data=>{
-                if(data[org_col_nm] === org_id){
+                if(data[org_col_nm] === orgInfo.org_ccorg_cd && data['org_level'] !== 'team' && data['org_level'] === child_level){
                     org_query_data.push(data)
+                };
+                if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
+                    if (!ackerton_list.find(data2 => data2 === data[search_org_ccorg]) && data[search_org_ccorg] && data['lv3_ccorg_cd'] === '610000') {
+                        ackerton_list.push(data[search_org_ccorg]);
+                    };
                 };
             })
 
             // DB 쿼리 실행 (병렬)
-            let [query] = await Promise.all([
-                SELECT.from(sga_view).columns(sga_column).where(sga_where).groupBy(...sga_groupBy)
+            const [query, target_query] = await Promise.all([
+                SELECT.from(sga_view).columns(sga_column).where(sga_where).groupBy(...sga_groupBy),
+                get_org_target(year,['C05','C07'])
             ]);
 
             if(!query.length){
@@ -113,92 +112,175 @@ module.exports = (srv) => {
                 return []
             }
 
-            //ackerton 로직
-            let ackerton_list = [];
-            let ackerton_org;
-            if(orgInfo.org_level === 'lv1_id' || orgInfo.org_level === 'lv2_id'){
-                let ac_map = []
+            let ackerton_org, ackerton_curr_sga_sum_data, ackerton_last_sga_sum_data;
+            if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
                 ackerton_org = org_query.find(data=>data.org_ccorg_cd === '610000');
-                org_query.forEach(data=>{
-                    if (!ackerton_list.find(data2 => data2.id === data[search_org]) && data[search_org] && data['lv3_ccorg_cd'] === '610000') {
-                        let oTemp = {
-                            id: data[search_org],
-                            name: data[search_org_name],
-                            ccorg: data[search_org_ccorg],
-                            org_order: data['org_order']
-                        };
-                        ac_map.push(data[search_org])
-                        ackerton_list.push(oTemp);
-                    };
-                });
-                sga_where = { ...sga_where, 'lv3_ccorg_cd' : '610000' };
 
-                let ackerton_data = await SELECT.from(sga_view).columns(sga_column).where(sga_where).groupBy(...sga_groupBy);
-
-                let ackerton_curr_sga_sum_data = {
-                    org_id: ackerton_org.org_id,
-                    year: year
+                ackerton_curr_sga_sum_data = {
+                    org_ccorg_cd: ackerton_org.org_ccorg_cd,
+                    year: year,
+                    exp_amount_sum: 0,
+                    labor_amount_sum: 0,
+                    iv_amount_sum: 0,
+                    labor_y_sum: 0,
+                    ex_iv_y_sum: 0
                 };
 
-                let ackerton_last_sga_sum_data = {
-                    org_id: ackerton_org.org_id,
-                    year: last_year
+                ackerton_last_sga_sum_data = {
+                    org_ccorg_cd: ackerton_org.org_ccorg_cd,
+                    year: last_year,
+                    exp_amount_sum: 0,
+                    labor_amount_sum: 0,
+                    iv_amount_sum: 0,
+                    labor_y_sum: 0,
+                    ex_iv_y_sum: 0
                 };
-
-                for(let i=1; i<=i_month; i++){
-                    ackerton_curr_sga_sum_data[`exp_m${i}_amt`] = 0;
-                    ackerton_curr_sga_sum_data[`labor_m${i}_amt`] = 0;
-                    ackerton_curr_sga_sum_data[`iv_m${i}_amt`] = 0;
-
-                    ackerton_last_sga_sum_data[`exp_m${i}_amt`] = 0;
-                    ackerton_last_sga_sum_data[`labor_m${i}_amt`] = 0;
-                    ackerton_last_sga_sum_data[`iv_m${i}_amt`] = 0;
-                }
-
-                //ackerton 하위 리스트
-                ackerton_data.forEach(data => {
-                    if(data.year === year){
-                        for(let i=1; i<=i_month; i++){
-                            ackerton_curr_sga_sum_data[`exp_m${i}_amt`] += data[`exp_m${i}_amt`];
-                            ackerton_curr_sga_sum_data[`labor_m${i}_amt`] += data[`labor_m${i}_amt`];
-                            ackerton_curr_sga_sum_data[`iv_m${i}_amt`] += data[`iv_m${i}_amt`];
-                        }
-                    }else if(data.year === last_year){
-                        for(let i=1; i<=i_month; i++){
-                            ackerton_last_sga_sum_data[`exp_m${i}_amt`] += data[`exp_m${i}_amt`];
-                            ackerton_last_sga_sum_data[`labor_m${i}_amt`] += data[`labor_m${i}_amt`];
-                            ackerton_last_sga_sum_data[`iv_m${i}_amt`] += data[`iv_m${i}_amt`];
-                        }
-                    }
-                });
-
-                query = query.filter(item=>!ac_map.includes(item['org_id']))
-                query.push(ackerton_curr_sga_sum_data);
-                query.push(ackerton_last_sga_sum_data);
             };
-            
-            //조직 리스트
-            let org_list = [];
-            org_query_data.forEach(data => {
-                if (!org_list.find(data2 => data2.id === data[search_org]) && data[search_org]) {
-                    let oTemp = {
-                        id: data[search_org],
-                        name: data[search_org_name],
-                        ccorg: data[search_org_ccorg],
-                        org_order: data['org_order']
+
+            let total_target = target_query.find(data=>data.org_ccorg_cd === orgInfo.org_ccorg_cd);
+            let sga_labor_amt_sum = {
+                div_id: org_id,
+                org_name: org_col_nm !== 'hdqt_id' && org_col_nm !== 'team_id' ? '합계' : org_col_nm_name,
+                type: 'LABOR',
+                org_order: '001',
+                curr_target_value: total_target.target_labor,
+                last_target_value: 0,
+                actual_curr_ym_value: 0,
+                actual_last_ym_value: 0,
+                actual_ym_gap: 0,
+                curr_ex_iv_sum: null,
+                last_ex_iv_sum: null,
+                curr_rate: 0,
+                last_rate: 0,
+                rate_gap: 0
+            };
+            let sga_invest_amt_sum = {
+                div_id: org_id,
+                org_name: org_col_nm !== 'hdqt_id' && org_col_nm !== 'team_id' ? '합계' : org_col_nm_name,
+                type: 'INVEST',
+                org_order: '002',
+                curr_target_value: total_target.target_expense,
+                last_target_value: 0,
+                actual_curr_ym_value: 0,
+                actual_last_ym_value: 0,
+                actual_ym_gap: 0,
+                curr_ex_iv_sum: 0,
+                last_ex_iv_sum: 0,
+                curr_rate: 0,
+                last_rate: 0,
+                rate_gap: 0
+            };
+            let sga_expence_amt_sum = {
+                div_id: org_id,
+                org_name: org_col_nm !== 'hdqt_id' && org_col_nm !== 'team_id' ? '합계' : org_col_nm_name,
+                type: 'EXPENSE',
+                org_order: '003',
+                curr_target_value: total_target.target_expense,
+                last_target_value: 0,
+                actual_curr_ym_value: 0,
+                actual_last_ym_value: 0,
+                actual_ym_gap: 0,
+                curr_ex_iv_sum: 0,
+                last_ex_iv_sum: 0,
+                curr_rate: 0,
+                last_rate: 0,
+                rate_gap: 0
+            };
+
+            let o_query_sum = {};
+            query.forEach(data=>{
+                if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
+                    if(data.ccorg_cd === '999990'){
+                        data.org_ccorg_cd = '999990';
                     };
-                    
-                    if(orgInfo.org_level === 'lv1_id' || orgInfo.org_level === 'lv2_id'){
-                        if(!ackerton_list.find(data3 => data3.ccorg === oTemp.ccorg)){
-                            org_list.push(oTemp);
+                    if(data.lv3_ccorg_cd === '610000'){
+                        if(data.year === year){
+                            ackerton_curr_sga_sum_data.exp_amount_sum += data.exp_amount_sum;
+                            ackerton_curr_sga_sum_data.labor_amount_sum += data.labor_amount_sum;
+                            ackerton_curr_sga_sum_data.iv_amount_sum += data.iv_amount_sum;
+                            ackerton_curr_sga_sum_data.labor_y_sum += data.labor_y_sum;
+                            ackerton_curr_sga_sum_data.ex_iv_y_sum += data.ex_iv_y_sum;
+                        }else if(data.year === last_year){
+                            ackerton_last_sga_sum_data.exp_amount_sum += data.exp_amount_sum;
+                            ackerton_last_sga_sum_data.labor_amount_sum += data.labor_amount_sum;
+                            ackerton_last_sga_sum_data.iv_amount_sum += data.iv_amount_sum;
+                            ackerton_last_sga_sum_data.labor_y_sum += data.labor_y_sum;
+                            ackerton_last_sga_sum_data.ex_iv_y_sum += data.ex_iv_y_sum;
                         };
-                    }else{
-                        org_list.push(oTemp);
-                    }
+                    };
+                };
+                
+                if(!o_query_sum[`${data.org_ccorg_cd}_${data.year}`]){
+                    o_query_sum[`${data.org_ccorg_cd}_${data.year}`] = {org_ccorg_cd : data.org_ccorg_cd, year:data.year};
+                };
+                o_query_sum[`${data.org_ccorg_cd}_${data.year}`]['exp_amount_sum'] = (o_query_sum[`${data.org_ccorg_cd}_${data.year}`]?.['exp_amount_sum'] ?? 0) + (data?.['exp_amount_sum']??0);
+                o_query_sum[`${data.org_ccorg_cd}_${data.year}`]['labor_amount_sum'] = (o_query_sum[`${data.org_ccorg_cd}_${data.year}`]?.['labor_amount_sum'] ?? 0) + (data?.['labor_amount_sum']??0);
+                o_query_sum[`${data.org_ccorg_cd}_${data.year}`]['iv_amount_sum'] = (o_query_sum[`${data.org_ccorg_cd}_${data.year}`]?.['iv_amount_sum'] ?? 0) + (data?.['iv_amount_sum']??0);
+                o_query_sum[`${data.org_ccorg_cd}_${data.year}`]['labor_y_sum'] = (o_query_sum[`${data.org_ccorg_cd}_${data.year}`]?.['labor_y_sum'] ?? 0) + (data?.['labor_y_sum']??0);
+                o_query_sum[`${data.org_ccorg_cd}_${data.year}`]['ex_iv_y_sum'] = (o_query_sum[`${data.org_ccorg_cd}_${data.year}`]?.['ex_iv_y_sum'] ?? 0) + (data?.['ex_iv_y_sum']??0);
+
+                if(data.year === year){
+                    sga_labor_amt_sum.actual_curr_ym_value += data.labor_amount_sum ?? 0;
+                    sga_invest_amt_sum.actual_curr_ym_value += data.iv_amount_sum ?? 0;
+                    sga_expence_amt_sum.actual_curr_ym_value += data.exp_amount_sum ?? 0;
+
+                    sga_invest_amt_sum.curr_ex_iv_sum += (data.iv_amount_sum ?? 0)+(data.exp_amount_sum ?? 0);
+                    sga_expence_amt_sum.curr_ex_iv_sum += (data.iv_amount_sum ?? 0)+(data.exp_amount_sum ?? 0);
+                }else if(data.year === last_year){
+                    sga_labor_amt_sum.actual_last_ym_value += data.labor_amount_sum ?? 0;
+                    sga_invest_amt_sum.actual_last_ym_value += data.iv_amount_sum ?? 0;
+                    sga_expence_amt_sum.actual_last_ym_value += data.exp_amount_sum ?? 0;
+
+                    sga_labor_amt_sum.last_target_value += data.labor_y_sum ?? 0;
+                    sga_invest_amt_sum.last_target_value += data.ex_iv_y_sum ?? 0;
+                    sga_expence_amt_sum.last_target_value += data.ex_iv_y_sum ?? 0;
+
+                    sga_invest_amt_sum.last_ex_iv_sum += (data.iv_amount_sum ?? 0)+(data.exp_amount_sum ?? 0);
+                    sga_expence_amt_sum.last_ex_iv_sum += (data.iv_amount_sum ?? 0)+(data.exp_amount_sum ?? 0);
                 };
             });
 
-            if(orgInfo.org_level === 'lv1_id' || orgInfo.org_level === 'lv2_id'){
+            sga_labor_amt_sum.actual_ym_gap += sga_labor_amt_sum.actual_curr_ym_value - sga_labor_amt_sum.actual_last_ym_value;
+            sga_invest_amt_sum.actual_ym_gap += sga_invest_amt_sum.actual_curr_ym_value - sga_invest_amt_sum.actual_last_ym_value;
+            sga_expence_amt_sum.actual_ym_gap += sga_expence_amt_sum.actual_curr_ym_value - sga_expence_amt_sum.actual_last_ym_value;
+
+            sga_labor_amt_sum.curr_rate = (sga_labor_amt_sum?.curr_target_value ?? 0) === 0 ? 0 : (sga_labor_amt_sum?.actual_curr_ym_value ?? 0) / ((sga_labor_amt_sum?.curr_target_value ?? 0)*100000000);
+            sga_invest_amt_sum.curr_rate = (sga_invest_amt_sum?.curr_target_value ?? 0) === 0 ? 0 : (sga_invest_amt_sum?.curr_ex_iv_sum ?? 0) / ((sga_invest_amt_sum?.curr_target_value ?? 0)*100000000);
+            sga_expence_amt_sum.curr_rate = (sga_invest_amt_sum?.curr_target_value ?? 0) === 0 ? 0 : (sga_invest_amt_sum?.curr_ex_iv_sum ?? 0) / ((sga_invest_amt_sum?.curr_target_value ?? 0)*100000000);
+
+            sga_labor_amt_sum.last_rate = (sga_labor_amt_sum?.last_target_value ?? 0) === 0 ? 0 : (sga_labor_amt_sum?.actual_last_ym_value ?? 0) / (sga_labor_amt_sum?.last_target_value ?? 0);
+            sga_invest_amt_sum.last_rate = (sga_invest_amt_sum?.last_target_value ?? 0) === 0 ? 0 : (sga_invest_amt_sum?.last_ex_iv_sum ?? 0) / (sga_invest_amt_sum?.last_target_value ?? 0);
+            sga_expence_amt_sum.last_rate = (sga_invest_amt_sum?.last_target_value ?? 0) === 0 ? 0 : (sga_invest_amt_sum?.last_ex_iv_sum ?? 0) / (sga_invest_amt_sum?.last_target_value ?? 0);
+
+            sga_labor_amt_sum.rate_gap = ((sga_labor_amt_sum?.curr_target_value ?? 0) === 0 ? 0 : (sga_labor_amt_sum?.actual_curr_ym_value ?? 0) / ((sga_labor_amt_sum?.curr_target_value ?? 0)*100000000)) - ((sga_labor_amt_sum?.last_target_value ?? 0) === 0 ? 0 : (sga_labor_amt_sum?.actual_last_ym_value ?? 0) / (sga_labor_amt_sum?.last_target_value ?? 0));
+            sga_invest_amt_sum.rate_gap = ((sga_invest_amt_sum?.curr_target_value ?? 0) === 0 ? 0 : (sga_invest_amt_sum?.curr_ex_iv_sum ?? 0) / ((sga_invest_amt_sum?.curr_target_value ?? 0)*100000000)) - ((sga_invest_amt_sum?.last_target_value ?? 0) === 0 ? 0 : (sga_invest_amt_sum?.last_ex_iv_sum ?? 0) / (sga_invest_amt_sum?.last_target_value ?? 0));
+            sga_expence_amt_sum.rate_gap = ((sga_invest_amt_sum?.curr_target_value ?? 0) === 0 ? 0 : (sga_invest_amt_sum?.curr_ex_iv_sum ?? 0) / ((sga_invest_amt_sum?.curr_target_value ?? 0)*100000000)) - ((sga_invest_amt_sum?.last_target_value ?? 0) === 0 ? 0 : (sga_invest_amt_sum?.last_ex_iv_sum ?? 0) / (sga_invest_amt_sum?.last_target_value ?? 0));
+
+            let a_query_sum = Object.values(o_query_sum);
+            if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
+                a_query_sum.push(ackerton_curr_sga_sum_data);
+                a_query_sum.push(ackerton_last_sga_sum_data);
+            };
+
+            let org_list = [];
+            org_query_data.forEach(data => {
+                let oTemp = {
+                    id: data[search_org],
+                    name: data[search_org_name],
+                    ccorg: data[search_org_ccorg],
+                    org_order: data['org_order']
+                };
+                
+                if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
+                    if(!ackerton_list.find(data2 => data2 === oTemp.ccorg)){
+                        org_list.push(oTemp);
+                    };
+                }else{
+                    org_list.push(oTemp);
+                }
+            });
+
+            if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
                 let oTemp = {
                     id: ackerton_org.org_id,
                     name: ackerton_org.org_name,
@@ -206,114 +288,115 @@ module.exports = (srv) => {
                     org_order: ackerton_org.org_order
                 };
                 org_list.push(oTemp);
+                let oTemp2 = {
+                    id: "999990",
+                    name: "전사",
+                    ccorg: "999990",
+                    org_order: '99999999999'
+                };
+                org_list.push(oTemp2);
             };
 
-            let sga_labor_amt_sum = {
-                div_id: org_id,
-                org_name: org_col_nm !== 'hdqt_id' && org_col_nm !== 'team_id' ? '합계' : org_col_nm_name,
-                type: 'LABOR',
-                actual_curr_ym_value: 0,
-                actual_last_ym_value: 0,
-                actual_ym_gap: 0,
-            };
-            let sga_invest_amt_sum = {
-                div_id: org_id,
-                org_name: org_col_nm !== 'hdqt_id' && org_col_nm !== 'team_id' ? '합계' : org_col_nm_name,
-                type: 'INVEST',
-                actual_curr_ym_value: 0,
-                actual_last_ym_value: 0,
-                actual_ym_gap: 0,
-            };
-            let sga_expence_amt_sum = {
-                div_id: org_id,
-                org_name: org_col_nm !== 'hdqt_id' && org_col_nm !== 'team_id' ? '합계' : org_col_nm_name,
-                type: 'EXPENSE',
-                actual_curr_ym_value: 0,
-                actual_last_ym_value: 0,
-                actual_ym_gap: 0,
-            };
-
-            //sga 데이터 가공
             let a_curr_y_sga = [];
             let a_last_y_sga = [];
-            query.forEach(data => {
+            a_query_sum.forEach(data => {
                 if (data.year === year) {
-                    data.labor_amount_sum = 0;
-                    data.iv_amount_sum = 0;
-                    data.exp_amount_sum = 0;
-
-                    for (let i = 1; i <= month; i++) {
-                        data.labor_amount_sum += data[`labor_m${i}_amt`] ?? 0;
-                        data.iv_amount_sum += data[`iv_m${i}_amt`] ?? 0;
-                        data.exp_amount_sum += data[`exp_m${i}_amt`] ?? 0;
-                    };
-
                     a_curr_y_sga.push(data);
-                    sga_labor_amt_sum.actual_curr_ym_value += data.labor_amount_sum ?? 0;
-                    sga_invest_amt_sum.actual_curr_ym_value += data.iv_amount_sum ?? 0;
-                    sga_expence_amt_sum.actual_curr_ym_value += data.exp_amount_sum ?? 0;
                 } else if (data.year === last_year) {
-                    data.labor_amount_sum = 0;
-                    data.iv_amount_sum = 0;
-                    data.exp_amount_sum = 0;
-
-                    for (let i = 1; i <= month; i++) {
-                        data.labor_amount_sum += data[`labor_m${i}_amt`] ?? 0;
-                        data.iv_amount_sum += data[`iv_m${i}_amt`] ?? 0;
-                        data.exp_amount_sum += data[`exp_m${i}_amt`] ?? 0;
-                    };
-
                     a_last_y_sga.push(data);
-                    sga_labor_amt_sum.actual_last_ym_value += data.labor_amount_sum ?? 0;
-                    sga_invest_amt_sum.actual_last_ym_value += data.iv_amount_sum ?? 0;
-                    sga_expence_amt_sum.actual_last_ym_value += data.exp_amount_sum ?? 0;
                 };
             });
-            sga_labor_amt_sum.actual_ym_gap += sga_labor_amt_sum.actual_curr_ym_value - sga_labor_amt_sum.actual_last_ym_value;
-            sga_invest_amt_sum.actual_ym_gap += sga_invest_amt_sum.actual_curr_ym_value - sga_invest_amt_sum.actual_last_ym_value;
-            sga_expence_amt_sum.actual_ym_gap += sga_expence_amt_sum.actual_curr_ym_value - sga_expence_amt_sum.actual_last_ym_value;
 
             const a_result = [];
             org_list.forEach(data => {
-                const o_curr_y_sga_org = a_curr_y_sga.find(b => b.org_id === data.id);
-                const o_last_y_sga_org = a_last_y_sga.find(b => b.org_id === data.id);
+                const o_curr_y_sga_org = a_curr_y_sga.find(data2 => data2.org_ccorg_cd === data.ccorg);
+                const o_last_y_sga_org = a_last_y_sga.find(data2 => data2.org_ccorg_cd === data.ccorg);
+                const target = target_query.find(data2=>data2.org_ccorg_cd === data.ccorg);
 
                 let o_labor = {
                     div_id: data.id,
                     org_name: data.name,
                     type: 'LABOR',
+                    org_order: data.org_order,
+                    curr_target_value: target?.target_labor ?? 0,
+                    last_target_value: o_last_y_sga_org?.labor_y_sum ?? 0,
                     actual_curr_ym_value: o_curr_y_sga_org?.['labor_amount_sum'] ?? 0,
                     actual_last_ym_value: o_last_y_sga_org?.['labor_amount_sum'] ?? 0,
-                    actual_ym_gap: (o_curr_y_sga_org?.['labor_amount_sum'] ?? 0) - (o_last_y_sga_org?.['labor_amount_sum'] ?? 0)
+                    actual_ym_gap: (o_curr_y_sga_org?.['labor_amount_sum'] ?? 0) - (o_last_y_sga_org?.['labor_amount_sum'] ?? 0),
+                    curr_ex_iv_sum: null,
+                    last_ex_iv_sum: null,
+                    curr_rate: (target?.target_labor ?? 0) === 0 ? 0 : (o_curr_y_sga_org?.['labor_amount_sum'] ?? 0) / ((target?.target_labor ?? 0)*100000000),
+                    last_rate: (o_last_y_sga_org?.labor_y_sum ?? 0) === 0 ? 0 : (o_last_y_sga_org?.['labor_amount_sum'] ?? 0) / (o_last_y_sga_org?.labor_y_sum ?? 0),
+                    rate_gap: ((target?.target_labor ?? 0) === 0 ? 0 : (o_curr_y_sga_org?.['labor_amount_sum'] ?? 0) / ((target?.target_labor ?? 0)*100000000)) - ((o_last_y_sga_org?.labor_y_sum ?? 0) === 0 ? 0 : (o_last_y_sga_org?.['labor_amount_sum'] ?? 0) / (o_last_y_sga_org?.labor_y_sum ?? 0))
                 };
                 let o_invest = {
                     div_id: data.id,
                     org_name: data.name,
                     type: 'INVEST',
+                    org_order: data.org_order,
+                    curr_target_value: target?.target_expense ?? 0,
+                    last_target_value: o_last_y_sga_org.ex_iv_y_sum ?? 0,
                     actual_curr_ym_value: o_curr_y_sga_org?.['iv_amount_sum'] ?? 0,
                     actual_last_ym_value: o_last_y_sga_org?.['iv_amount_sum'] ?? 0,
-                    actual_ym_gap: (o_curr_y_sga_org?.['iv_amount_sum'] ?? 0) - (o_last_y_sga_org?.['iv_amount_sum'] ?? 0)
+                    actual_ym_gap: (o_curr_y_sga_org?.['iv_amount_sum'] ?? 0) - (o_last_y_sga_org?.['iv_amount_sum'] ?? 0),
+                    curr_ex_iv_sum: (o_curr_y_sga_org?.['iv_amount_sum'] ?? 0) + (o_curr_y_sga_org?.['exp_amount_sum'] ?? 0),
+                    last_ex_iv_sum: (o_last_y_sga_org?.['iv_amount_sum'] ?? 0) + (o_last_y_sga_org?.['exp_amount_sum'] ?? 0),
+                    curr_rate: (target?.target_expense ?? 0) === 0 ? 0 : ((o_curr_y_sga_org?.['iv_amount_sum'] ?? 0) + (o_curr_y_sga_org?.['exp_amount_sum'] ?? 0)) / ((target?.target_expense ?? 0)*100000000),
+                    last_rate: (o_last_y_sga_org?.ex_iv_y_sum ?? 0) === 0 ? 0 : ((o_last_y_sga_org?.['iv_amount_sum'] ?? 0) + (o_last_y_sga_org?.['exp_amount_sum'] ?? 0)) / (o_last_y_sga_org?.ex_iv_y_sum ?? 0),
+                    rate_gap: ((target?.target_expense ?? 0) === 0 ? 0 : ((o_curr_y_sga_org?.['iv_amount_sum'] ?? 0) + (o_curr_y_sga_org?.['exp_amount_sum'] ?? 0)) / ((target?.target_expense ?? 0)*100000000)) - ((o_last_y_sga_org?.ex_iv_y_sum ?? 0) === 0 ? 0 : ((o_last_y_sga_org?.['iv_amount_sum'] ?? 0) + (o_last_y_sga_org?.['exp_amount_sum'] ?? 0)) / (o_last_y_sga_org?.ex_iv_y_sum ?? 0))
                 };
                 let o_expence = {
                     div_id: data.id,
                     org_name: data.name,
                     type: 'EXPENSE',
+                    org_order: data.org_order,
+                    curr_target_value: target?.target_expense ?? 0,
+                    last_target_value: o_last_y_sga_org.ex_iv_y_sum ?? 0,
                     actual_curr_ym_value: o_curr_y_sga_org?.['exp_amount_sum'] ?? 0,
                     actual_last_ym_value: o_last_y_sga_org?.['exp_amount_sum'] ?? 0,
-                    actual_ym_gap: (o_curr_y_sga_org?.['exp_amount_sum'] ?? 0) - (o_last_y_sga_org?.['exp_amount_sum'] ?? 0)
+                    actual_ym_gap: (o_curr_y_sga_org?.['exp_amount_sum'] ?? 0) - (o_last_y_sga_org?.['exp_amount_sum'] ?? 0),
+                    curr_ex_iv_sum: (o_curr_y_sga_org?.['iv_amount_sum'] ?? 0) + (o_curr_y_sga_org?.['exp_amount_sum'] ?? 0),
+                    last_ex_iv_sum: (o_last_y_sga_org?.['iv_amount_sum'] ?? 0) + (o_last_y_sga_org?.['exp_amount_sum'] ?? 0),
+                    curr_rate: (target?.target_expense ?? 0) === 0 ? 0 : ((o_curr_y_sga_org?.['iv_amount_sum'] ?? 0) + (o_curr_y_sga_org?.['exp_amount_sum'] ?? 0)) / ((target?.target_expense ?? 0)*100000000),
+                    last_rate: (o_last_y_sga_org?.ex_iv_y_sum ?? 0) === 0 ? 0 : ((o_last_y_sga_org?.['iv_amount_sum'] ?? 0) + (o_last_y_sga_org?.['exp_amount_sum'] ?? 0)) / (o_last_y_sga_org?.ex_iv_y_sum ?? 0),
+                    rate_gap: ((target?.target_expense ?? 0) === 0 ? 0 : ((o_curr_y_sga_org?.['iv_amount_sum'] ?? 0) + (o_curr_y_sga_org?.['exp_amount_sum'] ?? 0)) / ((target?.target_expense ?? 0)*100000000)) - ((o_last_y_sga_org?.ex_iv_y_sum ?? 0) === 0 ? 0 : ((o_last_y_sga_org?.['iv_amount_sum'] ?? 0) + (o_last_y_sga_org?.['exp_amount_sum'] ?? 0)) / (o_last_y_sga_org?.ex_iv_y_sum ?? 0))
                 };
 
-                a_result.push(o_labor, o_invest, o_expence)
+                a_result.push(o_labor, o_expence, o_invest)
             });
-
-            aRes.push(sga_labor_amt_sum, sga_invest_amt_sum, sga_expence_amt_sum);
+            
+            aRes.push(sga_labor_amt_sum, sga_expence_amt_sum, sga_invest_amt_sum);
             if(org_col_nm !== 'hdqt_id' && org_col_nm !== 'team_id'){
                 aRes.push(...a_result);
             }
+
+            let a_sort_field = [
+                { field: "org_order", order: "asc" }
+            ];
+            aRes.sort((oItem1, oItem2) => {
+                for (const { field, order } of a_sort_field) {
+                    // 필드가 null일 때
+                    if (oItem1[field] === null && oItem2[field] !== null) return -1;
+                    if (oItem1[field] !== null && oItem2[field] === null) return 1;
+                    if (oItem1[field] === null && oItem2[field] === null) continue;
+
+                    if (typeof oItem1[field] === "number") {
+                        var result = oItem1[field] - oItem2[field];
+                    } else {
+                        var result = oItem1[field].localeCompare(oItem2[field]);
+                    }
+
+                    if (result !== 0) {
+                        return (order === "asc") ? result : -result;
+                    }
+                }
+                return 0;
+            })
+
             return aRes;
         } catch(error) { 
             console.error(error); 
             return {code:error.code, message:error.message, isError: true} 
         } 
     })
-}
+}         

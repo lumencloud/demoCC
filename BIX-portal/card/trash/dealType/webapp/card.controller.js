@@ -16,7 +16,7 @@ sap.ui.define(
         
       },
       onAfterRendering: function() {
-        // debugger;
+        // ;
         const ctx = document.getElementById('dealType');
         if (!this.oChartInstance) {
           this.oChartInstance = new Chart(ctx, {

@@ -61,27 +61,21 @@ module.exports = (srv) => {
             
             let i_index = Number(month) === 12? 12 : Number(month)+1
             let aForecastSale = []; 
-            let aForecastMargin = []; 
             for (let i = 12; i >= i_index; i--) {
                 aForecastSale.push(`sale_m${i}_amt`);
-                aForecastMargin.push(`margin_m${i}_amt`);
             }
             let s_forecast_sale = Number(month) === 12? 0 : aForecastSale.join(" + ");
-            let s_forecast_margin = Number(month) === 12? 0 : aForecastMargin.join(" + ");
 
             // pl_view 설정
-            const pl_column = ['cstco_cd',
-                `sum(case when src_type not in ('WA', 'D') then sale_year_amt else 0 end) as sale_secured`,
+            const pl_column = ['cstco_cd', 'cstco_name',
+                `sum(case when src_type = 'D' then 0 else sale_year_amt end) as sale_secured`,
                 `sum(case when src_type = 'D' then ${s_forecast_sale} else 0 end) as sale_not_secured`,
-                `sum(case when src_type not in ('WA', 'D') then sale_year_amt else 0 end)
+                `sum(case when src_type = 'D' then 0 else sale_year_amt end)
                     + sum(case when src_type = 'D' then ${s_forecast_sale} else 0 end) as sale_forecast`,
-                `sum(case when src_type not in ('WA', 'D') then margin_year_amt else 0 end) as margin_secured`,
-                `sum(case when src_type = 'D' then ${s_forecast_margin} else 0 end) as margin_not_secured`,
-                `sum(case when src_type not in ('WA', 'D') then margin_year_amt else 0 end)
-                    + sum(case when src_type = 'D' then ${s_forecast_margin} else 0 end) as margin_forecast`,
                 ];
-            const pl_where = { 'year': year, [orgInfo.org_level]: orgInfo.org_ccorg_cd, biz_tp_account_cd: account_cd};
-            const pl_groupBy = ['cstco_cd'];
+            const pl_where = { 'year': year, [orgInfo.org_level]: orgInfo.org_ccorg_cd, biz_tp_account_cd: account_cd, 
+                'src_type': {'!=':'WO'}, cstco_name: { '!=': null }};
+            const pl_groupBy = ['cstco_cd', 'cstco_name'];
 
             // customer 설정
             const customer_column = ["code", "name"];
@@ -97,17 +91,11 @@ module.exports = (srv) => {
                 return []
             }
 
-            // PL 데이터에 고객사 이름 붙이기
-            pl_data.forEach(o_pl_data => {
-                return o_pl_data["cstco_name"] = customer_data.find(o_customer_data => o_customer_data.code === o_pl_data.cstco_cd)?.name;
-            })
-
             // 고객사명 없는 데이터 제거
             pl_data = pl_data.filter(o_pl_data => !!o_pl_data.cstco_name);
 
             // 연간 추정을 기준으로 상위 5개의 항목만 
             let a_sale_data = pl_data.sort((oItem1, oItem2) => oItem2.sale_forecast - oItem1.sale_forecast).slice(0, 5);
-            let a_margin_data = pl_data.sort((oItem1, oItem2) => oItem2.margin_forecast - oItem1.margin_forecast).slice(0, 5);
 
             // 데이터 가공
             a_sale_data.forEach(o_curr_data => {
@@ -117,16 +105,6 @@ module.exports = (srv) => {
                     forecast: o_curr_data?.sale_forecast??0,
                     cstco_name: o_curr_data?.cstco_name??0,
                     type: "매출",
-                });
-            })
-
-            a_margin_data.forEach(o_curr_data => {
-                a_result.push({
-                    secured: o_curr_data?.margin_secured??0,
-                    not_secured: o_curr_data?.margin_not_secured??0,
-                    forecast: o_curr_data?.margin_forecast??0,
-                    cstco_name: o_curr_data?.cstco_name??0,
-                    type: "마진",
                 });
             })
 

@@ -21,16 +21,13 @@
                 <Text text="매출"/>
                 <Text text="{
                     parts: [
-                        {path: 'Model>/sale'},
-                        {value: 'number'}
-                    ],
-                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                        {path: 'Model>/sale'}
+
+                    ], formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
                 <tnt:InfoLabel text="{
                     parts: [
-                        {path: 'Model>/sale_yoy'},
-                        {value: 'percent'}
-                    ],
-                    formatter: '.onFormatPerformance'}" 
+                        {path: 'Model>/sale_yoy'}
+                    ]}" 
                     colorScheme="{= ${Model>/sale_yoy} === 0 ? 1 :
                         ${Model>/sale_yoy} > 0 ? 8 : 2}" width="100%"/>
             </HBox>
@@ -38,16 +35,12 @@
                 <Text text="마진"/>
                 <Text text="{
                     parts: [
-                        {path: 'Model>/margin'},
-                        {value: 'number'}
-                    ],
-                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                        {path: 'Model>/margin'}
+                    ], formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
                 <tnt:InfoLabel text="{
                     parts: [
-                        {path: 'Model>/margin_yoy'},
-                        {value: 'percent'}
-                    ],
-                    formatter: '.onFormatPerformance'}" 
+                        {path: 'Model>/margin_yoy'}
+                    ]}" 
                     colorScheme="{= ${Model>/margin_yoy} === 0 ? 1 :
                         ${Model>/margin_yoy} > 0 ? 8 : 2}" width="100%"/>
             </HBox>
@@ -55,16 +48,12 @@
                 <Text text="마진율"/>
                 <Text text="{
                     parts: [
-                        {path: 'Model>/margin_rate'},
-                        {value: 'number'}
-                    ],
-                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                        {path: 'Model>/margin_rate'}
+                    ], formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
                 <tnt:InfoLabel text="{
                     parts: [
-                        {path: 'Model>/margin_rate_yoy'},
-                        {value: 'percent'}
-                    ],
-                    formatter: '.onFormatPerformance'}" 
+                        {path: 'Model>/margin_rate_yoy'}
+                    ]}" 
                     colorScheme="{= ${Model>/margin_rate_yoy} === 0 ? 1 :
                         ${Model>/margin_rate_yoy} > 0 ? 8 : 2}" width="100%"/>
             </HBox>
@@ -72,16 +61,12 @@
                 <Text text="SG&amp;A"/>
                 <Text text="{
                     parts: [
-                        {path: 'Model>/sga'},
-                        {value: 'number'}
-                    ],
-                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                        {path: 'Model>/sga'}
+                    ], formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
                 <tnt:InfoLabel text="{
                     parts: [
-                        {path: 'Model>/sga_yoy'},
-                        {value: 'percent'}
-                    ],
-                    formatter: '.onFormatPerformance'}" 
+                        {path: 'Model>/sga_yoy'}
+                    ]}" 
                     colorScheme="{= ${Model>/sga_yoy} === 0 ? 1 :
                         ${Model>/sga_yoy} > 0 ? 8 : 2}" width="100%"/>
             </HBox>
@@ -89,16 +74,12 @@
                 <Text text="공헌이익"/>
                 <Text text="{
                     parts: [
-                        {path: 'Model>/contribytion'},
-                        {value: 'number'}
-                    ],
-                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                        {path: 'Model>/contribytion'}
+                    ], formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
                 <tnt:InfoLabel text="{
                     parts: [
-                        {path: 'Model>/contribytion_yoy'},
-                        {value: 'percent'}
-                    ],
-                    formatter: '.onFormatPerformance'}" 
+                        {path: 'Model>/contribytion_yoy'}
+                    ]}" 
                     colorScheme="{= ${Model>/contribytion_yoy} === 0 ? 1 :
                         ${Model>/contribytion_yoy} > 0 ? 8 : 2}"
                          width="100%"/>
@@ -107,16 +88,12 @@
                 <Text text="영업이익"/>
                 <Text text="{
                     parts: [
-                        {path: 'Model>/profit'},
-                        {value: 'number'}
-                    ],
-                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                        {path: 'Model>/profit'}
+                    ], formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
                 <tnt:InfoLabel text="{
                     parts: [
-                        {path: 'Model>/profit_yoy'},
-                        {value: 'percent'}
-                    ],
-                    formatter: '.onFormatPerformance'}" 
+                        {path: 'Model>/profit_yoy'}
+                    ]}" 
                     colorScheme="{= ${Model>/profit_yoy} === 0 ? 1 :
                         ${Model>/profit_yoy} > 0 ? 8 : 2}" width="100%"/>
             </HBox>
@@ -124,16 +101,12 @@
                 <Text text="영업이익률"/>
                 <Text text="{
                     parts: [
-                        {path: 'Model>/profit_rate'},
-                        {value: 'number'}
-                    ],
-                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                        {path: 'Model>/profit_rate'}
+                    ], formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
                 <tnt:InfoLabel text="{
                     parts: [
-                        {path: 'Model>/profit_rate_yoy'},
-                        {value: 'percent'}
-                    ],
-                    formatter: '.onFormatPerformance'}" 
+                        {path: 'Model>/profit_rate_yoy'}
+                    ]}" 
                     colorScheme="{= ${Model>/profit_rate_yoy} === 0 ? 1 :
                         ${Model>/profit_rate_yoy} > 0 ? 8 : 2}" width="100%"/>
             </HBox>
@@ -141,16 +114,12 @@
                 <Text text="BR"/>
                 <Text text="{
                     parts: [
-                        {path: 'Model>/br'},
-                        {value: 'number'}
-                    ],
-                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                        {path: 'Model>/br'}
+                    ], formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
                 <tnt:InfoLabel text="{
                     parts: [
-                        {path: 'Model>/br_yoy'},
-                        {value: 'percent'}
-                    ],
-                    formatter: '.onFormatPerformance'}" 
+                        {path: 'Model>/br_yoy'}
+                    ]}" 
                     colorScheme="{= ${Model>/br_yoy} === 0 ? 1 :
                         ${Model>/br_yoy} > 0 ? 8 : 2}" width="100%"/>
             </HBox>
@@ -158,16 +127,12 @@
                 <Text text="RoHC"/>
                 <Text text="{
                     parts: [
-                        {path: 'Model>/rohc'},
-                        {value: 'number'}
-                    ],
-                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                        {path: 'Model>/rohc'}
+                    ], formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
                 <tnt:InfoLabel text="{
                     parts: [
-                        {path: 'Model>/rohc_yoy'},
-                        {value: 'percent'}
-                    ],
-                    formatter: '.onFormatPerformance'}" 
+                        {path: 'Model>/rohc_yoy'}
+                    ]}" 
                     colorScheme="{= ${Model>/rohc_yoy} === 0 ? 1 :
                         ${Model>/rohc_yoy} > 0 ? 8 : 2}" width="100%"/>
             </HBox>
@@ -175,16 +140,12 @@
                 <Text text="DT매출"/>
                 <Text text="{
                     parts: [
-                        {path: 'Model>/dt'},
-                        {value: 'number'}
-                    ],
-                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                        {path: 'Model>/dt'}
+                    ], formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
                 <tnt:InfoLabel text="{
                     parts: [
-                        {path: 'Model>/dt_yoy'},
-                        {value: 'percent'}
-                    ],
-                    formatter: '.onFormatPerformance'}" 
+                        {path: 'Model>/dt_yoy'}
+                    ]}" 
                     colorScheme="{= ${Model>/dt_yoy} === 0 ? 1 :
                         ${Model>/dt_yoy} > 0 ? 8 : 2}" width="100%"/>
             </HBox>
@@ -192,16 +153,12 @@
                 <Text text="Offshoring"/>
                 <Text text="{
                     parts: [
-                        {path: 'Model>/offshoring'},
-                        {value: 'number'}
-                    ],
-                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                        {path: 'Model>/offshoring'}
+                    ], formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
                 <tnt:InfoLabel text="{
                     parts: [
-                        {path: 'Model>/offshoring_yoy'},
-                        {value: 'percent'}
-                    ],
-                    formatter: '.onFormatPerformance'}" 
+                        {path: 'Model>/offshoring_yoy'}
+                    ]}" 
                     colorScheme="{= ${Model>/offshoring_yoy} === 0 ? 1 :
                         ${Model>/offshoring_yoy} > 0 ? 8 : 2}" width="100%"/>
             </HBox>
@@ -209,16 +166,12 @@
                 <Text text="Nom-MM"/>
                 <Text text="{
                     parts: [
-                        {path: 'Model>/nonMM'},
-                        {value: 'number'}
-                    ],
-                    formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
+                        {path: 'Model>/nonMM'}
+                    ], formatter: '.onFormatPerformance'}" width="100%" textAlign="End"/>
                 <tnt:InfoLabel text="{
                     parts: [
-                        {path: 'Model>/nonMM_yoy'},
-                        {value: 'percent'}
-                    ],
-                    formatter: '.onFormatPerformance'}" 
+                        {path: 'Model>/nonMM_yoy'}
+                    ]}" 
                     colorScheme="{= ${Model>/nonMM_yoy} === 0 ? 1 :
                         ${Model>/nonMM_yoy} > 0 ? 8 : 2}" width="100%"/>
             </HBox>

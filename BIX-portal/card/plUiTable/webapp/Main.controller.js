@@ -13,8 +13,10 @@ sap.ui.define([
 ], function (Controller, JSONModel, NumberFormat, Sorter, ODataModel, Fragment, EventBus, InteractionUtils, Modules,Module) {
     "use strict";
 
+    /**
+     * @typedef {sap.ui.base.Event} Event
+     */
     return Controller.extend("bix.card.plUiTable.Main", {
-        _sTableId: "plUiTable",
         _oEventBus: EventBus.getInstance(),
 
 
@@ -24,7 +26,7 @@ sap.ui.define([
             this._oEventBus.subscribe("pl", "selectMasterTable", this.onRowSelectionChange, this);
 
             // 테이블에 셀 클릭 이벤트 등록
-            var oTable = this.byId(this._sTableId);
+            var oTable = this.byId("table");
             if (oTable) {
                 oTable.attachCellClick(this.onCellClick, this);
             }
@@ -35,7 +37,7 @@ sap.ui.define([
         },
 
         onAfterRendering: function () {
-            let oTable = this.byId(this._sTableId);
+            let oTable = this.byId("table");
             
             Module.setTableMergeWithAltColor(oTable)
         },
@@ -54,7 +56,7 @@ sap.ui.define([
             let sOrgId = oData.orgId;
 
             // 새로운 테이블 경로
-            let oTable = this.byId(this._sTableId);
+            let oTable = this.byId("table");
             let sLastPath = oTable.getBinding("rows")?.getPath();
             let sNewPath = `/get_actual_pl(year='${iYear}',month='${sMonth}',org_id='${sOrgId}')`
 
@@ -80,7 +82,7 @@ sap.ui.define([
             })
 
             await Module.setTableMergeWithAltColor(oTable)
-            // console.log(oTable.getBinding("rows"));
+            // //console.log(oTable.getBinding("rows"));
 
             // 날짜 입력 값 받아 수정
             // let oTemp = { year: String(sYear).substring(2) };
@@ -153,7 +155,7 @@ sap.ui.define([
          * @param {Event} oEvent
          */
         onCellClick: function (oEvent) {
-            var result = InteractionUtils.processTableCellClick(this, oEvent, this._sTableId);
+            var result = InteractionUtils.processTableCellClick(this, oEvent, "table");
             this._lastClickedCellInfo = result.cellInfo;
         },
 
@@ -161,15 +163,15 @@ sap.ui.define([
          * PL 테이블 행 클릭 이벤트
          * @param {Event} oEvent 
          */
-        onRowSelectionChange: function (oEvent, sEventId, oData) {
+        onRowSelectionChange: function (oEvent, sEventId, oEventData) {
             if (!sEventId) {
                 let oContext = oEvent.getParameters()["rowContext"];
 
                 // type이 SG&A일 때
                 let oBindingObject = oContext?.getObject();
-                if (oBindingObject?.type === "매출") {
+                if (oBindingObject?.type === "매출" || oBindingObject?.type === "마진") {
                     this._oEventBus.publish("pl", "detail", { detail: "saleMargin" });
-                } else if (oBindingObject?.type === "SG&A") {
+                } else if (oBindingObject?.type === "사업 SG&A") {
                     this._oEventBus.publish("pl", "detail", { detail: "sga" });
                 }
 
@@ -177,7 +179,7 @@ sap.ui.define([
                 InteractionUtils.handleTableRowSelection(
                     this,
                     oEvent,
-                    this._sTableId,
+                    "table",
                     {
                         gridName: "PL 실적 테이블",
                         storageType: "session",
@@ -185,32 +187,29 @@ sap.ui.define([
                         sekectedCell: this._lastClickedCellInfo
                     }
                 );
-                let oTable = this.byId("plUiTable");
+                let oTable = this.byId("table");
                 if(oTable.getSelectedIndex() !== -1){
                     const aHash = window.location.hash.split('#/')[2];
                     const oUrlParams = aHash.split('/')
                     this._oEventBus.publish("pl", "selectMasterTable",  { detail: oUrlParams[2], page: oUrlParams[0], table:'pl' });
                 }
             } else {
-                if (oData['page'] === "actual") {
-                    let oTable = this.byId("plUiTable");
-                    if (oData['table'] === "oi") {
-                        oTable.setSelectedIndex(-1)
-                        return
-                    }
-                    if (oData['table'] === "pl") {
-                        return
-                    }
-                    let sType = oData['detail'] === 'saleMargin' ? "매출" : oData['detail'] === 'sga' ? "SG&A" : null
+                if (oEventData['page'] === "actual") {
+                    let oTable = this.byId("table");
                     if (!oTable) return;
-                    let aRows = oTable.getBinding("rows").getContexts();
-                    let iIndex = -1
-                    aRows.forEach(a => {
-                        if (a.getObject()['type'] === sType) {
-                            iIndex = a.getIndex()
-                        }
-                    })
-                    oTable.setSelectedIndex(iIndex)
+
+                    // detail에 따른 테이블(pl, oi) 분기처리
+                    let sTableType = (oEventData['detail'] === 'saleMargin' || oEventData['detail'] === 'sga') ? "pl" : "oi";
+                    if (sTableType === "oi") {
+                        oTable.setSelectedIndex(-1);
+                        return;
+                    }
+
+                    // 타입에 맞는 행 선택
+                    let sType = oEventData['detail'] === 'saleMargin' ? "매출" : oEventData['detail'] === 'sga' ? "사업 SG&A" : null
+                    let aBindingData = oTable.getBinding("rows").getContexts().map(oData => oData.getObject());
+                    let index = aBindingData.findIndex(oData => oData["type"] === sType) ?? -1;
+                    oTable.setSelectedIndex(index);
                 }
             }
         },
@@ -339,7 +338,7 @@ sap.ui.define([
         },
         
         _clearSelection: function () {
-            let oTable = this.byId("plUiTable");
+            let oTable = this.byId("table");
             if (oTable.getSelectedIndices().length > 0) {
                 oTable.clearSelection();
             }

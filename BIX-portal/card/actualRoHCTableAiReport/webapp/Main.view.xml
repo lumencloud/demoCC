@@ -20,7 +20,6 @@
         <content>
         <VBox height="100%" width="100%">
         <VBox fitContainer="true" 
-            id="actualRoHCBox1"
             visible="{=${uiModel>/tableKind} === 'org'}"
             busyIndicatorDelay="0"
             class="custom-vbox-wrap-table"
@@ -28,7 +27,7 @@
             
             <table:Table
                 id="actualRoHCTable1"
-                rows="{path:'oOrgTableModel>/'}"
+                rows="{path:'/'}"
                 class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
                 selectionMode="Single" 
                 selectionBehavior="RowOnly" 
@@ -39,12 +38,13 @@
                 fixedColumnCount="1"
                 busyIndicatorDelay="0"
                 noData=" "
+                fieldGroupIds="content,org"
             >
                 <table:extension>
                     <OverflowToolbar width="100%" height="3rem" style="Standard">
 
-                        <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                        <Text text="세부데이터"/>
+                        <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                        <Text text="세부 데이터" class="table-title"/>
                         <ToolbarSpacer />
                         <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false"/>
                         <ToolbarSeparator visible="false"/>
@@ -69,8 +69,8 @@
                         />
                         <table:template>
                             <Text emptyIndicatorMode="On"
-                                text="{oOrgTableModel>org_name}"
-                                tooltip="{oOrgTableModel>org_name}"
+                                text="{org_name}"
+                                tooltip="{org_name}"
                                 wrapping="false"
                                 width="100%"
                                 textAlign="Begin"
@@ -92,7 +92,7 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oOrgTableModel>target_curr_y_value', targetType: 'any'},
+                                        {path:'target_curr_y_value', targetType: 'any'},
                                         {value:''},
                                         {value:'RoHC'}
                                     ],
@@ -100,7 +100,7 @@
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oOrgTableModel>target_curr_y_value', targetType: 'any'},
+                                        {path:'target_curr_y_value', targetType: 'any'},
                                         {value:''},
                                         {value:'RoHC'},
                                         {value:'tooltip'}
@@ -135,7 +135,7 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oOrgTableModel>actual_curr_ym_value', targetType: 'any'},
+                                        {path:'actual_curr_ym_value', targetType: 'any'},
                                         {value:''},
                                         {value:'RoHC'}
                                     ],
@@ -143,7 +143,7 @@
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oOrgTableModel>actual_curr_ym_value', targetType: 'any'},
+                                        {path:'actual_curr_ym_value', targetType: 'any'},
                                         {value:''},
                                         {value:'RoHC'},
                                         {value:'tooltip'}
@@ -177,7 +177,7 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oOrgTableModel>actual_last_ym_value', targetType: 'any'},
+                                        {path:'actual_last_ym_value', targetType: 'any'},
                                         {value:''},
                                         {value:'RoHC'}
                                     ],
@@ -185,7 +185,7 @@
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oOrgTableModel>actual_last_ym_value', targetType: 'any'},
+                                        {path:'actual_last_ym_value', targetType: 'any'},
                                         {value:''},
                                         {value:'RoHC'},
                                         {value:'tooltip'}
@@ -219,16 +219,16 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oOrgTableModel>actual_curr_ym_value', targetType: 'any'},
-                                        {path:'oOrgTableModel>actual_last_ym_value', targetType: 'any'},
+                                        {path:'actual_curr_ym_value', targetType: 'any'},
+                                        {path:'actual_last_ym_value', targetType: 'any'},
                                         {value:'RoHC'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oOrgTableModel>actual_curr_ym_value', targetType: 'any'},
-                                        {path:'oOrgTableModel>actual_last_ym_value', targetType: 'any'},
+                                        {path:'actual_curr_ym_value', targetType: 'any'},
+                                        {path:'actual_last_ym_value', targetType: 'any'},
                                         {value:'RoHC'},
                                         {value:'tooltip'}
                                     ],
@@ -262,7 +262,7 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oOrgTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                        {path:'actual_curr_ym_rate', targetType: 'any'},
                                         {value:''},
                                         {value:'percent'}
                                     ],
@@ -270,7 +270,7 @@
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oOrgTableModel>actual_curr_ym_rate', targetType: 'any'},
+                                        {path:'actual_curr_ym_rate', targetType: 'any'},
                                         {value:''},
                                         {value:'percent'},
                                         {value:'tooltip'}
@@ -304,7 +304,7 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oOrgTableModel>actual_last_ym_rate', targetType: 'any'},
+                                        {path:'actual_last_ym_rate', targetType: 'any'},
                                         {value:''},
                                         {value:'percent'}
                                     ],
@@ -312,7 +312,7 @@
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oOrgTableModel>actual_last_ym_rate', targetType: 'any'},
+                                        {path:'actual_last_ym_rate', targetType: 'any'},
                                         {value:''},
                                         {value:'percent'},
                                         {value:'tooltip'}
@@ -346,16 +346,16 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oOrgTableModel>actual_curr_ym_rate', targetType: 'any'},
-                                        {path:'oOrgTableModel>actual_last_ym_rate', targetType: 'any'},
+                                        {path:'actual_curr_ym_rate', targetType: 'any'},
+                                        {path:'actual_last_ym_rate', targetType: 'any'},
                                         {value:'percent'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oOrgTableModel>actual_curr_ym_rate', targetType: 'any'},
-                                        {path:'oOrgTableModel>actual_last_ym_rate', targetType: 'any'},
+                                        {path:'actual_curr_ym_rate', targetType: 'any'},
+                                        {path:'actual_last_ym_rate', targetType: 'any'},
                                         {value:'percent'},
                                         {value:'tooltip'}
                                     ],

@@ -328,10 +328,12 @@ module.exports = (srv) => {
 
         } catch (e) {
             // 해당 버전 실행 Error 처리
-            await tx_main.run(UPDATE(common_version).set({ tag: 'E' }).where({ ver: ver_no }));
+            // await tx_main.run(UPDATE(common_version).set({ tag: 'E' }).where({ ver: ver_no }));
             await tx_rcv.rollback();
             await tx_trsf.commit();
             return { code: "error", message: e.message };
         }
     })
 }
+
+

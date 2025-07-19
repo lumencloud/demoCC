@@ -108,6 +108,7 @@ view wideview_account_view as
                 is_delivery,
                 is_total_cc,
                 org_tp,
+                org_level,
                 org_id,
                 org_ccorg_cd,
                 org_order,
@@ -138,7 +139,7 @@ view wideview_account_view as
                     where
                         org_tp = 'hybrid'
                 )
-        union all
+        union
             select
                 ver,
                 year,
@@ -242,6 +243,7 @@ view wideview_account_view as
                 rodr_is_delivery   as is_delivery,
                 rodr_is_total_cc   as is_total_cc,
                 rodr_org_tp        as org_tp,
+                rodr_org_level     as org_level,
                 rodr_org_id        as org_id,
                 rodr_org_ccorg_cd  as org_ccorg_cd,
                 rodr_org_order     as org_order,
@@ -272,7 +274,6 @@ view wideview_account_view as
                     where
                         org_tp = 'account'
                 )
-                and sale_ccorg_cd <> rodr_ccorg_cd
         ) {
             key ver,
             key year,
@@ -378,6 +379,7 @@ view wideview_account_view as
                 is_delivery,
                 is_total_cc,
                 org_tp,
+                org_level,
                 org_id,
                 org_ccorg_cd,
                 org_order,

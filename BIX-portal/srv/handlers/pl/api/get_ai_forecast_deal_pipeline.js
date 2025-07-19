@@ -73,7 +73,7 @@ module.exports = (srv) => {
             let pl_groupBy = ['deal_stage_cd']
             let pl_where_conditions = {year : year, deal_stage_chg_dt: { between: s_first_date, and: s_last_date }, weekly_yn: false, 'deal_stage_cd': { in: a_not_secured_data } }
             
-            if(!!org_tp){
+            if(org_tp === 'account' || org_tp === 'delivery'){
                 pl_where_conditions = {...pl_where_conditions,org_tp : org_tp}
             }
             let pl_where = org_col_nm === 'lv1_id' ? pl_where_conditions : { ...pl_where_conditions, [org_col_nm]: org_id };
@@ -83,6 +83,7 @@ module.exports = (srv) => {
                 SELECT.from(pl_view).columns(pl_col_list).where(pl_where).groupBy(...pl_groupBy),
                 SELECT.from(code).where({ category: "deal_stage_code" }).columns(header => { header.items(item => { item.value, item.sort_order }) }),
             ])
+            
             // if(!pl_data.length){
             //     //return req.res.status(204).send();
             //     return []

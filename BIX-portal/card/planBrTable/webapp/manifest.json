@@ -14,8 +14,22 @@
 				"Component",
 				"Card"
 			]
-		},		
+		},
 		"dataSources": {
+			"plService": {
+				"uri": "../../../odata/v4/pl_api/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "4.0"
+				}
+			},
+			"cmService": {
+				"uri": "../../../odata/v4/cm/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "4.0"
+				}
+			}
 		}
 	},
 	"sap.ui": {
@@ -28,6 +42,24 @@
 	},
 	"sap.ui5": {
 		"models": {
+			"pl": {
+				"dataSource": "plService",
+				"preload": true,
+				"settings": {
+					"operationMode": "Server",
+					"autoExpandSelect": true,
+					"earlyRequests": true
+				}
+			},
+			"cm": {
+				"dataSource": "cmService",
+				"preload": true,
+				"settings": {
+					"operationMode": "Server",
+					"autoExpandSelect": true,
+					"earlyRequests": true
+				}
+			}
 		},
 		"contentDensities": {
 			"compact": true,
@@ -49,8 +81,6 @@
 	},
 	"sap.card": {
 		"type": "Component",
-		"header": {
-		}
+		"header": {}
 	}
-	
 }

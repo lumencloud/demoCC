@@ -28,7 +28,7 @@ module.exports = (srv) => {
 
             const code = db.entities('common').code_header;
 
-            const { year, month, org_id, type } = req.data;
+            const { year, month, org_id, type, ai_flag } = req.data;
             let i_month = Number(month);
 
             /**
@@ -60,7 +60,9 @@ module.exports = (srv) => {
             let org_column = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? ['hdqt_id as id', 'hdqt_name as name', 'org_order', 'org_id','lv3_ccorg_cd','lv3_id','lv3_name'] : ['div_id as id', 'div_name as name', 'org_order', 'org_id','lv3_ccorg_cd','lv3_id','lv3_name'];
             let org_where = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? { 'hdqt_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'team_id': null} : { 'div_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'hdqt_id': null, 'team_id': null};
             let org_groupBy = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? ['hdqt_id', 'hdqt_name', 'org_order', 'org_id','lv3_ccorg_cd','lv3_id','lv3_name'] : ['div_id', 'div_name', 'org_order', 'org_id','lv3_ccorg_cd','lv3_id','lv3_name'];
-
+            if(['lv1_id','lv2_id'].includes(org_col_nm)){
+                org_where = {...org_where,'org_tp':'account'}
+            }
 
             //건수 = 수주 건수
             /**
@@ -191,7 +193,7 @@ module.exports = (srv) => {
                 let a_deal_pl = pl_deal_data.filter(pl => pl.id === org.id);
                 let a_pl = pl_data.filter(pl => pl.id === org.id)
                 o_result['org'].push({ org_name: org.name, org_id: org.id })
-                if(!!o_m_pl){
+                if(!!ai_flag || !!o_m_pl){
                     if (!o_result['month'][`${org.id}_order`]) {
                         o_result['month'][`${org.id}_order`] = { display_order: (org?.org_order ?? 0), item_order: 1, org_name: org.name, org_id: org.id, type: '수주', total_data: 0 }
                         o_result['month'][`${org.id}_sale`] = { display_order: (org?.org_order ?? 0), item_order: 2, org_name: org.name, org_id: org.id, type: '매출', total_data: 0 }
@@ -213,7 +215,7 @@ module.exports = (srv) => {
                         o_result['month'][`${org.id}_cnt`]['total_data'] = 0
                     }
                 }
-                if(!!a_deal_pl.length){
+                if(!!ai_flag || !!a_deal_pl.length){
                     if (!o_result['deal'][`${org.id}_order`]) {
                         o_result['deal'][`${org.id}_order`] = { display_order: (org?.org_order ?? 0), item_order: 1, org_name: org.name, org_id: org.id, type: '수주', not_secured_total: 0 }
                         o_result['deal'][`${org.id}_sale`] = { display_order: (org?.org_order ?? 0), item_order: 2, org_name: org.name, org_id: org.id, type: '매출', not_secured_total: 0 }
@@ -225,10 +227,10 @@ module.exports = (srv) => {
                         if (o_deal_pl) {
                             o_result['deal'][`${org.id}_order`][`${s_data_column}`] = o_deal_pl?.rodr_amount_sum ?? 0
                             o_result['deal'][`${org.id}_sale`][`${s_data_column}`] = o_deal_pl?.sale_amount_sum ?? 0
-                            o_result['deal'][`${org.id}_cnt`][`${s_data_column}`] = o_deal_pl?.rodr_cnt ?? 0
+                            o_result['deal'][`${org.id}_cnt`][`${s_data_column}`] = o_deal_pl?.total_rodr_cnt ?? 0
                             o_result['deal'][`${org.id}_order`]['not_secured_total'] += o_deal_pl?.rodr_amount_sum ?? 0
                             o_result['deal'][`${org.id}_sale`]['not_secured_total'] += o_deal_pl?.sale_amount_sum ?? 0
-                            o_result['deal'][`${org.id}_cnt`]['not_secured_total'] += o_deal_pl?.rodr_cnt ?? 0
+                            o_result['deal'][`${org.id}_cnt`]['not_secured_total'] += o_deal_pl?.total_rodr_cnt ?? 0
                         } else {
                             o_result['deal'][`${org.id}_order`][`${s_data_column}`] = 0
                             o_result['deal'][`${org.id}_sale`][`${s_data_column}`] = 0
@@ -236,7 +238,7 @@ module.exports = (srv) => {
                         }
                     })
                 }
-                if(!!a_pl.length){
+                if(!!ai_flag || !!a_pl.length){
                     if (!o_result['rodr'][`${org.id}_order`]) {
                         o_result['rodr'][`${org.id}_order`] = { display_order: (org?.org_order ?? 0), item_order: 1, org_name: org.name, org_id: org.id, type: '수주', total_data: 0, ...data_column }
                         o_result['rodr'][`${org.id}_sale`] = { display_order: (org?.org_order ?? 0), item_order: 2, org_name: org.name, org_id: org.id, type: '매출', total_data: 0, ...data_column }

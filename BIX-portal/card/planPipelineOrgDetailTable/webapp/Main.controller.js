@@ -35,15 +35,23 @@ sap.ui.define([
          */
         _oSearchData: {},
 
-        onInit: async function () {
+        onInit: function () {
             // 초기 JSON 모델 설정
             // await this._setModel();
             this._bindTable();
             this._oEventBus.subscribe("pl", "search", this._bindTable, this);
 
             this._aiPopupManager = new AIPopupManager();
-        },
 
+
+            this.byId("pipeDetailTable1").attachCellClick(this.onCellClick, this);
+            this.byId("pipeDetailTable1").attachCellContextmenu(this.onCellContextmenu, this);
+            this.byId("pipeDetailTable2").attachCellClick(this.onCellClick, this);
+            this.byId("pipeDetailTable2").attachCellContextmenu(this.onCellContextmenu, this);
+            this.byId("pipeDetailTable3").attachCellClick(this.onCellClick, this);
+            this.byId("pipeDetailTable3").attachCellContextmenu(this.onCellContextmenu, this);
+
+        },
         /**
          * JSON 모델 설정
          */
@@ -80,6 +88,10 @@ sap.ui.define([
             let aDeal = oData[0].deal.filter(pl => pl.org_id === sKey)
             let aRodr = oData[0].rodr.filter(pl => pl.org_id === sKey)
 
+            Module.displayStatusForEmpty(this.byId(this._aTableLists[0]), aDeal, this.byId(this._aBoxLists[0]));
+            Module.displayStatusForEmpty(this.byId(this._aTableLists[1]), aMonth, this.byId(this._aBoxLists[1]));
+            Module.displayStatusForEmpty(this.byId(this._aTableLists[2]), aRodr, this.byId(this._aBoxLists[2]));
+
             this.getView().setModel(new JSONModel(aMonth), "oMonthTableModel")
             this.getView().setModel(new JSONModel(aDeal), "oDealTableModel")
             this.getView().setModel(new JSONModel(aRodr), "oRodrTableModel")
@@ -105,7 +117,7 @@ sap.ui.define([
             // HashChanger.getInstance().setHash(sNewHash);
 
             // // PL에 detailSelect 해시 변경 EventBus 전송
-            // this._oEventBus.publish("pl", "setHashModel");
+            // this._oEventBus.publish("pl", "setHashModel", {system: true});
         },
 
         _setBusy: function (bFlag) {
@@ -114,8 +126,8 @@ sap.ui.define([
 
         _bindTable: async function (sChannelId, sEventId, oData) {
             // DOM이 없는 경우 Return
-            // let oDom = this.getView().getDomRef();
-            // if (!oDom) return;
+            let oDom = this.getView().getDomRef();
+            if (!oDom) return;
 
             // detailSelect 해시에 따른 Select 선택
             // let oSelect = this.byId("detailSelect");
@@ -156,16 +168,17 @@ sap.ui.define([
                 oModel.bindContext(sDealPath).requestObject(),
             ]).then(function (aResults) {
 
-                
+
                 let oData = aResults[0].value[0]
                 let aOrg = oData.org;
                 let aMonth = oData.month.filter(pl => pl.org_id === aOrg[0].org_id)
                 let aDeal = oData.deal.filter(pl => pl.org_id === aOrg[0].org_id)
                 let aRodr = oData.rodr.filter(pl => pl.org_id === aOrg[0].org_id)
-                
+
                 Module.displayStatusForEmpty(this.byId(this._aTableLists[0]), aDeal, this.byId(this._aBoxLists[0]));
                 Module.displayStatusForEmpty(this.byId(this._aTableLists[1]), aMonth, this.byId(this._aBoxLists[1]));
                 Module.displayStatusForEmpty(this.byId(this._aTableLists[2]), aRodr, this.byId(this._aBoxLists[2]));
+
                 // totalData 추가해서 모델 바인딩
                 this.getView().setModel(new JSONModel({ org_id: aOrg[0].org_id }), "uiModel");
                 this.getView().setModel(new JSONModel(aResults[0].value), "tableModel");
@@ -180,16 +193,16 @@ sap.ui.define([
                 // 하위 조직이 1개보다 클 때만 Select를 visible true로 설정
                 this.byId("detailSelect").setVisible(aOrg.length > 1);
 
-    
+                this._setVisibleRowCount(aResults);
 
             }.bind(this))
-            .catch((oErr) => {
-                for (let i =0; i < this._aTableLists.length; i++) {
-                    Modules.displayStatus(this.byId(this._aTableLists[i]),oErr.error.code, this.byId(this._aBoxLists[i]));
-                }
-            }).finally(()=>{
-                this._setBusy(false);
-            })
+                .catch((oErr) => {
+                    for (let i = 0; i < this._aTableLists.length; i++) {
+                        Modules.displayStatus(this.byId(this._aTableLists[i]), oErr.error.code, this.byId(this._aBoxLists[i]));
+                    }
+                }).finally(() => {
+                    this._setBusy(false);
+                })
         },
 
         // _addTotalData: function (aResults) {
@@ -209,33 +222,25 @@ sap.ui.define([
         //     this.getView().setModel(new JSONModel(aResults), "oDealTableModel")
         // },
 
-        // _setVisibleRowCount: function (aResults) {
-        //     //테이블 리스트
-        //     let aTableLists = this._aTableLists
+        _setVisibleRowCount: function (aResults) {
+             //테이블 리스트
+             let aTableLists = this._aTableLists
+             let monthArray = aResults[0]?.value?.[0].month || [];
 
-        //     for (let i = 0; i < aTableLists.length; i++) {
-        //         // 테이블 아이디로 테이블 객체
-        //         let oTable = this.byId(aTableLists[i])
-        //         // 처음 화면 렌더링시 table의 visibleCountMode auto 와 <FlexItemData growFactor="1"/>상태에서
-        //         // 화면에 꽉 찬 테이블의 row 갯수를 전역변수에 저장하기 위함
+             for (let i = 0; i < aTableLists.length; i++) {
 
-        //         if (this._iColumnCount === null) {
-        //             this._iColumnCount = oTable.getVisibleRowCount();
-        //         }
-        //         // 전역변수의 row 갯수 기준을 넘어가면 rowcountmode를 자동으로 하여 넘치는것을 방지
-        //         // 전역변수의 row 갯수 기준 이하면 rowcountmode를 수동으로 하고, 각 데이터의 길이로 지정
-        //         if (aResults[i].value.length > this._iColumnCount) {
+                 let oTable = this.byId(aTableLists[i])                
 
-        //             oTable.setVisibleRowCountMode("Auto")
-        //         } else {
-        //             oTable.setVisibleRowCountMode("Fixed")
-        //             oTable.setVisibleRowCount(aResults[i].value.length)
-        //         }
-        //     }
-        // },
+                 if(monthArray.length > 1){
+                    oTable.setVisibleRowCount(3);
+                 }else{
+                    oTable.setVisibleRowCount(1);
+                 }
+             }
+         },
 
         _monthVisibleSetting: function (aResults) {
-            if (aResults.length <= 0 ) return;
+            if (aResults.length <= 0) return;
             let aColumnsVisible = {};
             for (let i = 1; i < 13; i++) {
                 let sFindColumn = "m_" + String(i).padStart(2, "0") + "_data"
@@ -243,26 +248,34 @@ sap.ui.define([
                 aColumnsVisible[sFindColumn] = bResult
             }
             this.getView().setModel(new JSONModel(aColumnsVisible), "oColumnsVisibleModel")
-            //console.log(this.getView().getModel("oColumnsVisibleModel"))
-            //console.log(this.getView().getModel("oMonthTableModel"))
+            ////console.log(this.getView().getModel("oColumnsVisibleModel"))
+            ////console.log(this.getView().getModel("oMonthTableModel"))
         },
 
         _setTableMerge: function () {
+            Module.setTableMergeWithAltColor(this.byId("pipeDetailTable1"), "oDealTableModel");
+            Module.setTableMergeWithAltColor(this.byId("pipeDetailTable2"), "oMonthTableModel");
+            Module.setTableMergeWithAltColor(this.byId("pipeDetailTable3"), "oRodrTableModel");
 
-            let oTable1 = this.byId("pipeDetailTable1")
-            let oTable2 = this.byId("pipeDetailTable2")
-            let oTable3 = this.byId("pipeDetailTable3")
+            // let oTable1 = this.byId("pipeDetailTable1")
+            // let oTable2 = this.byId("pipeDetailTable2")
+            // let oTable3 = this.byId("pipeDetailTable3")
 
-            oTable1.attachCellClick(this.onCellClick, this);
-            oTable1.attachCellContextmenu(this.onCellContextmenu, this);
-            oTable2.attachCellClick(this.onCellClick, this);
-            oTable2.attachCellContextmenu(this.onCellContextmenu, this);
-            oTable3.attachCellClick(this.onCellClick, this);
-            oTable3.attachCellContextmenu(this.onCellContextmenu, this);
-
-            Module.setTableMergeWithAltColor(oTable1, "oDealTableModel");
-            Module.setTableMergeWithAltColor(oTable2, "oMonthTableModel");
-            Module.setTableMergeWithAltColor(oTable3, "oRodrTableModel");
+            // if (oTable1 && !oTable1?.mEventRegistry?.cellContextmenu) {
+            //     oTable1.attachCellClick(this.onCellClick, this);
+            //     oTable1.attachCellContextmenu(this.onCellContextmenu, this);
+            // }
+            // if (oTable2 && !oTable2?.mEventRegistry?.cellContextmenu) {
+            //     oTable2.attachCellClick(this.onCellClick, this);
+            //     oTable2.attachCellContextmenu(this.onCellContextmenu, this);
+            // }
+            // if (oTable3 && !oTable3?.mEventRegistry?.cellContextmenu) {
+            //     oTable3.attachCellClick(this.onCellClick, this);
+            //     oTable3.attachCellContextmenu(this.onCellContextmenu, this);
+            // }
+            // Module.setTableMergeWithAltColor(oTable1, "oDealTableModel");
+            // Module.setTableMergeWithAltColor(oTable2, "oMonthTableModel");
+            // Module.setTableMergeWithAltColor(oTable3, "oRodrTableModel");
         },
 
         onAfterRendering: function () {
@@ -304,6 +317,8 @@ sap.ui.define([
             this._selectedOrgName = oRowData && oRowData.org_name ? oRowData.org_name : oSessionData.org_name;
             this._selectedType = oRowData.type;
 
+            
+            this._excludeClick = !Module.checkAiPopupDisplay(oRowData,["div_id","div_name","display_order","item_order","type"],true);
 
             //첫번째 열 클릭 금지
             if (result.cellInfo && result.cellInfo.columnIndex === 0) {
@@ -317,9 +332,9 @@ sap.ui.define([
         onCellContextmenu: function (oEvent) {
             oEvent.preventDefault();
 
-            const global_table_id =oEvent.getSource().getId();
-            const table_id = global_table_id.replace(this.getView().getId()+"--","");
-            
+            const global_table_id = oEvent.getSource().getId();
+            const table_id = global_table_id.replace(this.getView().getId() + "--", "");
+
             this._selectedTableId = table_id;
             if (this._selectedTableId === "pipeDetailTable1") {
                 this._selectedTableName = "Deal Stage 별"
@@ -346,12 +361,12 @@ sap.ui.define([
             //aireport에서 불러들일 값을 sessionStorage에 저장
             sessionStorage.setItem("aiModel",
                 JSON.stringify({
-                    aiOrgId: this._selectedOrgId,
-                    aiOrgName: this._selectedOrgName,
-                    aiType: this._selectedType,
-                    aiSubTitle: this._selectedSubTitle,
+                    orgId: this._selectedOrgId,
+                    orgNm: this._selectedOrgName,
+                    type: this._selectedType,
+                    subTitle: this._selectedSubTitle,
                     aiTableId: this._selectedTableId,
-                    aiTableName : this._selectedTableName
+                    aiTableName: this._selectedTableName
                 })
             )
 
@@ -512,7 +527,7 @@ sap.ui.define([
             }
         },
 
-        onFirstVisibleRowChanged : function(){
+        onFirstVisibleRowChanged: function () {
             this._setTableMerge();
         },
     });

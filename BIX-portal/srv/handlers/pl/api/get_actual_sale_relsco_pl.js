@@ -56,29 +56,16 @@ module.exports = (srv) => {
             const pl_groupBy_cols = ['year', 'relsco_yn'];
 
             /**
-             * +++++ TBD +++++
-             * 권한 체크하여 사용자가 조회 가능한 조직인지 판별 후 코드 진행
-             */
-
-            /**
              * org_id 파라미터값으로 조직정보 조회
              * 
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_id'
-                when lv2_id = '${org_id}' THEN 'lv2_id'
-                when lv3_id = '${org_id}' THEN 'lv3_id'
-                when div_id = '${org_id}' THEN 'div_id'
-                when hdqt_id = '${org_id}' THEN 'hdqt_id'
-                when team_id = '${org_id}' THEN 'team_id'
-                end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd', 'org_name', 'org_tp'])
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_level', 'org_ccorg_cd', 'org_name', 'org_tp', 'lv3_ccorg_cd'])
                 .where({ 'org_id': org_id });
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             //조직 정보를 where 조건에 추가
-            let org_col_nm = orgInfo.org_level;
+            let org_col_nm = orgInfo.org_level+'_id';
             let org_col_nm_name = orgInfo['org_name'];
             let search_org, search_org_name, search_org_ccorg;
             if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id' || org_col_nm === 'lv3_id'){
@@ -108,27 +95,41 @@ module.exports = (srv) => {
             let pl_groupBy = org_col_nm === 'div_id' ? [...pl_groupBy_cols,'hdqt_id','hdqt_name'] : org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? [...pl_groupBy_cols,'team_id','team_name'] : [...pl_groupBy_cols,'div_id','div_name'];
 
             let pl_view_selec;
-            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.org_tp === 'hybrid' || orgInfo.org_tp === 'account'){
+            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.lv3_ccorg_cd === '237100' || orgInfo.org_tp === 'account'){
                 pl_view_selec = account_pl_view;
-            }else if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id'|| orgInfo.org_tp === 'delivery'){
+            }else{
                 pl_view_selec = pl_view;
             };
 
             // DB 쿼리 실행 (병렬)
             let [pl_data, account_pl_data] = await Promise.all([
                 SELECT.from(pl_view_selec).columns(pl_column).where(pl_where).groupBy(...pl_groupBy),
-                SELECT.from(account_pl_view).columns(pl_col_list).where(pl_where).groupBy(...pl_groupBy_cols),
+                SELECT.from(account_pl_view).columns(pl_column).where(pl_where).groupBy(...pl_groupBy)
             ]);
+            let b_data_check = false
 
-            if(!pl_data.length && !account_pl_data.length){
-                //return req.res.status(204).send();
+            pl_data.forEach(pl => {
+                if(pl.sale_amount_sum !== 0 || pl.margin_amount_sum !== 0){
+                    b_data_check = true
+                }
+            })
+            account_pl_data.forEach(pl => {
+                if(pl.sale_amount_sum !== 0 || pl.margin_amount_sum !== 0){
+                    b_data_check = true
+                }
+            })
+            if(!b_data_check){
                 return []
             }
+            // if(!pl_data.length && !account_pl_data.length){
+            //     //return req.res.status(204).send();
+            //     return []
+            // }
 
             //ackerton 로직
             let ackerton_list = [];
             let ackerton_org;
-            if(orgInfo.org_level === 'lv1_id' || orgInfo.org_level === 'lv2_id'){
+            if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
                 let ac_map = []
                 ackerton_org = org_query.find(data=>data.org_ccorg_cd === '610000');
                 org_query.forEach(data=>{
@@ -223,7 +224,7 @@ module.exports = (srv) => {
                         org_tp: data['org_tp']
                     };
                     
-                    if(orgInfo.org_level === 'lv1_id' || orgInfo.org_level === 'lv2_id'){
+                    if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
                         if(!ackerton_list.find(data3 => data3.ccorg === oTemp.ccorg)){
                             org_list.push(oTemp);
                         };
@@ -233,7 +234,7 @@ module.exports = (srv) => {
                 };
             });
 
-            if(orgInfo.org_level === 'lv1_id' || orgInfo.org_level === 'lv2_id'){
+            if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
                 let oTemp = {
                     id: ackerton_org.org_id,
                     name: ackerton_org.org_name,
@@ -244,27 +245,11 @@ module.exports = (srv) => {
                 org_list.push(oTemp);
             };
 
-            // acc_list = [];
-            // deli_list = [];
-            // org_list.forEach(data=>{
-            //     if(data.org_tp === 'account'){
-            //         acc_list.push(data)
-            //     }else{
-            //         deli_list.push(data)
-            //     }
-            // });
-
-            
-
             let i_count = 0;
             let o_data = {}
             let o_total = {
                 sale_true: {"display_order": i_count,"org_name": org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? org_col_nm_name : '합계',"relsco_type": "대내","type": "매출"},
-                // margin_true: {"display_order": ++i_count,"org_name": org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? org_col_nm_name : '합계',"relsco_type": "대내","type": "마진"},
-                // margin_rate_true: {"display_order": ++i_count,"org_name": org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? org_col_nm_name : '합계',"relsco_type": "대내","type": "마진율"},
                 sale_false: {"display_order": ++i_count,"org_name": org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? org_col_nm_name : '합계',"relsco_type": "대외","type": "매출"},
-                // margin_false: {"display_order": ++i_count,"org_name": org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? org_col_nm_name : '합계',"relsco_type": "대외","type": "마진"},
-                // margin_rate_false: {"display_order": ++i_count,"org_name": org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? org_col_nm_name : '합계',"relsco_type": "대외","type": "마진율"},
             }; 
             pl_data.forEach(o_pl=>{
                 if(!o_data[`${o_pl.id}`]){
@@ -273,22 +258,39 @@ module.exports = (srv) => {
                 if(o_pl.year === year){
                     if(o_pl.relsco_yn){
                         o_data[`${o_pl.id}`]['curr_true_sale'] = o_pl.sale_amount_sum
-                        // o_data[`${o_pl.id}`]['curr_true_margin'] = o_pl.margin_amount_sum
                     }else{
                         o_data[`${o_pl.id}`]['curr_false_sale'] = o_pl.sale_amount_sum
-                        // o_data[`${o_pl.id}`]['curr_false_margin'] = o_pl.margin_amount_sum
                     }
                 }else{
                     if(o_pl.relsco_yn){
                         o_data[`${o_pl.id}`]['last_true_sale'] = o_pl.sale_amount_sum
-                        // o_data[`${o_pl.id}`]['last_true_margin'] = o_pl.margin_amount_sum
                     }else{
                         o_data[`${o_pl.id}`]['last_false_sale'] = o_pl.sale_amount_sum
-                        // o_data[`${o_pl.id}`]['last_false_margin'] = o_pl.margin_amount_sum
                     }
                 }
             })
-            
+
+            if((orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2') && account_pl_data.length && account_pl_data.length > 0){
+                account_pl_data.forEach(o_pl=>{
+                    if(!o_data[`${o_pl.id}`]){
+                        o_data[`${o_pl.id}`]={id:o_pl.id, name:o_pl.name}
+                    }
+                    if(o_pl.year === year){
+                        if(o_pl.relsco_yn){
+                            o_data[`${o_pl.id}`]['curr_true_sale'] = o_pl.sale_amount_sum
+                        }else{
+                            o_data[`${o_pl.id}`]['curr_false_sale'] = o_pl.sale_amount_sum
+                        }
+                    }else{
+                        if(o_pl.relsco_yn){
+                            o_data[`${o_pl.id}`]['last_true_sale'] = o_pl.sale_amount_sum
+                        }else{
+                            o_data[`${o_pl.id}`]['last_false_sale'] = o_pl.sale_amount_sum
+                        }
+                    }
+                })
+            };
+      
             let a_pl_data = Object.values(o_data);
             let org_data = [];
             org_list.forEach((data,i)=>{
@@ -303,28 +305,6 @@ module.exports = (srv) => {
                     "actual_last_ym_value": 0,
                     "actual_curr_ym_value_gap": 0
                 };
-                // let margin_true_data =
-                // {
-                //     "display_order": ++i_count,
-                //     "org_id": data.id,
-                //     "org_name": data.name,
-                //     "relsco_type": "대내",
-                //     "type": "마진",
-                //     "actual_curr_ym_value": 0,
-                //     "actual_last_ym_value": 0,
-                //     "actual_curr_ym_value_gap": 0
-                // };
-                // let margin_rate_true_data =
-                // {
-                //     "display_order": ++i_count,
-                //     "org_id": data.id,
-                //     "org_name": data.name,
-                //     "relsco_type": "대내",
-                //     "type": "마진율",
-                //     "actual_curr_ym_value": 0,
-                //     "actual_last_ym_value": 0,
-                //     "actual_curr_ym_value_gap": 0
-                // };
                 let sale_false_data =
                 {
                     "display_order": ++i_count,
@@ -336,76 +316,27 @@ module.exports = (srv) => {
                     "actual_last_ym_value": 0,
                     "actual_curr_ym_value_gap": 0
                 };
-                // let margin_false_data =
-                // {
-                //     "display_order": ++i_count,
-                //     "org_id": data.id,
-                //     "org_name": data.name,
-                //     "relsco_type": "대외",
-                //     "type": "마진",
-                //     "actual_curr_ym_value": 0,
-                //     "actual_last_ym_value": 0,
-                //     "actual_curr_ym_value_gap": 0
-                // };
-                // let margin_rate_false_data =
-                // {
-                //     "display_order": ++i_count,
-                //     "org_id": data.id,
-                //     "org_name": data.name,
-                //     "relsco_type": "대외",
-                //     "type": "마진율",
-                //     "actual_curr_ym_value": 0,
-                //     "actual_last_ym_value": 0,
-                //     "actual_curr_ym_value_gap": 0
-                // };
 
                 a_pl_data.forEach((o_pl_data)=>{
                     if(data.id === o_pl_data.id){
                         sale_true_data["actual_curr_ym_value"] = o_pl_data?.["curr_true_sale"] ?? 0;
                         sale_true_data["actual_last_ym_value"] = o_pl_data?.["last_true_sale"] ?? 0;
                         sale_true_data["actual_curr_ym_value_gap"] = (o_pl_data?.["curr_true_sale"] ?? 0) - (o_pl_data?.["last_true_sale"] ?? 0);
-                        // margin_true_data["actual_curr_ym_value"] = o_pl_data?.["curr_true_margin"] ?? 0;
-                        // margin_true_data["actual_last_ym_value"] = o_pl_data?.["last_true_margin"] ?? 0;
-                        // margin_true_data["actual_curr_ym_value_gap"] = (o_pl_data?.["curr_true_margin"] ?? 0) - (o_pl_data?.["last_true_margin"] ?? 0);
-                        // margin_rate_true_data["actual_curr_ym_value"] = (o_pl_data?.["curr_true_sale"] ?? 0) === 0 ? 0 : (o_pl_data?.["curr_true_margin"] ?? 0)/o_pl_data["curr_true_sale"];
-                        // margin_rate_true_data["actual_last_ym_value"] = (o_pl_data?.["last_true_sale"] ?? 0) === 0 ? 0 : (o_pl_data?.["last_true_margin"] ?? 0)/o_pl_data["last_true_sale"];
-                        // margin_rate_true_data["actual_curr_ym_value_gap"] = ((o_pl_data?.["curr_true_sale"] ?? 0) === 0 ? 0 : (o_pl_data?.["curr_true_margin"] ?? 0)/o_pl_data["curr_true_sale"]) - ((o_pl_data?.["last_true_sale"] ?? 0) === 0 ? 0 : (o_pl_data?.["last_true_margin"] ?? 0)/o_pl_data["last_true_sale"]);
                         sale_false_data["actual_curr_ym_value"] = o_pl_data?.["curr_false_sale"] ?? 0;
                         sale_false_data["actual_last_ym_value"] = o_pl_data?.["last_false_sale"] ?? 0;
                         sale_false_data["actual_curr_ym_value_gap"] = (o_pl_data?.["curr_false_sale"] ?? 0) - (o_pl_data?.["last_false_sale"] ?? 0);
-                        // margin_false_data["actual_curr_ym_value"] = o_pl_data?.["curr_false_margin"] ?? 0;
-                        // margin_false_data["actual_last_ym_value"] = o_pl_data?.["last_false_margin"] ?? 0;
-                        // margin_false_data["actual_curr_ym_value_gap"] = (o_pl_data?.["curr_false_margin"] ?? 0) - (o_pl_data?.["last_false_margin"] ?? 0);
-                        // margin_rate_false_data["actual_curr_ym_value"] = (o_pl_data?.["curr_false_sale"] ?? 0) === 0 ? 0 : (o_pl_data?.["curr_false_margin"] ?? 0)/o_pl_data["curr_false_sale"];
-                        // margin_rate_false_data["actual_last_ym_value"] = (o_pl_data?.["last_false_sale"] ?? 0) === 0 ? 0 : (o_pl_data?.["last_false_margin"] ?? 0)/o_pl_data["last_false_sale"];
-                        // margin_rate_false_data["actual_curr_ym_value_gap"] = ((o_pl_data?.["curr_false_sale"] ?? 0) === 0 ? 0 : (o_pl_data?.["curr_false_margin"] ?? 0)/o_pl_data["curr_false_sale"]) - ((o_pl_data?.["last_false_sale"] ?? 0) === 0 ? 0 : (o_pl_data?.["last_false_margin"] ?? 0)/o_pl_data["last_false_sale"]);
-
-                        org_data.push(sale_true_data,sale_false_data);
-                        // org_data.push(sale_true_data,margin_true_data,margin_rate_true_data,sale_false_data,margin_false_data,margin_rate_false_data);
                     };
                     if(i===0){
                         o_total['sale_true']['actual_curr_ym_value'] = (o_total['sale_true']['actual_curr_ym_value'] || 0 ) + (o_pl_data?.["curr_true_sale"] ?? 0)
                         o_total['sale_true']['actual_last_ym_value'] = (o_total['sale_true']['actual_last_ym_value'] || 0 ) + (o_pl_data?.["last_true_sale"] ?? 0)
                         o_total['sale_true']['actual_curr_ym_value_gap'] = o_total['sale_true']['actual_curr_ym_value'] - o_total['sale_true']['actual_last_ym_value']
-                        // o_total['margin_true']['actual_curr_ym_value'] = (o_total['margin_true']['actual_curr_ym_value'] || 0 ) + (o_pl_data?.["curr_true_margin"] ?? 0)
-                        // o_total['margin_true']['actual_last_ym_value'] = (o_total['margin_true']['actual_last_ym_value'] || 0 ) + (o_pl_data?.["last_true_margin"] ?? 0)
-                        // o_total['margin_true']['actual_curr_ym_value_gap'] = o_total['margin_true']['actual_curr_ym_value'] - o_total['margin_true']['actual_last_ym_value']
                         o_total['sale_false']['actual_curr_ym_value'] = (o_total['sale_false']['actual_curr_ym_value'] || 0 ) + (o_pl_data?.["curr_false_sale"] ?? 0)
                         o_total['sale_false']['actual_last_ym_value'] = (o_total['sale_false']['actual_last_ym_value'] || 0 ) + (o_pl_data?.["last_false_sale"] ?? 0)
                         o_total['sale_false']['actual_curr_ym_value_gap'] = o_total['sale_false']['actual_curr_ym_value'] - o_total['sale_false']['actual_last_ym_value']
-                        // o_total['margin_false']['actual_curr_ym_value'] = (o_total['margin_false']['actual_curr_ym_value'] || 0 ) + (o_pl_data?.["curr_false_margin"] ?? 0)
-                        // o_total['margin_false']['actual_last_ym_value'] = (o_total['margin_false']['actual_last_ym_value'] || 0 ) + (o_pl_data?.["last_false_margin"] ?? 0)
-                        // o_total['margin_false']['actual_curr_ym_value_gap'] = o_total['margin_false']['actual_curr_ym_value'] - o_total['margin_false']['actual_last_ym_value']
                     };
-                });    
+                });   
+                org_data.push(sale_true_data,sale_false_data);
             });
-        
-            // o_total['margin_rate_true']['actual_curr_ym_value'] = (o_total['sale_true']?.['actual_curr_ym_value'] ?? 0) === 0 ? 0 : (o_total['margin_true']?.['actual_curr_ym_value'] ?? 0)/o_total['sale_true']['actual_curr_ym_value'];
-            // o_total['margin_rate_true']['actual_last_ym_value'] = (o_total['sale_true']?.['actual_last_ym_value'] ?? 0) === 0 ? 0 : (o_total['margin_true']?.['actual_last_ym_value'] ?? 0)/o_total['sale_true']['actual_last_ym_value'];
-            // o_total['margin_rate_true']['actual_curr_ym_value_gap'] = o_total['margin_rate_true']['actual_curr_ym_value'] - o_total['margin_rate_true']['actual_last_ym_value'];
-            // o_total['margin_rate_false']['actual_curr_ym_value'] = (o_total['sale_false']?.['actual_curr_ym_value'] ?? 0) === 0 ? 0 : (o_total['margin_false']?.['actual_curr_ym_value'] ?? 0)/o_total['sale_false']['actual_curr_ym_value'];
-            // o_total['margin_rate_false']['actual_last_ym_value'] = (o_total['sale_false']?.['actual_last_ym_value'] ?? 0) === 0 ? 0 : (o_total['margin_false']?.['actual_last_ym_value'] ?? 0)/o_total['sale_false']['actual_last_ym_value'];
-            // o_total['margin_rate_false']['actual_curr_ym_value_gap'] = o_total['margin_rate_false']['actual_curr_ym_value'] - o_total['margin_rate_false']['actual_last_ym_value'];
 
             let a_total_data = Object.values(o_total);
             a_total_data.forEach((o_total)=>{

@@ -53,25 +53,14 @@ module.exports = (srv) => {
 
             /**
              * org_id 파라미터값으로 조직정보 조회
-             * 
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_id'
-                when lv2_id = '${org_id}' THEN 'lv2_id'
-                when lv3_id = '${org_id}' THEN 'lv3_id'
-                when div_id = '${org_id}' THEN 'div_id'
-                when hdqt_id = '${org_id}' THEN 'hdqt_id'
-                when team_id = '${org_id}' THEN 'team_id'
-                end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd', "lv1_name", "lv2_name", "lv3_name", "div_name", "hdqt_name", "team_name", 'org_tp']).where({ 'org_id': org_id });
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_level', 'org_ccorg_cd', "lv1_name", "lv2_name", "lv3_name", "div_name", "hdqt_name", "team_name", 'org_tp', 'lv3_ccorg_cd', 'org_name']).where({ 'org_id': org_id });
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             //조직 정보를 where 조건에 추가
-            let org_col_nm = orgInfo.org_level;
-            let org_col_nm_name = orgInfo[org_col_nm.split('_', 1) + '_name'];
+            let org_col_nm = orgInfo.org_level + '_id';
             let org_ccorg = orgInfo.org_ccorg_cd;
-            let org_ccorg_col = org_col_nm.split('_', 1) + '_ccorg_cd';
             let search_org, search_org_name, search_org_ccorg;
 
             const pl_col_list = ['year', sale_sum_col, sale_sum_total_col];
@@ -92,9 +81,12 @@ module.exports = (srv) => {
             const org_query = await SELECT.from(org_full_level).orderBy('org_order');
             let org_query_data = [];
             org_query.forEach(data=>{
-                if(data[org_col_nm] === org_id){
+                if(data[org_col_nm] === org_id && data['org_level'] !== 'team'){
                     if(org_tp){
                         if(data['org_tp'] === org_tp){
+                            org_query_data.push(data)
+                        }
+                        if(orgInfo.org_level === 'div' && data['div_ccorg_cd'] === '241100' && data['org_tp'] === 'staff'){
                             org_query_data.push(data)
                         }
                     }else{
@@ -109,13 +101,14 @@ module.exports = (srv) => {
             let aAddList = [search_org, search_org_name];
             pl_col_list.push(...aAddList);
             const pl_where_conditions = { 'year': { in: [year, last_year] } };
-            let pl_where = org_col_nm === 'lv1_id' ? pl_where_conditions : { ...pl_where_conditions, [org_col_nm]: org_id };
+            let account_pl_where = orgInfo.org_level === 'lv1' ? pl_where_conditions : { ...pl_where_conditions, [org_col_nm]: org_id };
+            let pl_where = orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'? { ...pl_where_conditions, 'org_tp':'delivery' } : { ...pl_where_conditions, [org_col_nm]: org_id };
             const pl_groupBy_cols = ['year', search_org, search_org_name];
 
             // DB 쿼리 실행 (병렬)
             let [pl_data, account_pl_data, target_data] = await Promise.all([
                 SELECT.from(pl_view).columns(pl_col_list).where(pl_where).groupBy(...pl_groupBy_cols),
-                SELECT.from(account_pl_view).columns(pl_col_list).where(pl_where).groupBy(...pl_groupBy_cols),
+                SELECT.from(account_pl_view).columns(pl_col_list).where(account_pl_where).groupBy(...pl_groupBy_cols),
                 get_org_target(year, ['B02'])
             ]);
 
@@ -128,7 +121,7 @@ module.exports = (srv) => {
             let ackerton_list = [];
             let ackerton_org;
 
-            if(orgInfo.org_level === 'lv1_id' || orgInfo.org_level === 'lv2_id'){
+            if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
                 let ac_map = []
                 ackerton_org = org_query.find(data=>data.org_ccorg_cd === '610000');
 
@@ -175,7 +168,7 @@ module.exports = (srv) => {
                         ackerton_last_pl_sum_data.sale_total_amount_sum += data.sale_total_amount_sum
                     }
                 });
-                pl_data = pl_data.filter(item=>!ac_map.includes(item[search_org]))
+                // pl_data = pl_data.filter(item=>!ac_map.includes(item[search_org]))
                 pl_data.push(ackerton_curr_pl_sum_data);
                 pl_data.push(ackerton_last_pl_sum_data);
             };
@@ -192,7 +185,7 @@ module.exports = (srv) => {
                         org_tp: data['org_tp']
                     };
                     
-                    if(orgInfo.org_level === 'lv1_id' || orgInfo.org_level === 'lv2_id'){
+                    if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
                         if(!ackerton_list.find(data3 => data3.ccorg === oTemp.ccorg)){
                             org_list.push(oTemp);
                         };
@@ -202,7 +195,7 @@ module.exports = (srv) => {
                 };
             });
 
-            if((orgInfo.org_level === 'lv1_id' || orgInfo.org_level === 'lv2_id') && org_tp !== 'account'){
+            if((orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2') && org_tp !== 'account'){
                 let oTemp = {
                     id: ackerton_org.org_id,
                     name: ackerton_org.org_name,
@@ -212,8 +205,6 @@ module.exports = (srv) => {
                 };
                 org_list.push(oTemp);
             };
-
-            
 
             // pl_data 결과 값 flat 하게 데이터 구성
             let flat_pl = pl_data.reduce((acc, item) => {
@@ -262,9 +253,9 @@ module.exports = (srv) => {
                 let target = target_data.find(data2=>data2.org_ccorg_cd === data.ccorg);
 
                 let pl_view_select;
-                if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && data.org_tp === 'hybrid' || data.org_tp === 'account'){
+                if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.lv3_ccorg_cd === '237100' || data.org_tp === 'account'){
                     pl_view_select = flat_account_pl;
-                }else if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id'|| data.org_tp === 'delivery'){
+                }else{
                     pl_view_select = flat_pl;
                 };
 
@@ -289,18 +280,20 @@ module.exports = (srv) => {
                 org_data.push(sale_data);
             });
 
-            if(pl_data.length > 0){
+            if(pl_data.length > 0 && (org_tp === 'delivery' || !org_tp)){
                 pl_data.forEach(data => {
-                    if (data.year === year) {
-                        total_data.actual_curr_ym_value += (data?.sale_amount_sum ?? 0);
-                    } else if (data.year === last_year) {
-                        total_data.actual_last_ym_value += (data?.sale_amount_sum ?? 0);
-                        total_data.target_last_y_value += (data?.sale_total_amount_sum ?? 0);
+                    if(data.div_id !== '6444'){
+                        if (data.year === year) {
+                            total_data.actual_curr_ym_value += (data?.sale_amount_sum ?? 0);
+                        } else if (data.year === last_year) {
+                            total_data.actual_last_ym_value += (data?.sale_amount_sum ?? 0);
+                            total_data.target_last_y_value += (data?.sale_total_amount_sum ?? 0);
+                        };
                     };
                 })
             }
 
-            if(account_pl_data.length > 0){
+            if(account_pl_data.length > 0 && org_tp === 'account'){
                 account_pl_data.forEach(data => {
                     if (data.year === year) {
                         total_data.actual_curr_ym_value += (data?.sale_amount_sum ?? 0);

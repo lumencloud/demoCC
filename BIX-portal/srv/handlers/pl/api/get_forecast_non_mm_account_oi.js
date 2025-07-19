@@ -28,11 +28,6 @@ module.exports = (srv) => {
             const pl_org_view = db.entities('pl').wideview_non_mm_view;
             const pl_account_view = db.entities('pl').wideview_account_non_mm_view;
             /**
-             * common_annual_target_temp_view
-             * 조직 별 연단위 목표금액
-             */
-            const target = db.entities('common').annual_target_temp_view;
-            /**
              * common.org_full_level_view [조직정보]
              * 조직구조 테이블
              */
@@ -72,13 +67,6 @@ module.exports = (srv) => {
             /** 
              * 타겟 뷰 조회용 컬럼
              */
-            const target_col_list = [
-                'year',
-                'target_type_cd',
-                'ifnull(non_mm_target,0) as non_mm_target'
-            ];
-            const target_where_conditions = { 'year': year, 'target_type': 'biz_tp_account_cd'};
-            const target_groupBy_cols = ['year' ,'target_type_cd']
 
             /**
              * +++++ TBD +++++
@@ -120,10 +108,9 @@ module.exports = (srv) => {
             let pl_groupBy = pl_groupBy_cols;
 
             // DB 쿼리 실행 (병렬)
-            const [pl_data, account_data,target_query] = await Promise.all([
+            const [pl_data, account_data] = await Promise.all([
                 SELECT.from(pl_view).columns(pl_column).where(pl_where).groupBy(...pl_groupBy),
-                SELECT.from(account_view).columns(['biz_tp_account_cd','biz_tp_account_nm','sort_order']),
-                SELECT.from(target).columns(target_col_list).where(target_where_conditions),
+                SELECT.from(account_view).columns(['biz_tp_account_cd','biz_tp_account_nm','sort_order'])
             ]);
             
             if(!pl_data.length){
@@ -136,73 +123,58 @@ module.exports = (srv) => {
 
             let o_result = {}
             let o_total = {
-                'sale':{display_order : 1, item_order : 1, account_nm : '합계', account_id : 'total', type: "매출",target:0},
-                'margin':{display_order : 1, item_order : 2, account_nm : '합계', account_id : 'total', type: "마진",target:0}
+                'sale':{display_order : 1, item_order : 1, account_nm : '합계', account_id : 'total', type: "매출"},
+                'margin':{display_order : 1, item_order : 2, account_nm : '합계', account_id : 'total', type: "마진"},
+                'margin_rate':{display_order : 1, item_order : 3, account_nm : '합계', account_id : 'total', type: "마진율"}
             }
             o_total[`sale`]['secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_sale, 0)
             o_total[`sale`]['not_secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.not_secured_sale, 0)
             o_total[`sale`]['forecast_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_sale+oData.not_secured_sale, 0)
             o_total[`sale`]['last_forecast_value'] = last_pl.reduce((iSum, oData) => iSum += oData.secured_sale+oData.not_secured_sale, 0)
+            o_total[`sale`]['yoy'] = o_total[`sale`]['forecast_value'] - o_total[`sale`]['last_forecast_value']
+
             o_total[`margin`]['secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_margin, 0)
             o_total[`margin`]['not_secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.not_secured_margin, 0)
             o_total[`margin`]['forecast_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_margin+oData.not_secured_margin, 0)
             o_total[`margin`]['last_forecast_value'] = last_pl.reduce((iSum, oData) => iSum += oData.secured_margin+oData.not_secured_margin, 0)
+            o_total[`margin`]['yoy'] = o_total[`margin`]['forecast_value'] - o_total[`margin`]['last_forecast_value']
+
+            o_total['margin_rate']['secured_value'] = o_total[`sale`]['secured_value'] === 0 ? 0 : o_total[`margin`]['secured_value']/o_total[`sale`]['secured_value']
+            o_total['margin_rate']['not_secured_value'] = o_total[`sale`]['not_secured_value'] === 0 ? 0 : o_total[`margin`]['not_secured_value']/o_total[`sale`]['not_secured_value']
+            o_total['margin_rate']['forecast_value'] = o_total[`sale`]['forecast_value'] === 0 ? 0 : o_total[`margin`]['forecast_value']/o_total[`sale`]['forecast_value']
+            o_total['margin_rate']['last_forecast_value'] = o_total[`sale`]['last_forecast_value'] === 0 ? 0 : o_total[`margin`]['last_forecast_value']/o_total[`sale`]['last_forecast_value']
+            o_total[`margin_rate`]['yoy'] = o_total['margin_rate']['forecast_value'] - o_total['margin_rate']['last_forecast_value']
             
             account_data.forEach(account => {
                 let o_pl = curr_pl.find(pl => pl.biz_tp_account_cd === account.biz_tp_account_cd);
                 let o_last_pl = last_pl.find(pl => pl.biz_tp_account_cd === account.biz_tp_account_cd);
-                let o_curr_target = target_query.find(target => target.target_type_cd === account.biz_tp_account_cd)
                 if(!o_result[`${account.biz_tp_account_cd}_sale`]){
-                    o_result[`${account.biz_tp_account_cd}_sale`]={display_order : account.sort_order, item_order : 1, account_nm : account.biz_tp_account_nm, account_id : account.biz_tp_account_cd, type: "매출"}
-                    o_result[`${account.biz_tp_account_cd}_margin`]={display_order : account.sort_order, item_order : 2, account_nm : account.biz_tp_account_nm, account_id : account.biz_tp_account_cd, type: "마진"}
+                    o_result[`${account.biz_tp_account_cd}_sale`]={display_order : account.sort_order+1, item_order : 1, account_nm : account.biz_tp_account_nm, account_id : account.biz_tp_account_cd, type: "매출"}
+                    o_result[`${account.biz_tp_account_cd}_margin`]={display_order : account.sort_order+1, item_order : 2, account_nm : account.biz_tp_account_nm, account_id : account.biz_tp_account_cd, type: "마진"}
+                    o_result[`${account.biz_tp_account_cd}_margin_rate`]={display_order : account.sort_order+1, item_order : 3, account_nm : account.biz_tp_account_nm, account_id : account.biz_tp_account_cd, type: "마진율"}
                 }
                 o_result[`${account.biz_tp_account_cd}_sale`]['secured_value'] = (o_pl?.secured_sale ?? 0)
                 o_result[`${account.biz_tp_account_cd}_sale`]['not_secured_value'] = (o_pl?.not_secured_sale ?? 0)
                 o_result[`${account.biz_tp_account_cd}_sale`]['forecast_value'] = (o_pl?.secured_sale ?? 0) + (o_pl?.not_secured_sale ?? 0)
-                o_result[`${account.biz_tp_account_cd}_sale`]['plan_ratio'] = ((o_pl?.secured_sale ?? 0) + (o_pl?.not_secured_sale ?? 0)) - ((o_curr_target?.non_mm_target ?? 0)*100000000)
                 o_result[`${account.biz_tp_account_cd}_sale`]['yoy'] = ((o_pl?.secured_sale ?? 0) + (o_pl?.not_secured_sale ?? 0)) - ((o_last_pl?.secured_sale ?? 0) + (o_last_pl?.not_secured_sale ?? 0))
+                
                 o_result[`${account.biz_tp_account_cd}_margin`]['secured_value'] = (o_pl?.secured_margin ?? 0)
                 o_result[`${account.biz_tp_account_cd}_margin`]['not_secured_value'] = (o_pl?.not_secured_margin ?? 0)
                 o_result[`${account.biz_tp_account_cd}_margin`]['forecast_value'] = (o_pl?.secured_margin ?? 0) + (o_pl?.not_secured_margin ?? 0)
-                o_result[`${account.biz_tp_account_cd}_margin`]['plan_ratio'] = ((o_pl?.secured_margin ?? 0) + (o_pl?.not_secured_margin ?? 0)) - ((o_curr_target?.margin_target ?? 0)*100000000)
                 o_result[`${account.biz_tp_account_cd}_margin`]['yoy'] = ((o_pl?.secured_margin ?? 0) + (o_pl?.not_secured_margin ?? 0)) - ((o_last_pl?.secured_margin ?? 0) + (o_last_pl?.not_secured_margin ?? 0))
+                
+                o_result[`${account.biz_tp_account_cd}_margin_rate`]['secured_value'] = o_result[`${account.biz_tp_account_cd}_sale`]['secured_value'] === 0 ? 0 : o_result[`${account.biz_tp_account_cd}_margin`]['secured_value']/o_result[`${account.biz_tp_account_cd}_sale`]['secured_value']
+                o_result[`${account.biz_tp_account_cd}_margin_rate`]['not_secured_value'] = o_result[`${account.biz_tp_account_cd}_sale`]['not_secured_value'] === 0 ? 0 : o_result[`${account.biz_tp_account_cd}_margin`]['not_secured_value']/o_result[`${account.biz_tp_account_cd}_sale`]['not_secured_value']
+                o_result[`${account.biz_tp_account_cd}_margin_rate`]['forecast_value'] = o_result[`${account.biz_tp_account_cd}_sale`]['forecast_value'] === 0 ? 0 : o_result[`${account.biz_tp_account_cd}_margin`]['forecast_value']/o_result[`${account.biz_tp_account_cd}_sale`]['forecast_value']
+                o_result[`${account.biz_tp_account_cd}_margin_rate`]['last_forecast_value'] = o_result[`${account.biz_tp_account_cd}_sale`]['last_forecast_value'] === 0 ? 0 : o_result[`${account.biz_tp_account_cd}_margin`]['last_forecast_value']/o_result[`${account.biz_tp_account_cd}_sale`]['last_forecast_value']
+                o_result[`${account.biz_tp_account_cd}_margin_rate`]['yoy'] = o_result[`${account.biz_tp_account_cd}_margin_rate`]['forecast_value'] - o_result[`${account.biz_tp_account_cd}_margin_rate`]['last_forecast_value']
 
-                o_total[`sale`]['target'] += (o_curr_target?.non_mm_target ?? 0)
-                o_total[`margin`]['target'] += (o_curr_target?.margin_target ?? 0)
             })
             const a_result = Object.values(o_result)
             const a_total = Object.values(o_total);
-            a_total.forEach(total => {
-                
-                let o_temp = {
-                    "display_order": total.display_order,
-                    "item_order" : total.item_order,
-                    "type": total.type,
-                    "account_nm" : total.account_nm,
-                    "forecast_value" : total.forecast_value,
-                    "secured_value" : total.secured_value,
-                    "not_secured_value" : total.not_secured_value,
-                    "plan_ratio" : total.forecast_value - total.target*100000000,
-                    "yoy" : total.forecast_value - total.last_forecast_value,
-                }
-                
-                oResult.push(o_temp)
-            })
-            a_result.forEach(result => {
+            
+            oResult.push(...a_total,...a_result)
 
-                let o_temp = {
-                    "display_order": result.display_order,
-                    "item_order" : result.item_order,
-                    "type": result.type,
-                    "account_nm" : result.account_nm,
-                    "forecast_value" : result.forecast_value,
-                    "secured_value" : result.secured_value,
-                    "not_secured_value" : result.not_secured_value,
-                    "plan_ratio" : result.plan_ratio,
-                    "yoy" : result.yoy,
-                }
-                oResult.push(o_temp)
-            })
             return oResult
         } catch(error) { 
             console.error(error); 

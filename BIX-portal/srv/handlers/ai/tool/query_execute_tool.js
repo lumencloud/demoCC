@@ -73,20 +73,18 @@ class QueryExecuteTool {
      */
     parseGenerateQuery(generateQuery) {
         try {
-            let queryString = generateQuery;
+            this.logger.debug('원본 generate_query:', generateQuery);
             
-            if (typeof queryString === 'string') {
-                // JSON 파싱을 위한 안전한 전처리
-                queryString = queryString
-                    .replace(/`/g, '"')           // 백틱을 따옴표로 변경
-                    .replace(/\n/g, '\\n')        // 줄바꿈 처리
-                    .replace(/\r/g, '\\r')        // 캐리지 리턴 처리
-                    .replace(/\t/g, '\\t')        // 탭 처리
-                    .replace(/\\\\/g, '\\');      // 이중 백슬래시 처리
+            // 1단계: 기본 JSON 파싱 시도
+            let queryData;
+            if (typeof generateQuery === 'string') {
+                queryData = JSON.parse(generateQuery);
+            }
+            else {
+                queryData = generateQuery;
             }
             
-            const parsed = JSON.parse(queryString);
-            let sql_query = parsed.sql_query;
+            let sql_query = queryData.sql_query;
             
             if (sql_query) {
                 // SQL 정리
@@ -96,29 +94,102 @@ class QueryExecuteTool {
                     .replace(/\\t/g, ' ')
                     .replace(/\s+/g, ' ')
                     .trim();
+                
+                this.logger.info('JSON 파싱 성공');
+                return sql_query;
             }
-            
-            return sql_query;
-            
+            else {
+                throw new Error('sql_query 필드가 없습니다');
+            }
         } catch (parseError) {
             this.logger.error('JSON 파싱 실패:', parseError.message);
             
-            // 대안: 정규식으로 SQL 부분만 추출
+            // 2단계: 정규식으로 SQL 추출 (더 강력한 패턴)
             try {
-                const sqlMatch = generateQuery.match(/"sql_query":\s*"([^"]+)"/);
-                if (sqlMatch) {
-                    const sql_query = sqlMatch[1]
-                        .replace(/\\n/g, ' ')
-                        .replace(/\s+/g, ' ')
-                        .trim();
-                    this.logger.info('정규식으로 SQL 추출 성공');
-                    return sql_query;
+                const generateQueryStr = typeof generateQuery === 'string' ? 
+                    generateQuery : JSON.stringify(generateQuery);
+                
+                // 여러 정규식 패턴 시도
+                const patterns = [
+                    /"sql_query":\s*"((?:[^"\\]|\\.)*)"/g,  // 이스케이프 문자 포함
+                    /'sql_query':\s*'((?:[^'\\]|\\.)*)'/g,  // 단일 따옴표
+                    /`sql_query`:\s*`((?:[^`\\]|\\.)*)`/g,  // 백틱
+                    /"sql_query":\s*"([^"]*)"/g             // 기본 패턴
+                ];
+                
+                for (const pattern of patterns) {
+                    const match = pattern.exec(generateQueryStr);
+                    if (match && match[1]) {
+                        let sql_query = match[1]
+                            .replace(/\\"/g, '"')     // 이스케이프된 따옴표 복원
+                            .replace(/\\n/g, ' ')     // 줄바꿈 처리
+                            .replace(/\\r/g, ' ')     // 캐리지 리턴 처리  
+                            .replace(/\\t/g, ' ')     // 탭 처리
+                            .replace(/\\\\/g, '\\')   // 이중 백슬래시 처리
+                            .replace(/\s+/g, ' ')     // 연속 공백 정리
+                            .trim();
+                        
+                        this.logger.info('정규식으로 SQL 추출 성공');
+                        return sql_query;
+                    }
                 }
-                else {
-                    throw new Error('SQL 쿼리를 찾을 수 없습니다');
-                }
+                
+                throw new Error('SQL 쿼리를 찾을 수 없습니다');
             } catch (regexError) {
-                throw new Error(`쿼리 정보 파싱에 실패했습니다: ${parseError.message}`);
+                this.logger.error('정규식 추출 실패:', regexError.message);
+                
+                // 3단계: 마지막 시도 - 문자열 검색
+                try {
+                    const generateQueryStr = typeof generateQuery === 'string' ? 
+                        generateQuery : JSON.stringify(generateQuery);
+                    
+                    const startMarker = '"sql_query"';
+                    const startIndex = generateQueryStr.indexOf(startMarker);
+                    
+                    if (startIndex !== -1) {
+                        const colonIndex = generateQueryStr.indexOf(':', startIndex);
+                        const quoteStartIndex = generateQueryStr.indexOf('"', colonIndex) + 1;
+                        
+                        // 마지막 따옴표 찾기 (이스케이프된 것 제외)
+                        let quoteEndIndex = quoteStartIndex;
+                        let escaped = false;
+                        
+                        for (let i = quoteStartIndex; i < generateQueryStr.length; i++) {
+                            const char = generateQueryStr[i];
+                            if (escaped) {
+                                escaped = false;
+                                continue;
+                            }
+                            if (char === '\\') {
+                                escaped = true;
+                                continue;
+                            }
+                            if (char === '"') {
+                                quoteEndIndex = i;
+                                break;
+                            }
+                        }
+                        
+                        if (quoteEndIndex > quoteStartIndex) {
+                            const sql_query = generateQueryStr
+                                .substring(quoteStartIndex, quoteEndIndex)
+                                .replace(/\\"/g, '"')
+                                .replace(/\\n/g, ' ')
+                                .replace(/\\r/g, ' ')
+                                .replace(/\\t/g, ' ')
+                                .replace(/\\\\/g, '\\')
+                                .replace(/\s+/g, ' ')
+                                .trim();
+                            
+                            this.logger.info('문자열 검색으로 SQL 추출 성공');
+                            return sql_query;
+                        }
+                    }
+                    
+                    throw new Error('문자열 검색에서도 SQL을 찾을 수 없습니다');  
+                } catch (stringError) {
+                    throw new Error(`모든 파싱 방법 실패: JSON(${parseError.message}), Regex(${regexError.message}), String(${stringError.message})`);
+                }
             }
         }
     }
@@ -154,10 +225,10 @@ class QueryExecuteTool {
             throw new Error('올바르지 않은 SQL 구문입니다. FROM 절이 필요합니다');
         }
 
-        // 다중 쿼리 방지
-        if (cleanSql.includes(';')) {
-            throw new Error('다중 SQL 문은 실행할 수 없습니다');
-        }
+        // // 다중 쿼리 방지
+        // if (cleanSql.includes(';')) {
+        //     throw new Error('다중 SQL 문은 실행할 수 없습니다');
+        // }
     }
 
     /**

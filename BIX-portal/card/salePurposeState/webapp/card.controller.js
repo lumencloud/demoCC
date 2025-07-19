@@ -42,6 +42,9 @@ sap.ui.define(
       let oChart = this._oMyChart[0]
       
       oChart.data.datasets[0].data = [oData.Difference, oData.Sale];
+      let add;
+      if(oData.Sale >= 0){add =  "#1768FA"} else { add = "#FA4646"};
+      oChart.data.datasets[0].backgroundColor[1] = add
 
       oChart.update();
 
@@ -58,13 +61,16 @@ sap.ui.define(
         let oParentElement = document.getElementById(sCardId).parentElement;
         let iBoxWidth = Math.floor(oParentElement.clientWidth / window.innerWidth * 80);
         let iBoxHeight = Math.floor(oParentElement.clientHeight / window.innerHeight * 50);        
-
         this.byId("donughtTextBox").setHeight(`${iBoxHeight}vh`)
+
+
 
         let Gray = getComputedStyle(document.documentElement).getPropertyValue('--custom_black8');
         let Blue = getComputedStyle(document.documentElement).getPropertyValue('--custom_Chart1');
         let LightBlue = getComputedStyle(document.documentElement).getPropertyValue('--custom_Chart21');
         let oData = await this._dataSetting();
+
+        let add = (oData.Difference < 0) ?  "#FA4646" : "#1768FA";
 
 
         for (let i = 0; i < this._aCanvasId.length; i++) {
@@ -82,7 +88,9 @@ sap.ui.define(
                         datasets: [
                             {
                                 data: [oData.Difference, oData.Sale],
-                                backgroundColor: [Gray, Blue],                                
+                                backgroundColor: [
+                                  Gray, add  
+                                ],                                
                             }
                         ]
                     },
@@ -120,7 +128,13 @@ sap.ui.define(
                             position: "top"
                             },
                             datalabels:{
-                              color: '#1768FA',
+                              color: function(context){        
+                                if(context.chart.data.datasets[0].data[1] >= 0){
+                                  return '#1768FA'
+                                } else {
+                                  return '#FA4646'
+                                }
+                              },
                               display: function(context){
                                 return context.chart.data.labels[context.dataIndex] === '현재 실적';
                               },
@@ -138,7 +152,6 @@ sap.ui.define(
                             padding : 7,
                             formatter: function(value){
                               if(value){
-                                if (value > 100) {
                                   var oNumberFormat = NumberFormat.getFloatInstance({
                                       groupingEnabled: true,
                                       groupingSeparator: ',',
@@ -147,7 +160,6 @@ sap.ui.define(
                                       });
                                     return oNumberFormat.format(value)+"억";                                                
                                     }
-                                  }
                               },                              
                           }
                         },
@@ -155,7 +167,7 @@ sap.ui.define(
                     plugins: [ChartDataLabels],                       
 
                 })
-                this._ovserveResize(this.byId(this._aContainerId[i]), i)
+                //this._ovserveResize(this.byId(this._aContainerId[i]), i)
 
             }.bind(this));
        }
@@ -201,7 +213,7 @@ sap.ui.define(
           Module.displayStatus(this.getOwnerComponent().oCard,oErr.error.code, this.byId("cardContent"));
       });
 
-        let oResult = aResult.value.find((result)=> result.type === "매출")
+        let oResult = aResult.value.find((result)=> result.type === "영업이익")
         
         let PurposeContarst, SaleContarst;
         let type
@@ -268,7 +280,7 @@ sap.ui.define(
             decimals: 1,
           });
           return oNumberFormat.format(iValue) + "%";
-        } else if (sType === "percent_contrast") {
+        }  else if (sType === "percent_contrast") {
           var oNumberFormat = NumberFormat.getFloatInstance({
             groupingEnabled: true,
             groupingSeparator: ',',

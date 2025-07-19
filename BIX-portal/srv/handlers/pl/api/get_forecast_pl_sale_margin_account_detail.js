@@ -3,11 +3,11 @@ const get_org_target = require('../../function/get_org_target');
 
 module.exports = (srv) => {
     srv.on('get_forecast_pl_sale_margin_account_detail', async (req) => {
-        try{
+        try {
             /**
              * 핸들러 초기에 권한체크
              */
-            await check_user_auth(req);     
+            await check_user_auth(req);
 
             /**
              * API 리턴값 담을 배열 선언
@@ -16,7 +16,7 @@ module.exports = (srv) => {
 
             // cds 모듈을 통한 DB 커넥트
             const db = await cds.connect.to('db');
-    
+
             // =========================== 조회 대상 DB 테이블 ===========================
             // entities('<cds namespace 명>').<cds entity 명>
             // srv .cds 에 using from 구문에 엔티티가 속한 db .cds 파일이 최소 한 번이라도 걸려있어야 db.entities 로 엔티티 인식가능
@@ -26,6 +26,7 @@ module.exports = (srv) => {
              */
             const pl_org_view = db.entities('pl').wideview_view;
             const pl_account_view = db.entities('pl').wideview_account_view;
+            const last_account_view = db.entities('pl').account_convert_view
             /**
              * common.org_full_level_view [조직정보]
              */
@@ -57,7 +58,7 @@ module.exports = (srv) => {
                 when hdqt_id = '${org_id}' THEN 'hdqt_id'
                 when team_id = '${org_id}' THEN 'team_id'
                 end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd','lv3_ccorg_cd','org_tp'])
+            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd', 'lv3_ccorg_cd', 'org_tp'])
                 .where`org_id = ${org_id} and (lv1_id = ${org_id} or lv2_id = ${org_id} or lv3_id = ${org_id} or div_id = ${org_id} or hdqt_id = ${org_id} or team_id = ${org_id})`;
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
@@ -68,7 +69,7 @@ module.exports = (srv) => {
             let org_tp = orgInfo.org_tp;
 
             let pl_view = pl_org_view
-            if(org_col_nm !== 'lv1_id' && org_col_nm !== 'lv2_id' && ((org_tp === 'hybrid' && lv3_ccorg_cd === '237100') || org_tp === 'account')){
+            if (org_col_nm !== 'lv1_id' && org_col_nm !== 'lv2_id' && ((org_tp === 'hybrid' && lv3_ccorg_cd === '237100') || org_tp === 'account')) {
                 pl_view = pl_account_view
             }
 
@@ -76,26 +77,38 @@ module.exports = (srv) => {
              * pl 조회 컬럼 - 확보(secured) 매출/마진, 미확보(not_secured) 매출/마진, 년도, account 코드
              * 조회 조건 - 년도, 데이터 속성이 WO(org)가 아닌 것
              */
-            let i_index = Number(month) === 12? 12 : Number(month)+1
-            let aForecastSale = []; 
-            for (let i = 12; i >= i_index; i--) {
-                aForecastSale.push(`sale_m${i}_amt`);
+            let i_index = Number(month) === 12 ? 12 : Number(month) + 1
+            let aForecastSale = [];
+            let aTotalSale = [];
+            for (let i = 1; i<=12; i++){
+                if(i>=i_index){
+                    aForecastSale.push(`sale_m${i}_amt`);
+                }
+                aTotalSale.push(`sale_m${i}_amt`);
             }
-            let s_forecast_sale = Number(month) === 12? 0 : aForecastSale.join(" + ");
+            let s_forecast_sale = Number(month) === 12 ? 0 : aForecastSale.join(" + ");
 
             const pl_col_list = [
-                'year', 
+                'year',
                 'biz_tp_account_cd',
                 `sum(case when src_type = 'D' then ${s_forecast_sale} else 0 end) as not_secured_sale`,
-                `sum(case when src_type = 'D' then 0 else sale_year_amt end) as secured_sale`,
-
+                `sum(case when src_type = 'D' then 0 else sale_year_amt end) as secured_sale`
             ];
-            const pl_groupBy_cols = ['year','biz_tp_account_cd'];
-            const pl_where_conditions = { 'year': { in: [year, last_year] }, 'src_type': {'!=':'WO'}};
-            
+            const pl_groupBy_cols = ['year', 'biz_tp_account_cd'];
+            const pl_where_conditions = { 'year': year, 'src_type': { '!=': 'WO' } };
+
+            const last_account_col_list = [
+                'year',
+                'biz_tp_account_cd',
+                `sum(${aForecastSale.join(" + ")}) as forecast_value`,
+            ]
+            const last_account_where_conditions = { 'year': {in:[year, last_year]}};
+            const last_account_groupBy_cols = ['year','biz_tp_account_cd']
+
             // 전사 (lv1_) 레벨 조회일 경우, 조직 정보가 없는 ccorg_cd 포함하도록, org_id 조건 없이 전체 aggregation
             let pl_where = org_col_nm === 'lv1_id' ? pl_where_conditions : { ...pl_where_conditions, [org_col_nm]: org_id };
-            
+            let last_account_where = org_col_nm === 'lv1_id' ? last_account_where_conditions : { ...last_account_where_conditions, [org_col_nm]: org_id };
+
             /** 
              * 타겟 뷰 조회용 컬럼 - 년도, 목표 대상 코드, 매출목표, 마진목표
              * 조회 조건 - 년도, 목표 대상
@@ -105,83 +118,118 @@ module.exports = (srv) => {
                 'target_type_cd',
                 'ifnull(sale_target,0) as sale_target'
             ];
-            const target_where_conditions = { 'year': year, 'target_type': 'biz_tp_account_cd'};
+            const target_where_conditions = { 'year': year, 'target_type': 'biz_tp_account_cd' };
 
             // DB 쿼리 실행 (병렬)
-            const [query, account_query, target_query] = await Promise.all([
+            const [query, account_data_query, account_query, target_query] = await Promise.all([
                 // PL 실적, 목표 조회
                 SELECT.from(pl_view).columns(pl_col_list).where(pl_where).groupBy(...pl_groupBy_cols),
-                SELECT.from(common_account).columns(['biz_tp_account_cd','biz_tp_account_nm','sort_order']),
+                SELECT.from(last_account_view).columns(last_account_col_list).where(last_account_where).groupBy(...last_account_groupBy_cols),
+                SELECT.from(common_account).columns(['biz_tp_account_cd', 'biz_tp_account_nm', 'sort_order']),
                 SELECT.from(target).columns(target_col_list).where(target_where_conditions),
             ]);
-            if(display_type !== 'chart' && !query.length && !target_query.length){
+            if (display_type !== 'chart' && !query.length && !account_data_query.length) {
                 //return req.res.status(204).send();
                 return []
             }
-            
-            /**
-             * 데이터를 년도별로 filter
-             */
-            const curr_pl = query.filter(pl => pl.year === year),
-                last_pl = query.filter(pl => pl.year === last_year);
-
-            /**
-             * 총합데이터
-             */
-            let o_total = {"display_order": 0, "item_order" : 1, "account_nm" : '합계',"account_cd":'total',target:0}
-            o_total['secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_sale, 0)
-            o_total['not_secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.not_secured_sale, 0)
-            o_total['forecast_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_sale+oData.not_secured_sale, 0)
-            o_total['last_forecast_value'] = last_pl.reduce((iSum, oData) => iSum += oData.secured_sale+oData.not_secured_sale, 0)
-            
-            /**
-             * 년도별로 분류한 데이터를 Account별로 정리
-             */
+            let o_total = { "display_order": 0, "item_order": 1, " type":'매출', "account_nm": '합계', "account_cd": 'total', target: 0 }
             let o_result = {}
-            account_query.forEach(account => {
-                let o_curr_pl = curr_pl.find(pl => pl.biz_tp_account_cd === account.biz_tp_account_cd);
-                let o_last_pl = last_pl.find(pl => pl.biz_tp_account_cd === account.biz_tp_account_cd);
-                let o_target = target_query.find(target => target.target_type_cd === account.biz_tp_account_cd)
-                if(!o_result[`${account.biz_tp_account_cd}_sale`]){
-                    o_result[`${account.biz_tp_account_cd}_sale`]={display_order : account.sort_order,
-                            item_order : 1,
-                            account_nm : account.biz_tp_account_nm,
-                            account_cd : account.biz_tp_account_cd,
-                            target : o_target?.sale_target ?? 0
+            if(year === '2024'){
+                const curr_pl = account_data_query.filter(account =>  account.year === year);
+                o_total['secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.forecast_value, 0)
+                o_total['not_secured_value'] = 0
+                o_total['forecast_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.forecast_value, 0)
+                o_total['last_forecast_value'] = 0
+                account_query.forEach(account => {
+                    let o_curr_pl = curr_pl.find(pl => pl.biz_tp_account_cd === account.biz_tp_account_cd);
+                    let o_target = target_query.find(target => target.target_type_cd === account.biz_tp_account_cd)
+                    if (!o_result[`${account.biz_tp_account_cd}_sale`]) {
+                        o_result[`${account.biz_tp_account_cd}_sale`] = {
+                            display_order: account.sort_order+1,
+                            item_order: 1,
+                            type:"매출",
+                            account_nm: account.biz_tp_account_nm,
+                            account_cd: account.biz_tp_account_cd,
+                            // target: o_target?.sale_target ?? 0,
                         }
-                }
-                o_result[`${account.biz_tp_account_cd}_sale`]['secured_value'] = (o_curr_pl?.secured_sale ?? 0)
-                o_result[`${account.biz_tp_account_cd}_sale`]['not_secured_value'] = (o_curr_pl?.not_secured_sale ?? 0)
-                o_result[`${account.biz_tp_account_cd}_sale`]['forecast_value'] = (o_curr_pl?.secured_sale ?? 0) + (o_curr_pl?.not_secured_sale ?? 0)
-                o_result[`${account.biz_tp_account_cd}_sale`]['last_forecast_value'] = (o_last_pl?.secured_sale ?? 0) + (o_last_pl?.not_secured_sale ?? 0)
-
-                o_total['target'] += (o_target?.sale_target ?? 0)
-            })
+                    }
+                    o_result[`${account.biz_tp_account_cd}_sale`]['secured_value'] = (o_curr_pl?.forecast_value ?? 0)
+                    o_result[`${account.biz_tp_account_cd}_sale`]['not_secured_value'] = 0
+                    o_result[`${account.biz_tp_account_cd}_sale`]['forecast_value'] = (o_curr_pl?.forecast_value ?? 0)
+                    // o_result[`${account.biz_tp_account_cd}_sale`]['last_forecast_value'] = 0
+                    o_result[`${account.biz_tp_account_cd}_sale`]['plan_ratio'] = (o_curr_pl?.forecast_value ?? 0) - ((o_target?.sale_target ?? 0)*100000000)
+                    o_result[`${account.biz_tp_account_cd}_sale`]['yoy'] = (o_curr_pl?.forecast_value ?? 0)
+    
+                    o_total['target'] += (o_target?.sale_target ?? 0)
+                })
+            }else{
+                /**
+                 * 데이터를 년도별로 filter
+                 */
+                const curr_pl = query,
+                    last_pl = account_data_query.filter(account =>  account.year === last_year);
+                
+                /**
+                 * 총합데이터
+                 */
+                o_total['secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_sale, 0)
+                o_total['not_secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.not_secured_sale, 0)
+                o_total['forecast_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0)
+                o_total['last_forecast_value'] = last_pl.reduce((iSum, oData) => iSum += oData.forecast_value, 0)
+    
+                /**
+                 * 년도별로 분류한 데이터를 Account별로 정리
+                 */
+                account_query.forEach(account => {
+                    let o_curr_pl = curr_pl.find(pl => pl.biz_tp_account_cd === account.biz_tp_account_cd);
+                    let o_last_pl = last_pl.find(pl => pl.biz_tp_account_cd === account.biz_tp_account_cd);
+                    let o_target = target_query.find(target => target.target_type_cd === account.biz_tp_account_cd)
+                    if (!o_result[`${account.biz_tp_account_cd}_sale`]) {
+                        o_result[`${account.biz_tp_account_cd}_sale`] = {
+                            display_order: account.sort_order,
+                            item_order: 1,
+                            type:"매출",
+                            account_nm: account.biz_tp_account_nm,
+                            account_cd: account.biz_tp_account_cd,
+                            // target: o_target?.sale_target ?? 0,
+                        }
+                    }
+                    o_result[`${account.biz_tp_account_cd}_sale`]['secured_value'] = (o_curr_pl?.secured_sale ?? 0)
+                    o_result[`${account.biz_tp_account_cd}_sale`]['not_secured_value'] = (o_curr_pl?.not_secured_sale ?? 0)
+                    o_result[`${account.biz_tp_account_cd}_sale`]['forecast_value'] = (o_curr_pl?.secured_sale ?? 0) + (o_curr_pl?.not_secured_sale ?? 0)
+                    // o_result[`${account.biz_tp_account_cd}_sale`]['last_forecast_value'] = (o_last_pl?.last_forecast ?? 0)
+                    o_result[`${account.biz_tp_account_cd}_sale`]['plan_ratio'] = o_result[`${account.biz_tp_account_cd}_sale`]['forecast_value'] - ((o_target?.sale_target ?? 0)*100000000)
+                    o_result[`${account.biz_tp_account_cd}_sale`]['yoy'] = o_result[`${account.biz_tp_account_cd}_sale`]['forecast_value'] - (o_last_pl?.forecast_value ?? 0)
+    
+                    o_total['target'] += (o_target?.sale_target ?? 0)
+                })
+            }
 
             const a_result = Object.values(o_result)
 
-            
+
             sort_data(a_result)
 
             let o_temp = {
                 "display_order": o_total.display_order,
-                "item_order" : o_total.item_order,
-                "account_cd" : o_total.account_cd,
-                "account_nm" : o_total.account_nm,
-                "forecast_value" : o_total.forecast_value,
-                "secured_value" : o_total.secured_value,
-                "not_secured_value" : o_total.not_secured_value,
-                "plan_ratio" : o_total.forecast_value - o_total.target*100000000,
-                "yoy" : o_total.forecast_value - o_total.last_forecast_value,
+                "item_order": o_total.item_order,
+                "type":o_total.type,
+                "account_cd": o_total.account_cd,
+                "account_nm": o_total.account_nm,
+                "forecast_value": o_total.forecast_value,
+                "secured_value": o_total.secured_value,
+                "not_secured_value": o_total.not_secured_value,
+                "plan_ratio": o_total.forecast_value - o_total.target * 100000000,
+                "yoy": o_total.forecast_value - o_total.last_forecast_value,
             }
-            
+
             oResult.push(o_temp)
             oResult.push(...a_result)
 
             /**
              * display_order, item_order기준 오름차순으로 정렬
              */
-            function sort_data(a_data){
+            function sort_data(a_data) {
                 let a_sort_field = [
                     { field: "display_order", order: "asc" },
                     { field: "item_order", order: "asc" },
@@ -192,13 +240,13 @@ module.exports = (srv) => {
                         if (oItem1[field] === null && oItem2[field] !== null) return -1;
                         if (oItem1[field] !== null && oItem2[field] === null) return 1;
                         if (oItem1[field] === null && oItem2[field] === null) continue;
-    
+
                         if (typeof oItem1[field] === "number") {
                             var result = oItem1[field] - oItem2[field];
                         } else {
                             var result = oItem1[field].localeCompare(oItem2[field]);
                         }
-    
+
                         if (result !== 0) {
                             return (order === "asc") ? result : -result;
                         }
@@ -207,9 +255,9 @@ module.exports = (srv) => {
                 })
             }
             return oResult;
-        } catch(error) { 
-            console.error(error); 
-            return {code:error.code, message:error.message, isError: true} 
-        } 
+        } catch (error) {
+            console.error(error);
+            return { code: error.code, message: error.message, isError: true }
+        }
     });
 };

@@ -75,6 +75,7 @@ module.exports = (srv) => {
                     s_last_day = new Date(year, month, 0).getDate().toString().padStart(2, '0');
                 let s_first_date = `${year}-${month}-${s_first_day}`
                 let s_last_date = `${year}-${month}-${s_last_day}`
+                
                 let s_order_by = `rodr_year_amt desc`
         
                 let pl_where_conditions = { year: year, deal_stage_chg_dt: { between: s_first_date, and: s_last_date }, weekly_yn: false}
@@ -90,7 +91,7 @@ module.exports = (srv) => {
                     pl_where_conditions = {...pl_where_conditions, deal_stage_cd:'Contracted'};
                 }
                 
-                if(!!org_tp){
+                if(org_tp === 'account'){
                     pl_where_conditions = {...pl_where_conditions,org_tp : org_tp}
                 }
                 let pl_where = org_col_nm === 'lv1_id' ? pl_where_conditions : { ...pl_where_conditions, [org_col_nm]: org_id };
@@ -145,10 +146,10 @@ module.exports = (srv) => {
                 let s_last_date = `${year}-${month}-${s_last_day}`
                 let s_order_by = `rodr_year_amt desc`
         
-                let pl_where_conditions = { year: year, deal_stage_chg_dt: { between: s_first_date, and: s_last_date }, weekly_yn: false, [org_col_nm]: org_id, deal_stage_cd:'Qualified' }
-                let sfdc_where_conditions = { year: year, deal_stage_chg_dt: { between: s_first_date, and: s_last_date }, deal_stage_cd:'Qualified' }
+                let pl_where_conditions = { year: year, expected_contract_date: { between: s_first_date, and: s_last_date }, weekly_yn: false, [org_col_nm]: org_id, deal_stage_cd:'Qualified' }
+                let sfdc_where_conditions = { year: year, expected_contract_date: { between: s_first_date, and: s_last_date }, deal_stage_cd:'Qualified' }
         
-                if(!!org_tp){
+                if(org_tp === 'account' || org_tp === 'delivery'){
                     pl_where_conditions = {...pl_where_conditions,org_tp : org_tp}
                 }
                 

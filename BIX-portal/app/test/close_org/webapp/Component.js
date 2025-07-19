@@ -1,0 +1,29 @@
+sap.ui.define([
+    "sap/ui/core/UIComponent",
+    "bix/test/close_org/model/models"
+], (UIComponent, models) => {
+    "use strict";
+
+    return UIComponent.extend("bix.test.close_org.Component", {
+        metadata: {
+            manifest: "json",
+            interfaces: [
+                "sap.ui.core.IAsyncContentCreation"
+            ]
+        },
+
+        init: function () {
+            // call the base component's init function
+            UIComponent.prototype.init.apply(this, arguments);
+
+            // set the device model
+            this.setModel(models.createDeviceModel(), "device");
+
+            // size Limit 설정
+            let oModel = this.getModel();
+            // oModel.setSizeLimit(2000);
+
+            this.getRouter().initialize();
+        }
+    });
+});

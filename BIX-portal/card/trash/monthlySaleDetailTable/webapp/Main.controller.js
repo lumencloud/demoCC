@@ -215,7 +215,7 @@ sap.ui.define([
 
                 MessageToast.show("다운로드가 완료되었습니다.");
             }).catch((err) => {
-                console.log(err);
+                //console.log(err);
             })
         },
         // 테이블 구현 테스트를 위한 임시데이터

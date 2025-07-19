@@ -93,7 +93,7 @@ sap.ui.define(
         });
 
         // 차트 제목 및 주요지표 설정
-        let oNumberFormat = NumberFormat.getIntegerInstance({
+        let oNumberFormat = NumberFormat.getFloatInstance({
           groupingEnabled: true,
           groupingSeparator: ','
         });
@@ -295,7 +295,7 @@ sap.ui.define(
       //       });
 
       //       // 차트 제목 및 주요지표 설정
-      //       let oNumberFormat = NumberFormat.getIntegerInstance({
+      //       let oNumberFormat = NumberFormat.getFloatInstance({
       //         groupingEnabled: true,
       //         groupingSeparator: ','
       //       });

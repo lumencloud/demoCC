@@ -18,8 +18,10 @@ sap.ui.define([
      * @typedef {sap.m.Select} Select
      */
     return Controller.extend("bix.card.planPipelineDetailTableAiReport.Main", {
-        _aTableLists: ["pipeDetailTable1", "pipeDetailTable2", "pipeDetailTable3"],
-        _aBoxLists: ["pipeDetailBox1", "pipeDetailBox2", "pipeDetailBox3"],
+        /**
+         * @type {String} UI에 띄운 테이블의 로컬 ID
+         */
+        _sTableId: undefined,
 
         /**
          * @type {sap.ui.core.EventBus} 글로벌 이벤트버스
@@ -36,37 +38,43 @@ sap.ui.define([
          */
         _oSearchData: {},
 
-        onInit: async function () {
-            // 초기 JSON 모델 설정
-            await this._setModel();
-
-            this._bindTable();
+        onInit: function () {
+            this._asyncInit();
             this._oEventBus.subscribe("pl", "search", this._bindTable, this);
 
             this._aiPopupManager = new AIPopupManager();
         },
+        _asyncInit: async function () {
+
+            // 초기 JSON 모델 설정
+            await this._setModel();
+            // 테이블 바인딩
+            this._bindTable();
+        },
+
 
         /**
          * JSON 모델 설정
          */
         _setModel: async function () {
-            // 데이터 불러오기 전에 모든 테이블이 보여서 먼저 선언
-            this.getView().setModel(new JSONModel({}), "uiModel");
+            // uiModel 설정 (기본적으로 첫 번째 항목의 테이블을 보여줌)
+            let oAiData = JSON.parse(sessionStorage.getItem("aiModel"));
+            this.getView().setModel(new JSONModel(oAiData), "uiModel");
 
-            // 현재 해시를 기준으로 DB에서 Select에 들어갈 카드 정보를 불러옴
-            let aHash = Modules.getHashArray();
-            let sSelectPath = `/pl_content_view(page_path='${aHash[0]}',position='detail',grid_layout_info=null,detail_path='${aHash[2]}',detail_info='${aHash[3]}')/Set`;
-            const oListBinding = this.getOwnerComponent().getModel("cm").bindList(sSelectPath, null, null, null, {
-                $filter: `length(sub_key) gt 0`
-            });
-            let aSelectContexts = await oListBinding.requestContexts();
-            let aSelectData = aSelectContexts.map(oContext => oContext.getObject());
+            let oSearchData = JSON.parse(sessionStorage.getItem("initSearchModel"));
+            this.getView().setModel(new JSONModel(oSearchData), "searchModel");
 
-            // 카드 정보를 selectModel로 설정 (sub_key, sub_text)
-            this.getView().setModel(new JSONModel(aSelectData), "selectModel");
+            // 화면에 보일 테이블을 전역 변수에 저장
+            this.getView().getControlsByFieldGroupId("content").forEach(object => {
+                if (object.isA("sap.ui.table.Table") && object.getFieldGroupIds().length > 0) {
+                    let sub_key = object.getFieldGroupIds().find(sId => sId === oAiData.subKey);
 
-            // 기본적으로 첫 번째 항목의 테이블을 보여줌
-            this.getView().setModel(new JSONModel({ tableKind: aSelectData[0].sub_key }), "uiModel");
+                    // sub_key가 일치하는 테이블의 로컬 ID를 저장
+                    if (!!sub_key) {
+                        this._sTableId = this.getView().getLocalId(object.getId());
+                    }
+                }
+            })
         },
 
         /**
@@ -99,48 +107,31 @@ sap.ui.define([
             HashChanger.getInstance().setHash(sNewHash);
 
             // PL에 detailSelect 해시 변경 EventBus 전송
-            this._oEventBus.publish("pl", "setHashModel");
+            this._oEventBus.publish("pl", "setHashModel", { system: true });
         },
 
         _setBusy: function (bFlag) {
-            this._aBoxLists.forEach((sBoxId) => this.byId(sBoxId).setBusy(bFlag))
+            const oTable = this.byId(this._sTableId);
+            const oBox = oTable.getParent();
+            oBox.setBusy(bFlag);
         },
 
         _bindTable: async function (sChannelId, sEventId, oData) {
             // DOM이 없는 경우 Return
             let oDom = this.getView().getDomRef();
             if (!oDom) return;
+            
 
-            // detailSelect 해시에 따른 Select 선택
-            let oSelect = this.byId("detailSelect");
-            let aHash = Modules.getHashArray();
-            let sDetailKey = aHash?.[4];
-            if (sDetailKey) {   // 해시가 있는 경우 Select 설정
-                oSelect.setSelectedKey(sDetailKey);
-            } else {    // 없는 경우 첫 번째 Select 항목 선택
-                let oFirstDetailKey = this.getView().getModel("selectModel").getProperty("/0/sub_key");
-                oSelect.setSelectedKey(oFirstDetailKey);
-            }
-
-            // 새로운 검색 조건이 같은 경우 return
-            oData = JSON.parse(sessionStorage.getItem("initSearchModel"));
-            let aKeys = Object.keys(oData);
-            let isDiff = aKeys.find(sKey => oData[sKey] !== this._oSearchData[sKey]);
-            if (!isDiff) return;
-
-            // 새로운 검색 조건 저장
-            this._oSearchData = oData;
+            // 검색 조건
+            let oAiData = this.getView().getModel("uiModel").getData();
+            let oSearchData = this.getView().getModel("searchModel").getData();
 
             // 검색 파라미터
             this._setBusy(true);
 
-            let dYearMonth = new Date(oData.yearMonth);
+            let dYearMonth = new Date(oSearchData.yearMonth);
             let iYear = dYearMonth.getFullYear();
             let sMonth = String(dYearMonth.getMonth() + 1).padStart(2, "0");
-
-
-            let oAiData = JSON.parse(sessionStorage.getItem("aiModel"))
-            let sOrgId = oAiData.aiOrgId;
 
 
             const oModel = new ODataModel({
@@ -148,104 +139,103 @@ sap.ui.define([
                 synchronizationMode: "None",
                 operationMode: "Server"
             });
+            let sKey = oAiData.subKey;
 
-            let sDealPath = `/get_forecast_pl_pipeline_detail(year='${iYear}',month='${sMonth}',org_id='${sOrgId}',type='deal')`
-            let sMonthPath = `/get_forecast_pl_pipeline_detail(year='${iYear}',month='${sMonth}',org_id='${sOrgId}',type='month')`
-            let sRodrPath = `/get_forecast_pl_pipeline_detail(year='${iYear}',month='${sMonth}',org_id='${sOrgId}',type='rodr')`
+            let sBindingPath;
+
+            if (sKey === "deal_stage") {
+                sBindingPath = `/get_forecast_pl_pipeline_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}',type='deal')`
+            } else if (sKey === "month") {
+                sBindingPath = `/get_forecast_pl_pipeline_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}',type='month')`
+            } else if (sKey === "rodr") {
+                sBindingPath = `/get_forecast_pl_pipeline_detail(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}',type='rodr')`
+            }
+
+
 
             await Promise.all([
-                oModel.bindContext(sDealPath).requestObject(),
-                oModel.bindContext(sMonthPath).requestObject(),
-                oModel.bindContext(sRodrPath).requestObject(),
-            ]).then(function (aResults) {
+                oModel.bindContext(sBindingPath).requestObject(),
+            ])
+                .then((aResults) => {
 
-                for (let i =0; i < this._aTableLists.length; i++) {
-                    Module.displayStatusForEmpty(this.byId(this._aTableLists[i]),aResults[i].value, this.byId(this._aBoxLists[i]));
-                }
-                
+                    let oTable = this.byId(this._sTableId);
+                    let oBox = oTable.getParent();
 
-                const aFilteredResults = []
-                aResults.forEach((result, index) => {
-                    const filteredItems = result.value.filter(item => item.type === oAiData.aiType)
-                    aFilteredResults.push(filteredItems);
+                    aResults[0].value = aResults[0].value.filter(item => item.type === oAiData.type)
+                    // Empty 상태 설정
+                    Module.displayStatusForEmpty(oTable, aResults[0].value, oBox);
+
+                    // _sBindingPath 설정
+                    oTable._sBindingPath = sBindingPath;
+
+
+                    if (oAiData.subKey === "month") {
+                        this._monthVisibleSetting(aResults[0].value);
+                    }
+
+                    // 테이블에 모델 바인딩
+                    oTable.setModel(new JSONModel(aResults[0].value));
+
+                    // 테이블 로우 셋팅
+                    this._setVisibleRowCount(aResults);
+
                 })
+                .catch((oErr) => {
+                    // 추후 호출 분리 필요
+                    let oTable = this.byId(this._sTableId);
+                    let oBox = oTable.getParent();
+                    //Module.displayStatus(oTable, oErr.error.code, oBox);
+                });
 
-                // totalData 추가해서 모델 바인딩
-                this.getView().setModel(new JSONModel(aFilteredResults[0]), "oDealTableModel")
-                this.getView().setModel(new JSONModel(aFilteredResults[1]), "oMonthTableModel")
-                this.getView().setModel(new JSONModel(aFilteredResults[2]), "oRodrTableModel")
+            await this._setTableMerge();
 
-                this._monthVisibleSetting(aFilteredResults[1]);
-                this._setTableMerge();
-
-                // 테이블 로우 셋팅
-                this._setVisibleRowCount(aFilteredResults);
-
-                this._setBusy(false);
-            }.bind(this))
+            this._setBusy(false);
 
 
         },
 
         _setVisibleRowCount: function (aResults) {
-            //테이블 리스트
-            let aTableLists = this._aTableLists
+            let oTable = this.byId(this._sTableId)
+            // 처음 화면 렌더링시 table의 visibleCountMode auto 와 <FlexItemData growFactor="1"/>상태에서
+            // 화면에 꽉 찬 테이블의 row 갯수를 전역변수에 저장하기 위함
 
-            for (let i = 0; i < aTableLists.length; i++) {
-                // 테이블 아이디로 테이블 객체
-                let oTable = this.byId(aTableLists[i])
-                // 처음 화면 렌더링시 table의 visibleCountMode auto 와 <FlexItemData growFactor="1"/>상태에서
-                // 화면에 꽉 찬 테이블의 row 갯수를 전역변수에 저장하기 위함
+            if (oTable && !oTable?.mEventRegistry?.cellContextmenu) {
+                oTable.attachCellClick(this.onCellClick, this);
+                oTable.attachCellContextmenu(this.onCellContextmenu, this);
+            }
 
-                if (oTable) {
-                    oTable.attachCellClick(this.onCellClick, this);
-                    oTable.attachCellContextmenu(this.onCellContextmenu, this);
-                }
+            if (this._iColumnCount === null) {
+                this._iColumnCount = oTable.getVisibleRowCount();
+            }
+            // 전역변수의 row 갯수 기준을 넘어가면 rowcountmode를 자동으로 하여 넘치는것을 방지
+            // 전역변수의 row 갯수 기준 이하면 rowcountmode를 수동으로 하고, 각 데이터의 길이로 지정
+            if (aResults[0].value.length > this._iColumnCount) {
 
-                if (this._iColumnCount === null) {
-                    this._iColumnCount = oTable.getVisibleRowCount();
-                }
-                // 전역변수의 row 갯수 기준을 넘어가면 rowcountmode를 자동으로 하여 넘치는것을 방지
-                // 전역변수의 row 갯수 기준 이하면 rowcountmode를 수동으로 하고, 각 데이터의 길이로 지정
-                if (aResults[i].length > this._iColumnCount) {
-
-                    oTable.setVisibleRowCountMode("Auto")
-                } else {
-                    oTable.setVisibleRowCountMode("Fixed")
-                    oTable.setVisibleRowCount(aResults[i].length)
-                }
+                oTable.setVisibleRowCountMode("Auto")
+            } else {
+                oTable.setVisibleRowCountMode("Fixed")
+                oTable.setVisibleRowCount(aResults[0].value.length)
             }
         },
 
         _monthVisibleSetting: function (aResults) {
+            if (aResults.length <= 0) return;
             let aColumnsVisible = {};
-            if(!aResults ||aResults.length===0){
-                return
-            }
             for (let i = 1; i < 13; i++) {
                 let sFindColumn = "m_" + String(i).padStart(2, "0") + "_data"
-                if(aResults[0].hasOwnProperty(sFindColumn)){
-                    aColumnsVisible[sFindColumn] = aResults[0].hasOwnProperty(sFindColumn)
-                }
+                let bResult = aResults[0].hasOwnProperty(sFindColumn)
+                aColumnsVisible[sFindColumn] = bResult
             }
             this.getView().setModel(new JSONModel(aColumnsVisible), "oColumnsVisibleModel")
-            //console.log(this.getView().getModel("oColumnsVisibleModel"))
-            //console.log(this.getView().getModel("oMonthTableModel"))
+
         },
 
         _setTableMerge: function () {
-
-            let oTable1 = this.byId("pipeDetailTable1")
-            let oTable2 = this.byId("pipeDetailTable2")
-            let oTable3 = this.byId("pipeDetailTable3")
-            Module.setTableMergeWithAltColor(oTable1, "oDealTableModel");
-            Module.setTableMergeWithAltColor(oTable2, "oMonthTableModel");
-            Module.setTableMergeWithAltColor(oTable3, "oRodrTableModel");
+            const oTable = this.byId(this._sTableId);
+            Module.setTableMergeWithAltColor(oTable);
         },
 
-        onAfterRendering: function () {
-            this._setTableMerge();
-        },
+
 
 
         /**
@@ -363,11 +353,11 @@ sap.ui.define([
             //aireport에서 불러들일 값을 sessionStorage에 저장
             sessionStorage.setItem("aiModel",
                 JSON.stringify({
-                    aiOrgId: this._selectedOrgId,
-                    aiOrgName: this._selectedOrgName,
-                    aiType: oAiData.aiType,
-                    aiSubTitle: oAiData.aiSubTitle,
-                    aiSubKey : oAiData.aiSubKey
+                    orgId: this._selectedOrgId,
+                    orgNm: this._selectedOrgName,
+                    type: oAiData.type,
+                    subTitle: oAiData.subTitle,
+                    subKey: oAiData.subKey
                 })
             )
 
@@ -378,7 +368,6 @@ sap.ui.define([
                 "planPipelineDetailTableAiReport",
                 this
             );
-            console.log("sAnalysisId !!! ", sAnalysisId);
 
             // AI 분석 시작
             this._startAnalysis(oEvent, oAnalysisData.params, sAnalysisId);
@@ -388,10 +377,7 @@ sap.ui.define([
             var oSessionData = JSON.parse(sessionStorage.getItem("initSearchModel"));
             var dYearMonth = new Date(oSessionData.yearMonth);
 
-            let oSelect = this.byId("detailSelect");
-            const sSelectedKey = oSelect.getSelectedKey()
-            const aItems = oSelect.getItems();
-            const oSelectedItem = aItems.find(item => item.getKey() === sSelectedKey);
+            let oAiData = JSON.parse(sessionStorage.getItem("aiModel"))
 
             const params = {
                 year: String(dYearMonth.getFullYear()),
@@ -404,7 +390,7 @@ sap.ui.define([
                 orgName: this._selectedOrgName || oSessionData.orgNm,
                 menuName: "전사 Pipeline 상세",
                 type: this._selectedType,
-                subTitle: oSelectedItem.getText()
+                subTitle: oAiData.subTitle
             };
 
             return { params, tokenData };

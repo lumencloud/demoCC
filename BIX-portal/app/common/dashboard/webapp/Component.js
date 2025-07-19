@@ -3,8 +3,10 @@ sap.ui.define([
     "sap/ui/Device",
     "bix/common/dashboard/model/models",
     "sap/base/util/ObjectPath",
-    ],
-    function (UIComponent, Device, models, ObjectPath) {
+    'sap/ui/core/Component',
+    'sap/ui/core/Element'
+],
+    function (UIComponent, Device, models, ObjectPath, Component, Element) {
         "use strict";
 
         return UIComponent.extend("bix.common.dashboard.Component", {
@@ -29,6 +31,9 @@ sap.ui.define([
                 UIComponent.prototype.init.apply(this, arguments);
 
                 this.getRouter().initialize();
+
+                this.oUserModel = Component.getOwnerComponentFor(Element.getElementById("container-bix.main---App"))?.getModel("main_userModel");
+                this.setModel(this.oUserModel, "main_userModel");
             },
 
             getEditMode: function () {

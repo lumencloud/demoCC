@@ -7,11 +7,29 @@
     displayBlock="true"
     controllerName="bix.card.deliveryMonthlyContent3_2.Main"
 >
-    <VBox id="cardContent" class="custom-ai-report-test-delivery-content3_2-container">
-        <VBox class="title-wrapper">
-            <!--Title text="Preview:"/-->
-            <Title text="{LLMModel>/title}"/>
-            <Text text="{LLMModel>/full}" />
+    <VBox id="cardContent"
+          class="custom-ai-report-test-delivery-content3_2-container"
+          busy="{LLMModel>/isLoading}">
+        <VBox width="100%">
+            <Text text="{LLMModel>/title}" 
+                  class="custom-ai-report-review-header sapUiTinyMarginBegin" />
+            <VBox visible="{LLMModel>/isLoading}" 
+                  width="100%" 
+                  alignItems="Center" 
+                  justifyContent="Center" 
+                  class="sapUiMediumMargin">
+                <Text text="AI 보고서 생성중입니다." 
+                      class="custom-ai-report-review-content" 
+                      textAlign="Center" />
+            </VBox>
+            <!--수정-->
+            <FormattedText visible="{= !${LLMModel>/isLoading}}"
+               htmlText="{LLMModel>/full}"
+               class="custom-ai-report-review-content sapUiTinyMarginBegin" />
+            <!--원본-->
+            <!--Text visible="{= !${LLMModel>/isLoading}}" 
+                  text="{LLMModel>/full}" 
+                  class="custom-ai-report-review-content sapUiTinyMarginBegin" /-->
         </VBox>
     </VBox>
 </mvc:View>

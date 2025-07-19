@@ -6,6 +6,7 @@ using from '../../../db/cds/sga/view/investment_view';
 using sga.wideview_view as sga_wideview_view from '../../../db/cds/sga/view/wideview_view';
 using sga.expense_view as sga_expense_view from '../../../db/cds/sga/view/expense_view';
 using sga.investment_view as sga_investment_view from '../../../db/cds/sga/view/investment_view';
+using sga.excel_export_view as sga_excel_export_view from '../../../db/cds/sga/view/execl_export_view';
 
 @impl    : 'srv/handlers/sga/sga_handler.js' // api 구현 코드위치
 @path    : '/odata/v4/sga-api'

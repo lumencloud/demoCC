@@ -66,9 +66,7 @@
                         fixedColumnCount="2"
                         noData=" "
                     >
-                        <table:rowMode>
-                            <rowmodes:Fixed rowCount="3" />
-                        </table:rowMode>
+                        
 
                         <table:layoutData>
                             <FlexItemData growFactor="1" />
@@ -419,9 +417,7 @@
                             </OverflowToolbar>
                         </table:extension>
 
-                        <table:rowMode>
-                            <rowmodes:Fixed rowCount="3" />
-                        </table:rowMode>
+                        
                     
                         <table:layoutData>
                             <FlexItemData growFactor="1" />
@@ -950,9 +946,7 @@
                         fixedColumnCount="2"
                         noData=" "
                     >
-                        <table:rowMode>
-                            <rowmodes:Fixed rowCount="3" />
-                        </table:rowMode>
+                        
                     
                         <table:layoutData>
                             <FlexItemData growFactor="1" />

@@ -7,7 +7,7 @@ sap.ui.define([
 		onCardReady: function (oCard) {
 			this.oCard = oCard;
 			
-			oCard.addStyleClass("custom-donught-up-card custom-dashboard-card-header")		
+			oCard.addStyleClass("custom-dashboard-top-card custom-card-header-hide")				
 		}
 	});
 });

@@ -28,11 +28,11 @@
           "description": "보고서 컨텐츠 생성",
           "template": {
             "type": "dynamic",
-            "path": "reportAgent"
+            "path": "reportContentAgent"
           },
           "model_config": {
             "model_id": "model_01",
-            "model_name": "gpt-4.1-mini",
+            "model_name": "gpt-4.1",
             "model_params": {
               "temperature": 0.3,
               "max_tokens": 30000

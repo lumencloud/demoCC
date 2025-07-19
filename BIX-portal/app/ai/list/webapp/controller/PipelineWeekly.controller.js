@@ -4,13 +4,17 @@ sap.ui.define([
     "bix/common/library/control/Modules",
     "sap/ui/core/EventBus",
     "sap/ui/core/routing/HashChanger",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
 ],
     function (
         Controller,
         JSONModel,
         Modules,
         EventBus,
-        HashChanger
+        HashChanger,
+        Filter,
+        FilterOperator,
     ) {
         "use strict";
 
@@ -21,8 +25,8 @@ sap.ui.define([
         return Controller.extend("bix.ai.list.controller.PipelineWeekly", {
             _oEventBus: EventBus.getInstance(),
             _iCardReady: 0,
+
             onInit: function () {
-                this._iCardReady = 0;
                 const myRoute = this.getOwnerComponent().getRouter().getRoute("PipelineWeekly");
                 myRoute.attachPatternMatched(this.onMyRoutePatternMatched, this);
             },
@@ -31,10 +35,10 @@ sap.ui.define([
                 let oArguments = oEvent.getParameters()["arguments"];
                 // 첫 페이지 고정
                 const oCarousel = this.byId("carousel");
-                if (oCarousel) { oCarousel.setActivePage(oCarousel.getPages()[0]); }
+                if (oCarousel) { oCarousel.setActivePage(oCarousel.getPages()[0]); oCarousel.scrollTo(0); }
                 // 스크롤 상단 고정
-                let oPage = this.byId("carouselPage")
-                if (oPage) { oPage.scrollTo(0); }
+                // let oPage = this.byId("carouselPage")
+                // if (oPage) { oPage.scrollTo(0); }
 
                 this._oEventBus.subscribe("aiReport", "newData", this._setModel, this);
                 this._oEventBus.subscribe("aiReport", "newBauData", this._setModel, this);
@@ -44,46 +48,75 @@ sap.ui.define([
                 this._oEventBus.subscribe("aiReport", "negoBauData", this._setModel, this);
                 this._oEventBus.subscribe("aiReport", "comData", this._setModel, this);
                 this._oEventBus.subscribe("aiReport", "comBauData", this._setModel, this);
-                this._oEventBus.subscribe("CardWeekChannel", "CardWeekFullLoad", this._onCardReady, this);
-                this.setSelectModel();
 
+                if (!this._isSubscribed) {
+                    this._oEventBus.subscribe("CardWeekChannel", "CardWeekFullLoad", this._onCardReady, this);
+                    this._isSubscribed = true;
+                }
+
+                this.setSelectModel();
+                this._setSessionItem();
+                await this._setTopOrgModel();
                 // URL 해시 설정
                 this._setHash(oArguments);
+            },
+
+            onAfterRendering: function () {
+                this._countViewContainCard();
             },
 
             _onCardReady: function (sChannelId, sEventId, oData) {
                 this._iCardReady++;
                 if (this._iCardReady === this.iCardCount) {
-                    this.byId("pdfDownload").setEnabled(true);
+                    this.getView().getModel("uiModel").setProperty("/bPdfFlag", true)
+                    this.getView().getModel("uiModel").setProperty("/busyFlag", false)
                 }
+            },
+            _countViewContainCard: function () {
+                let iCardCount = 0;
+                const aCard = this.getView().findAggregatedObjects(true, function (oControl) {
+                    return oControl.isA("sap.ui.integration.widgets.Card");
+                });
+                aCard.forEach(oCard => {
+                    iCardCount++;
+                })
+                this.iCardCount = iCardCount;
             },
 
             /**
              * 연, 월, 주차 해시 설정
              */
             _setHash: function (oArguments) {
+
                 // 컴포넌트 경로가 다른 경우 Return
                 let sCurrHash = HashChanger.getInstance().getHash();
-                if (!sCurrHash.includes("PipelineWeekly")) return;
 
+                // if (!sCurrHash.includes("PipelineWeekly")) return;
                 let oDateData = this.getView().getModel("dateModel").getData();
 
                 // dateModel에 해시 정보에 대한 항목이 없으면 첫 번째 항목으로 고정
                 let oSelectedDate = oDateData.find(oWeek => {
                     return oWeek.year == oArguments.year && oWeek.month == oArguments.month && oWeek.weekNo == oArguments.weekNo
                 });
+
                 if (!oSelectedDate) {
                     oSelectedDate = oDateData[0];
-
                     // 선택된 항목이 없으면 강제로 첫 번째 항목으로 해시 설정
                     let sHash = sCurrHash.split("&")[0];
-                    let sNewHash = sHash + `&/#/PipelineWeekly` + `/${oSelectedDate.year}/${oSelectedDate.month}/${oSelectedDate.weekNo}`;
-                    HashChanger.getInstance().setHash(sNewHash);
+                    let sNewHash = sHash + `/${oSelectedDate.year}/${oSelectedDate.month}/${oSelectedDate.weekNo}`;
+                    // HashChanger.getInstance().setHash(sNewHash);
+                    window.location.href = "/main/aiReportWeek.html#" + sNewHash
                 }
 
                 // 선택된 항목으로 uiModel 생성
                 let sFlag = (new Date(oSelectedDate.end_date).getMonth() <= 5) ? "상반기" : "하반기";
-                this.getView().setModel(new JSONModel({ selectedKey: oSelectedDate["id"], halfYear: sFlag }), "uiModel");
+                this.getView().setModel(new JSONModel(
+                    {
+                        selectedKey: oSelectedDate["id"],
+                        halfYear: sFlag,
+                        bPdfFlag: false,
+                        busyFlag: true
+                    }), "uiModel");
 
                 // 선택된 dateModel 항목으로 Select Change 이벤트 실행
                 let oSelect = this.byId("selectWeek");
@@ -96,18 +129,49 @@ sap.ui.define([
                 oSelect.fireChange({ selectedItem: oSelectedItem })
             },
 
-            onAfterRendering: function () {
-
-
-                let iCardCount = 0;
-                const aCard = this.getView().findAggregatedObjects(true, function (oControl) {
-                    return oControl.isA("sap.ui.integration.widgets.Card");
-                });
-                aCard.forEach(oCard => {
-                    iCardCount++;
-                })
-                this.iCardCount = iCardCount;
+            /**하드 코딩 되어있음
+             * 각 카드에 사용할 세션값 저장
+             * @param {*} oData  조직 데이터
+             * @param {*} startDate 
+             * @param {*} endDate 
+             */
+            // _setSessionItem: function (oData, year, month) {
+            //     sessionStorage.setItem("aiWeekReport", JSON.stringify({
+            //         org_id: '5',
+            //         start_date: '2025-06-23',
+            //         end_date: '2025-06-29',
+            //     }));
+            //     this._oEventBus.publish("aireport", "dateData");
+            // },
+            _setSessionItem: function (oData, year, month) {
+                const oDataModel = this.getView().getModel("topOrgModel").getData();
+                sessionStorage.setItem("aiWeekReport", JSON.stringify({
+                    org_id: oDataModel.org_id,
+                    start_date: String(year),
+                    end_date: String(month),
+                }));
+                this._oEventBus.publish("aireport", "dateData");
             },
+            /**
+            * 최상위 조직 값 모델 설정
+            */
+            _setTopOrgModel: async function () {
+                const andFilter = new Filter([
+                    new Filter("org_id", FilterOperator.NE, null),
+                    new Filter("org_parent", FilterOperator.EQ, null),
+                ], true)
+
+                // 전사조직 모델 세팅
+                const oModel = this.getOwnerComponent().getModel();
+                const oBinding = oModel.bindList("/org_full_level", undefined, undefined, andFilter)
+                await oBinding.requestContexts().then((aContext) => {
+                    const aData = aContext.map(ctx => ctx.getObject());
+                    this.getView().setModel(new JSONModel(aData[0]), "topOrgModel");
+
+                })
+            },
+
+
 
             // 월요일을 기준으로 다음달 주차수 계산
             // ex) 31일이 월요일이면 그 달 마지막 주차
@@ -213,7 +277,7 @@ sap.ui.define([
                         await new Promise(res => setTimeout(res, 200));
 
                         const currPageDom = sap.ui.getCore().byId(pageId[i]).getDomRef();
-                        const canvas = await html2canvas(currPageDom, { scale: 2 })
+                        const canvas = await html2canvas(currPageDom, { scale: 1.5 })
                         const imgData = canvas.toDataURL("image/png");
                         const imgProps = pdf.getImageProperties(imgData);
                         const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -221,8 +285,14 @@ sap.ui.define([
                         if (i > 0) pdf.addPage();
                         pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
                     }
+
+
                     const sWeekName = this.getView().getModel("uiModel").getProperty("/weekName")
                     const sFileName = sWeekName + "\n" + "주간리포트.pdf";
+                    // const sFileName = "6월 4주차" + "\n" + "주간리포트.pdf";
+                    /**
+                     * 하드코딩 되어있음  ↑↑↑↑
+                     */
                     pdf.save(sFileName);
                     oCarousel.setActivePage(pageId[activeIdx])
                 } catch (e) {
@@ -245,7 +315,16 @@ sap.ui.define([
                 this.getView().getModel("uiModel").setProperty("/halfYear", bFlag);
                 this.getView().getModel("uiModel").setProperty("/weekName", oSelectedItem.weekName);
 
+                const oData = this.getView().getModel("topOrgModel").getData();
+                this._setSessionItem(oData, oSelectedItem.start_date, oSelectedItem.end_date);
+
                 this._oEventBus.publish("aiReport", "dateData", { start_date: oSelectedItem.start_date, end_date: oSelectedItem.end_date, org_id: '5' })
+                this._oEventBus.publish("aiReport", "dateDataTable", { start_date: oSelectedItem.start_date, end_date: oSelectedItem.end_date, org_id: '5' })
+                // this._oEventBus.publish("aiReport", "dateData", { start_date: '2025-06-23', end_date: '2025-06-29', org_id: '5' })
+                // this._oEventBus.publish("aiReport", "dateDataTable", { start_date: '2024-06-23', end_date: '2025-06-29', org_id: '5' })
+                /**
+                 * 하드코딩 되어있음  ↑↑↑↑
+                 */
             },
 
             onCancel: function () {
@@ -264,10 +343,15 @@ sap.ui.define([
             },
 
             onPageChanged: function (oEvent) {
+                // 페이지 실행 중 데이터 재로드 방지
                 let oSelect = this.byId("selectWeek");
+                const oData = this.getView().getModel("topOrgModel").getData()
                 let oBindingObject = oSelect.getSelectedItem().getBindingContext("dateModel").getObject();
-                this._oEventBus.publish("aiReport", "dateData", { start_date: oBindingObject.start_date, end_date: oBindingObject.end_date, org_id: '5' })
+                this._oEventBus.publish("aiReport", "dateDataTable", { start_date: oBindingObject.start_date, end_date: oBindingObject.end_date, org_id: oData.org_id })
+                // this._oEventBus.publish("aiReport", "dateDataTable", { start_date: '2024-06-23', end_date: '2025-06-29', org_id: '5' })
+                /**
+                * 하드코딩 되어있음  ↑↑↑↑
+                */
             },
-        
         });
     });

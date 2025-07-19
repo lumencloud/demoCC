@@ -25,11 +25,6 @@ module.exports = (srv) => {
              * [부문/본부/팀 + 년,month_amt,금액] 팀,본부 단위의 프로젝트 실적비용 집계 뷰
              */
             const pl_view = db.entities('pl').wideview_non_mm_view;
-            /**
-             * common_target
-             * 조직 별 연단위 목표금액
-             */
-            const target = db.entities('common').annual_target_temp_view;
             //org_tp:account, hybrid일 경우 사용
             const account_pl_view = db.entities('pl').wideview_account_non_mm_view;
             /**
@@ -66,48 +61,32 @@ module.exports = (srv) => {
             const pl_groupBy_cols = ['year', 'bd_n2_cd'];
 
             /**
-             * +++++ TBD +++++
-             * 권한 체크하여 사용자가 조회 가능한 조직인지 판별 후 코드 진행
-             */
-
-            /**
              * org_id 파라미터값으로 조직정보 조회
-             * 
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_id'
-                when lv2_id = '${org_id}' THEN 'lv2_id'
-                when lv3_id = '${org_id}' THEN 'lv3_id'
-                when div_id = '${org_id}' THEN 'div_id'
-                when hdqt_id = '${org_id}' THEN 'hdqt_id'
-                when team_id = '${org_id}' THEN 'team_id'
-                end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd', 'org_tp'])
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_level', 'org_ccorg_cd', 'org_tp', 'lv3_ccorg_cd'])
                 .where({ 'org_id': org_id });
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             //조직 정보를 where 조건에 추가
-            let org_col_nm = orgInfo.org_level;
-            // ccorg_cd 만 가지고 있는 경우 조회조건으로 사용
+            let org_col_nm = orgInfo.org_level+'_id';
 
             // 전사 (lv1_) 레벨 조회일 경우, 조직 정보가 없는 ccorg_cd 포함하도록, org_id 조건 없이 전체 aggregation
-
             let pl_column = pl_col_list;
             let pl_where = org_col_nm === 'lv1_id' ? pl_where_conditions : { ...pl_where_conditions, [org_col_nm]: org_id };
             let pl_groupBy = pl_groupBy_cols;
 
             let pl_view_selec;
-            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.org_tp === 'hybrid' || orgInfo.org_tp === 'account'){
+            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.lv3_ccorg_cd === '237100' || orgInfo.org_tp === 'account'){
                 pl_view_selec = account_pl_view;
-            }else if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id'|| orgInfo.org_tp === 'delivery'){
+            }else{
                 pl_view_selec = pl_view;
             };
 
             // DB 쿼리 실행 (병렬)
             const [pl_data, code_item_data] = await Promise.all([
                 SELECT.from(pl_view_selec).columns(pl_column).where(pl_where).groupBy(...pl_groupBy),
-                SELECT.from(code_item).columns(['name','value','sort_order']).where({'delete_yn':false,'use_yn':true, 'header_ID':s_header_id})
+                SELECT.from(code_item).columns(['name','value','sort_order']).where({'delete_yn':false,'use_yn':true,'header_ID':s_header_id})
             ]);
             if(!pl_data.length){
                 //return req.res.status(204).send();
@@ -202,12 +181,8 @@ module.exports = (srv) => {
                 })
                 oResult.push(o_sale_temp,o_margin_temp,o_margin_rate_temp);
             });
-            
             oResult.sort((a,b)=>a.display_order - b.display_order);
-            
-            // o_total['margin_rate']['target_curr_y_value'] = (o_total['sale']?.['target_curr_y_value'] ?? 0) === 0 ? 0 : (o_total['margin']?.['target_curr_y_value'] ?? 0)/o_total['sale']['target_curr_y_value'];
-            // o_total['margin_rate']['actual_curr_ym_value'] = (o_total['sale']?.['actual_curr_ym_value'] ?? 0) === 0 ? 0 : (o_total['margin']?.['actual_curr_ym_value'] ?? 0)/o_total['sale']['actual_curr_ym_value'];
-            // o_total['margin_rate']['actual_last_ym_value'] = (o_total['sale']?.['actual_last_ym_value'] ?? 0) === 0 ? 0 : (o_total['margin']?.['actual_last_ym_value'] ?? 0)/o_total['sale']['actual_last_ym_value'];
+            o_total['margin_rate']['actual_curr_ym_value'] = (o_total['sale']['actual_curr_ym_value'] ?? 0) === 0 ? 0 : (o_total['margin']['actual_curr_ym_value'] ?? 0) / (o_total['sale']['actual_curr_ym_value']);
             
             let a_total_data = Object.values(o_total);
             let a_total=[];
@@ -220,7 +195,7 @@ module.exports = (srv) => {
                     "actual_curr_ym_value": o_total?.actual_curr_ym_value ?? 0,
                     "actual_last_ym_value": o_total?.actual_last_ym_value ?? 0,
                     "actual_curr_ym_rate": (o_total?.target_curr_y_value ?? 0) === 0 ? 0 : (o_total?.actual_curr_ym_value ?? 0)/(o_total.target_curr_y_value*100000000),
-                    "actual_last_ym_rate": (o_total?.target_last_y_value ?? 0) === 0 ? 0 : (o_total?.actual_last_ym_value ?? 0)/(o_total.target_last_y_value*100000000),
+                    "actual_last_ym_rate": (o_total?.target_last_y_value ?? 0) === 0 ? 0 : (o_total?.actual_last_ym_value ?? 0)/(o_total.target_last_y_value*100000000)
                 };
                 a_total.push(o_temp);
             })

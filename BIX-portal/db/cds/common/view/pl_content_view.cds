@@ -98,7 +98,7 @@ view pl_content_view (
         card.sub_text
 
         from common_menu as card
-        left join common_menu as menu on card.Parent.ID = menu.ID
+        left join common_menu as menu on card.page_path = menu.page_path and card.detail_path = menu.detail_path and menu.isApp = 'sub'
 
         where ifnull(card.use_yn, false) = true
         and (card.page_path = :page_path or ifnull(length(:page_path), 0) = 0)
@@ -106,6 +106,7 @@ view pl_content_view (
         and (card.grid_layout_info = :grid_layout_info or ifnull(length(:grid_layout_info), 0) = 0)    
         and (card.detail_path = :detail_path or ifnull(length(:detail_path), 0) = 0)
         and (card.detail_info = :detail_info or ifnull(length(:detail_info), 0) = 0)
+        and card.use_yn = true
     ) {
         key row: Integer,
         page_path, 

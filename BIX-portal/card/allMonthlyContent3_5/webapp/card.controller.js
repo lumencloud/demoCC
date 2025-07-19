@@ -21,9 +21,9 @@ sap.ui.define([
             this._createId();
 
             // 차트 설정
-            this._setChart();
+            // this._setChart();
 
-            this._oEventBus.subscribe("aireport", "infoSet", this._updateChart, this);	
+            this._oEventBus.subscribe("aireport", "allContent3_5", this._setChart, this);	
 
 
         },
@@ -41,9 +41,10 @@ sap.ui.define([
             this._iMinHeight = 400;
         },
 
-        _updateChart: async function () {
-            this.byId("cardContent").setBusy(true)
-            let aResults = await this._dataSetting();
+        _updateChart: async function (sChannel, sEventId, oData) {
+            // this.byId("cardContent").setBusy(true)
+            this.getOwnerComponent().oCard.setBusy(true);
+            let aResults = await this._dataSetting(oData.data);
 
             this._oMyChart[0].data.labels = aResults.aLabel
             this._oMyChart[0].data.datasets[0].data = aResults.aChance
@@ -51,10 +52,12 @@ sap.ui.define([
             this._oMyChart[0].data.datasets[2].data = aResults.aSale
 
             this._oMyChart[0].update();
-            this.byId("cardContent").setBusy(false)
+            setTimeout(()=>{
+                this.getOwnerComponent().oCard.setBusy(false);
+            }, 300)
         },
 
-        _setChart: async function () {
+        _setChart: async function (sChannel, sEventId, oData) {
             this.byId("cardContent").setBusy(true)
             // 카드
             const oCard = this.getOwnerComponent().oCard;
@@ -65,6 +68,12 @@ sap.ui.define([
             let iBoxWidth = Math.floor(oParentElement.clientWidth / window.innerWidth * 90);
             let iBoxHeight = Math.floor(oParentElement.clientHeight / window.innerHeight * 90);
 
+            let lightYellow = "#FFF2d4"
+            let red = "#EA002d"
+            let orange = "#ff8211"
+
+            this._oEventBus.subscribe("aireport", "allContent3_5", this._updateChart, this);
+
             for (let i = 0; i < this._aCanvasId.length; i++) {
                 let oHTML = this.byId("html" + i);
                 oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:450px; height:250px; min-height:250px'><canvas id='${this._aCanvasId[i]}' /></div>`);
@@ -72,7 +81,7 @@ sap.ui.define([
                     // 차트 구성
                     const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[i])).getContext("2d");
                     //데이터 요청
-                    let aData = await this._dataSetting();
+                    let aData = await this._dataSetting(oData.data);
                     this._oMyChart[i] = new Chart(ctx, {
                         type: "bar",
                         data: {
@@ -82,23 +91,27 @@ sap.ui.define([
                                 {
                                     label: "사업 기회",
                                     data: aData.aChance,
-                                    backgroundColor: "yellow",
-                                    borderColor: "yellow",
+                                    backgroundColor: orange,
+                                    borderColor: orange,
                                     type: "line",
                                     yAxisID: 'y1',
+                                    pointBackgroundColor : orange,
+                                    pointBorderColor : "white",
+                                    pointBorderWidth: 3,
+                                    pointRadius: 6,
 
                                 },
                                 {
                                     label: "수주액",
                                     data: aData.aTake,
-                                    backgroundColor: "red",
+                                    backgroundColor: red,
                                     yAxisID: "y",
 
                                 },
                                 {
                                     label: "매출액",
                                     data: aData.aSale,
-                                    backgroundColor: "pink",
+                                    backgroundColor: lightYellow,
                                     yAxisId: "y",
 
                                 },
@@ -108,8 +121,10 @@ sap.ui.define([
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-
                             plugins: {
+                                tooltip:{
+                                    enabled:false
+                                },
                                 legend: {
                                     display: true,
                                     position: 'bottom',
@@ -119,8 +134,8 @@ sap.ui.define([
                                             return[
                                                 {
                                                     text:'사업 기회',
-                                                    fillStyle:'yellow',
-                                                    strokeStyle: 'yellow',
+                                                    fillStyle:orange,
+                                                    strokeStyle: orange,
                                                     lineWidth: 1,
                                                     hidden: false,
                                                     datasetIndex: 0,
@@ -128,8 +143,8 @@ sap.ui.define([
                                                 },
                                                 {
                                                     text:'수주액',
-                                                    fillStyle: 'red',
-                                                    strokeStyle: 'red',
+                                                    fillStyle: red,
+                                                    strokeStyle: red,
                                                     lineWidth: 1,
                                                     hidden: false,
                                                     datasetIndex: 2,
@@ -137,8 +152,8 @@ sap.ui.define([
                                                 },
                                                 {
                                                     text: '매출액',
-                                                    fillStyle: 'pink',
-                                                    strokeStyle: 'pink',
+                                                    fillStyle: lightYellow,
+                                                    strokeStyle: lightYellow,
                                                     lineWidth: 1,
                                                     hidden: false,
                                                     datasetIndex: 3,
@@ -209,18 +224,14 @@ sap.ui.define([
                                         display: false,
                                         text: '수주건수(건)',
                                     }
-
-
                                 }
-
-
                             }
                         },
                 })
                 
                 this.dataLoad();
 
-                this._ovserveResize(this.byId(this._aContainerId[i]), i)
+                //this._ovserveResize(this.byId(this._aContainerId[i]), i)
             }.bind(this));
 
 }
@@ -244,8 +255,9 @@ sap.ui.define([
             }
         },
 
-    _dataSetting: async function () {
-        let aResults = await this._setData();
+    _dataSetting: async function (oData) {
+        // let aResults = await this._setData();
+        let aResults = oData;
         let aData;
         let aLabel = ["100억 이상", "50~100억", "30~50억", "10~30억", "5억~10억", "1억~5억", "1억 이하"];
         let aTake = [

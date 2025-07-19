@@ -40,10 +40,11 @@
                             <SegmentedButtonItem key="{typeModel>type_key}" text="{typeModel>type_text}"/>
                         </items>
                     </SegmentedButton>
-                    <table:Table id="table"
-                        rows="{sgaDetailTreeTableModel>/}" 
+                    <table:Table 
+                        id="table"
+                        rows="{path:'/'}" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
-                        fixedColumnCount="2"
+                        fixedColumnCount="1"
                         selectionMode="Single" 
                         selectionBehavior="RowOnly" 
                         rowSelectionChange="onRowSelectionChange"
@@ -54,8 +55,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false" />
                                 <ToolbarSeparator visible="false"/>
@@ -74,7 +75,7 @@
 
                                     <Label text="조직" wrapping="true"/>
                                 <table:template>
-                                    <Text emptyIndicatorMode="On"  text="{sgaDetailTreeTableModel>org_name}" wrapping="false" width="100%" textAlign="Begin"   />
+                                    <Text emptyIndicatorMode="On"  text="{org_name}" wrapping="false" width="100%" textAlign="Begin"   />
                                 </table:template>
                                 <table:customData>
                                     <core:CustomData key="mergeKey" value="org_name" />
@@ -104,7 +105,7 @@
                                 <table:template>
                                     <Text emptyIndicatorMode="On"  text="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>goal', targetType: 'any' },
+                                            {path: 'goal', targetType: 'any' },
                                             {value:''},
                                             {value:'int'}
                                         ],
@@ -112,7 +113,7 @@
                                         }"
                                         tooltip="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>goal', targetType: 'any' },
+                                            {path: 'goal', targetType: 'any' },
                                             {value:''},
                                             {value:'tooltip'}
                                         ],
@@ -129,7 +130,7 @@
                                 <table:template>
                                     <Text emptyIndicatorMode="On"  text="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>actual_curr_ym_value', targetType: 'any' },
+                                            {path: 'actual_curr_ym_value', targetType: 'any' },
                                             {value:''},
                                             {value:'int'}
                                         ],
@@ -137,7 +138,7 @@
                                         }"
                                         tooltip="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>actual_curr_ym_value', targetType: 'any' },
+                                            {path: 'actual_curr_ym_value', targetType: 'any' },
                                             {value:''},
                                             {value:'tooltip'}
                                         ],
@@ -154,7 +155,7 @@
                                 <table:template>
                                     <Text emptyIndicatorMode="On"  text="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>actual_last_ym_value', targetType: 'any' },
+                                            {path: 'actual_last_ym_value', targetType: 'any' },
                                             {value:''},
                                             {value:'int'}
                                         ],
@@ -162,7 +163,7 @@
                                         }"
                                         tooltip="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>actual_last_ym_value', targetType: 'any' },
+                                            {path: 'actual_last_ym_value', targetType: 'any' },
                                             {value:''},
                                             {value:'tooltip'}
                                         ],
@@ -179,7 +180,7 @@
                                 <table:template>
                                     <Text emptyIndicatorMode="On"  text="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>actual_ym_gap', targetType: 'any' },
+                                            {path: 'actual_ym_gap', targetType: 'any' },
                                             {value:''},
                                             {value:'int'}
                                         ],
@@ -187,7 +188,7 @@
                                         }"
                                         tooltip="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>actual_ym_gap', targetType: 'any' },
+                                            {path: 'actual_ym_gap', targetType: 'any' },
                                             {value:''},
                                             {value:'tooltip'}
                                         ],
@@ -275,7 +276,7 @@
                                 <table:template>
                                     <Text emptyIndicatorMode="On"  text="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>actual_curr_ym_rate', targetType: 'any' },
+                                            {path: 'actual_curr_ym_rate', targetType: 'any' },
                                             {value:''},
                                             {value:'percent'}
                                         ],
@@ -283,7 +284,7 @@
                                         }"
                                         tooltip="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>actual_curr_ym_rate', targetType: 'any' },
+                                            {path: 'actual_curr_ym_rate', targetType: 'any' },
                                             {value:''},
                                             {value:'percent'}
                                         ],
@@ -301,7 +302,7 @@
                                 <table:template>
                                     <Text emptyIndicatorMode="On"  text="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>actual_last_ym_rate', targetType: 'any' },
+                                            {path: 'actual_last_ym_rate', targetType: 'any' },
                                             {value:''},
                                             {value:'percent'}
                                         ],
@@ -309,7 +310,7 @@
                                         }"
                                         tooltip="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>actual_last_ym_rate', targetType: 'any' },
+                                            {path: 'actual_last_ym_rate', targetType: 'any' },
                                             {value:''},
                                             {value:'percent'}
                                         ],
@@ -327,7 +328,7 @@
                                 <table:template>
                                     <Text emptyIndicatorMode="On"  text="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>actual_ym_rate_gap', targetType: 'any' },
+                                            {path: 'actual_ym_rate_gap', targetType: 'any' },
                                             {value:''},
                                             {value:'percent'}
                                         ],
@@ -335,7 +336,7 @@
                                         }"
                                         tooltip="{
                                         parts: [
-                                            {path: 'sgaDetailTreeTableModel>actual_ym_rate_gap', targetType: 'any' },
+                                            {path: 'actual_ym_rate_gap', targetType: 'any' },
                                             {value:''},
                                             {value:'percent'}
                                         ],
@@ -353,8 +354,8 @@
                     <table:Table
                         rows="{sgaDetailTableModel>/}" 
                         id="actualSgaDetailTable"
-                        class="custom-table-container custom-table-header custom-table-body custom-table-first-emphasis
-                        custom-uiTable-selection custom-table-rounding-border custom-inherit-height sapUiTinyMarginBottom" 
+                        class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table
+                        custom-uiTable-selection custom-inherit-height sapUiTinyMarginBottom" 
                         selectionMode="Single" 
                         selectionBehavior="RowOnly" 
                         enableColumnReordering="false"
@@ -369,9 +370,9 @@
                             </OverflowToolbar>
                         </table:extension>
                         
-                        <table:rowMode>
-                            <rowmodes:Auto />
-                        </table:rowMode>
+                        <table:rowSettingsTemplate>
+                            <table:RowSettings />
+                        </table:rowSettingsTemplate>
 
                         <table:columns>
                             <table:Column hAlign="Center" width="10rem" resizable="false" name="type" >
@@ -380,6 +381,9 @@
                                     <Text emptyIndicatorMode="On"  text="{sgaDetailTableModel>name}" wrapping="false" width="100%" textAlign="Center"
                                         />
                                 </table:template>
+                                <table:customData>
+                                    <core:CustomData key="mergeKey" value="name" />
+                                </table:customData>
                             </table:Column>
                             <table:Column hAlign="Center" resizable="false">
                                 <Label text="실적 금액" wrapping="true"/>

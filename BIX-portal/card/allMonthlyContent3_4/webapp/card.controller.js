@@ -21,12 +21,9 @@ sap.ui.define([
             this._createId();
 
             // 차트 설정
-            this._setChart();
+            // this._setChart();
 
-            this._oEventBus.subscribe("aireport", "infoSet", this._updateChart, this);	
-
-
-
+            this._oEventBus.subscribe("aireport", "allContent3_4", this._setChart, this);
         },
 
         /**
@@ -42,9 +39,9 @@ sap.ui.define([
             this._iMinHeight = 400;
         },
 
-        _updateChart: async function () {
-            this.byId("cardContent").setBusy(true)
-            let aResults = await this._dataSetting();
+        _updateChart: async function (sChannel, sEventId, oData) {
+            this.getOwnerComponent().oCard.setBusy(true);
+            let aResults = await this._dataSetting(oData.data);
 
             this._oMyChart[0].data.labels = aResults.aLabel
             this._oMyChart[0].data.datasets[0].data = aResults.aChance
@@ -52,10 +49,13 @@ sap.ui.define([
             this._oMyChart[0].data.datasets[2].data = aResults.aSale
 
             this._oMyChart[0].update();
-            this.byId("cardContent").setBusy(false)
+            this.dataLoad();
+            setTimeout(() => {
+                this.getOwnerComponent().oCard.setBusy(false);
+            }, 300)
         },
 
-        _setChart: async function () {
+        _setChart: async function (sChannel, sEventId, oData) {
             this.byId("cardContent").setBusy(true)
             // 카드
             const oCard = this.getOwnerComponent().oCard;
@@ -66,6 +66,12 @@ sap.ui.define([
             let iBoxWidth = Math.floor(oParentElement.clientWidth / window.innerWidth * 90);
             let iBoxHeight = Math.floor(oParentElement.clientHeight / window.innerHeight * 90);
 
+            let lightYellow = "#FFF2d4"
+            let red = "#EA002d"
+            let orange = "#ff8211"
+
+            this._oEventBus.subscribe("aireport", "allContent3_4", this._updateChart, this);
+
             for (let i = 0; i < this._aCanvasId.length; i++) {
                 let oHTML = this.byId("html" + i);
                 oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:450px; height:250px; min-height:250px'><canvas id='${this._aCanvasId[i]}' /></div>`);
@@ -73,7 +79,7 @@ sap.ui.define([
                     // 차트 구성
                     const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[i])).getContext("2d");
                     //데이터 요청
-                    let aData = await this._dataSetting();
+                    let aData = await this._dataSetting(oData.data);
                     this._oMyChart[i] = new Chart(ctx, {
                         type: "bar",
                         data: {
@@ -83,23 +89,28 @@ sap.ui.define([
                                 {
                                     label: "사업 기회",
                                     data: aData.aChance,
-                                    backgroundColor: "yellow",
-                                    borderColor: "yellow",
+                                    backgroundColor: orange,
+                                    borderColor: orange,
                                     type: "line",
                                     yAxisID: 'y1',
+                                    fill: false,
+                                    pointBackgroundColor: orange,
+                                    pointBorderColor: "white",
+                                    pointBorderWidth: 3,
+                                    pointRadius: 6,
 
                                 },
                                 {
                                     label: "수주액",
                                     data: aData.aTake,
-                                    backgroundColor: "red",
+                                    backgroundColor: red,
                                     yAxisID: "y",
 
                                 },
                                 {
                                     label: "매출액",
                                     data: aData.aSale,
-                                    backgroundColor: "pink",
+                                    backgroundColor: lightYellow,
                                     yAxisId: "y",
 
                                 },
@@ -114,23 +125,23 @@ sap.ui.define([
                                 legend: {
                                     display: true,
                                     position: 'bottom',
-                                    labels:{
+                                    labels: {
                                         usePointStyle: true,
-                                        generateLabels(chart){
-                                            return[
+                                        generateLabels(chart) {
+                                            return [
                                                 {
-                                                    text:'사업 기회',
-                                                    fillStyle:'yellow',
-                                                    strokeStyle: 'yellow',
+                                                    text: '사업 기회',
+                                                    fillStyle: orange,
+                                                    strokeStyle: orange,
                                                     lineWidth: 1,
                                                     hidden: false,
                                                     datasetIndex: 0,
                                                     pointStyle: 'line'
                                                 },
                                                 {
-                                                    text:'수주액',
-                                                    fillStyle: 'red',
-                                                    strokeStyle: 'red',
+                                                    text: '수주액',
+                                                    fillStyle: red,
+                                                    strokeStyle: red,
                                                     lineWidth: 1,
                                                     hidden: false,
                                                     datasetIndex: 2,
@@ -138,8 +149,8 @@ sap.ui.define([
                                                 },
                                                 {
                                                     text: '매출액',
-                                                    fillStyle: 'pink',
-                                                    strokeStyle: 'pink',
+                                                    fillStyle: lightYellow,
+                                                    strokeStyle: lightYellow,
                                                     lineWidth: 1,
                                                     hidden: false,
                                                     datasetIndex: 3,
@@ -149,7 +160,10 @@ sap.ui.define([
                                             ]
                                         }
                                     }
-                                }
+                                },
+                                tooltip: {
+                                    enabled: false
+                                },
                             },
 
                             scales: {
@@ -175,8 +189,8 @@ sap.ui.define([
                                     position: 'left',
                                     ticks: {
                                         callback: function (value) {
-                                                return (value).toLocaleString() + '억';
-                                                
+                                            return (value).toLocaleString() + '억';
+
                                         },
                                         stepSize: 5
                                     },
@@ -218,85 +232,87 @@ sap.ui.define([
 
                             }
                         },
-                })
-                
-                this.dataLoad();
+                    })
 
-                this._ovserveResize(this.byId(this._aContainerId[i]), i)
-            }.bind(this));
-            
-        }
+             
+
+                    //this._ovserveResize(this.byId(this._aContainerId[i]), i)
+                }.bind(this));
+
+            }
+            this.dataLoad();
             this.byId("cardContent").setBusy(false)
         },
-        
 
-		dataLoad : function(){
-			const oEventBus = sap.ui.getCore().getEventBus();
-			oEventBus.publish("CardChannel","CardFullLoad",{
-				cardId:this.getView().getId()
-			})
-		},
 
-        _ovserveResize: function(oElement, i){
+        dataLoad: function () {
+            const oEventBus = sap.ui.getCore().getEventBus();
+            oEventBus.publish("CardChannel", "CardFullLoad", {
+                cardId: this.getView().getId()
+            })
+        },
 
-            if(!this._resizeObserver){
-                this._resizeObserver = new ResizeObserver(()=> {
+        _ovserveResize: function (oElement, i) {
+
+            if (!this._resizeObserver) {
+                this._resizeObserver = new ResizeObserver(() => {
                     this._oMyChart[i].resize()
                 })
-                   
+
             }
         },
 
-    _dataSetting: async function () {
-        let aResults = await this._setData();
-        let aData;
-        let aLabel = [];
-        let aTake = [];
-        let aSale = [];
-        let aChance = [];
+        _dataSetting: async function (oData) {
+            // let aResults = await this._setData();
+            let aResults = oData;
+            let aData;
+            let aLabel = [];
+            let aTake = [];
+            let aSale = [];
+            let aChance = [];
 
-        aResults.forEach(
-            function (oResult) {
-                aLabel.push(oResult.deal_stage_cd)
-                aTake.push(oResult.rodr_amt_sum)
-                aSale.push(oResult.sale_amt_sum)
-                aChance.push(oResult.total_rodr_cnt)
-            }
-        )
-        aData = { aLabel, aTake, aSale, aChance }
+            aResults.forEach(
+                function (oResult) {
+                    aLabel.push(oResult.deal_stage_cd)
+                    aTake.push(oResult.rodr_amt_sum)
+                    aSale.push(oResult.sale_amt_sum)
+                    aChance.push(oResult.total_rodr_cnt)
+                }
+            )
+            aData = { aLabel, aTake, aSale, aChance }
 
-        return aData;
-    },
+            return aData;
+        },
 
 
 
-    _setData: async function () {
-        let oData = JSON.parse(sessionStorage.getItem("aiReport"));
-        // 파라미터
-        let iYear = oData.year
-        let sMonth = oData.month
-        let sOrgId = oData.orgId;
-        let sType = oData.type
+        _setData: async function () {
+            let oData = JSON.parse(sessionStorage.getItem("aiReport"));
+            // 파라미터
+            let iYear = oData.year
+            let sMonth = oData.month
+            let sOrgId = oData.orgId;
+            let sType = oData.type
 
-        const oModel = new ODataModel({
-            serviceUrl: "../odata/v4/pl_api/",
-            synchronizationMode: "None",
-            operationMode: "Server"
-        });
+            const oModel = new ODataModel({
+                serviceUrl: "../odata/v4/pl_api/",
+                synchronizationMode: "None",
+                operationMode: "Server"
+            });
 
-        let sOrgPath = `/get_ai_forecast_deal_pipeline(year='${iYear}',month='${sMonth}',org_id='${sOrgId}',org_tp='${sType}')`
+            let sOrgPath = `/get_ai_forecast_deal_pipeline(year='${iYear}',month='${sMonth}',org_id='${sOrgId}',org_tp='${sType}')`
 
-        let aData;
-        await Promise.all([
-            oModel.bindContext(sOrgPath).requestObject(),
-        ]).then(function (aResults) {
-            aData = aResults[0].value
-        }.bind(this))
-        .catch((oErr) => {
-            Module.displayStatus(this.getOwnerComponent().oCard,oErr.error.code, this.byId("cardContent"));
-        });
-        return aData;
-    },
+            let aData;
+            await Promise.all([
+                oModel.bindContext(sOrgPath).requestObject(),
+            ]).then(function (aResults) {
+                aData = aResults[0].value
+            }.bind(this))
+                .catch((oErr) => {
+                    Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
+                });
+            return aData;
+        },
 
 
     });

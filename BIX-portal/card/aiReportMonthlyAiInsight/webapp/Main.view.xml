@@ -7,17 +7,56 @@
     controllerName="bix.card.aiReportMonthlyAiInsight.Main"
 >
     <VBox id="cardContent" width="100%">
-        <VBox width="100%" class="title-wrapper inner-spacing back-gray border-rounding sapUiMediumMarginBottom">
+        <!-- AI Insight 영역 -->
+        <VBox width="100%" 
+              class="title-wrapper inner-spacing back-gray border-rounding sapUiMediumMarginBottom"
+              busy="{LLMModel>/isLoading}">
             <HBox>
                 <Image src="./resource/icon/ai_icon05.png" />
                 <Title text="AI Insight"/>
             </HBox>
-            <Text text="{LLMModel>/insight}" />
+            
+            <VBox visible="{LLMModel>/isLoading}" 
+                  width="100%" 
+                  alignItems="Center" 
+                  justifyContent="Center" 
+                  class="sapUiMediumMargin">
+                <Text text="AI 보고서 생성중입니다." 
+                      textAlign="Center" />
+            </VBox>
+            
+            <FormattedText visible="{= !${LLMModel>/isLoading}}"
+               htmlText="{LLMModel>/insight}"
+               class="title-wrapper-text sapUiTinyMarginBegin" />
         </VBox>
         
-        <VBox width="100%" class="title-wrapper inner-spacing back-gray border-rounding">
-            <Title text="AI Summerize"/>
-            <Text text="{LLMModel>/summary}" />
+        <!-- AI Summarize 영역 -->
+        <VBox width="100%" 
+              class="title-wrapper inner-spacing back-gray border-rounding"
+              busy="{LLMModel>/isLoading}">
+            <Title text="AI Summarize"/>
+            
+            <VBox visible="{LLMModel>/isLoading}" 
+                  width="100%" 
+                  alignItems="Center" 
+                  justifyContent="Center" 
+                  class="sapUiMediumMargin">
+                <Text text="AI 보고서 생성중입니다." 
+                      textAlign="Center" />
+            </VBox>
+            
+            <List items="{LLMModel>/summary}" showSeparators="None" backgroundDesign="Transparent">
+                <CustomListItem>
+                    <HBox width="100%">
+                        <core:Icon src="sap-icon://circle-task-2" 
+                                  class="custom-ai-report-test-aiIcon sapUiTinyMarginEnd" 
+                                  size="7px" />
+                        <Text text="{LLMModel>}" 
+                              wrapping="true" 
+                              class="custom-ai-report-test-card-content"/>
+                    </HBox>
+                </CustomListItem>
+            </List>
         </VBox>
     </VBox>
 </mvc:View>

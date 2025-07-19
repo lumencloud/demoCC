@@ -136,7 +136,7 @@ module.exports = (srv) => {
 
         } catch (e) {
             // 해당 버전 실행 Error 처리
-            await tx_main.run(UPDATE(common_version_sfdc).set({ tag: 'E' }).where({ ver_sfdc: ver_no }));
+            // await tx_main.run(UPDATE(common_version_sfdc).set({ tag: 'E' }).where({ ver_sfdc: ver_no }));
             await tx_trsf.commit();
             return { code: "error", message: e.message };
         }

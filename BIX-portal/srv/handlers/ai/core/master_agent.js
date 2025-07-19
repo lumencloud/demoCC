@@ -145,7 +145,7 @@ class MasterAgent {
             
             // 변수 대체
             const inputVariables = {
-                agent_list: JSON.stringify(this.agentList, null, 2),
+                agent_list: JSON.stringify(filteredAgents, null, 2),  // ✅ 필터링된 리스트 사용
                 interaction_data: context
             };
             

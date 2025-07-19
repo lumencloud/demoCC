@@ -12,10 +12,12 @@ module.exports = (srv) => {
                 org_name: '',
                 emp_no: '',
                 auth: '',
-                name: (parseInt(userInfo.attr?.familyName).isNaN && userInfo.attr?.familyName ? '' : userInfo.attr?.familyName) + (parseInt(userInfo.attr?.givenName).isNaN && userInfo.attr?.givenName ? '' : userInfo.attr?.givenName)
+                name: ''
             };
 
+            oInfo.name = (parseInt(userInfo.attr?.familyName).isNaN && userInfo.attr?.familyName ? '' : userInfo.attr?.familyName) + (parseInt(userInfo.attr?.givenName).isNaN && userInfo.attr?.givenName ? '' : userInfo.attr?.givenName);
             oInfo.name = oInfo.name.replace("undefined", "");
+            oInfo.name = oInfo.name.replace(/\d+/g,'');
 
             oInfo.emp_no = userInfo.attr?.emp_no?.[0];
 

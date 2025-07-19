@@ -142,7 +142,7 @@ module.exports = (srv) => {
                 let o_last_pl = last_pl.find(pl => pl.biz_tp_account_cd === account.biz_tp_account_cd);
                 let o_curr_target = target_query.find(target => target.target_type_cd === account.biz_tp_account_cd)
                 if(!o_result[`${account.biz_tp_account_cd}_sale`]){
-                    o_result[`${account.biz_tp_account_cd}_sale`]={display_order : account.sort_order, account_nm : account.biz_tp_account_nm, account_cd : account.biz_tp_account_cd, type: "매출"}
+                    o_result[`${account.biz_tp_account_cd}_sale`]={display_order : account.sort_order+1, account_nm : account.biz_tp_account_nm, account_cd : account.biz_tp_account_cd, type: "매출"}
                 }
                 o_result[`${account.biz_tp_account_cd}_sale`]['secured_value'] = (o_pl?.secured_sale ?? 0)
                 o_result[`${account.biz_tp_account_cd}_sale`]['not_secured_value'] = (o_pl?.not_secured_sale ?? 0)

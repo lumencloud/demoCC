@@ -18,7 +18,7 @@
                         </VBox>
                         <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin" wrap="Wrap" renderType="Bare" alignContent="Center">
                             <Text emptyIndicatorMode="On" text="{Model>/first/biz_opp_nm}"  tooltip="{Model>/first/biz_opp_nm}"/>                        
-                            <Text emptyIndicatorMode="On" text="({path: 'Model>/first/total_target_amt', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/first/total_target_amt', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                            <Text emptyIndicatorMode="On" text="({path: 'Model>/first/total_target_amt', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/first/total_target_amt', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
                         </HBox>
                     </HBox>                    
                 </VBox>
@@ -30,7 +30,7 @@
                         </VBox>
                         <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin" wrap="Wrap" renderType="Bare" alignContent="Center">
                             <Text emptyIndicatorMode="On" text="{Model>/second/biz_opp_nm}" tooltip="{Model>/second/biz_opp_nm}" />                        
-                            <Text emptyIndicatorMode="On" text="({path: 'Model>/second/total_target_amt', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/second/total_target_amt', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                            <Text emptyIndicatorMode="On" text="({path: 'Model>/second/total_target_amt', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/second/total_target_amt', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
                         </HBox>
                     </HBox>                    
                 </VBox>
@@ -42,7 +42,7 @@
                         </VBox>
                         <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin" wrap="Wrap" renderType="Bare" alignContent="Center">
                             <Text emptyIndicatorMode="On" text="{Model>/third/biz_opp_nm}"   tooltip="{Model>/third/biz_opp_nm}"/>                        
-                            <Text emptyIndicatorMode="On" text="({path: 'Model>/third/total_target_amt', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/third/total_target_amt', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                            <Text emptyIndicatorMode="On" text="({path: 'Model>/third/total_target_amt', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/third/total_target_amt', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
                         </HBox>
                     </HBox>                    
                 </VBox>
@@ -54,7 +54,7 @@
                         </VBox>
                         <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin" wrap="Wrap" renderType="Bare" alignContent="Center">
                             <Text emptyIndicatorMode="On" text="{Model>/forth/biz_opp_nm}"  tooltip="{Model>/forth/biz_opp_nm}"/>                        
-                            <Text emptyIndicatorMode="On" text="({path: 'Model>/forth/total_target_amt', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/forth/total_target_amt', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                            <Text emptyIndicatorMode="On" text="({path: 'Model>/forth/total_target_amt', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/forth/total_target_amt', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
                         </HBox>
                     </HBox>                    
                 </VBox>
@@ -66,7 +66,7 @@
                         </VBox>
                         <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin" wrap="Wrap" renderType="Bare" alignContent="Center">
                             <Text emptyIndicatorMode="On" text="{Model>/etcName} 등 {Model>/etcCount}건" tooltip="{Model>/etcName} 등 {Model>/etcCount}건" />                        
-                            <Text emptyIndicatorMode="On" text="({path: 'Model>/etcAmount', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/etcAmount', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                            <Text emptyIndicatorMode="On" text="({path: 'Model>/etcAmount', formatter: '._formatTotal'}억)" tooltip="({path: 'Model>/etcAmount', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
                         </HBox>
                     </HBox>                    
                 </VBox>

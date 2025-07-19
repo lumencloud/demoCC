@@ -1,9 +1,5 @@
 using {managed} from '@sap/cds/common';
 
-/**
- * 등록일 : 250513
- * 등록자 : 이금복
- */
 namespace common;
 
 /**

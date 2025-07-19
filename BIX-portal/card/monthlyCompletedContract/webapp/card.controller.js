@@ -13,8 +13,8 @@ sap.ui.define(
       _oEventBus: EventBus.getInstance(),
 
       onInit: function () {
-        this._dataSetting();
-        this._oEventBus.subscribe("aireport", "infoSet", this._dataSetting, this)
+        // this._dataSetting();
+        this._oEventBus.subscribe("aireport", "contract", this._modelSetting, this)
       },
 
       _dataSetting: async function () {
@@ -38,14 +38,14 @@ sap.ui.define(
 
         await oModel.bindContext(sPath).requestObject().then(
           function (aResult) {
-            Module.displayStatusForEmpty(this.getOwnerComponent().oCard,aResult.value, this.byId("cardContent"));
+            Module.displayStatusForEmpty(this.getOwnerComponent().oCard, aResult.value, this.byId("cardContent"));
             this._modelSetting(aResult.value);
 
             this.dataLoad();
           }.bind(this))
           .catch((oErr) => {
-            Module.displayStatus(this.getOwnerComponent().oCard,oErr.error.code, this.byId("cardContent"));
-        });
+            Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
+          });
         this.byId("cardContent").setBusy(false);
       },
 
@@ -56,8 +56,8 @@ sap.ui.define(
         })
       },
 
-      _modelSetting: function (aResult) {
-     
+      _modelSetting: function (sChannel, sEventId, oData) {
+        let aResult = oData.data
         // 총 금액
         let iAmount = 0;
         aResult.forEach((oResult) => iAmount += Number(oResult.rodr_amt))
@@ -89,7 +89,7 @@ sap.ui.define(
         // 모델용 객체 생성
         let oModel = {
           iCount: iCount || 0,
-          iAmount: iAmount.toFixed(0) || 0,
+          iAmount: this._formatTotal(iAmount.toFixed()) || 0,
           first: aResult[0],
           second: aResult[1],
           third: aResult[2],
@@ -102,7 +102,8 @@ sap.ui.define(
           oModel["etcAmount"] = aResult[4].rodr_amt.toFixed(1)
           oModel["etcName"] = aResult[4].biz_tp_account_nm
         }
-
+       
+        this.dataLoad();
         this._oEventBus.publish("aiReport", "comMonthData", oModel)
         this.getOwnerComponent().setModel(new JSONModel(oModel), "Model");
 
@@ -142,7 +143,7 @@ sap.ui.define(
 
         let fNumber = parseFloat(sValue);
         if (Number.isInteger(fNumber)) {
-          let oFormatter = NumberFormat.getIntegerInstance({
+          let oFormatter = NumberFormat.getFloatInstance({
             groupingEnabled: true
           });
           return oFormatter.format(fNumber);

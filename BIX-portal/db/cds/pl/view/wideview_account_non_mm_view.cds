@@ -9,8 +9,11 @@ view wideview_account_non_mm_view as
             select * from pl_wideview_account_view
         ) as pl
         inner join common_non_mm_filter_view as non_mm
-            on(
+            on (
+                (
                                     non_mm.nm_rodr_ccorg_cd   =      pl.rodr_ccorg_cd
+                    or              non_mm.nm_rodr_ccorg_cd   =      pl.sale_ccorg_cd
+                )
                 and (
                     (
                                     pl.prj_nm                 like   non_mm.prj_nm

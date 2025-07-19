@@ -34,19 +34,11 @@ module.exports = (srv) => {
              * org_id 파라미터값으로 조직정보 조회
              * 
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_id'
-                when lv2_id = '${org_id}' THEN 'lv2_id'
-                when lv3_id = '${org_id}' THEN 'lv3_id'
-                when div_id = '${org_id}' THEN 'div_id'
-                when hdqt_id = '${org_id}' THEN 'hdqt_id'
-                when team_id = '${org_id}' THEN 'team_id'
-                end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd','org_name','org_tp'])
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_level', 'org_ccorg_cd','org_name','org_tp','lv3_ccorg_cd'])
                 .where`org_id = ${org_id} and (lv1_id = ${org_id} or lv2_id = ${org_id} or lv3_id = ${org_id} or div_id = ${org_id} or hdqt_id = ${org_id} or team_id = ${org_id})`;
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
-            let org_col_nm = orgInfo.org_level;
+            let org_col_nm = orgInfo.org_level+'_id';
 
             let pl_col_list = ['src_type'];
             let pl_where_conditions = {year : year, [org_col_nm]: org_id}
@@ -56,9 +48,9 @@ module.exports = (srv) => {
                 pl_col_list.push(`ifnull(sum(margin_m${i}_amt), 0) as m_${i}_margin`)
             }
             let pl_view_select;
-            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.org_tp === 'hybrid' || orgInfo.org_tp === 'account'){
+            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.lv3_ccorg_cd === '237100' || orgInfo.org_tp === 'account'){
                 pl_view_select = account_pl_view;
-            }else if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id'|| orgInfo.org_tp === 'delivery'){
+            }else{
                 pl_view_select = pl_view;
             };
             const [pl_data]=await Promise.all([

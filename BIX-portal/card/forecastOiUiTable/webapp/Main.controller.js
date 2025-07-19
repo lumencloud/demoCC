@@ -9,7 +9,6 @@ sap.ui.define([
     "use strict";
 
     return Controller.extend("bix.card.forecastOiUiTable.Main", {
-        _sTableId : "forecastOiUiTable",
         _oEventBus: EventBus.getInstance(),
         
         onInit: function () {            
@@ -17,9 +16,7 @@ sap.ui.define([
             this._oEventBus.subscribe("pl", "search", this._bindTable, this);
             this._oEventBus.subscribe("pl", "selectMasterTable", this.onRowSelectionChange, this);
         },
-        onAfterRendering: function () {
-            let oTable = this.byId(this._sTableId);        
-        },
+
         _bindTable: async function (sChannelId, sEventId, oData) {
             oData = JSON.parse(sessionStorage.getItem("initSearchModel"));
 
@@ -30,7 +27,7 @@ sap.ui.define([
             let sOrgId = oData.orgId;
 
             // 새로운 테이블 경로
-            let oTable = this.byId("forecastOiUiTable");
+            let oTable = this.byId("table");
             let sLastPath = oTable.getBinding("rows")?.getPath();
             let sNewPath = `/get_forecast_oi(year='${iYear}',month='${sMonth}',org_id='${sOrgId}')`;
 
@@ -55,7 +52,7 @@ sap.ui.define([
                 }
             })
             await Module.setTableMergeWithAltColor(oTable);
-            // console.log(oTable.getBinding("rows"));
+            // //console.log(oTable.getBinding("rows"));
 
             // 날짜 입력 값 받아 수정
             // let oTemp = { year: String(iYear).substring(2) };
@@ -136,7 +133,7 @@ sap.ui.define([
         onFormatPerformance: function (iValue, sType, sTooltip) {
             return Modules.valueFormat(sType, iValue, '', sTooltip)
         },
-        onRowSelectionChange: function (oEvent, sEventId, oData) {
+        onRowSelectionChange: function (oEvent, sEventId, oEventData) {
             if(!sEventId){
                 let oContext = oEvent.getParameters()["rowContext"];
     
@@ -144,39 +141,36 @@ sap.ui.define([
                 if (oBindingObject?.type === "DT 매출") {
                     this._oEventBus.publish("pl", "detail", { detail: "dtSaleMargin" });
                 } else if (oBindingObject?.type === "Offshoring") {
-                    this._oEventBus.publish("pl", "detail", { detail: "offshoring" });
+                    //this._oEventBus.publish("pl", "detail", { detail: "offshoring" });
                 }else if (oBindingObject?.type === "Non-MM") {
                     this._oEventBus.publish("pl", "detail", { detail: "nonMm" });
                 }else if (oBindingObject?.type === "BR") {
                     this._oEventBus.publish("pl", "detail", { detail: "br" });
                 }
     
-                let oTable = this.byId("forecastOiUiTable");
+                let oTable = this.byId("table");
                 if(oTable.getSelectedIndex() !== -1){
                     const aHash = window.location.hash.split('#/')[2];
                     const oUrlParams = aHash.split('/')
                     this._oEventBus.publish("pl", "selectMasterTable",  { detail: oUrlParams[2], page: oUrlParams[0], table:'oi' });
                 }
             }else{
-                if(oData['page'] === "plan"){
-                    let oTable = this.byId("forecastOiUiTable");
-                    if (oData['table'] === "pl") {
-                        oTable.setSelectedIndex(-1)
-                        return
+                if(oEventData['page'] === "plan"){
+                    let oTable = this.byId("table");
+                    if (!oTable) return;
+
+                    // detail에 따른 테이블(pl, oi) 분기처리
+                    let sTableType = (oEventData['detail'] === 'saleMargin' || oEventData['detail'] === 'sga') ? "pl" : "oi";
+                    if (sTableType === "pl") {
+                        oTable.setSelectedIndex(-1);
+                        return;
                     }
-                    if (oData['table'] === "oi") {
-                        return
-                    }
-                    let sType = oData['detail'] === 'dtSaleMargin' ? "DT 매출" : oData['detail'] === 'offshoring' ? "Offshoring": oData['detail'] === 'nonMm' ? "Non-MM": oData['detail'] === 'br' ? "BR" : null
-                    if(!oTable) return;
-                    let aRows = oTable.getBinding("rows").getContexts();
-                    let iIndex = -1
-                    aRows.forEach(a=>{
-                        if (a.getObject()['type'] === sType){
-                            iIndex = a.getIndex()
-                        }
-                    })
-                    oTable.setSelectedIndex(iIndex)
+
+                    // 타입에 맞는 행 선택
+                    let sType = oEventData['detail'] === 'dtSaleMargin' ? "DT 매출" : oEventData['detail'] === 'offshoring' ? "Offshoring": oEventData['detail'] === 'nonMm' ? "Non-MM": oEventData['detail'] === 'br' ? "BR" : null
+                    let aBindingData = oTable.getBinding("rows").getContexts().map(oData => oData.getObject());
+                    let index = aBindingData.findIndex(oData => oData["type"] === sType) ?? -1;
+                    oTable.setSelectedIndex(index);
                 }
             }
         },

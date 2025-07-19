@@ -107,7 +107,7 @@ sap.ui.define([
             // let aChartData6 = aResults.map(oResult => oResult.value.find(oData => oData.seq == "7").performanceCurrentYearMonth);
 
             // 차트 제목 및 주요지표 설정
-            let oNumberFormat = NumberFormat.getIntegerInstance({
+            let oNumberFormat = NumberFormat.getFloatInstance({
                 groupingEnabled: true,
                 groupingSeparator: ','
             });

@@ -11,8 +11,8 @@ sap.ui.define([
 	return Controller.extend("bix.card.deliveryMonthlyContent3_1.Main", {
 		_oEventBus: EventBus.getInstance(),
 		onInit: function () {
-			this._dataSetting();
-			this._oEventBus.subscribe("aireport", "infoSet", this._dataSetting, this);
+			// this._dataSetting();
+			this._oEventBus.subscribe("aireport", "deliContent3_1", this._modelSetting, this);
 		},
 
 		_dataSetting: async function () {
@@ -62,8 +62,9 @@ sap.ui.define([
 				cardId:this.getView().getId()
 			})
 		},
-		_modelSetting: function (aResult) {
-			this.getView().setModel(new JSONModel(aResult), "Model");
+		_modelSetting: function (sChannel, sEventId, oData) {
+			this.getView().setModel(new JSONModel(oData.data), "Model");
+			this.dataLoad();
 		},
 
 		onFormatPerformance: function (iValue, sType) {

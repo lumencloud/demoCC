@@ -6,69 +6,207 @@ namespace ai;
 
 view ai_agent_view2(start_date : String(10), end_date : String(10)) as
     select from (
-        select
-            biz_opp_nm,
-            MIN(deal_stage_chg_dt) as change_date,
-            MIN(deal_stage_cd)     as deal_stage_cd,
-            MIN(cstco_name)        as cstco_nm,
-            MIN(dgtr_task_nm)      as dgtr_task_nm,
-            MIN(biz_tp_account_nm) as biz_tp_account_nm,
-            MIN(biz_tp_account_cd) as biz_account,
-            ROUND(
-                SUM(COALESCE(
-                    rodr_m1_amt, 0
-                )  + COALESCE(
-                    rodr_m2_amt, 0
-                )+COALESCE(
-                    rodr_m3_amt, 0
-                )+COALESCE(
-                    rodr_m4_amt, 0
-                )+COALESCE(
-                    rodr_m5_amt, 0
-                )+COALESCE(
-                    rodr_m6_amt, 0
-                )+COALESCE(
-                    rodr_m7_amt, 0
-                )+COALESCE(
-                    rodr_m8_amt, 0
-                )+COALESCE(
-                    rodr_m9_amt, 0
-                )+COALESCE(
-                    rodr_m10_amt, 0
-                )+COALESCE(
-                    rodr_m11_amt, 0
-                )+COALESCE(
-                    rodr_m12_amt, 0
-                )) / 100000000, 2
-            )                      as total_target_amt,
-            COUNT( * )             as record_count
-        from pl_pipeline_view
-        where
-                    1                 =       1
-            and     deal_stage_chg_dt between :start_date
-            and :end_date
-            and (
-                    deal_stage_cd     =       'Lead'
-                                                    // or deal_stage_cd     =       'Identified'
-                                                    // or deal_stage_cd     =       'Registered'
-                                                    // or deal_stage_cd     =       'Validated'
-                                              )
-                and length(dgtr_task_cd) > 0
-                and weekly_yn         =       true
-            group by
-                biz_opp_nm
-            order by
-                total_target_amt desc
+            (
+                select
+                    biz_opp_nm,
+                    deal_stage_change_date,
+                    deal_stage_cd,
+                    cstco_nm,
+                    dgtr_task_nm,
+                    biz_tp_account_nm,
+                    biz_account,
+                    deselected_reason,
+                    total_target_amt,
+                    1 as record_count
+                from (
+                    select
+                        biz_opp_nm,
+                        deal_stage_change_date,
+                        deal_stage_cd,
+                        cstco_nm,
+                        dgtr_task_nm,
+                        biz_tp_account_nm,
+                        biz_account,
+                        deselected_reason,
+                        total_target_amt,
+                        ROW_NUMBER() over(order by total_target_amt desc) as rn
+                    from (
+                        select
+                            biz_opp_nm,
+                            MIN(deal_stage_chg_dt) as deal_stage_change_date,
+                            MIN(deal_stage_cd)     as deal_stage_cd,
+                            MIN(cstco_name)        as cstco_nm,
+                            MIN(dgtr_task_nm)      as dgtr_task_nm,
+                            MIN(biz_tp_account_nm) as biz_tp_account_nm,
+                            MIN(biz_tp_account_cd) as biz_account,
+                            MIN(cls_rsn_tp_nm)     as deselected_reason,
+                            SUM(COALESCE(
+                                rodr_m1_amt, 0
+                            )+COALESCE(
+                                rodr_m2_amt, 0
+                            )+COALESCE(
+                                rodr_m3_amt, 0
+                            )+COALESCE(
+                                rodr_m4_amt, 0
+                            )+COALESCE(
+                                rodr_m5_amt, 0
+                            )+COALESCE(
+                                rodr_m6_amt, 0
+                            )+COALESCE(
+                                rodr_m7_amt, 0
+                            )+COALESCE(
+                                rodr_m8_amt, 0
+                            )+COALESCE(
+                                rodr_m9_amt, 0
+                            )+COALESCE(
+                                rodr_m10_amt, 0
+                            )+COALESCE(
+                                rodr_m11_amt, 0
+                            )+COALESCE(
+                                rodr_m12_amt, 0
+                            ))                     as total_target_amt,
+                            COUNT( * )             as record_count
+                        from pl_pipeline_view
+                        where
+                                deal_stage_chg_dt between :start_date
+                            and :end_date
+                            and deal_stage_cd     =       'Lead'
+                            and length(dgtr_task_cd) > 0
+                            and weekly_yn         =       true
+                        group by
+                            biz_opp_nm
+                        order by
+                            total_target_amt desc
+                    )
+                )
+                where
+                    rn < 5
+            )
+
+        union all
+
+            (
+                select
+                    max(case
+                            when rn = 5
+                                 then '기타'
+                            else ''
+                        end)              as biz_opp_nm,
+                    max(case
+                            when rn = 5
+                                 then deal_stage_change_date
+                            else ''
+                        end)              as deal_stage_change_date,
+                    max(case
+                            when rn = 5
+                                 then deal_stage_cd
+                            else ''
+                        end)              as deal_stage_cd,
+                    max(case
+                            when rn = 5
+                                 then cstco_nm
+                            else ''
+                        end)              as cstco_nm,
+                    max(case
+                            when rn = 5
+                                 then dgtr_task_nm
+                            else ''
+                        end)              as dgtr_task_nm,
+                    max(case
+                            when rn = 5
+                                 then biz_tp_account_nm
+                            else ''
+                        end)              as biz_tp_account_nm,
+                    max(case
+                            when rn = 5
+                                 then biz_account
+                            else ''
+                        end)              as biz_account,
+                    max(case
+                            when rn = 5
+                                 then deselected_reason
+                            else ''
+                        end)              as deselected_reason,
+                    sum(total_target_amt) as total_target_amt,
+                    sum(record_count)     as record_count
+                from (
+                    select
+                        biz_opp_nm,
+                        deal_stage_change_date,
+                        deal_stage_cd,
+                        cstco_nm,
+                        dgtr_task_nm,
+                        biz_tp_account_nm,
+                        biz_account,
+                        deselected_reason,
+                        total_target_amt,
+                        ROW_NUMBER() over(order by total_target_amt desc) as rn,
+                        record_count
+                    from (
+                        select
+                            biz_opp_nm,
+                            MIN(deal_stage_chg_dt) as deal_stage_change_date,
+                            MIN(deal_stage_cd)     as deal_stage_cd,
+                            MIN(cstco_name)        as cstco_nm,
+                            MIN(dgtr_task_nm)      as dgtr_task_nm,
+                            MIN(biz_tp_account_nm) as biz_tp_account_nm,
+                            MIN(biz_tp_account_cd) as biz_account,
+                            MIN(cls_rsn_tp_nm)     as deselected_reason,
+                            SUM(COALESCE(
+                                rodr_m1_amt, 0
+                            )+COALESCE(
+                                rodr_m2_amt, 0
+                            )+COALESCE(
+                                rodr_m3_amt, 0
+                            )+COALESCE(
+                                rodr_m4_amt, 0
+                            )+COALESCE(
+                                rodr_m5_amt, 0
+                            )+COALESCE(
+                                rodr_m6_amt, 0
+                            )+COALESCE(
+                                rodr_m7_amt, 0
+                            )+COALESCE(
+                                rodr_m8_amt, 0
+                            )+COALESCE(
+                                rodr_m9_amt, 0
+                            )+COALESCE(
+                                rodr_m10_amt, 0
+                            )+COALESCE(
+                                rodr_m11_amt, 0
+                            )+COALESCE(
+                                rodr_m12_amt, 0
+                            ))                     as total_target_amt,
+                            COUNT( * )             as record_count
+                        from pl_pipeline_view
+                        where
+                                deal_stage_chg_dt between :start_date
+                            and :end_date
+                            and deal_stage_cd     =       'Lead'
+                            and length(dgtr_task_cd) > 0
+                            and weekly_yn         =       true
+                        group by
+                            biz_opp_nm
+                        order by
+                            total_target_amt desc
+                    )
+                )
+                where
+                    rn >= 5
+                having
+                    count(biz_opp_nm) > 0
+            )
         ) {
-            biz_opp_nm        : String(120),
-            change_date       : Date,
-            deal_stage_cd     : String(20),
-            cstco_nm          : String(100),
-            dgtr_task_nm      : String(30),
-            biz_tp_account_nm : String(30),
-            biz_account       : String(30),
-            total_target_amt  : Decimal(18, 2),
-            record_count      : Integer
+            biz_opp_nm             : String(120),
+            deal_stage_change_date : Date,
+            deal_stage_cd          : String(20),
+            cstco_nm               : String(100),
+            dgtr_task_nm           : String(30),
+            biz_tp_account_nm      : String(30),
+            biz_account            : String(30),
+            deselected_reason      : String(30),
+            total_target_amt       : Decimal(18, 2),
+            record_count           : Integer
         }
 
 

@@ -15,20 +15,26 @@
         id="cardContent"
     >
     <headerToolbar>
-            <OverflowToolbar style="Clear">
+            <OverflowToolbar style="Clear" height="2.5rem">
                 <ToolbarSpacer />
-                <Select
-                    change=".onUiChange"
-                    width="40%"
-                    items="{path: 'selectModel>/'}"
-                >
-                    <items>
-                        <core:ListItem
-                            key="{selectModel>key}"
-                            text="{selectModel>name}"
-                        />
-                    </items>
-                </Select>
+                 <HBox
+                        class="custom-select-box"
+                        width="30%"
+                        justifyContent="End"
+                    >
+                    <Select
+                        change=".onUiChange"
+                        width="40%"
+                        items="{path: 'selectModel>/'}"
+                    >
+                        <items>
+                            <core:ListItem
+                                key="{selectModel>key}"
+                                text="{selectModel>name}"
+                            />
+                        </items>
+                    </Select>
+                </HBox>
             </OverflowToolbar>
         </headerToolbar>
         

@@ -23,7 +23,7 @@ sap.ui.define([
 
             let oBinding = oModel.bindList(sPath)
             oBinding.requestContexts().then((ctx) => {
-                console.log(ctx)
+                //console.log(ctx)
                 let aData = ctx.map(aCtx => aCtx.getObject())                
                 this.getView().setModel(new JSONModel(aData), "accountModel")
             })

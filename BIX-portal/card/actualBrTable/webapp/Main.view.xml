@@ -24,11 +24,22 @@
                         class="custom-overflow-toolbar"                    
                     >
                     
-                        <ToolbarSpacer />
+                    <ToolbarSpacer />
+                                                
+                    <SegmentedButton
+                        id="detailSelect"
+                        selectionChange=".onUiChange"
+                        selectedKey="{uiModel>/tableKind}"
+                        class="custom-detail-select-btn"
+                        items="{path: 'selectModel>/'}"
+                        visible="false">
+                        <items>
+                            <SegmentedButtonItem key="{selectModel>sub_key}" text="{selectModel>sub_text}"/>
+                        </items>
+                    </SegmentedButton>
                 </OverflowToolbar>       
             <VBox fitContainer="true"
                 visible="{=${uiModel>/tableKind} === 'org'}"
-                id="actualBrBox1"
                 busyIndicatorDelay="0"
                 class="custom-vbox-wrap-table"
                 height="100%"
@@ -36,7 +47,7 @@
                  >
                 <table:Table
                     id="actualBrTable1"
-                    rows="{path:'oOrgTableModel>/'}"
+                    rows="{path:'/'}"
                                     class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table
                     custom-inherit-height custom-uiTable-selection" 
                     selectionMode="Single" 
@@ -46,6 +57,7 @@
                     busyIndicatorDelay="0"
                     visibleRowCountMode="Auto"
                     noData=" "
+                    fieldGroupIds="content,org"
                 >
                     <table:layoutData>
                         <FlexItemData growFactor="1" />
@@ -66,8 +78,8 @@
                             />
                             <table:template>
                                 <Text emptyIndicatorMode="On"
-                                    text="{oOrgTableModel>org_name}"
-                                    tooltip="{oOrgTableModel>org_name}"
+                                    text="{org_name}"
+                                    tooltip="{org_name}"
                                     wrapping="false"
                                     width="100%"
                                     textAlign="Begin"
@@ -90,8 +102,8 @@
                             />
                             <table:template>
                                 <Text emptyIndicatorMode="On"
-                                    text="{oOrgTableModel>type}"
-                                    tooltip="{oOrgTableModel>type}"
+                                    text="{type}"
+                                    tooltip="{type}"
                                     wrapping="false"
                                     width="100%"
                                     textAlign="Center"
@@ -114,13 +126,13 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                     parts:[                                                
-                                        {path:'oOrgTableModel>target_curr_y_value', targetType: 'any'}
+                                        {path:'target_curr_y_value', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                     tooltip="{     
                                     parts:[                                                         
-                                        {path:'oOrgTableModel>target_curr_y_value', targetType: 'any'},                                                        
+                                        {path:'target_curr_y_value', targetType: 'any'},                                                        
                                         {value:''},         
                                         {value:'targetTooltip'}    
                                     ],     
@@ -141,11 +153,11 @@
                         >
                             <table:multiLabels>
                                 <Label
-                                    text="당월 실적"
+                                    text="당월 누계 실적"
                                     wrapping="true"
                                 />
                                 <Label
-                                    text="당월"
+                                    text="당월 누계"
                                     textAlign="Center"
                                     width="100%"
                                 />
@@ -154,12 +166,12 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{     
                                             parts:[         
-                                                {path:'oOrgTableModel>actual_curr_ym_value', targetType: 'any'}
+                                                {path:'actual_curr_ym_value', targetType: 'any'}
                                             ],     
                                             formatter: '.onFormatPerformance' }"
                                     tooltip="{     
                                         parts:[     
-                                            {path:'oOrgTableModel>actual_curr_ym_value', targetType: 'any'},  
+                                            {path:'actual_curr_ym_value', targetType: 'any'},  
                                             {value:''},         
                                             {value:'tooltip'}
                                         ],     
@@ -192,13 +204,13 @@
                                 <Text emptyIndicatorMode="On"
                                         text="{     
                                         parts:[        
-                                            {path:'oOrgTableModel>actual_last_ym_value', targetType: 'any'}
+                                            {path:'actual_last_ym_value', targetType: 'any'}
                                         ],     
                                         formatter: '.onFormatPerformance'
                                     }"
                                         tooltip="{    
                                         parts:[       
-                                            {path:'oOrgTableModel>actual_last_ym_value', targetType: 'any'},   
+                                            {path:'actual_last_ym_value', targetType: 'any'},   
                                             {value:''},         
                                             {value:'tooltip'}
                                         ],     
@@ -231,30 +243,31 @@
                                 <tnt:InfoLabel
                                     text="{
                                             parts:[ 
-                                                {path:'oOrgTableModel>actual_curr_ym_value', targetType: 'any'}, 
-                                                {path:'oOrgTableModel>actual_last_ym_value', targetType: 'any'}
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {path:'actual_last_ym_value', targetType: 'any'},
+                                                {value:'infoLabel'}
                                             ],
                                             formatter: '.onFormatPerformance'
                                             }"
                                         tooltip="{
                                             parts:[ 
-                                                {path:'oOrgTableModel>actual_curr_ym_value', targetType: 'any'}, 
-                                                {path:'oOrgTableModel>actual_last_ym_value', targetType: 'any'}, 
+                                                {path:'actual_curr_ym_value', targetType: 'any'}, 
+                                                {path:'actual_last_ym_value', targetType: 'any'}, 
                                                 {value:'tooltip'}
                                             ],
                                             formatter: '.onFormatPerformance'                                
                                             }"
                                         colorScheme="{
                                             parts: [
-                                                {path: 'oOrgTableModel>actual_curr_ym_value', targetType: 'any' },
-                                                {path: 'oOrgTableModel>actual_last_ym_value', targetType: 'any' },
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
                                                 {value: ''}
                                             ],
                                             formatter: '.onFormatInfoLabel'}"
                                         icon="{
                                             parts: [
-                                                {path: 'oOrgTableModel>actual_curr_ym_value', targetType: 'any' },
-                                                {path: 'oOrgTableModel>actual_last_ym_value', targetType: 'any' },
+                                                {path: 'actual_curr_ym_value', targetType: 'any' },
+                                                {path: 'actual_last_ym_value', targetType: 'any' },
                                                 {value: 'icon'}
                                             ],
                                             formatter: '.onFormatInfoLabel'}"
@@ -285,13 +298,13 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                             parts:[ 
-                                                {path:'oOrgTableModel>actual_curr_ym_rate', targetType: 'any'}
+                                                {path:'actual_curr_ym_rate', targetType: 'any'}
                                             ],
                                             formatter: '.onFormatPerformance'
                                             }"
                                         tooltip="{
                                             parts:[ 
-                                                {path:'oOrgTableModel>actual_curr_ym_rate', targetType: 'any'}, 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'}, 
                                                 {value:''}, 
                                                 {value:'tooltip'}
                                             ],
@@ -324,13 +337,13 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                             parts:[ 
-                                                {path:'oOrgTableModel>actual_last_ym_rate', targetType: 'any'}
+                                                {path:'actual_last_ym_rate', targetType: 'any'}
                                             ],
                                             formatter: '.onFormatPerformance'
                                         }"
                                         tooltip="{
                                             parts:[ 
-                                                {path:'oOrgTableModel>actual_last_ym_rate', targetType: 'any'}, 
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
                                                 {value:''}, 
                                                 {value:'tooltip'}
                                             ],
@@ -363,30 +376,31 @@
                                 <tnt:InfoLabel
                                     text="{
                                         parts:[ 
-                                            {path:'oOrgTableModel>actual_curr_ym_rate', targetType: 'any'}, 
-                                            {path:'oOrgTableModel>actual_last_ym_rate', targetType: 'any'}
+                                            {path:'actual_curr_ym_rate', targetType: 'any'}, 
+                                            {path:'actual_last_ym_rate', targetType: 'any'},
+                                            {value:'infoLabel'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                         }"
                                         tooltip="{
                                             parts:[ 
-                                                {path:'oOrgTableModel>actual_curr_ym_rate', targetType: 'any'},
-                                                {path:'oOrgTableModel>actual_last_ym_rate', targetType: 'any'}, 
+                                                {path:'actual_curr_ym_rate', targetType: 'any'},
+                                                {path:'actual_last_ym_rate', targetType: 'any'}, 
                                                 {value:'tooltip'}
                                             ],
                                             formatter: '.onFormatPerformance'                                
                                         }"
                                         colorScheme="{
                                             parts: [
-                                                {path: 'oOrgTableModel>actual_curr_ym_rate', targetType: 'any' },
-                                                {path: 'oOrgTableModel>actual_last_ym_rate', targetType: 'any' },
+                                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                                {path: 'actual_last_ym_rate', targetType: 'any' },
                                                 {value: ''}
                                             ],
                                             formatter: '.onFormatInfoLabel'}"
                                         icon="{
                                             parts: [
-                                                {path: 'oOrgTableModel>actual_curr_ym_rate', targetType: 'any' },
-                                                {path: 'oOrgTableModel>actual_last_ym_rate', targetType: 'any' },
+                                                {path: 'actual_curr_ym_rate', targetType: 'any' },
+                                                {path: 'actual_last_ym_rate', targetType: 'any' },
                                                 {value: 'icon'}
                                             ],
                                             formatter: '.onFormatInfoLabel'}"

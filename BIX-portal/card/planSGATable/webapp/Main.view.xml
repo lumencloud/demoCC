@@ -101,7 +101,7 @@
                                 text="연간 추정"
                                 wrapping="true"
                             />
-                            <Label text="추정" textAlign="Center" width="100%"/>
+                            <Label text="합계" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
                             <Text emptyIndicatorMode="On"

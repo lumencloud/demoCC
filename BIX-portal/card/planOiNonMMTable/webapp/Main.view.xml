@@ -40,12 +40,15 @@
         <VBox id="planOiNonMMBox1" busyIndicatorDelay="0" visible="{=${uiModel>/tableKind} === 'account'}" class="custom-vbox-wrap-table" height="100%">
             <table:Table
                 id="planOiNonMMTable1"
-                rows="{path:'oAccountTableModel>/'}"
+                rows="{path:'/'}"
                 class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
-                selectionMode="None"
+                firstVisibleRowChanged="onFirstVisibleRowChanged"
+                selectionMode="Single" 
+                selectionBehavior="RowOnly" 
                 fixedColumnCount="2"
                 busyIndicatorDelay="0"
                 visibleRowCountMode="Auto"
+                fieldGroupIds="content,account"
                 noData=" "
             >
 
@@ -67,8 +70,8 @@
                         />
                         <table:template>
                             <Text emptyIndicatorMode="On"
-                                text="{oAccountTableModel>account_nm}"
-                                tooltip="{oAccountTableModel>account_nm}"
+                                text="{account_nm}"
+                                tooltip="{account_nm}"
                                 wrapping="false"
                                 width="100%"
                                 textAlign="Begin"
@@ -91,8 +94,8 @@
                         />
                         <table:template>
                             <Text emptyIndicatorMode="On"
-                                text="{oAccountTableModel>type}"
-                                tooltip="{oAccountTableModel>type}"
+                                text="{type}"
+                                tooltip="{type}"
                                 wrapping="false"
                                 width="100%"
                                 textAlign="Center"
@@ -113,21 +116,21 @@
                                 text="연간 추정"
                                 wrapping="true"
                             />
-                            <Label text="추정" textAlign="Center" width="100%"/>
+                            <Label text="합계" textAlign="Center" width="100%" class="plan-emphasize"/>
                         </table:multiLabels>
                         <table:template>
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oAccountTableModel>forecast_value', targetType: 'any'},
-                                        {value:''}
+                                        {path:'forecast_value', targetType: 'any'},
+                                        {value:''},{path:'type', targetType: 'any'}
 
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oAccountTableModel>forecast_value', targetType: 'any'},
+                                        {path:'forecast_value', targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                
@@ -152,21 +155,22 @@
                                 text="확보"
                                 textAlign="Center"
                                 width="100%"
+                                class="plan-emphasize"
                             />
                         </table:multiLabels>
                         <table:template>
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oAccountTableModel>secured_value', targetType: 'any'},
-                                        {value:''}
+                                        {path:'secured_value', targetType: 'any'},
+                                        {value:''},{path:'type', targetType: 'any'}
 
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oAccountTableModel>secured_value', targetType: 'any'},
+                                        {path:'secured_value', targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                
@@ -192,20 +196,21 @@
                                 text="미확보"
                                 textAlign="Center"
                                 width="100%"
+                                class="plan-emphasize"
                             />
                         </table:multiLabels>
                         <table:template>
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oAccountTableModel>not_secured_value', targetType: 'any'},
-                                        {value:''}
+                                        {path:'not_secured_value', targetType: 'any'},
+                                        {value:''},{path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oAccountTableModel>not_secured_value', targetType: 'any'},
+                                        {path:'not_secured_value', targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                
@@ -234,23 +239,10 @@
                             />
                         </table:multiLabels>
                         <table:template>
-                            <Text emptyIndicatorMode="On"
-                                text="{
-                                    parts:[
-                                        {path:'oAccountTableModel>plan_ratio', targetType: 'any'},
-                                        {value:''}
-                                    ],
-                                    formatter: '.onFormatPerformance'
-                                }"
-                                tooltip="{
-                                    parts:[
-                                        {path:'oAccountTableModel>plan_ratio', targetType: 'any'},
-                                        {value:'tooltip'}
-                                    ],
-                                    formatter: '.onFormatPerformance'                                
-                                }"
-                                wrapping="false"
+                            <Text
+                                text=""
                                 width="100%"
+                                class="cutsom-table-empty-cell"
                                 textAlign="End"
                             />
                         </table:template>
@@ -276,14 +268,14 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oAccountTableModel>yoy', targetType: 'any'},
-                                        {value:''}
+                                        {path:'yoy', targetType: 'any'},
+                                        {value:''},{path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oAccountTableModel>yoy', targetType: 'any'},
+                                        {path:'yoy', targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                
@@ -302,12 +294,15 @@
 
             <table:Table
                 id="planOiNonMMTable2"
-                rows="{path:'oLobTableModel>/'}"
+                rows="{path:'/'}"
                 class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
-                selectionMode="None"
+                firstVisibleRowChanged="onFirstVisibleRowChanged"
+                selectionMode="Single" 
+                selectionBehavior="RowOnly" 
                 fixedColumnCount="2"
                 busyIndicatorDelay="0"
                 visibleRowCountMode="Auto"
+                fieldGroupIds="content,lob"
                 noData=" "
             >
 
@@ -330,8 +325,8 @@
                     />
                         <table:template>
                             <Text emptyIndicatorMode="On"
-                                text="{oLobTableModel>org_id}"
-                                tooltip="{oLobTableModel>org_id}"
+                                text="{org_id}"
+                                tooltip="{org_id}"
                                 wrapping="false"
                                 width="100%"
                                 textAlign="Begin"
@@ -355,8 +350,8 @@
 
                         <table:template>
                             <Text emptyIndicatorMode="On"
-                                text="{oLobTableModel>type}"
-                                tooltip="{oLobTableModel>type}"
+                                text="{type}"
+                                tooltip="{type}"
                                 wrapping="false"
                                 width="100%"
                                 textAlign="Center"
@@ -377,21 +372,21 @@
                                 text="연간 추정"
                                 wrapping="true"
                             />
-                            <Label text="추정" textAlign="Center" width="100%"/>
+                            <Label text="합계" textAlign="Center" width="100%" class="plan-emphasize"/>
                         </table:multiLabels>
                         <table:template>
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oLobTableModel>curr_forecast_value', targetType: 'any'},
-                                        {value:''}
+                                        {path:'curr_forecast_value', targetType: 'any'},
+                                        {value:''},{path:'type', targetType: 'any'}
 
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oLobTableModel>curr_forecast_value', targetType: 'any'},
+                                        {path:'curr_forecast_value', targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                
@@ -416,21 +411,22 @@
                                 text="확보"
                                 textAlign="Center"
                                 width="100%"
+                                class="plan-emphasize"
                             />
                         </table:multiLabels>
                         <table:template>
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oLobTableModel>curr_secured_value', targetType: 'any'},
-                                        {value:''}
+                                        {path:'curr_secured_value', targetType: 'any'},
+                                        {value:''},{path:'type', targetType: 'any'}
 
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oLobTableModel>curr_secured_value', targetType: 'any'},
+                                        {path:'curr_secured_value', targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                
@@ -456,20 +452,21 @@
                                 text="미확보"
                                 textAlign="Center"
                                 width="100%"
+                                class="plan-emphasize"
                             />
                         </table:multiLabels>
                         <table:template>
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oLobTableModel>curr_not_secured_value', targetType: 'any'},
-                                        {value:''}
+                                        {path:'curr_not_secured_value', targetType: 'any'},
+                                        {value:''},{path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oLobTableModel>curr_not_secured_value', targetType: 'any'},
+                                        {path:'curr_not_secured_value', targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                
@@ -522,15 +519,15 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oLobTableModel>yoy', targetType: 'any'},
-                                        {value:''}
+                                        {path:'yoy', targetType: 'any'},
+                                        {value:''},{path:'type', targetType: 'any'}
 
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oLobTableModel>yoy', targetType: 'any'},
+                                        {path:'yoy', targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                
@@ -562,7 +559,7 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oLobTableModel>last_secured_value', targetType: 'any'},
+                                        {path:'last_secured_value', targetType: 'any'},
                                         {value:''}
 
                                     ],
@@ -570,7 +567,7 @@
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oLobTableModel>last_secured_value', targetType: 'any'},
+                                        {path:'last_secured_value', targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                
@@ -602,14 +599,14 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oLobTableModel>last_not_secured_value', targetType: 'any'},
+                                        {path:'last_not_secured_value', targetType: 'any'},
                                         {value:''}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oLobTableModel>last_not_secured_value', targetType: 'any'},
+                                        {path:'last_not_secured_value', targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                
@@ -641,14 +638,14 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oLobTableModel>plan_ratio', targetType: 'any'},
+                                        {path:'plan_ratio', targetType: 'any'},
                                         {value:''}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oLobTableModel>plan_ratio', targetType: 'any'},
+                                        {path:'plan_ratio', targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                
@@ -680,14 +677,14 @@
                             <Text emptyIndicatorMode="On"
                                 text="{
                                     parts:[
-                                        {path:'oLobTableModel>yoy', targetType: 'any'},
+                                        {path:'yoy', targetType: 'any'},
                                         {value:''}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                 tooltip="{
                                     parts:[
-                                        {path:'oLobTableModel>yoy', targetType: 'any'},
+                                        {path:'yoy', targetType: 'any'},
                                         {value:'tooltip'}
                                     ],
                                     formatter: '.onFormatPerformance'                                

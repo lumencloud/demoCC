@@ -36,16 +36,24 @@ sap.ui.define([
          */
         _oSearchData: {},
 
-        onInit: async function () {
-            // 초기 JSON 모델 설정
-            await this._setModel();
+        onInit: function () {
+            
+            this._asyncInit();
 
-            // 테이블 바인딩
-            this._bindTable();
             this._oEventBus.subscribe("pl", "search", this._bindTable, this);
 
             this._aiPopupManager = new AIPopupManager();
         },
+
+
+        _asyncInit: async function () {
+
+            // 초기 JSON 모델 설정
+            await this._setModel();
+            // 테이블 바인딩
+            this._bindTable();
+        },
+
 
         /**
          * JSON 모델 설정
@@ -61,7 +69,7 @@ sap.ui.define([
             // 화면에 보일 테이블을 전역 변수에 저장
             this.getView().getControlsByFieldGroupId("content").forEach(object => {
                 if (object.isA("sap.ui.table.Table") && object.getFieldGroupIds().length > 0) {
-                    let sub_key = object.getFieldGroupIds().find(sId => sId === oAiData.aiSubKey);
+                    let sub_key = object.getFieldGroupIds().find(sId => sId === oAiData.subKey);
 
                     // sub_key가 일치하는 테이블의 로컬 ID를 저장
                     if (!!sub_key) {
@@ -101,7 +109,7 @@ sap.ui.define([
             HashChanger.getInstance().setHash(sNewHash);
 
             // PL에 detailSelect 해시 변경 EventBus 전송
-            this._oEventBus.publish("pl", "setHashModel");
+            this._oEventBus.publish("pl", "setHashModel", { system: true });
         },
 
         _setBusy: async function (bType) {
@@ -111,6 +119,10 @@ sap.ui.define([
         },
 
         _bindTable: async function (sChannelId, sEventId, oData) {
+            // DOM이 없는 경우 Return
+            let oDom = this.getView().getDomRef();
+            if (!oDom) return;
+            
             // 검색 조건
             let oAiData = this.getView().getModel("uiModel").getData();
             let oSearchData = this.getView().getModel("searchModel").getData();
@@ -125,22 +137,22 @@ sap.ui.define([
             const oPlModel = this.getOwnerComponent().getModel("pl");
 
             // sub_key에 따른 api 변경
-            let sKey = oAiData.aiSubKey;
+            let sKey = oAiData.subKey;
             let sBindingPath;
             if (sKey === "org") {
-                sBindingPath = `/get_forecast_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}')`;
+                sBindingPath = `/get_forecast_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}')`;
             } else if (sKey === "org_delivery") {
-                sBindingPath = `/get_forecast_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}',org_tp='delivery')`;
+                sBindingPath = `/get_forecast_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}',org_tp='delivery')`;
             } else if (sKey === "org_account") {
-                sBindingPath = `/get_forecast_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}',org_tp='account')`;
+                sBindingPath = `/get_forecast_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}',org_tp='account')`;
             } else if (sKey === "account") {
-                sBindingPath = `/get_plan_cstco_by_biz_account_dt(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}',account_cd='${oAiData.aiAccountCd}')`
+                sBindingPath = `/get_plan_cstco_by_biz_account_dt(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}',account_cd='${oAiData.accountCd}')`
             } else if (sKey === "task") {
-                sBindingPath = `/get_forecast_dt_task_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}')`
+                sBindingPath = `/get_forecast_dt_task_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}')`
             } else if (sKey === "member_year") {
-                sBindingPath = `/get_forecast_dt_customer_oi(year='${iYear}',org_id='${oAiData.aiOrgId}')`
+                sBindingPath = `/get_forecast_dt_customer_oi(year='${iYear}',org_id='${oAiData.orgId}')`
             } else if (sKey === "task_year") {
-                sBindingPath = `/get_forecast_dt_task_year_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}')`
+                sBindingPath = `/get_forecast_dt_task_year_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}')`
             }
 
             await Promise.all([
@@ -148,6 +160,10 @@ sap.ui.define([
             ]).then(function (aResults) {
                 // 테이블의 이름 없는 빈 모델에 데이터 저장
                 let oTable = this.byId(this._sTableId);
+                let oBox = oTable.getParent();
+
+                Module.displayStatusForEmpty(oTable, aResults[0].value, oBox);
+
                 oTable.setModel(new JSONModel(aResults[0].value));
 
                 // this 변수에 테이블에 바인딩된 path 저장
@@ -155,6 +171,12 @@ sap.ui.define([
 
                 // 테이블 로우 셋팅
                 this._setVisibleRowCount(aResults);
+                if (sKey === "account") {
+                    oTable.setVisibleRowCountMode("Fixed")
+                    oTable.setVisibleRowCount(5);
+                }
+
+
             }.bind(this)
             ).catch(function (oError) {
                 console.log("데이터 로드 실패 ", oError);
@@ -167,15 +189,13 @@ sap.ui.define([
         },
 
         _setVisibleRowCount: function (aResults) {
-            // 최대 5개 행으로 고정할 테이블 리스트
-            let aTableLists = ["org", "org_delivery", "org_account", "account", "task"];
 
             // 테이블 아이디로 테이블 객체
             const oTable = this.byId(this._sTableId);
 
             // 처음 화면 렌더링시 table의 visibleCountMode auto 와 <FlexItemData growFactor="1"/>상태에서
             // 화면에 꽉 찬 테이블의 row 갯수를 전역변수에 저장하기 위함
-            if (oTable) {
+            if (oTable && !oTable?.mEventRegistry?.cellContextmenu) {
                 oTable.attachCellClick(this.onCellClick, this);
                 oTable.attachCellContextmenu(this.onCellContextmenu, this);
             }
@@ -190,12 +210,8 @@ sap.ui.define([
                 oTable.setVisibleRowCountMode("Auto")
             } else {
                 oTable.setVisibleRowCountMode("Fixed")
-                
-                if (aTableLists.includes(this._sTableId)) {
-                    oTable.setVisibleRowCount(5);
-                } else {
-                    oTable.setVisibleRowCount(aResults[0].value.length);
-                }
+                oTable.setVisibleRowCount(aResults[0].value.length);
+
             }
         },
 
@@ -216,13 +232,6 @@ sap.ui.define([
             return Modules.valueFormat('', iValue, '', sTooltip)
         },
 
-        onAfterRendering: function () {
-            let aTableList = ["planDTSalesTable1", "planDTSalesTable2"]
-            let aModelList = ["oOrgTableModel", "oAssignmentTableModel"]
-            for (let i = 0; i < aTableList.length; i++) {
-                Module.setTableMergeWithAltColor(this.byId(aTableList[i]), aModelList[i])
-            }
-        },
 
         /**
          * 셀 클릭 이벤트 핸들러
@@ -247,7 +256,7 @@ sap.ui.define([
             this._selectedOrgName = oRowData && oRowData.org_name ? oRowData.org_name : oSessionData.orgNm;
 
             this._selectedType = oRowData.type;
-            
+
             //합계 클릭 금지 
             if (oRowData.org_name === "합계" || oRowData.org_id === "total") {
                 this._excludeClick = true;
@@ -260,7 +269,6 @@ sap.ui.define([
          */
         onRowSelectionChange: function (oEvent) {
             let aRowMergeInfo = Module._tableRowGrouping(oEvent.getSource());
-            Module.setMergeTableRowClick(oEvent.getSource(), aRowMergeInfo);
         },
 
         /**
@@ -276,20 +284,25 @@ sap.ui.define([
             if (this._excludeClick) {
                 return
             }
+            
+            let oUiData = this.getView().getModel("uiModel").getData();
+            this._selectedSubTitle = oUiData.subTitle;
+
+            if(oUiData.subKey ==="account"){
+                return
+            }
 
             // 분석 데이터 준비
             const oAnalysisData = this._prepareAnalysisData();
 
-            let oUiData = this.getView().getModel("uiModel").getData();
-            this._selectedSubTitle = oUiData.aiSubTitle;
 
             sessionStorage.setItem("aiModel",
                 JSON.stringify({
-                    aiOrgId: this._selectedOrgId,
-                    aiOrgName: this._selectedOrgName,
-                    aiType: this._selectedType,
-                    aiSubTitle: this._selectedSubTitle,
-                    aiSubKey : oUiData.aiSubKey
+                    orgId: this._selectedOrgId,
+                    orgNm: this._selectedOrgName,
+                    type: this._selectedType,
+                    subTitle: this._selectedSubTitle,
+                    subKey: oUiData.subKey
                 })
             )
 
@@ -321,7 +334,7 @@ sap.ui.define([
                 orgName: this._selectedOrgName || oSearchData.orgNm,
                 menuName: "매출/마진 상세",
                 type: this._selectedType,
-                subTitle: oUiData.aiSubTitle
+                subTitle: oUiData.subTitle
             };
 
             return { params, tokenData };

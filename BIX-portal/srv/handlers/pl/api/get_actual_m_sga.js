@@ -40,19 +40,11 @@ module.exports = (srv) => {
              * org_id 파라미터값으로 조직정보 조회
              * 
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_id'
-                when lv2_id = '${org_id}' THEN 'lv2_id'
-                when lv3_id = '${org_id}' THEN 'lv3_id'
-                when div_id = '${org_id}' THEN 'div_id'
-                when hdqt_id = '${org_id}' THEN 'hdqt_id'
-                when team_id = '${org_id}' THEN 'team_id'
-                end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd', "org_name"]).where({ 'org_id': org_id });
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_level', 'org_ccorg_cd', "org_name"]).where({ 'org_id': org_id });
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             // 조직 정보를 where 조건에 추가
-            let org_col_nm = orgInfo.org_level;
+            let org_col_nm = orgInfo.org_level+'_id';
             let org_col_nm_name = orgInfo.org_name;
             let search_org, search_org_name, search_org_ccorg
 
@@ -80,7 +72,6 @@ module.exports = (srv) => {
                 sga_column = [...sga_col_list, 'team_id as org_id'];
                 sga_groupBy = [...sga_groupBy, 'team_id'];
             }
-            sga_where = org_tp ? { ...sga_where, 'org_tp' : org_tp } : sga_where;
 
             const org_query = await SELECT.from(org_full_level).columns([search_org, search_org_name, search_org_ccorg, 'org_order']).where({ [org_col_nm]: org_id }).orderBy('org_order');
 

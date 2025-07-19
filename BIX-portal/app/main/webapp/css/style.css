@@ -7,7 +7,28 @@
 }
 .custom-main-flexible-app {
     > .sapFFCLColumnBegin {
-        width: 38% !important;
+        width: 39% !important;
+    }
+    > .sapFFCLColumnSeparator {
+        display: none !important;
+    }
+    .sapFFCLColumnLastActive {
+        .custom-pl-container {
+            > section {
+                padding-left: 0 !important;
+            }
+        }
+    }
+}
+.custom-side-popover {
+    .sapMLnk {
+        color: var(--custom_black1) !important;
+    }
+    .sapMLnk:hover {
+        color: var(--sapLink_Hover_Color) !important;
+    }
+    .sapMTreeItemBaseChildren {
+        background-color: transparent;
     }
 }
 .sapMHrdrCntrInner {
@@ -68,7 +89,11 @@
 .custom-hide {
     display: none;
 }
-
+.custom-card-header-hide {
+    .sapFCardHeader {
+        display: none;
+    }
+}
 /* 그룹과 단일항목 사이 간격조정 */
 .sapTntNLSeparator {
     display: none !important;
@@ -414,12 +439,13 @@
         display: none !important;
     }
 
-    .sapUiTableCell:has(.sapMText.mergedContainer) {
-        border-bottom: none !important;
+    .sapUiTableCell:has(.sapMText.mergedContainer),
+    .sapUiTableCell:has(.sapTntInfoLabel.mergedContainer) {
+        border-bottom-color: transparent;
     }
 
     .altColor {
-        background: #f7f7f7 !important;
+        background: #f7f7f7;
     }
 }
 
@@ -626,6 +652,7 @@
             &.sapUiTableCellFirst {
                 /* 첫 번째 셀의 테두리 추가 */
                 border-left: 1px solid #2970F0 !important;
+                border-bottom: 1px solid #2970F0 !important;
             }
 
             &.sapUiTableCellLast {
@@ -652,13 +679,15 @@
         }
     }
 
-    .sapUiTableCCnt {
-        .sapUiTableRowSel {
-            .sapUiTableCellFirst.sapUiTableCellLastFixed {
-                background-color: #2970F0;
-
-                .sapMText {
-                    color: #fff !important;
+    &.custom-pl-table{
+        .sapUiTableCCnt {
+            .sapUiTableRowSel {
+                .sapUiTableCellFirst.sapUiTableCellLastFixed {
+                    background-color: #2970F0;
+    
+                    .sapMText {
+                        color: #fff !important;
+                    }
                 }
             }
         }
@@ -1066,6 +1095,7 @@
 .custom-pl-container {
     > section {
         padding: 0 1.5rem !important;
+        /* padding-left: 0rem !important; */
     }
 
     .sapUiLoSplitterBar {
@@ -1291,7 +1321,7 @@
 .cross{
     position: absolute;    
     top: 0%;
-    left: 15.5%;    
+    left: 16.5%;    
     height: 100%;
     width: 1px;
     background-color: #e4eaf0;    
@@ -1706,7 +1736,9 @@
             .sapUiTableCell {
                 border-right-color: transparent;
                 position: relative;
-
+                &:has(.plan-emphasize) {
+                    background-color: #deeaf3;
+                }
                 &.sapUiTableHeaderDataCell {
                     .sapMLabel {
                         font-size: 0.813rem;
@@ -1771,15 +1803,15 @@
                 color: var(--custom_black2);
             }
 
-            .sapUiTableRow:nth-child(n+4) {
-                .sapUiTableCell:has(.fixed-empty-plan-pl) {
+            .sapUiTableRow:nth-child(2) {
+                .sapUiTableCell:has(.fixed-empty-actual-oi) {
                     opacity: 0.6;
                     background-image: url(../resource/image/pattern_nodata.png);
                     background-repeat: repeat;
 
                     .sapMText,
                     .sapTntInfoLabelText {
-                        color: #fff
+                        color: transparent !important
                     }
                 }
             }
@@ -1792,7 +1824,7 @@
 
                     .sapMText,
                     .sapTntInfoLabelText {
-                        color: #fff
+                        color: transparent !important
                     }
                 }
             }
@@ -1804,7 +1836,7 @@
 
                     .sapMText,
                     .sapTntInfoLabelText {
-                        color: #fff !important
+                        color: transparent !important
                     }
                 }
             }
@@ -1823,6 +1855,9 @@
 
         .sapUiTableHeaderRow {
             .sapUiTableCell {
+                &:has(.plan-emphasize) {
+                    background-color: #deeaf3;
+                }
                 &.sapUiTableHeaderDataCell {
                     .sapMLabel {
                         font-size: 0.813rem;
@@ -1840,14 +1875,12 @@
             }
         }
 
-        .sapUiTableCtrlScr {
-            .sapUiTableHeaderRow:not(:last-child) {
-                .sapUiTableHeaderDataCell {
-                    border-bottom: 1px solid #d4d6de;
+        .sapUiTableHeaderRow:not(:first-child) {
+            .sapUiTableHeaderDataCell {
+                border-top: 1px solid #d4d6de;
 
-                    &.one-label {
-                        border-bottom: none;
-                    }
+                &:not(:has(.sapMLabel)) {
+                    border-top: none;
                 }
             }
         }
@@ -1855,7 +1888,9 @@
 
     .sapUiTableCCnt {
         border-bottom: 1px solid #e0e0e0;
-
+        .sapUiTableCellDummy {
+            background-image: url(../resource/image/pattern_checkered.png) !important;
+        }
         .sapUiTableCtrlScrFixed {
             .sapUiTableContentCell .sapMText {
                 font-size: 0.813rem;
@@ -1871,7 +1906,7 @@
             background-repeat: repeat;
 
             .sapMText {
-                color: #fff
+                color: transparent !important;
             }
         }
 
@@ -2043,26 +2078,35 @@
         }
     }
     &.backgroundColor2 {
-        .sapTntInfoLabelText {
+        .sapTntInfoLabelText,
+        .sapUiIcon {
             color: #fa4646 !important;
         }
     }
 
     &.backgroundColor8 {
-        .sapTntInfoLabelText {
+        .sapTntInfoLabelText,
+        .sapUiIcon {
             color: #1454ff !important;
         }
 
     }
 }
 .custom-ai-btn {
+    .sapUiIcon::before {
+        aspect-ratio: 52/58;
+        width: 1rem;
+        content: "";
+        background-image: url(../resource/image/ai_icon.png);
+        background-size: 16px 18px;
+        background-repeat: no-repeat;
+    }
     .sapUiIcon {
         background: radial-gradient(#dc0b2b, #f4801b);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent !important;
     }
-
     .sapMBtnContent {
         background: radial-gradient(#dc0b2b, #f4801bed);
         -webkit-background-clip: text;
@@ -2111,7 +2155,9 @@
 .custom-absoulte {
     position: absolute;
 }
-
+.custom-nopadding-top {
+    padding-top: 0;
+}
 .custom-tiny-top-margin{
     margin-top: 1.4rem !important;
 }
@@ -2399,6 +2445,13 @@
         }
     }
 }
+
+.custom-ai-simpleform{
+    .sapMIBar {
+        height: 50px !important;
+    }
+}
+
 
 
 /* 챗봇 타이틀 */
@@ -2804,6 +2857,44 @@
                                                                 border-radius: 0.313rem;
                                                             }
 
+                                                            .sapMBtnContent {
+                                                                color: #2c3746;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    .ai-report-section {
+                                        .no-report {
+                                            .report-text {}
+                                            .report-message {}
+                                            .report-button-main {
+                                                .sapMBtnInner {
+                                                    border-radius: 0.313rem;
+                                                    background-color: var(--custom_black1);
+                                                }
+                                                .sapMBtnContent {
+                                                    color: #fff;
+                                                }
+                                            }
+                                        }
+                                        .multiple-reports {
+                                            .report-title {
+                                                font-size: 0.875rem;
+                                                font-weight: 500;
+                                            }
+                                            .report-message {}
+                                            .report-buttons-container {
+                                                .report-list {
+                                                    .report-item {
+                                                        margin-top: 0.625rem;
+                                                        .report-button {
+                                                            .sapMBtnInner {
+                                                                border-radius: 0.313rem;
+                                                            }
                                                             .sapMBtnContent {
                                                                 color: #2c3746;
                                                             }
@@ -3362,6 +3453,14 @@
 
 }
 
+.custom-dashboard-top-card {
+    height: 170px !important;
+
+    .sapFCardContent {
+        align-items: center;
+        padding: 0 1.5rem !important;
+    }
+}
 .custom-donught-left-card {
     height: 230px !important;
 
@@ -3369,7 +3468,6 @@
         padding: 0 !important;
     }
 }
-
 .custom-donught-title {
     text-align: center;
     justify-content: center;
@@ -3665,6 +3763,8 @@
 
     .sapMPIBarRemaining {
         height: 0.625rem;
+        background: #f1f3f3;
+        border: none;
     }
 
     &.blue {
@@ -3796,7 +3896,7 @@
         background: #FECCBE;
         justify-content: center;
         height: 38px !important;
-        width: 60px !important;
+        width: 70px !important;
 
         .sapMText {
             font-weight: 500;
@@ -3810,7 +3910,7 @@
         border-radius: 1rem;
         background: #f4f4f4;
         justify-content: center;
-        width: 60px !important;
+        width: 70px !important;
         .sapMText {
             font-weight: 500;
             color: #999;
@@ -3937,6 +4037,10 @@
     &.size {
         font-size: 1.9rem;
     }
+
+    &.size2{
+        font-size: 18px
+    }
 }
 
 .custom-negative-state2 {
@@ -3964,6 +4068,10 @@
     font-size: 18px;
 }
 
+.custom-size{
+    font-size: 13px;
+    color: #999999;
+}
 .custom-blue-state2 {
     color: #3182f6 !important;
     font-weight: 600 !important;
@@ -4004,6 +4112,7 @@
 .custom-donut-inner-title {
     font-size: 1rem;
     font-weight: bold;
+    color: #666666
 
 }
 
@@ -4174,6 +4283,10 @@
     &.gray {
         border-color: #e0e0e0;
     }
+
+    &.red {
+        border-color: #Fa4646;
+    }
 }
 
 .custom-dashboard-box2 {
@@ -4228,14 +4341,17 @@
 
     .sapFCardHeader {
         .sapFCardHeaderText {
-            display: block;
+            display: flex;
+            justify-content: start;
+            flex-direction: row;
 
-            * {
-                display: inline;
+            .sapFCardHeaderTextFirstLine {
+                display: inline-block;
+                width:auto;
             }
 
             .sapFCardHeaderTextSecondLine {
-
+                display:inline-block;
                 margin-left: 4px;
                 .sapMText {
                     font-size: 15px;
@@ -4280,7 +4396,7 @@
     .sapMFlexItem {
         font-weight: 600;
         font-size: 30px;
-        padding: 0 3px 3px 3px;
+       
         /* .sapMLIBContent{
             height: 22px;
         } */
@@ -4507,16 +4623,12 @@
             padding: 0 0.625rem;
             margin: 0.188rem 0;
             border: none !important;
-            background-color: #fff;
+            background-color: #fff !important;
 
             .sapMTokenText {
                 color: var(--custom_black1);
                 font-weight: 500;
                 font-size: 0.813rem;
-            }
-
-            &::before {
-                display: none;
             }
         }
 
@@ -4551,6 +4663,9 @@
 .custom-aireport {
 
     max-height: 750px !important;
+    background-color: #f7f9fb;
+    padding: 0.875rem;
+    box-shadow: none;
 
     .sapMDialogSection,
     .sapMTB {
@@ -4560,7 +4675,6 @@
     .sapFCard {
         border: none !important;
     }
-
 }
 
 .custom-aireport-header {
@@ -4574,6 +4688,7 @@
 }
 
 .custom-aireport-content-box {
+    margin-top: 0.875rem;
     border-radius: 10px;
 }
 
@@ -4583,11 +4698,22 @@
     border-radius: 20px;
     overflow: hidden;
     .highlight-title {
+        padding-top:0.625rem;
+        border-bottom: none;
+        height: 3rem;
         .sapMFlexItem:has(.sapMImg) {
             display:flex;
             align-items: center;
         }
+        .sapMText {
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
         
+    }
+    .table-title {
+        font-size: 1.125rem;
+        font-weight: 700;
     }
     sapMDialogSection,
     .sapMTB {
@@ -4607,29 +4733,12 @@
                 box-sizing: border-box;
                 width: 48px;
                 height: 48px;
-                left: 0;
-                bottom: 0;
-                position: absolute;
-                border-radius: 50% 50% 0;
-                border: 15px solid #ff2244;
-                transform: rotate(45deg) translate(0, 0);
-                box-sizing: border-box;
-                animation: animMarker 0.4s ease-in-out infinite alternate;
-            }
-
-            &::before {
-                content: '';
-                box-sizing: border-box;
-                position: absolute;
-                left: 0;
-                right: 0;
-                margin: auto;
-                top: 150%;
-                width: 24px;
-                height: 4px;
                 border-radius: 50%;
-                background: rgba(0, 0, 0, 0.2);
-                animation: animShadow 0.4s ease-in-out infinite alternate;
+                display: inline-block;
+                border-top: 3px solid #ff2244;
+                border-right: 3px solid transparent;
+                box-sizing: border-box;
+                animation: rotation 1s linear infinite;
             }
 
             >div {
@@ -4707,7 +4816,7 @@
     width: 26px;
     justify-content: center;
     align-items: center;
-    align-content: center;
+    text-align: center;
     border-radius: 20px;
 
     &.blue{
@@ -4727,6 +4836,8 @@
     }
 
     .sapMPopoverCont {
+        padding:0.75rem;
+        min-height: 50px;
         background-color: #3b3b3d !important;
     }
 }
@@ -4811,6 +4922,8 @@
         /* padding: 1.25rem;
         margin-top: auto; */
         background-color: #fff;
+        position: absolute;
+        bottom: -20px;
 
         .sapMFlexItem:first-child {
             position: static;
@@ -5162,18 +5275,21 @@
         }
     }
 
+    /* 원본:18px -> 수정:23px */
     .custom-ai-report-review-header {
-        font-size: 18px;
+        font-size: 23px;
         font-weight: 600;
         padding-bottom: 10px;
     }
 
+    /* 원본:14px -> 수정:18px,  */
     .custom-ai-report-review-content {
-        font-size: 14px;
+        font-size: 18px;
         letter-spacing: 0;
         line-height: 1.5;
         max-width: 100ch;
         max-height: calc(1.5rem*31);
+        white-space: pre-wrap;
     }
 
     .review-positive {
@@ -5229,9 +5345,20 @@
     }
 
     .title-wrapper {
+        font-size: 24px !important;
         &.inner-spacing {
             padding: 1.25rem;
+            .sapMText {
+                font-size : 18px !important;
+            }
         }
+    
+    .title-wrapper-text {
+        font-size: 18px !important;  /* .sapMText에 맞춤 */
+        white-space: pre-wrap;
+        line-height: 1.5;
+        }
+
     }
 
     .back-gray {
@@ -5357,6 +5484,44 @@
             font-size: 20px;
             font-weight: 700;
         }
+    }
+
+    .sapMTitle {
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .sapMText {
+        font-size: 14px;
+    }
+
+    .custom-ai-report-summary-box {
+        height: 166px;
+        width: 498px;
+
+        .smry-box {
+            background-color: #eee;
+            border-radius: 5px;
+            padding: 1.25rem;
+            line-height: 2;
+        }
+    }
+
+    /* 원본:18px -> 수정:23px */
+    .custom-ai-report-review-header {
+        font-size: 23px;
+        font-weight: 600;
+        padding-bottom: 10px;
+    }
+
+    /* 원본:14px -> 수정:18px,  */
+    .custom-ai-report-review-content {
+        font-size: 18px;
+        letter-spacing: 0;
+        line-height: 1.5;
+        max-width: 100ch;
+        max-height: calc(1.5rem*31);
+        white-space: pre-wrap;
     }
 }
 

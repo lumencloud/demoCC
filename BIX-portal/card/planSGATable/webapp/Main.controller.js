@@ -20,7 +20,7 @@ sap.ui.define([
 
         _setData: async function(sChannelId, sEventId, oData){
             oData = JSON.parse(sessionStorage.getItem("initSearchModel"));
-            console.log('1')
+            //console.log('1')
 
             // 파라미터
             let dYearMonth = new Date(oData.yearMonth);

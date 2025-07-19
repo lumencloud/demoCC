@@ -2,8 +2,8 @@
   {
     "agent_id": "general_qa_agent",
     "name": "일반질의 에이전트",
-    "description": "용어를 조회하고 LLM이 최종 결론을 생성하여 복합적인 질문에 심층적인 응답 제공",
-    "trigger_patterns": ["이유", "설명", "왜", "어떻게", "의미", "개념", "정의", "차이점", "비교", "관계", "영향"],
+    "description": "LLM이 복잡한 사용자 질의에 대한 심층적인 최종 결론을 생성하여 응답 제공 및 용어 개념에 대해 설명",
+    "trigger_patterns": ["이유", "설명", "왜", "어떻게", "의미", "개념", "정의", "차이점", "비교", "관계", "영향", "뭐야", "뜻"],
     "trigger_events": ["chat_input"],
     "icon_path": "./resource/icon/ai_agent/general_qa.png"
   },
@@ -18,8 +18,8 @@
   {
     "agent_id": "navigator_agent",
     "name": "네비게이터 에이전트",
-    "description": "사용자 질문에 대해 특정 화면이나 대시보드로 이동 안내 및 관련 메뉴 안내",
-    "trigger_patterns": ["어디서", "화면", "이동", "대시보드", "메뉴", "페이지", "보여줘", "열어줘", "접속", "~화면으로", "~대시보드로"],
+    "description": "사용자 질문 혹은 단순 화면 메뉴명 입력 시 특정 화면이나 대시보드로 이동",
+    "trigger_patterns": ["어디서", "화면", "이동", "대시보드", "메뉴", "페이지", "보여줘", "열어줘", "접속", "~화면으로", "~대시보드로", "~로 이동"],
     "trigger_events": ["chat_input"],
     "icon_path": "./resource/icon/ai_agent/navigator.png"
   },
@@ -36,14 +36,22 @@
     "name": "시각화 에이전트",
     "description": "데이터를 차트, 그래프 등 시각적 요소로만 표현하며 심층적인 텍스트 분석 없이 순수 시각 자료 생성",
     "trigger_patterns": ["차트", "그래프", "시각화", "그려줘", "보여줘", "추이", "추세", "패턴", "분포", "시각적으로"],
-    "trigger_events": ["chat_input"],
+    "trigger_events": ["undefined"],
     "icon_path": "./resource/icon/ai_agent/visualization.png"
   },
   {
+    "agent_id": "report_agent",
+    "name": "보고서 에이전트",
+    "description": "사용자 질문을 분석하여 관련된 기존 보고서와 리포트를 검색하고 제공",
+    "trigger_patterns": ["리포트", "레포트", "보고서", "리포트 찾기", "보고서 검색", "기존 보고서"],
+    "trigger_events": ["chat_input"],
+    "icon_path": "./resource/icon/ai_agent/report.png"
+  },
+  {
     "agent_id": "report_content_agent",
-    "name": "리포트 에이전트",
-    "description": "다중 데이터 소스를 병렬 수집하여 종합적인 비즈니스 보고서를 자동 생성",
-    "trigger_patterns": ["리포트", "레포트", "종합", "보고서", "주간 보고서", "월마감 보고서"],
+    "name": "보고서 컨텐츠 에이전트",
+    "description": "다양한 데이터를 분석하여 종합적인 보고서를 자동으로 생성",
+    "trigger_patterns": ["종합", "주간 보고서", "월마감 보고서", "보고서 생성", "리포트 작성", "데이터 종합"],
     "trigger_events": ["context_fill"],
     "icon_path": "./resource/icon/ai_agent/report.png"
   }

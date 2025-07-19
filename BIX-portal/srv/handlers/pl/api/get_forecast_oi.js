@@ -261,13 +261,13 @@ module.exports = (srv) => {
                 "display_order": 4,
                 "type": "BR",
                 "secured_value": rsp_curr_row?.["mm_total_sum"] ? (rsp_curr_row?.["b_mm_amt_sum"] / rsp_curr_row?.["mm_total_sum"]) : 0,
-                "not_secured_value": rsp_curr_row?.["est_total_year_emp"] ? ((rsp_curr_row?.["opp_year_amt"] / rsp_curr_row?.["est_avg_year_amt"]) / rsp_curr_row?.["est_total_year_emp"]) : 0,
+                "not_secured_value": rsp_curr_row?.["mm_total_sum"] ? ((rsp_curr_row?.["opp_year_amt"] / rsp_curr_row?.["est_avg_year_amt"]) / rsp_curr_row?.["mm_total_sum"]) : 0,
             };
             br_data["forecast_value"] = br_data["secured_value"] + br_data["not_secured_value"];
             br_data["plan_ratio"] = br_data["forecast_value"] - ((a_curr_target?.['target_br_mm'] || 0) / 100);
 
-            let last_secured_value = rsp_last_row?.["mm_total_sum"] ? (rsp_last_row?.["b_mm_amt_sum"] / rsp_last_row?.["mm_total_sum"]) : 0;
-            let last_not_secured_value = rsp_last_row?.["est_total_year_emp"] ? ((rsp_last_row?.["opp_year_amt"] / rsp_last_row?.["est_avg_year_amt"]) / rsp_last_row?.["est_total_year_emp"]) : 0;
+            let last_secured_value = rsp_last_row?.["mm_total_sum"] ? ((rsp_last_row?.["b_mm_amt_sum"]??0) / rsp_last_row?.["mm_total_sum"]) : 0;
+            let last_not_secured_value = rsp_last_row?.["mm_total_sum"] && rsp_last_row?.["est_avg_year_amt"] ? (((rsp_last_row?.["opp_year_amt"]??0) / rsp_last_row?.["est_avg_year_amt"]) / rsp_last_row?.["mm_total_sum"]) : 0;
             let last_plan_value = last_secured_value + last_not_secured_value;
             
             br_data["yoy"] = br_data["forecast_value"] - last_plan_value;

@@ -16,10 +16,11 @@ module.exports = (srv) => {
             const db = await cds.connect.to('db');
 
             /**
-             * pl.pipeline_view [실적]
+             * pl.wideview_view [실적]
              * [부문/본부/팀 + 연월,금액] 팀,본부 단위의 프로젝트 실적비용 집계 뷰
              */
-            const pl_view = db.entities('pl').pipeline_view;
+            const pl_org_view = db.entities('pl').wideview_view;
+            const pl_account_view = db.entities('pl').wideview_account_view;
             /**
              * common.org_full_level_view [조직정보]
              * 조직구조 테이블
@@ -46,34 +47,37 @@ module.exports = (srv) => {
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
             let org_col_nm = orgInfo.org_level;
-
-            let pl_col_list = ['year'];
-            let pl_where_conditions = {year : year, [org_col_nm]: org_id}
-            let pl_groupBy = ['year'];
-            for(let i=1; i<=12; i++){
-                pl_col_list.push(`sum(sale_m${i}_amt)/100000000 as m_${i}_sale`)
-                pl_col_list.push(`sum(rodr_m${i}_amt)/100000000 as m_${i}_rodr`)
+            
+            let pl_view = pl_org_view
+            if(org_tp === 'account'){
+                pl_view = pl_account_view
             }
-
-            if(!!org_tp){
-                pl_where_conditions = {...pl_where_conditions,org_tp : org_tp}
+            let pl_where_conditions = {year : year, src_type : {'!=':'WA'}}
+            let pl_col_list = ['src_type'];
+            let pl_where = org_col_nm === 'lv1_id' ? pl_where_conditions : {...pl_where_conditions, [org_col_nm]: org_id}
+            let pl_groupBy = ['src_type'];
+            for(let i=1; i<=12; i++){
+                pl_col_list.push(`ifnull(sum(sale_m${i}_amt), 0) as m_${i}_sale`)
             }
             
-            const [pl_data,target_data]=await Promise.all([
-                SELECT.from(pl_view).columns(pl_col_list).where(pl_where_conditions).groupBy(...pl_groupBy),
+            const [pl_data, target_data]=await Promise.all([
+                SELECT.from(pl_view).columns(pl_col_list).where(pl_where).groupBy(...pl_groupBy),
                 get_org_target(year,['A01'])
             ])
             
             const o_target = target_data.find(target => target.org_id === org_id )
             
+            // let o_result = {target:0}
+            let not_secured_pl = pl_data.find(pl => pl.src_type === 'D'),
+            secured_pl = pl_data.filter(pl => pl.src_type !== 'D')
             let o_result = {target:o_target?.target_sale??0}
             for(let i=1; i<=12; i++){
                 const i_month = Number(month);
                 if(i<=i_month){
-                    o_result[`m_${i}_sale`] = pl_data[0]?.[`m_${i}_sale`]??0
+                    o_result[`m_${i}_sale`] = (secured_pl.reduce((iSum, oData) => iSum += oData[`m_${i}_sale`], 0))/100000000
                     o_result[`m_${i}_type`] = 'actual'
                 }else{
-                    o_result[`m_${i}_sale`] = pl_data[0]?.[`m_${i}_rodr`]??0
+                    o_result[`m_${i}_sale`] = ((not_secured_pl?.[`m_${i}_sale`]??0) + secured_pl.reduce((iSum, oData) => iSum += oData[`m_${i}_sale`], 0))/100000000
                     o_result[`m_${i}_type`] = 'plan'
                 }
             }

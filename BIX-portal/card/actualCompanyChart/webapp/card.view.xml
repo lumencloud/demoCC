@@ -13,16 +13,27 @@
     <Panel id="flexBox" class="sapUiTinyMarginTop"
        backgroundDesign="Solid">
         <OverflowToolbar style="Clear" width="100%" height="2.5rem" class="sapUiMediumMarginBottom">
-            <Title id="tempMessage" text="※ 현재 데이터가 없어 일부 값이 맞지 않을 수 있습니다." />
+            <!-- <Title id="tempMessage" text="※ 현재 데이터가 없어 일부 값이 맞지 않을 수 있습니다." /> -->
 
             <ToolbarSpacer />
+            <SegmentedButton
+                id="detailSelect"
+                selectionChange=".onUiChange"
+                selectedKey="{uiModel>/key}"
+                class="custom-detail-select-btn"
+                items="{path: 'selectModel>/'}"
+                visible="false">
+                    <items>
+                        <SegmentedButtonItem key="{selectModel>sub_key}" text="{selectModel>sub_text}"/>
+                    </items>
+            </SegmentedButton>
         </OverflowToolbar>
 
         <vbm:AnalyticMap width="100%" id="vbm" regionClick=".onRegionClick" initialZoom="1"
-            initialPosition="15;25;0" class="custom-default-background"
+            initialPosition="15;25;0" class="custom-default-background" disableZoom="true"
             regions="{regionModel>/}">
             <vbm:regions>
-                <vbm:Region code="{regionModel>code}" color="{regionModel>color}" tooltip="{regionModel>name}"  />
+                <vbm:Region code="{regionModel>code}" color="{regionModel>color}" tooltip="{regionModel>name}" />
             </vbm:regions>       
 
             <vbm:Containers items="{regionModel>/}">

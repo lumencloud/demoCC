@@ -227,6 +227,8 @@ sap.ui.define([
                         },
                             
                         options: {
+                            responsive: true,
+                            maintainAspectRatio: false,  
                             layout:{
                                 padding: {
                                     top: 40,
@@ -234,14 +236,13 @@ sap.ui.define([
                                     left: 0,
                                     right: 0,
                                 }
-                            },
-                            responsive: true,
-                            maintainAspectRatio: false,       
+                            },                            
                             plugins:{
                                 legend: {
                                     display: true,
-                                    position: 'bottom',
+                                    position: 'bottom',                                    
                                     labels:{
+                                        padding: 40,
                                         usePointStyle: true,
                                         pointStyle: "circle",
                                         sort: (a, b) => {
@@ -349,7 +350,10 @@ sap.ui.define([
                                         display:true,
                                         text: '금액(억원)',
                                         
-                                    },                              
+                                    },  
+                                    grid: {
+                                        display: false
+                                    },                            
                                     ticks: {
                                         callback: function (value) {
                                             if (value % 100000000 === 0) {
@@ -387,10 +391,10 @@ sap.ui.define([
                     })
                     
                     this.dataLoad();
-                    this._ovserveResize(this.byId(this._aContainerId[i]), i)
+                    //this._ovserveResize(this.byId(this._aContainerId[i]), i)
                 }.bind(this));
                 
-``            }
+           }
         this.byId("cardContent").setBusy(false)
 
         },
@@ -468,6 +472,7 @@ sap.ui.define([
                 "plan" : aPlan
             }  
 
+            //console.log(aData)
 
             return aData;
         },

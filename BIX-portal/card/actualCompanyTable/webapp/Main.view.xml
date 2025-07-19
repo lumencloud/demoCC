@@ -21,10 +21,24 @@
                 width="100%"
                 height="100%">
                 <OverflowToolbar
-                    width="100%"
-                    height="3rem"
-                    class="custom-overflow-toolbar">
+                        width="100%"
+                        height="2.6rem"
+                        class="custom-overflow-toolbar"                    
+                    >
+                
                     <ToolbarSpacer />
+                        
+                    <SegmentedButton
+                        id="detailSelect"
+                        selectionChange=".onUiChange"
+                        selectedKey="{uiModel>/tableKind}"
+                        class="custom-detail-select-btn"
+                        items="{path: 'selectModel>/'}"
+                        visible="false">
+                        <items>
+                            <SegmentedButtonItem key="{selectModel>sub_key}" text="{selectModel>sub_text}"/>
+                        </items>
+                    </SegmentedButton>
                 </OverflowToolbar>
 
                 <VBox
@@ -38,12 +52,12 @@
                         class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
                         selectionMode="Single" 
                         selectionBehavior="RowOnly" 
-                        rowSelectionChange="onRowSelectionChange"
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         fixedColumnCount="2"
                         busyIndicatorDelay="0"
+                        noData=" "
                         visibleRowCountMode="Auto"
-                        fieldGroupIds="content">
+                        fieldGroupIds="content,sub_company">
                         <table:layoutData>
                             <FlexItemData growFactor="1" />
                         </table:layoutData>
@@ -84,7 +98,8 @@
                                         tooltip="{type}"
                                         wrapping="false"
                                         width="100%"
-                                        textAlign="Center"/>
+                                        textAlign="Center"
+                                        class="custom-text-regular"/>
                                 </table:template>
                             </table:Column>
 
@@ -129,10 +144,10 @@
                                 width="7rem">
                                 <table:multiLabels>
                                     <Label
-                                        text="당월 실적"
+                                        text="당월 누계 실적"
                                         wrapping="true"/>
                                     <Label
-                                        text="당월"
+                                        text="당월 누계"
                                         textAlign="Center"
                                         width="100%"/>
                                 </table:multiLabels>

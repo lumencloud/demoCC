@@ -5,14 +5,14 @@ sap.ui.define([
     "sap/ui/model/odata/v4/ODataModel",
     "sap/ui/core/format/NumberFormat",
     "sap/ui/core/EventBus",
-], function (Controller, JSONModel, Module, ODataModel, NumberFormat, EventBus ) {
+], function (Controller, JSONModel, Module, ODataModel, NumberFormat, EventBus) {
     "use strict";
 
     return Controller.extend("bix.card.planSectorPipelineChart.card", {
         _aCanvasId: [],
         _aContainerId: [],
         _oEventBus: EventBus.getInstance(),
-        _oMyChart : [],
+        _oMyChart: [],
 
 
         onInit: function () {
@@ -33,17 +33,18 @@ sap.ui.define([
         _updateChart: async function (sChannelId, sEventId, oData) {
             this.byId("cardContent").setBusy(true);
             let aResults = await this._dataSetting();
-            
 
-            for(let i = 0; i<this._oMyChart.length; i++){
+
+
+            for (let i = 0; i < this._oMyChart.length; i++) {
                 this._oMyChart[i].data.labels = aResults[i].aLabel
                 this._oMyChart[i].data.datasets[0].data = aResults[i].aChance
                 this._oMyChart[i].data.datasets[1].data = aResults[i].aTake
-                this._oMyChart[i].data.datasets[2].data = aResults[i].aSale                                        
+                this._oMyChart[i].data.datasets[2].data = aResults[i].aSale
                 this._oMyChart[i].update();
             }
             this.byId("cardContent").setBusy(false);
-          },
+        },
 
         _setUiModel: function () {
             this.getView().setModel(new JSONModel({
@@ -104,12 +105,12 @@ sap.ui.define([
             for (let i = 0; i < this._aCanvasId.length; i++) {
                 let oHTML = this.byId("html" + i);
                 oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:${iBoxWidth}vw; height:${iBoxHeight}vh; min-height:${this._iMinHeight}px'><canvas id='${this._aCanvasId[i]}' /></div>`);
-                oHTML.attachEvent("afterRendering", async function () {                                       
+                oHTML.attachEvent("afterRendering", async function () {
                     // 차트 구성
                     const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[i])).getContext("2d");
                     //데이터 요청
                     let aData = await this._dataSetting();
-                    
+
                     this._oMyChart[i] = new Chart(ctx, {
                         type: "bar",
                         data: {
@@ -129,7 +130,7 @@ sap.ui.define([
                                     data: aData[i].aTake,
                                     borderRadius: 3,
                                     backgroundColor: "Blue",
-                                    yAxisID : "y",
+                                    yAxisID: "y",
                                 },
                                 {
                                     label: "매출",
@@ -140,35 +141,36 @@ sap.ui.define([
 
 
                                 },
-                                
+
 
                             ]
                         },
 
                         options: {
                             responsive: true,
-                            maintainAspectRatio: false,       
-                            plugins:{
+                            maintainAspectRatio: false,
+                            plugins: {
                                 legend: {
                                     display: true,
-                                    position: 'bottom',                                    
+                                    position: 'bottom',
                                 },
-                                title:{
+                                title: {
                                     display: true,
                                     text: aData[i].sTitle,
-                                    font:{
+                                    font: {
                                         size: 25,
                                         weight: 'bold'
 
                                     },
                                     position: "top"
 
-                                }
-                            },                     
+                                },
+                                
+                            },
                             scales: {
                                 x: {
                                     stacked: false,
-                                    border:{
+                                    border: {
                                     },
                                     grid: {
                                         display: false
@@ -182,7 +184,7 @@ sap.ui.define([
                                     }
                                 },
                                 y: {
-                                    type:"linear",
+                                    type: "linear",
                                     display: true,
                                     position: 'left',
                                     ticks: {
@@ -191,18 +193,18 @@ sap.ui.define([
                                                 return (value / 100000000).toLocaleString() + '억';
                                             };
                                         }
-                                    }  
-                                       
+                                    }
+
 
                                 },
                                 y1: {
-                                    type:"linear",
+                                    type: "linear",
                                     display: true,
                                     grid: {
                                         display: false
                                     },
                                     position: 'right',
-                                    
+
 
                                 }
 
@@ -212,19 +214,20 @@ sap.ui.define([
                     })
 
                     this.byId("cardContent").setBusy(false);
-                    this._ovserveResize(this.byId(this._aContainerId[i]), i)
+                    //this._ovserveResize(this.byId(this._aContainerId[i]), i)
                 }.bind(this));
-                
-``            }
+
+                ``
+            }
         },
 
-        _ovserveResize: function(oElement, i){
+        _ovserveResize: function (oElement, i) {
 
-            if(!this._resizeObserver){
-                this._resizeObserver = new ResizeObserver(()=> {
+            if (!this._resizeObserver) {
+                this._resizeObserver = new ResizeObserver(() => {
                     this._oMyChart[i].resize()
                 })
-                   
+
             }
         },
 
@@ -232,43 +235,42 @@ sap.ui.define([
         _dataSetting: async function () {
             let aResults = await this._setData();
             let aData = [];
+            let oData1 = {
+                aLabel: ["Lead", "Identified", "Validated", "Qualified", "Negotiated"],
+                aTake: this._convertData(aResults[0].value.find(sType => sType.type === "수주")),
+                aChance: this._convertData(aResults[0].value.find(sType => sType.type === "건수")),
+                aSale: this._convertData(aResults[0].value.find(sType => sType.type === "매출")),
+                sTitle: "Deal Stage 현황"
+            }
 
-                let oData1 = {
-                    aLabel: ["Lead", "Identified", "Validated", "Qualified", "Negotiated"],
-                    aTake: this._convertData(aResults[0].value.find(sType => sType.type==="수주")),
-                    aChance: this._convertData(aResults[0].value.find(sType => sType.type==="건수")),
-                    aSale: this._convertData(aResults[0].value.find(sType => sType.type==="매출")),
-                    sTitle: "Deal Stage 현황"
-                }
+            aData.push(oData1);
 
-                aData.push(oData1);
+            let oConvertData = await this._monthSetting(aResults[1].value)
 
-                let oConvertData  = await this._monthSetting(aResults[1].value)
+            let oData2 = {
+                aLabel: oConvertData.aLabel,
+                aTake: oConvertData.aTake,
+                aChance: oConvertData.aChance,
+                aSale: oConvertData.aSale,
+                sTitle: "월 현황"
+            }
 
-                let oData2 = {
-                    aLabel: oConvertData.aLabel,
-                    aTake: oConvertData.aTake,
-                    aChance: oConvertData.aChance,
-                    aSale: oConvertData.aSale,
-                    sTitle: "월 현황"
-                }
+            aData.push(oData2);
 
-                aData.push(oData2);
+            let oData3 = {
+                aLabel: ["100억 이상", "50억~100억", "30억~50억", "10억~30억", "5억~10억", "1억~5억", "1억 미만"],
+                aTake: this._convertMoneyData(aResults[2].value.find(sType => sType.type === "수주")),
+                aChance: this._convertMoneyData(aResults[2].value.find(sType => sType.type === "건수")),
+                aSale: this._convertMoneyData(aResults[2].value.find(sType => sType.type === "매출")),
+                sTitle: "수주금액별 현황"
+            }
 
-                let oData3 = {
-                    aLabel: ["100억 이상", "50억~100억", "30억~50억", "10억~30억", "5억~10억", "1억~5억", "1억 미만"],
-                    aTake: this._convertMoneyData(aResults[2].value.find(sType => sType.type==="수주")),
-                    aChance: this._convertMoneyData(aResults[2].value.find(sType => sType.type==="건수")),
-                    aSale: this._convertMoneyData(aResults[2].value.find(sType => sType.type==="매출")),
-                    sTitle: "수주금액별 현황"
-                }
-
-                aData.push(oData3);
+            aData.push(oData3);
 
             return aData;
         },
 
-        _monthSetting : function(aResults) {
+        _monthSetting: function (aResults) {
 
 
             let aLabel = [];
@@ -277,63 +279,65 @@ sap.ui.define([
             let aSale = [];
 
             aResults.forEach(
-                function(aResult){
-                    for(let i=1; i<13; i++){
-                        let sFindColumn = "m_"+String(i).padStart(2, "0")+"_data"
+                function (aResult) {
+                    for (let i = 1; i < 13; i++) {
+                        let sFindColumn = "m_" + String(i).padStart(2, "0") + "_data"
                         let bResult = aResult.hasOwnProperty(sFindColumn)
-                        if(bResult){
-                            if(!aLabel.find(sMonth => sMonth === i+"월")){
-                                aLabel.push(i+"월")
+                        if (bResult) {
+                            if (!aLabel.find(sMonth => sMonth === i + "월")) {
+                                aLabel.push(i + "월")
                             }
-                            switch(aResult.type){
-                                case "수주" :
+                            switch (aResult.type) {
+                                case "수주":
                                     aTake.push(aResult[sFindColumn])
                                     break;
-                                case "매출" :
+                                case "매출":
                                     aSale.push(aResult[sFindColumn])
                                     break;
-                                case "건수" :
+                                case "건수":
                                     aChance.push(aResult[sFindColumn])
                                     break;
                             }
                         }
-                        
-                        
+
+
                     }
-                } 
-                    
+                }
+
             )
-            
-            return {aLabel, aTake, aSale, aChance};
+
+            return { aLabel, aTake, aSale, aChance };
         },
 
-        _convertData : function(oData){         
-               return [
-                   oData.lead_data,
-                   oData.identified_data,
-                   oData.validated_data,
-                   oData.qualified_data,
-                   oData.negotiated_data,
-                   oData.contracted_data,
-                   oData.deal_lost_data,
-                   oData.deselected_data
-               ]
+        _convertData: function (oData) {
+            return [
+                oData.lead_data,
+                oData.identified_data,
+                oData.validated_data,
+                oData.qualified_data,
+                oData.negotiated_data,
+                oData.contracted_data,
+                oData.deal_lost_data,
+                oData.deselected_data
+            ]
         },
 
-        _convertMoneyData : function(oData){         
+        _convertMoneyData: function (oData) {
             return [
                 oData["more10bil"],
-                oData["5bil-10bil"],
-                oData["3bil-5bil"],
-                oData["1bil-3bil"],
-                oData["500mil-1bil"],
-                oData["100mil-500mil"]
+                oData["5bil_10bil"],
+                oData["3bil_5bil"],
+                oData["1bil_3bil"],
+                oData["500mil_1bil"],
+                oData["100mil_500mil"],
+                oData["less100mil"]
             ]
-     },
+        },
 
-       
 
-        _setData: async function(){
+
+
+        _setData: async function () {
             let oData = JSON.parse(sessionStorage.getItem("initSearchModel"));
 
             // 파라미터
@@ -341,31 +345,33 @@ sap.ui.define([
             let iYear = dYearMonth.getFullYear();
             let sMonth = String(dYearMonth.getMonth() + 1).padStart(2, "0");
             let sOrgId = oData.orgId;
-            
+
             const oModel = new ODataModel({
                 serviceUrl: "../odata/v4/pl_api/",
                 synchronizationMode: "None",
                 operationMode: "Server"
-              });
+            });
 
-            let sDealPath =`/get_forecast_pl_pipeline_detail(year='${iYear}',month='${sMonth}',org_id='${sOrgId}',type='deal',display_type='chart')`
+            let sDealPath = `/get_forecast_pl_pipeline_detail(year='${iYear}',month='${sMonth}',org_id='${sOrgId}',type='deal',display_type='chart')`
             let sMonthPath = `/get_forecast_pl_pipeline_detail(year='${iYear}',month='${sMonth}',org_id='${sOrgId}',type='month',display_type='chart')`
             let sRodrPath = `/get_forecast_pl_pipeline_detail(year='${iYear}',month='${sMonth}',org_id='${sOrgId}',type='rodr',display_type='chart')`
-            
-            let aData ;
-           await Promise.all([
+
+            let aData;
+            await Promise.all([
                 oModel.bindContext(sDealPath).requestObject(),
                 oModel.bindContext(sMonthPath).requestObject(),
                 oModel.bindContext(sRodrPath).requestObject(),
-            ]).then(function(aResults){
+            ]).then(function (aResults) {
                 aData = aResults
             }.bind(this))
-            .catch((oErr) => {
-                Module.displayStatus(this.getOwnerComponent().oCard,oErr.error.code, this.byId("cardContent"));
-            });
-        return aData;
-    },
+                .catch((oErr) => {
+                    Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
+                });
+            return aData;
+        },
 
-        
+
+
+
     });
 });           

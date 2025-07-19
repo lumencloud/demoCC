@@ -42,25 +42,15 @@ module.exports = (srv) => {
             /**
              * org_id 파라미터값으로 조직정보 조회
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_id'
-                when lv2_id = '${org_id}' THEN 'lv2_id'
-                when lv3_id = '${org_id}' THEN 'lv3_id'
-                when div_id = '${org_id}' THEN 'div_id'
-                when hdqt_id = '${org_id}' THEN 'hdqt_id'
-                when team_id = '${org_id}' THEN 'team_id'
-                end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd', "lv1_name","lv2_name","lv3_name","div_name","hdqt_name","team_name",'org_tp']).where({ 'org_id': org_id });
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_level', 'org_ccorg_cd', "lv1_name","lv2_name","lv3_name","div_name","hdqt_name","team_name",'org_tp','lv3_ccorg_cd']).where({ 'org_id': org_id });
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             //조직 정보를 where 조건에 추가
-            let org_col_nm = orgInfo.org_level;
+            let org_col_nm = orgInfo.org_level+'_id';
             let org_col_nm_name = orgInfo[org_col_nm.split('_',1) + '_name'];
-            let org_ccorg = orgInfo.org_ccorg_cd;
-            let org_ccorg_col = org_col_nm.split('_',1) + '_ccorg_cd';
             let search_org, search_org_name, search_org_ccorg;
-
+            
             let a_sale_column = [];
             let a_margin_column = [];
             for (let i = 1; i <= Number(month); i++) {
@@ -85,9 +75,20 @@ module.exports = (srv) => {
                 search_org_ccorg = 'team_ccorg_cd';
             }else{return;};
 
-            let org_column = org_col_nm === 'lv1_id' ? [search_org, search_org_name, search_org_ccorg, 'org_order', 'org_tp', 'org_id'] : [search_org, search_org_name, search_org_ccorg, 'org_order', 'org_id'];
-            let org_where = { [org_col_nm]: org_id, 'org_tp' : {'!=':null} }; // account 조직 제거
-            const org_query = await SELECT.from(org_full_level).columns(org_column).where(org_where).orderBy('org_order');
+            // let org_column = org_col_nm === 'lv1_id' ? [search_org, search_org_name, search_org_ccorg, 'org_order', 'org_tp', 'org_id'] : [search_org, search_org_name, search_org_ccorg, 'org_order', 'org_id'];
+            // let org_where = { [org_col_nm]: org_id, 'org_tp' : {'!=':null} }; // account 조직 제거
+            // const org_query = await SELECT.from(org_full_level).columns(org_column).where(org_where).orderBy('org_order');
+            const org_query = await SELECT.from(org_full_level);
+
+            //ackerton 로직
+            let ackerton_list = [];
+            if((orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2') && org_tp !== 'account'){
+                org_query.forEach(data=>{
+                    if (!ackerton_list.find(data2 => data2 === data[search_org]) && data[search_org] && data['lv3_ccorg_cd'] === '610000') {
+                        ackerton_list.push(data.org_id);
+                    };
+                });
+            };
 
             //조직 리스트
             let org_list = [];
@@ -101,7 +102,7 @@ module.exports = (srv) => {
             };
             
             org_query.forEach(data=>{
-                if(!org_list.find(data2=>data2.id === data[search_org]) && data[search_org]){
+                if(!org_list.find(data2=>data2.id === data[search_org]) && data[search_org] && data[org_col_nm] === org_id){
                     let oTemp = {
                         id : data[search_org],
                         name : data[search_org_name],
@@ -109,8 +110,8 @@ module.exports = (srv) => {
                         org_order : data['org_order']
                     };
 
-                    if(org_col_nm === 'lv1_id'){
-                        if(!account_list.includes(oTemp.id)){
+                    if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id'){
+                        if(!account_list.includes(oTemp.id) && !ackerton_list.includes(oTemp.id)){
                             org_list.push(oTemp);
                         }
                     }else{
@@ -118,7 +119,7 @@ module.exports = (srv) => {
                     };
                 };
             });
-
+            
             /**
              * DT 매출 조회용 SELECT 컬럼 - 전사, 부문, 본부 공통으로 사용되는 컬럼 조건 (+ 연, 월, 부문, 본부 조건별 추가)
              */
@@ -127,14 +128,13 @@ module.exports = (srv) => {
             let pl_col = org_col_nm === 'lv1_id' ? [...pl_col_list, 'org_tp'] : pl_col_list;
             const pl_where_conditions = { 'year': { in: [year] }, 'org_tp': {'!=' : 'account'} };   // account 조직 제거
             let pl_where = org_col_nm === 'lv1_id' ? pl_where_conditions : { ...pl_where_conditions, [org_col_nm]: org_id };
-            // pl_where = org_tp ? { ...pl_where, 'org_tp' : org_tp } : pl_where;
             const pl_groupBy_cols = ['year', search_org, search_org_name];
             let pl_groupBy = org_col_nm === 'lv1_id' ? [...pl_groupBy_cols, 'org_tp'] : pl_groupBy_cols;
 
             let pl_view_select;
-            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.org_tp === 'hybrid' || orgInfo.org_tp === 'account' || org_tp === 'account'){
+            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.lv3_ccorg_cd === '237100' || orgInfo.org_tp === 'account' || org_tp === 'account'){
                 pl_view_select = account_pl_view;
-            }else if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id'|| orgInfo.org_tp === 'delivery'){
+            }else{
                 pl_view_select = pl_view;
             };
             // DB 쿼리 실행 (병렬)
@@ -142,6 +142,7 @@ module.exports = (srv) => {
                 SELECT.from(pl_view).columns(pl_col).where(pl_where).groupBy(...pl_groupBy),
                 get_org_target(year, ['A01', 'A03', 'A02'])
             ]);
+            
             // if(!pl_data.length){
             //     //return req.res.status(204).send();
             //     return []
@@ -187,11 +188,10 @@ module.exports = (srv) => {
                 return acc;
             }, {});
 
-            let i_count = 1
             let org_data = [];
             org_list.forEach(data=>{
                 let temp_data = {
-                    "display_order": ++i_count,
+                    "display_order": data.org_order,
                     "org_id": data.id,
                     "org_name": data.name,
                     "sale" : flat_pl?.[`_${data.id}_${year}_sale_amount_sum`] ?? 0,
@@ -205,7 +205,7 @@ module.exports = (srv) => {
                 org_data.push(temp_data);
             });
             oResult.push(...org_data);
-
+            
             if(org_col_nm === 'div_id'){
                 let total = {
                     "display_order": 0,
@@ -225,6 +225,30 @@ module.exports = (srv) => {
                 total.margin_rate = total.sale === 0 ? 0 : (total.margin / total.sale) *100;
                 oResult.unshift(total);
             };
+
+             // display_order 순으로 최종 정렬
+             let aSortFields = [
+                { field: "display_order", order: "asc" },
+            ];
+            oResult.sort((oItem1, oItem2) => {
+                for (const { field, order } of aSortFields) {
+                    // 필드가 null일 때
+                    if (oItem1[field] === null && oItem2[field] !== null) return -1;
+                    if (oItem1[field] !== null && oItem2[field] === null) return 1;
+                    if (oItem1[field] === null && oItem2[field] === null) continue;
+
+                    if (typeof oItem1[field] === "string") {    // 문자일 때 localeCompare
+                        var iResult = oItem1[field].localeCompare(oItem2[field]);
+                    } else if (typeof oItem1[field] === "number") { // 숫자일 때
+                        var iResult = oItem1[field] - oItem2[field];
+                    }
+
+                    if (iResult !== 0) {
+                        return (order === "asc") ? iResult : -iResult;
+                    }
+                }
+                return 0;
+            })
 
             return oResult
         } catch(error) { 

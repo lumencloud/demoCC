@@ -76,7 +76,7 @@ sap.ui.define([
             HashChanger.getInstance().setHash(sNewHash);
 
             // PL에 detailSelect 해시 변경 EventBus 전송
-            this._oEventBus.publish("pl", "setHashModel");
+            this._oEventBus.publish("pl", "setHashModel", {system: true});
         },
 
         _bindTable: async function (sChannelId, sEventId, oData) {

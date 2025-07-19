@@ -1,0 +1,126 @@
+{
+  "_version": "1.65.0",
+  "sap.app": {
+    "id": "bix.test.close_org",
+    "type": "application",
+    "i18n": {
+      "bundleUrl": "../../bix/portal/i18n/i18n.properties",
+      "supportedLocales": [
+        "ko",
+        "en"
+      ],
+      "fallbackLocale": "ko"
+    },
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.16.5",
+      "toolsId": "3df907c1-95f6-455b-beaf-196522c4bd9f"
+    },
+    "dataSources": {
+      "cmService": {
+        "uri": "../../odata/v4/cm/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.134.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleUrl": "../../bix/portal/i18n/i18n.properties",
+          "supportedLocales": [
+            "ko",
+            "en"
+          ],
+          "fallbackLocale": "ko"
+        }
+      },
+      "cm": {
+        "dataSource": "cmService",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "bix.test.close_org.view"
+      },
+      "routes": [
+        {
+          "name": "Org_Table",
+          "pattern": ":?query:",
+          "target": [
+            "Org_Table"
+          ]
+        }
+      ],
+      "targets": {
+        "Org_Table": {
+          "id": "Org_Table",
+          "name": "Org_Table"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "bix.test.close_org.view.App",
+      "type": "XML",
+      "id": "App"
+    }
+  }
+}

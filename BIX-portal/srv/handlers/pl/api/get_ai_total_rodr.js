@@ -35,14 +35,16 @@ module.exports = (srv) => {
             let i_end_month = new Date(start_date).getMonth()
             let i_start_date = new Date(start_date).getDate()
             let i_end_date = new Date(end_date).getDate()
-            if(i_start_date-7<0){
-                i_start_month++
-            }
-            const last_start_date = new Date(i_year,i_start_month,i_start_date-7).toISOString().split("T")[0]
-            if(i_end_date-7<0){
-                i_end_month++
-            }
-            const last_end_date = new Date(i_year,i_end_month,i_end_date-7).toISOString().split("T")[0]
+            
+            // 전주 날짜 계산 (월이 바뀌는 경우 포함)
+            const dt_last_start = new Date(start_date);
+            dt_last_start.setDate(dt_last_start.getDate() - 7);
+
+            const dt_last_end = new Date(end_date);
+            dt_last_end.setDate(dt_last_end.getDate() - 7);
+
+            const last_start_date = dt_last_start.toISOString().split("T")[0];
+            const last_end_date = dt_last_end.toISOString().split("T")[0];
             
             /**
              * org_id 파라미터값으로 조직정보 조회
@@ -68,8 +70,8 @@ module.exports = (srv) => {
             let pl_last_where_conditions = {deal_stage_cd:{'not in':['Contracted', 'Deal Lost', 'Deselected']}, deal_stage_chg_dt:{between:last_start_date, and:last_end_date}}
             let pl_last_where = org_col_nm === 'lv1_id' ? pl_last_where_conditions : {...pl_last_where_conditions,[org_col_nm]: org_id}
             if(type === 'dt'){
-                pl_where = {...pl_where,dgtr_task_cd:{'!=':null}}
-                pl_last_where = {...pl_last_where,dgtr_task_cd:{'!=':null}}
+                pl_where = {...pl_where,dgtr_task_cd:{'!=':''}}
+                pl_last_where = {...pl_last_where,dgtr_task_cd:{'!=':''}}
             }else{
                 pl_where = {...pl_where,dgtr_task_cd:{'in':[null,'']}}
                 pl_last_where = {...pl_last_where,dgtr_task_cd:{'in':[null,'']}}

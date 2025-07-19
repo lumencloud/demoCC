@@ -1,0 +1,207 @@
+<mvc:View
+    xmlns:layout="sap.ui.layout"
+    controllerName="bix.card.saleRelsco2.card"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    height="100%"
+    width="100%"
+    displayBlock="true"
+>
+    <form:SimpleForm
+        id="cardContent"
+        class="custom-back-white"
+    >
+        <form:content>
+            <VBox
+                width="100%"
+                height="100%"
+            >
+                <HBox
+                    width="100%"
+                    alignItems="Center"
+                    justifyContent="Center"
+                    visible="{=${model>/Percentage}!==0}"
+                >
+                    <core:HTML id="html0" />
+                </HBox>
+
+                <!-- <VBox id="donughtTextBox" width="93%" >
+                    <HBox justifyContent="Center">
+                        <Text
+                                class="custom-blue-state bold size"
+                                emptyIndicatorMode="On"
+                                text="{
+                                            parts:[
+                                                {path:'model>/Percentage', targetType: 'any'},
+                                                {value:'rate'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                            }"
+                                
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Center"
+                                visible="{=${model>/Percentage}!==0}"
+                            />
+                        <Text class="custom-blue-state bold size sapUiTinyMarginStartEnd"  text= ":"></Text>
+                        <Text
+                                class="custom-blue-state bold size"
+                                emptyIndicatorMode="On"
+                                text="{
+                                            parts:[
+                                                {path:'model>/Percentage2', targetType: 'any'},
+                                                {value:'rate'}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                            }"                                
+                                wrapping="false"
+                                width="100%"
+                                textAlign="Center"
+                                visible="{=${model>/Percentage}!==0}"
+                            />
+                        </HBox>
+                    <Text text="비율" class="custom-donut-inner-title" visible="{=${model>/Percentage}!==0}"></Text>                
+                </VBox> -->
+
+                <VBox
+                    width="100%"
+                    justifyContent="Center"
+                    class="sapUiLargeMarginTop"
+                >
+                    <HBox alignItems="End" justifyContent="Center">
+                        <HBox
+                            justifyContent="End"
+                        >
+                            <VBox justifyContent="Center">
+                                <core:Icon src="sap-icon://circle-task-2" color="#2d99ff" size="10px"/>
+                            </VBox>
+                            <Text text="대내 매출" class="sapUiTinyMarginBegin" />
+                        </HBox>
+                        <HBox class="sapUiMediumMarginBegin">
+                            <HBox width="60%">
+                                <Text class="custom-text-bold custom-size2 sapUiLittleMarginBegin"
+                                    emptyIndicatorMode="On"
+                                    text="{
+                                            parts:[
+                                                {path:'model>/InRelsco', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                            }"
+                                    tooltip="{
+                                            parts:[
+                                                {path:'model>/InRelsco', targetType: 'any'},
+                                                {value:'tooltip_billion'}                                     
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                            }"
+                                    wrapping="false"
+                                    width="100%"
+                                    textAlign="End"
+                                />
+                            </HBox>
+                            <VBox justifyContent="End" width="40%">
+                                <HBox width="100%" >
+                                    <Text
+                                        class="custom-size sapUiLittleMarginBegin"
+                                        emptyIndicatorMode="On"
+                                        text="{
+                                                    parts:[
+                                                        {path:'model>/Percentage2', targetType: 'any'},
+                                                        {value:'percent_little'}
+                                                    ],
+                                                    formatter: '.onFormatPerformance'
+                                                    }"
+                                        tooltip="{
+                                                    parts:[
+                                                        {path:'model>/Percentage2', targetType: 'any'},
+                                                        {value:'tooltip_percent'}                                     
+                                                    ],
+                                                    formatter: '.onFormatPerformance'                                
+                                                    }"
+                                        wrapping="false"
+                                        width="100%"
+                                    />
+                                </HBox>
+                            </VBox>
+                        </HBox>
+                    </HBox>
+
+                    <HBox alignItems="End" justifyContent="Center">
+
+                        <HBox
+                            justifyContent="End"
+                        >
+                            <VBox justifyContent="Center">
+                                <core:Icon
+                                    src="sap-icon://circle-task-2"
+                                    color="#80caee"
+                                    size="10px"
+                                />
+                            </VBox>
+                            <Text
+                                text="대외 매출"
+                                class="sapUiTinyMarginBegin"
+                            />
+                        </HBox>
+                        <HBox class="sapUiMediumMarginBegin">
+                            <HBox width="60%">
+                                <Text
+                                    class="custom-text-bold custom-size2 sapUiLittleMarginBegin"
+                                    emptyIndicatorMode="On"
+                                    text="{
+                                            parts:[
+                                                {path:'model>/OutReslco', targetType: 'any'},
+                                                {value:''}
+                                            ],
+                                            formatter: '.onFormatPerformance'
+                                            }"
+                                    tooltip="{
+                                            parts:[
+                                                {path:'model>/OutReslco', targetType: 'any'},
+                                                {value:'tooltip_billion'}                                     
+                                            ],
+                                            formatter: '.onFormatPerformance'                                
+                                            }"
+                                    wrapping="false"
+                                    width="100%"
+                                    textAlign="End"
+                                />
+                            </HBox>
+                            <VBox
+                                justifyContent="End"
+                                width="40%"
+                            >
+                                <HBox width="100%">
+                                <Text
+                                    class="custom-size sapUiLittleMarginBegin"
+                                    emptyIndicatorMode="On"
+                                    text="{
+                                                parts:[
+                                                    {path:'model>/Percentage', targetType: 'any'},
+                                                    {value:'percent_little'}
+                                                ],
+                                                formatter: '.onFormatPerformance'
+                                                }"
+                                    tooltip="{
+                                                parts:[
+                                                    {path:'model>/Percentage', targetType: 'any'},
+                                                    {value:'tooltip_percent'}                                     
+                                                ],
+                                                formatter: '.onFormatPerformance'                                
+                                                }"
+                                    wrapping="false"
+                                    width="100%"
+                                />
+                                </HBox>
+                            </VBox>
+                        </HBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </form:content>
+    </form:SimpleForm>
+</mvc:View>

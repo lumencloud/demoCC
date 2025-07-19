@@ -20,13 +20,13 @@
                         <table:Column hAlign="Center" resizable="false" width="15%">
                             <Label text="Account 부문" wrapping="true"/>
                             <table:template>
-                                <Text text="{model>biz_tp_account_nm}" tooltip="" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                                <Text text="{model>biz_tp_account_nm}" tooltip="" wrapping="false" width="100%" textAlign="Center" emptyIndicatorMode="On"/>
                             </table:template>
                         </table:Column>
                         <table:Column hAlign="Center" resizable="false" width="15%">
                             <Label text="Delivery 부문" wrapping="true"/>
                             <table:template>
-                                <Text text="{model>delivery_div_name}" tooltip="" wrapping="false" width="100%" textAlign="End" emptyIndicatorMode="On"/>
+                                <Text text="{model>delivery_div_name}" tooltip="" wrapping="false" width="100%" textAlign="Center" emptyIndicatorMode="On"/>
                             </table:template>
                         </table:Column>
                         <table:Column hAlign="Center" resizable="false">

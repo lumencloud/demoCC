@@ -95,32 +95,29 @@ module.exports = (srv) => {
                 }
                 let o_result = {}
                 let o_total = {
-                    order: { display_order: 1, item_order: 1, div_name: '합계', div_id: 'total', type: '수주' },
-                    sale: { display_order: 1, item_order: 2, div_name: '합계', div_id: 'total', type: '매출' },
-                    count: { display_order: 1, item_order: 3, div_name: '합계', div_id: 'total', type: '건수' },
+                    order: { display_order: 0, item_order: 1, div_name: '합계', div_id: 'total', type: '수주' },
+                    sale: { display_order: 0, item_order: 2, div_name: '합계', div_id: 'total', type: '매출' },
+                    count: { display_order: 0, item_order: 3, div_name: '합계', div_id: 'total', type: '건수' },
                 }
 
                 o_total['order'][`total_data`] = pl_data.reduce((iSum,oData)=>iSum += oData.rodr_amount_sum,0)
                 o_total['sale'][`total_data`] = pl_data.reduce((iSum,oData)=>iSum += oData.sale_amount_sum,0)
                 o_total['count'][`total_data`] = pl_data.reduce((iSum,oData)=>iSum += oData.total_rodr_cnt,0)
-
-                pl_data.forEach(o_pl => {
-                    let o_account = account_query.find(account => account.biz_tp_account_cd === o_pl.biz_tp_account_cd)
-                    if (o_account) {
-                        if (!o_result[`${o_pl.biz_tp_account_cd}_order`]) {
-                            o_result[`${o_pl.biz_tp_account_cd}_order`] = { display_order: o_account.sort_order + 1, item_order: 1, div_name: o_account.biz_tp_account_nm, div_id: o_account.biz_tp_account_cd, type: '수주', total_data: o_pl.rodr_amount_sum }
-                            o_result[`${o_pl.biz_tp_account_cd}_sale`] = { display_order: o_account.sort_order + 1, item_order: 2, div_name: o_account.biz_tp_account_nm, div_id: o_account.biz_tp_account_cd, type: '매출', total_data: o_pl.sale_amount_sum }
-                            o_result[`${o_pl.biz_tp_account_cd}_cnt`] = { display_order: o_account.sort_order + 1, item_order: 3, div_name: o_account.biz_tp_account_nm, div_id: o_account.biz_tp_account_cd, type: '건수', total_data: o_pl.total_rodr_cnt }
-                        }
-                        for (let i = 12; i > Number(month); i--) {
-                            const s_index = i.toString().padStart(2, '0')
-                            o_result[`${o_pl.biz_tp_account_cd}_order`][`m_${s_index}_data`] = o_pl[`m_${i}_rodr_data`]
-                            o_result[`${o_pl.biz_tp_account_cd}_sale`][`m_${s_index}_data`] = o_pl[`m_${i}_sale_data`]
-                            o_result[`${o_pl.biz_tp_account_cd}_cnt`][`m_${s_index}_data`] = o_pl[`m_${i}_rodr_cnt`]
-                            o_total['order'][`m_${s_index}_data`] = (o_total['order'][`m_${s_index}_data`] || 0) + o_pl[`m_${i}_rodr_data`]
-                            o_total['sale'][`m_${s_index}_data`] = (o_total['sale'][`m_${s_index}_data`] || 0) + o_pl[`m_${i}_sale_data`]
-                            o_total['count'][`m_${s_index}_data`] = (o_total['count'][`m_${s_index}_data`] || 0) + o_pl[`m_${i}_rodr_cnt`]
-                        }
+                account_query.forEach(account => {
+                    let o_pl = pl_data.find(pl => pl.biz_tp_account_cd === account.biz_tp_account_cd)
+                    if (!o_result[`${account.biz_tp_account_cd}_order`]) {
+                        o_result[`${account.biz_tp_account_cd}_order`] = { display_order: account.sort_order + 1, item_order: 1, div_name: account.biz_tp_account_nm, div_id: account.biz_tp_account_cd, type: '수주', total_data: o_pl?.rodr_amount_sum??0 }
+                        o_result[`${account.biz_tp_account_cd}_sale`] = { display_order: account.sort_order + 1, item_order: 2, div_name: account.biz_tp_account_nm, div_id: account.biz_tp_account_cd, type: '매출', total_data: o_pl?.sale_amount_sum??0 }
+                        o_result[`${account.biz_tp_account_cd}_cnt`] = { display_order: account.sort_order + 1, item_order: 3, div_name: account.biz_tp_account_nm, div_id: account.biz_tp_account_cd, type: '건수', total_data: o_pl?.total_rodr_cnt??0 }
+                    }
+                    for (let i = 12; i > Number(month); i--) {
+                        const s_index = i.toString().padStart(2, '0')
+                        o_result[`${account.biz_tp_account_cd}_order`][`m_${s_index}_data`] = (o_pl?.[`m_${i}_rodr_data`]??0)
+                        o_result[`${account.biz_tp_account_cd}_sale`][`m_${s_index}_data`] = (o_pl?.[`m_${i}_sale_data`]??0)
+                        o_result[`${account.biz_tp_account_cd}_cnt`][`m_${s_index}_data`] = (o_pl?.[`m_${i}_rodr_cnt`]??0)
+                        o_total['order'][`m_${s_index}_data`] = (o_total['order'][`m_${s_index}_data`] || 0) + (o_pl?.[`m_${i}_rodr_data`]??0)
+                        o_total['sale'][`m_${s_index}_data`] = (o_total['sale'][`m_${s_index}_data`] || 0) + (o_pl?.[`m_${i}_sale_data`]??0)
+                        o_total['count'][`m_${s_index}_data`] = (o_total['count'][`m_${s_index}_data`] || 0) + (o_pl?.[`m_${i}_rodr_cnt`]??0)
                     }
                 })
                 let a_total = Object.values(o_total),
@@ -177,9 +174,9 @@ module.exports = (srv) => {
                 account_query.forEach(account => {
                     let o_pl = pl_data.filter(pl => pl.biz_tp_account_cd === account.biz_tp_account_cd)
                     if (!o_result[`${account.biz_tp_account_cd}_order`]) {
-                        o_result[`${account.biz_tp_account_cd}_order`] = { display_order: account.sort_order, item_order: 1, div_name: account.biz_tp_account_nm, div_id: account.biz_tp_account_cd, type: '수주', not_secured_total:0 }
-                        o_result[`${account.biz_tp_account_cd}_sale`] = { display_order: account.sort_order, item_order: 2, div_name: account.biz_tp_account_nm, div_id: account.biz_tp_account_cd, type: '매출', not_secured_total:0 }
-                        o_result[`${account.biz_tp_account_cd}_count`] = { display_order: account.sort_order, item_order: 3, div_name: account.biz_tp_account_nm, div_id: account.biz_tp_account_cd, type: '건수', not_secured_total:0 }
+                        o_result[`${account.biz_tp_account_cd}_order`] = { display_order: account.sort_order+1, item_order: 1, div_name: account.biz_tp_account_nm, div_id: account.biz_tp_account_cd, type: '수주', not_secured_total:0 }
+                        o_result[`${account.biz_tp_account_cd}_sale`] = { display_order: account.sort_order+1, item_order: 2, div_name: account.biz_tp_account_nm, div_id: account.biz_tp_account_cd, type: '매출', not_secured_total:0 }
+                        o_result[`${account.biz_tp_account_cd}_count`] = { display_order: account.sort_order+1, item_order: 3, div_name: account.biz_tp_account_nm, div_id: account.biz_tp_account_cd, type: '건수', not_secured_total:0 }
                         a_not_secured_data.forEach(code => {
                             let s_data_column = code.toLowerCase().replace('-', '_').replace(' ', '_') + '_data';
                             let pl_data = o_pl.find(pl => pl.deal_stage_cd === code)
@@ -266,9 +263,9 @@ module.exports = (srv) => {
                 let a_data_key = Object.keys(data_column)
 
                 let o_total = {
-                    order: { display_order: 1, item_order: 1, div_name: '합계', div_id: 'total', type: '수주', ...data_column },
-                    sale: { display_order: 1, item_order: 2, div_name: '합계', div_id: 'total', type: '매출', ...data_column },
-                    count: { display_order: 1, item_order: 3, div_name: '합계', div_id: 'total', type: '건수', ...data_column },
+                    order: { display_order: 0, item_order: 1, div_name: '합계', div_id: 'total', type: '수주', ...data_column },
+                    sale: { display_order: 0, item_order: 2, div_name: '합계', div_id: 'total', type: '매출', ...data_column },
+                    count: { display_order: 0, item_order: 3, div_name: '합계', div_id: 'total', type: '건수', ...data_column },
                 } 
 
                 a_data_key.forEach(key => {

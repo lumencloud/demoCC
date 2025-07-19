@@ -92,20 +92,28 @@ module.exports = (srv) => {
 
             // 전사 (lv1_) 레벨 조회일 경우, 조직 정보가 없는 ccorg_cd 포함하도록, org_id 조건 없이 전체 aggregation
 
-            let dt_pl_column = org_col_nm === 'div_id' ? [...dt_pl_col_list,'hdqt_ccorg_cd as ccorg_cd','hdqt_name as name'] : org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? [...dt_pl_col_list,'team_ccorg_cd as ccorg_cd','team_name as name'] : [...dt_pl_col_list,'div_ccorg_cd as ccorg_cd','div_name as name'];
+            let dt_pl_column = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? [...dt_pl_col_list,'hdqt_ccorg_cd as ccorg_cd','hdqt_name as name'] : [...dt_pl_col_list,'div_ccorg_cd as ccorg_cd','div_name as name'];
             let dt_pl_where = org_col_nm === 'lv1_id' ? dt_pl_where_conditions : { ...dt_pl_where_conditions, [org_col_nm]: org_id };
-            let dt_pl_groupBy = org_col_nm === 'div_id' ? [...dt_pl_groupBy_cols,'hdqt_ccorg_cd','hdqt_name'] : org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? [...dt_pl_groupBy_cols,'team_ccorg_cd','team_name'] : [...dt_pl_groupBy_cols,'div_ccorg_cd','div_name'];
+            let dt_pl_groupBy = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? [...dt_pl_groupBy_cols,'hdqt_ccorg_cd','hdqt_name'] : [...dt_pl_groupBy_cols,'div_ccorg_cd','div_name'];
             
-            let org_column = org_col_nm === 'div_id' ? ['hdqt_ccorg_cd as ccorg_cd','hdqt_name as name','org_order','org_id','lv3_ccorg_cd','lv3_id','lv3_name'] : ['div_ccorg_cd as ccorg_cd','div_name as name','org_order','org_id','lv3_ccorg_cd','lv3_id','lv3_name'];
-            let org_where = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? { 'hdqt_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'team_id':null, org_tp:org_tp } : { 'div_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'hdqt_id':null, 'team_id':null, org_tp:org_tp };
-            let org_groupBy = org_col_nm === 'div_id' ? ['hdqt_ccorg_cd','hdqt_name','org_order','org_id','lv3_ccorg_cd','lv3_id','lv3_name'] : ['div_ccorg_cd','div_name','org_order','org_id','lv3_ccorg_cd','lv3_id','lv3_name'];
-
+            let org_column = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? ['hdqt_ccorg_cd as ccorg_cd','hdqt_name as name','org_order','org_id','lv3_ccorg_cd','lv3_id','lv3_name'] : ['div_ccorg_cd as ccorg_cd','div_name as name','org_order','org_id','lv3_ccorg_cd','lv3_id','lv3_name'];
+            let org_where = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? { 'hdqt_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'team_id':null } : { 'div_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'hdqt_id':null, 'team_id':null };
+            let org_groupBy = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? ['hdqt_ccorg_cd','hdqt_name','org_order','org_id','lv3_ccorg_cd','lv3_id','lv3_name'] : ['div_ccorg_cd','div_name','org_order','org_id','lv3_ccorg_cd','lv3_id','lv3_name'];
+            
+            if(!!org_tp && org_col_nm.includes('lv')){
+                org_where = {...org_where, 'org_tp': org_tp}
+            }
+            if(org_tp === 'delivery' && (['lv1_id','lv2_id'].includes(org_col_nm))){
+                dt_pl_where = {...dt_pl_where, 'org_tp': 'delivery'}
+            }
+            
             // DB 쿼리 실행 (병렬)
             const [dt_pl_data,target_query,org_data] = await Promise.all([
                 SELECT.from(pl_view).columns(dt_pl_column).where(dt_pl_where).groupBy(...dt_pl_groupBy),
                 get_org_target(year,['B02']),
                 SELECT.from(org_full_level).columns(org_column).where(org_where).groupBy(...org_groupBy)
             ]);
+            
             if(!dt_pl_data.length){
                 //return req.res.status(204).send();
                 return []
@@ -167,37 +175,37 @@ module.exports = (srv) => {
             
             let a_result = Object.values(o_result);
             let a_total = Object.values(o_total);
-            a_total.forEach(total => {
-                let o_temp = {
-                    "display_order": total.display_order,
-                    "type": total.type,
-                    "org_name" : org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? orgInfo.org_name : total.org_name,
-                    "org_id" : total.org_id,
-                    "forecast_value" : total.forecast_value,
-                    "secured_value" : total.secured_value,
-                    "not_secured_value" : total.not_secured_value,
-                    "plan_ratio" : total.forecast_value - total.target*100000000,
-                    "yoy" : total.forecast_value - total.last_forecast_value,
-                }
-                
-                oResult.push(o_temp)
-            })
             if(org_col_nm !== 'hdqt_id' && org_col_nm !== 'team_id'){
-                a_result.forEach(result => {
+                a_total.forEach(total => {
                     let o_temp = {
-                        "display_order": result.display_order,
-                        "type": result.type,
-                        "org_name" : result.org_name,
-                        "org_id" : result.org_id,
-                        "forecast_value" : result.forecast_value,
-                        "secured_value" : result.secured_value,
-                        "not_secured_value" : result.not_secured_value,
-                        "plan_ratio" : result.plan_ratio,
-                        "yoy" : result.yoy,
+                        "display_order": total.display_order,
+                        "type": total.type,
+                        "org_name" : org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? orgInfo.org_name : total.org_name,
+                        "org_id" : total.org_id,
+                        "forecast_value" : total.forecast_value,
+                        "secured_value" : total.secured_value,
+                        "not_secured_value" : total.not_secured_value,
+                        "plan_ratio" : total.forecast_value - total.target*100000000,
+                        "yoy" : total.forecast_value - total.last_forecast_value,
                     }
+                    
                     oResult.push(o_temp)
-                })            
+                })
             }
+            a_result.forEach(result => {
+                let o_temp = {
+                    "display_order": result.display_order,
+                    "type": result.type,
+                    "org_name" : result.org_name,
+                    "org_id" : result.org_id,
+                    "forecast_value" : result.forecast_value,
+                    "secured_value" : result.secured_value,
+                    "not_secured_value" : result.not_secured_value,
+                    "plan_ratio" : result.plan_ratio,
+                    "yoy" : result.yoy,
+                }
+                oResult.push(o_temp)
+            })            
             
 
             let aSortFields = [

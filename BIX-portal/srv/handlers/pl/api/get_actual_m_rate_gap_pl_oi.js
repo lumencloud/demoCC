@@ -117,30 +117,20 @@ module.exports = (srv) => {
              * org_id 파라미터값으로 조직정보 조회
              * 
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_ccorg_cd'
-                when lv2_id = '${org_id}' THEN 'lv2_ccorg_cd'
-                when lv3_id = '${org_id}' THEN 'lv3_ccorg_cd'
-                when div_id = '${org_id}' THEN 'div_ccorg_cd'
-                when hdqt_id = '${org_id}' THEN 'hdqt_ccorg_cd'
-                when team_id = '${org_id}' THEN 'team_ccorg_cd'
-                end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd','org_tp'])
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_level', 'org_ccorg_cd','org_tp'])
                 .where`org_id = ${org_id} and (lv1_id = ${org_id} or lv2_id = ${org_id} or lv3_id = ${org_id} or div_id = ${org_id} or hdqt_id = ${org_id} or team_id = ${org_id})`;
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             // 조직 정보를 where 조건에 추가
-            let org_col_nm = orgInfo.org_level;
+            let org_col_nm = orgInfo.org_level+'_ccorg_cd';
 
             let pl_column = pl_col_list;
             let pl_where = org_col_nm === 'lv1_ccorg_cd' ? pl_where_conditions : { ...pl_where_conditions, [org_col_nm]: orgInfo.org_ccorg_cd };
-            // pl_where = org_tp ? { ...pl_where, 'org_tp' : org_tp } : pl_where;
             let pl_groupBy = pl_groupBy_cols;
 
             let dt_pl_column = dt_pl_col_list;
             let dt_pl_where = org_col_nm === 'lv1_ccorg_cd' ? dt_pl_where_conditions : { ...dt_pl_where_conditions, [org_col_nm]: orgInfo.org_ccorg_cd };
-            // dt_pl_where = org_tp ? { ...dt_pl_where, 'org_tp' : org_tp } : dt_pl_where;
             let dt_pl_groupBy = dt_pl_groupBy_cols;
 
             const rsp_column = ['year',
@@ -153,25 +143,23 @@ module.exports = (srv) => {
             ];
             
             const rsp_where_conditions = { 'year': { in: [year, last_year] }, [org_col_nm]: orgInfo.org_ccorg_cd, is_delivery: true };
-            let rsp_where = org_tp ? { ...rsp_where_conditions, 'org_tp' : org_tp } : rsp_where_conditions;
+            let rsp_where = rsp_where_conditions;
             const rsp_groupBy = ['year'];
 
             let sga_column = sga_col_list;
             let sga_where = org_col_nm === 'lv1_id' ? sga_where_conditions : { ...sga_where_conditions, [org_col_nm]: orgInfo.org_ccorg_cd };
-            sga_where = org_tp ? { ...sga_where, 'org_tp' : org_tp } : sga_where;
             let sga_groupBy = sga_groupBy_cols;
 
             let non_mm_column = non_mm_col_list;
             let non_mm_where = org_col_nm === 'lv1_id' ? non_mm_where_conditions : { ...non_mm_where_conditions, [org_col_nm]: orgInfo.org_ccorg_cd };
-            // non_mm_where = org_tp ? { ...non_mm_where, 'org_tp' : org_tp } : non_mm_where;
             let non_mm_groupBy = non_mm_groupBy_cols;
 
             let pl_view_select, dt_view_select, nonmm_view_select;
-            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.org_tp === 'hybrid' || orgInfo.org_tp === 'account' || org_tp === 'account'){
+            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.lv3_ccorg_cd === '237100' || orgInfo.org_tp === 'account' || org_tp === 'account'){
                 pl_view_select = account_pl_view;
                 dt_view_select = account_dt_view;
                 nonmm_view_select = account_non_mm_view;
-            }else if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id'|| orgInfo.org_tp === 'delivery'){
+            }else{
                 pl_view_select = pl_view;
                 dt_view_select = dt_view;
                 nonmm_view_select = non_mm_view;
@@ -225,9 +213,9 @@ module.exports = (srv) => {
             let curr_contribution = (pl_curr_y_row?.["margin_amount_sum"] ?? 0) - (sga_curr_y_row?.["sga_amount_sum"] ?? 0);
             let last_contribution = (pl_last_y_row?.["margin_amount_sum"] ?? 0) - (sga_last_y_row?.["sga_amount_sum"] ?? 0);
 
-            let sale_curr_rate = (curr_target?.target_sale ?? 0) === 0 ? 0 : ((pl_curr_y_row?.sale_amount_sum ?? 0) / (curr_target?.target_sale ?? 0)*100000000) * 100;
+            let sale_curr_rate = (curr_target?.target_sale ?? 0) === 0 ? 0 : ((pl_curr_y_row?.sale_amount_sum ?? 0) / ((curr_target?.target_sale ?? 0)*100000000)) * 100;
             let sale_last_rate = (last_target?.target_sale ?? 0) === 0 ? 0 : ((pl_last_y_row?.sale_amount_sum ?? 0) / (last_target?.target_sale ?? 0)) * 100;
-            let margin_curr_rate = (curr_target?.target_margin ?? 0) === 0 ? 0 : ((pl_curr_y_row?.margin_amount_sum ?? 0) / (curr_target?.target_margin ?? 0)*100000000) * 100;
+            let margin_curr_rate = (curr_target?.target_margin ?? 0) === 0 ? 0 : ((pl_curr_y_row?.margin_amount_sum ?? 0) / ((curr_target?.target_margin ?? 0)*100000000)) * 100;
             let margin_last_rate = (last_target?.target_margin ?? 0) === 0 ? 0 : ((pl_last_y_row?.margin_amount_sum ?? 0) / (last_target?.target_margin ?? 0)) * 100;
             let margin_rate_curr_rate = (curr_target?.target_margin_rate ?? 0) === 0 ? 0 : (curr_margin_rate / (curr_target?.target_margin_rate ?? 0)) * 100;
             let margin_rate_last_rate = (last_target?.target_margin_rate ?? 0) === 0 ? 0 : (last_margin_rate / (last_target?.target_margin_rate ?? 0)) * 100;
@@ -241,6 +229,7 @@ module.exports = (srv) => {
             let contribution_last_rate = (last_target?.target_cont_profit ?? 0) === 0 ? 0 : last_contribution / (last_target?.target_cont_profit ?? 0) * 100;
             let nonmm_curr_rate = (curr_target?.target_non_mm ?? 0) === 0 ? 0 : (curr_non_mm?.sale_amount_sum ?? 0) / ((curr_target?.target_non_mm ?? 0)*100000000) * 100;
             let nonmm_last_rate = (last_target?.target_non_mm ?? 0) === 0 ? 0 : (last_non_mm?.sale_amount_sum ?? 0) / (last_target?.target_non_mm ?? 0) * 100;
+          
             const temp_data =
                 {
                     sale_gap : sale_curr_rate - sale_last_rate,//전사, account, cloud

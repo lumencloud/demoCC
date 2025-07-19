@@ -38,18 +38,20 @@ sap.ui.define([
             this._oEventBus.subscribe("pl", "page", this._getEventBus, this);
             this._oEventBus.subscribe("pl", "detail", this._getEventBus, this);
             this._oEventBus.subscribe("pl", "detailType", this._getEventBus, this);
+            this._oEventBus.subscribe("pl", "setDetailMenu", this._setDetailMenu, this);
 
             // let aContents = this.byId("detailContainer").getContent();
             // let oFirstMenu = aContents[0];
             // oFirstMenu.firePress();
+
+            // 카드에서 PL Component 접근을 위한 속성 설정
+            this.byId("detailCard")._oComponent = this.getOwnerComponent();
 
 
             this._setFavorite();
         },
 
         onMyRoutePatternMatched: function (oEvent) {
-            // this._oEventBus.publish("pl", "setHashModel");
-            // this._oEventBus.publish("pl", "page");
         },
 
         /**
@@ -74,12 +76,7 @@ sap.ui.define([
                 // oHashModel.setProperty("/detailType", "detail");
                 this._oEventBus.publish("pl", "detailType");
             } else if (sEventId === "detailType") {
-                // if (oHashModel.getProperty("/detail") === "sga" && oHashModel.getProperty("/detailType") === "chart") {
-                //     MessageToast.show("아직 구성되지 않은 \n메뉴입니다.");
-                // }
-                this.onMenu();
-
-                this._oEventBus.publish("pl", "setHash");
+                this._oEventBus.publish("pl", "setHashModel", { system: true });
             } else if (sEventId === "page") { // 상세 메뉴 리스트 from splitter
                 // 해시 데이터가 없는 초기일 때 Return
                 let hasHashData = Object.entries(oHashModel.getData()).length > 0;
@@ -120,10 +117,10 @@ sap.ui.define([
                 this._oEventBus.publish("pl", "detail");
 
                 // 선택한 메뉴 버튼 클릭
-                let aContents = this.byId("detailContainer").getContent();                
+                let aContents = this.byId("detailContainer").getContent();
                 let oButton = aContents.find(oContent => oContent.getBindingContext("detailModel").getObject().page_path === oFirstMenu.page_path && oContent.getBindingContext("detailModel").getObject().detail_path === oFirstMenu.detail_path);
 
-                oButton.firePress({pressed: true});
+                oButton.firePress({ pressed: true });
             }
         },
 
@@ -145,7 +142,7 @@ sap.ui.define([
          * @param {sap.ui.base.Event} oEvent 
          * @param {String} sCardName 
          */
-        onMenu: async function (oEvent, sCardName) {
+        _setDetailMenu: async function (oEvent, sCardName) {
             // 선택한 메뉴 정보 반환
             let oData = this.getOwnerComponent().getModel("hashModel").getData();
             let sUrl = `/pl_content_view(page_path='${oData.page}',position='detail',grid_layout_info=null,detail_path='${oData.detail}',detail_info='${oData.detailType}')/Set`;
@@ -160,7 +157,12 @@ sap.ui.define([
                 MessageToast.show("아직 구성되지 않은 \n메뉴입니다.");
             } else {
                 let sManifest = `../bix/card/${oCardData.card_info}/manifest.json`
-                oCard.setManifest(sManifest);
+                // 리랜더에러 수정 ==> 해당코드 setManifest 중첩적용으로 
+                // 사이드네비게이션 작동시 리랜더링 버그에 영향있어보여 예외처리 (동일한 manifest가 적용되어있으면 새로 적용 안되게)
+                // 추후 더 확인 필요
+                if (sManifest !== oCard.getManifest()) {
+                    oCard.setManifest(sManifest);
+                }
                 // 카드 로딩 3분 이내 처리 안될 시 강제 클리어
                 // setTimeout(()=>{
                 //     if(!oCard.isReady()){
@@ -304,7 +306,7 @@ sap.ui.define([
             let oModel = this.getOwnerComponent().getModel("hashModel");
             if (sFlag) {
                 oModel.setProperty("/detail", sFlag);
-                oModel.setProperty("/detailType", 'detail'); // 차트 카드가 없을 시 세그먼트 버튼의 key를 detail 버튼 고정  /// 추후 삭제 예정
+                // oModel.setProperty("/detailType", 'detail'); // 차트 카드가 없을 시 세그먼트 버튼의 key를 detail 버튼 고정  /// 추후 삭제 예정
             }
 
             ////////// 디테일 세그먼트 버튼 차트 데이터 없을 시 차트 버튼 visible=false 처리 /////////////////////// 추후 삭제 예정
@@ -315,15 +317,16 @@ sap.ui.define([
             const oBinding = oDataModel.bindContext(sUrl);
             let oRequest = await oBinding.requestObject();
             let oCardData = oRequest.value[0];
-            if(!oCardData){
+            if (!oCardData) {
                 this.byId("segmentedButton").getItems()[0].setVisible(false)
                 this.byId("segmentedButton").getItems()[1].setWidth("50%")
-            }else{
+            } else {
                 this.byId("segmentedButton").getItems()[0].setVisible(true)
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            this._oEventBus.publish("pl", "selectMasterTable", oModel.getData());
+            // selectMasterTable 내부에 detail publish가 존재함
+            // this._oEventBus.publish("pl", "selectMasterTable", oModel.getData());
             this._oEventBus.publish("pl", "detail");
 
             // 메뉴 변경 시 detailSelect 해시 제거
@@ -334,7 +337,7 @@ sap.ui.define([
             // HashChanger.getInstance().setHash(sNewHash);
 
             // 해시를 기준으로 해시모델 재설정
-            this._oEventBus.publish("pl", "setHashModel");
+            // this._oEventBus.publish("pl", "setHashModel");
         },
 
         onPressAIAnalysis: function (oEvent) {

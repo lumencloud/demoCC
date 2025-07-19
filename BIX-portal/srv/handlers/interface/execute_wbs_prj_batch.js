@@ -114,6 +114,4 @@ module.exports = (srv) => {
         }
 
     })
-
-    // return oReturn;
 }

@@ -22,7 +22,7 @@
                         <Text emptyIndicatorMode="On" text="{Model>/first/biz_tp_account_nm} {Model>/first/biz_opp_nm} " class="sapUiTinyMarginBegin"/>                        
                     </HBox>
                     <HBox>
-                        <Text emptyIndicatorMode="On" text="({path: 'Model>/first/rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                        <Text emptyIndicatorMode="On" text="({path: 'Model>/first/rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
                     </HBox>
                 </HBox>
 
@@ -34,7 +34,7 @@
                         <Text emptyIndicatorMode="On" text="{Model>/second/biz_tp_account_nm} {Model>/second/biz_opp_nm} " class="sapUiTinyMarginBegin"/>                        
                     </HBox>
                     <HBox>
-                        <Text emptyIndicatorMode="On" text="({path: 'Model>/second/rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                        <Text emptyIndicatorMode="On" text="({path: 'Model>/second/rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
                     </HBox>
                 </HBox>
 
@@ -46,7 +46,7 @@
                         <Text emptyIndicatorMode="On" text="{Model>/third/biz_tp_account_nm} {Model>/third/biz_opp_nm} " class="sapUiTinyMarginBegin"/>                        
                     </HBox>
                     <HBox>
-                        <Text emptyIndicatorMode="On" text="({path: 'Model>/third/rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                        <Text emptyIndicatorMode="On" text="({path: 'Model>/third/rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin"/>
                     </HBox>
                 </HBox>
 
@@ -58,7 +58,7 @@
                         <Text emptyIndicatorMode="On" text="{Model>/forth/biz_tp_account_nm} {Model>/third/biz_opp_nm} " class="sapUiTinyMarginBegin"/>                        
                     </HBox>
                     <HBox>
-                        <Text emptyIndicatorMode="On" text="({path: 'Model>/forth/rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state "/>
+                        <Text emptyIndicatorMode="On" text="({path: 'Model>/forth/rodr_amt', formatter: '._formatTotal'}억)" class="custom-negative-state sapUiTinyMarginBegin "/>
                     </HBox>
                 </HBox>
 

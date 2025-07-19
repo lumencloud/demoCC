@@ -1,0 +1,69 @@
+<mvc:View controllerName="bix.test.close_org.controller.Org_Table"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    busyIndicatorDelay="0"
+    height="100%"
+    width="100%"
+
+
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+>
+    <f:DynamicPage
+        class="sapUiContentPadding"
+        id="closeOrgPage"
+        fitContent="true"
+        showFooter="true"
+    >
+        <f:content>
+            <FlexBox width="100%" height="100%" fitContainer="true" direction="Column" >
+                <form:SimpleForm  editable="true" class="custom-search-container">
+                    <form:content>
+                        <Title text="폐쇄 조직 관리" class="custom-mg-title">
+                            <layoutData>
+                                <layout:GridData span="XL12 L12 M12 S12" />
+                            </layoutData>
+                        </Title>
+                    </form:content>
+                </form:SimpleForm>
+                <FlexBox width="100%" height="calc(100% - 10.5rem)" class="sapUiSmallMarginTop sapUiSmallMarginEnd">
+                    <table:Table 
+                        id="closeORgTable"
+                        class="custom-mg-uiTable custom-selection-uiTable custom-table-rounding-border custom-mg-uiTable-noline" 
+                        busyIndicatorDelay="0" 
+                        rows="{ path: 'closeOrgTableModel>/' }"
+                        selectionMode="None"
+                        >
+                        <table:rowMode>
+                            <rowmodes:Auto/>
+                        </table:rowMode>
+
+                        <table:columns>
+                            <table:Column hAlign="Center" autoResizable="true">
+                                <Label text="CCORG_CD" wrapping="true"/>
+                                <table:template>
+                                    <Text text="{closeOrgTableModel>ccorg_cd}"/>
+                                </table:template>
+                            </table:Column>
+                            <table:Column hAlign="Center" autoResizable="true">
+                                <Label text="변경 CCORG_CD" wrapping="true"/>
+                                <table:template>
+                                    <Text text="{closeOrgTableModel>replace_ccorg_cd}"/>
+                                </table:template>
+                            </table:Column>
+                            <table:Column hAlign="Center" autoResizable="true">
+                                <Label text="조직명" wrapping="true"/>
+                                <table:template>
+                                    <Text text="{closeOrgTableModel>org_desc}"/>
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:Table >
+                </FlexBox>
+            </FlexBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

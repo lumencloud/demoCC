@@ -47,31 +47,17 @@ module.exports = (srv) => {
 
             // function 입력 파라미터
             const { year, month, org_id, org_tp } = req.data;
-
-            /**
-             * +++++ TBD +++++
-             * 권한 체크하여 사용자가 조회 가능한 조직인지 판별 후 코드 진행
-             */
-
             /**
              * org_id 파라미터값으로 조직정보 조회
              * 
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_id'
-                when lv2_id = '${org_id}' THEN 'lv2_id'
-                when lv3_id = '${org_id}' THEN 'lv3_id'
-                when div_id = '${org_id}' THEN 'div_id'
-                when hdqt_id = '${org_id}' THEN 'hdqt_id'
-                when team_id = '${org_id}' THEN 'team_id'
-                end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd', 'org_name', 'org_tp'])
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_level', 'org_ccorg_cd', 'org_name', 'org_tp', 'lv3_ccorg_cd'])
                 .where({ 'org_id': org_id });
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             // 조직 정보를 where 조건에 추가
-            let org_col_nm = orgInfo.org_level;
+            let org_col_nm = orgInfo.org_level+'_id';
 
             let a_margin_column = [];
             let a_sga_column = [];
@@ -89,8 +75,7 @@ module.exports = (srv) => {
             /**
              * DT 매출 조회용 SELECT 컬럼 - 전사, 부문, 본부 공통으로 사용되는 컬럼 조건 (+ 연, 월, 부문, 본부 조건별 추가)
              */
-            // const pl_col_list = ['year', s_margin_column];
-            const pl_col_list = ['year', `(sum(margin_m${Number(month)}_amt)) as margin_amount_sum`];
+            const pl_col_list = ['year', s_margin_column];
             const pl_where_conditions = { 'year': { in: [year] } };
             const pl_groupBy_cols = ['year'];
 
@@ -98,14 +83,14 @@ module.exports = (srv) => {
              * SG&A 조회용 컬럼
              * shared_exp_yn false = 사업 / true = 전사
              */
-            // const sga_col_list = ['year', s_sga_column];
-            const sga_col_list = ['year', `sum(labor_m${Number(month)}_amt)+sum(exp_m${Number(month)}_amt)+sum(iv_m${Number(month)}_amt) as amount_sum`];
+            const sga_col_list = ['year', s_sga_column];
+            // const sga_col_list = ['year', `sum(labor_m${Number(month)}_amt)+sum(exp_m${Number(month)}_amt)+sum(iv_m${Number(month)}_amt) as amount_sum`];
             const sga_where_conditions = { 'year': { in: [year] }, 'is_total_cc': { in: [false, null] } };
             const sga_groupBy_cols = ['year'];
 
             // rsp 조회용 정보
-            // const rsp_col_list = ['year', s_rsp_total_amt_ym];
-            const rsp_col_list = ['year', `sum(total_m${Number(month)}_amt) as total_year_amt`];
+            const rsp_col_list = ['year', s_rsp_total_amt_ym];
+            // const rsp_col_list = ['year', `sum(total_m${Number(month)}_amt) as total_year_amt`];
             const rsp_groupBy_cols = ['year'];
             const rsp_where_conditions = { 'year': { in: [year] }, [org_col_nm]: org_id, is_delivery: true };
 
@@ -126,9 +111,20 @@ module.exports = (srv) => {
                 search_org_ccorg = 'team_ccorg_cd';
             } else { return; };
 
-            let org_column = org_col_nm === 'lv1_id' ? [search_org, search_org_name, search_org_ccorg, 'org_order', 'org_tp', 'org_id'] : [search_org, search_org_name, search_org_ccorg, 'org_order', 'org_id'];
-            let org_where = { [org_col_nm]: org_id, 'org_tp' : {'!=':null} }; // account 조직 제거
-            const org_query = await SELECT.from(org_full_level).columns(org_column).where(org_where).orderBy('org_order');
+            // let org_column = org_col_nm === 'lv1_id' ? [search_org, search_org_name, search_org_ccorg, 'org_order', 'org_tp', 'org_id'] : [search_org, search_org_name, search_org_ccorg, 'org_order', 'org_id'];
+            // let org_where = { [org_col_nm]: org_id, 'org_tp' : {'!=':null} }; // account 조직 제거
+            // const org_query = await SELECT.from(org_full_level).columns(org_column).where(org_where).orderBy('org_order');
+            const org_query = await SELECT.from(org_full_level);
+
+             //ackerton 로직
+             let ackerton_list = [];
+             if((orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2') && org_tp !== 'account'){
+                 org_query.forEach(data=>{
+                     if (!ackerton_list.find(data2 => data2 === data[search_org]) && data[search_org] && data['lv3_ccorg_cd'] === '610000') {
+                         ackerton_list.push(data.org_id);
+                     };
+                 });
+             };
 
             let org_list = [];
             let account_list=[];
@@ -149,8 +145,8 @@ module.exports = (srv) => {
                         org_order : data['org_order']
                     };
 
-                    if(org_col_nm === 'lv1_id'){
-                        if(!account_list.includes(oTemp.id)){
+                    if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id'){
+                        if(!account_list.includes(oTemp.id) && !ackerton_list.includes(oTemp.id)){
                             org_list.push(oTemp);
                         }
                     }else{
@@ -162,22 +158,20 @@ module.exports = (srv) => {
             // 전사 (lv1_) 레벨 조회일 경우, 조직 정보가 없는 ccorg_cd 포함하도록, org_id 조건 없이 전체 aggregation
             let pl_column = org_col_nm === 'div_id' ? [...pl_col_list, 'hdqt_id as id', 'hdqt_name as name'] : org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? [...pl_col_list, 'team_id as id', 'team_name as name'] : [...pl_col_list, 'div_id as id', 'div_name as name'];
             let pl_where = org_col_nm.includes('lv1') ? pl_where_conditions : { ...pl_where_conditions, [org_col_nm]: org_id, org_tp: {'!=': 'account'} };  // account 조직 제거
-            // pl_where = org_tp ? { ...pl_where, 'org_tp' : org_tp } : pl_where;
             let pl_groupBy = org_col_nm === 'div_id' ? [...pl_groupBy_cols, 'hdqt_id', 'hdqt_name'] : org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? [...pl_groupBy_cols, 'team_id', 'team_name'] : [...pl_groupBy_cols, 'div_id', 'div_name'];
 
             let sga_column = org_col_nm === 'div_id' ? [...sga_col_list, 'hdqt_id as id', 'hdqt_name as name'] : org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? [...sga_col_list, 'team_id as id', 'team_name as name'] : [...sga_col_list, 'div_id as id', 'div_name as name'];
             let sga_where = org_col_nm.includes('lv1') ? sga_where_conditions : { ...sga_where_conditions, [org_col_nm]: org_id };
-            sga_where = org_tp ? { ...sga_where, 'org_tp' : org_tp } : sga_where;
             let sga_groupBy = org_col_nm === 'div_id' ? [...sga_groupBy_cols, 'hdqt_id', 'hdqt_name'] : org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? [...sga_groupBy_cols, 'team_id', 'team_name'] : [...sga_groupBy_cols, 'div_id', 'div_name'];
 
             let rsp_column = org_col_nm === 'div_id' ? [...rsp_col_list, 'hdqt_id as id', 'hdqt_name as name'] : org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? [...rsp_col_list, 'team_id as id', 'team_name as name'] : [...rsp_col_list, 'div_id as id', 'div_name as name'];
-            let rsp_where = org_tp ? { ...rsp_where_conditions, 'org_tp' : org_tp } : rsp_where_conditions;
+            let rsp_where = rsp_where_conditions;
             let rsp_groupBy = org_col_nm === 'div_id' ? [...rsp_groupBy_cols, 'hdqt_id', 'hdqt_name'] : org_col_nm === 'hdqt_id' || org_col_nm === 'team_id' ? [...rsp_groupBy_cols, 'team_id', 'team_name'] : [...rsp_groupBy_cols, 'div_id', 'div_name'];
 
             let pl_view_select;
-            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.org_tp === 'hybrid' || orgInfo.org_tp === 'account' || org_tp === 'account'){
+            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.lv3_ccorg_cd === '237100' || orgInfo.org_tp === 'account' || org_tp === 'account'){
                 pl_view_select = account_pl_view;
-            }else if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id'|| orgInfo.org_tp === 'delivery'){
+            }else{
                 pl_view_select = pl_view;
             };
 

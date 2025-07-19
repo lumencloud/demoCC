@@ -65,8 +65,8 @@
                                 <VBox width="30%" class="custom-table-extension-box-add" >
                                     <Text text="Deal Stage 별" width="100%" textAlign="Center"/>
                                 </VBox>
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer visible="false"/>
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false" />
                                 <ToolbarSeparator />
@@ -377,8 +377,8 @@
                                 <VBox width="30%" class="custom-table-extension-box-add" >
                                     <Text text="월별" width="100%" textAlign="Center"/>
                                 </VBox>
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer visible="false"/>
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false" />
                                 <ToolbarSeparator />
@@ -895,8 +895,8 @@
                                 <VBox width="30%" class="custom-table-extension-box-add" >
                                     <Text text="수주 금액 기준" width="100%" textAlign="Center"/>
                                 </VBox>
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer visible="false"/>
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false" />
                                 <ToolbarSeparator />

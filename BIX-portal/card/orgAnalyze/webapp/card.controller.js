@@ -313,7 +313,7 @@ sap.ui.define([
                         },
                         plugins: [ChartDataLabels], 
                     })
-                this._ovserveResize(this.byId(this._aContainerId[i]), i)
+                //this._ovserveResize(this.byId(this._aContainerId[i]), i)
 
                 }.bind(this));
             }

@@ -9,7 +9,8 @@ sap.ui.define(
     "use strict";
     return BaseController.extend("bix.card.aiInsightBau.card", {
       _oEventBus: EventBus.getInstance(),
-
+      _bFlag: true,
+      
       onInit: function () {
        this.getOwnerComponent().oCard.setBusy(true)
         this.getView().setModel(new JSONModel([{
@@ -48,13 +49,16 @@ sap.ui.define(
         this.collectData[oData.key] = oData.insight;
 
         this.getView().setModel(new JSONModel(this.collectData), "LLMModel")
-        this.dataLoad();
+        if(this._bFlag){
+          this.dataLoad();
+        }
         this.getOwnerComponent().oCard.setBusy(false)
       },
       dataLoad: function () {
         this._oEventBus.publish("CardWeekChannel", "CardWeekFullLoad", {
           cardId: this.getView().getId()
         })
+        this._bFlag = false;
       },
 
     })

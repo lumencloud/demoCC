@@ -96,7 +96,7 @@ sap.ui.define([
                 // this.getView().getModel('information').setProperty("/userName", sUserName);
                 this.getView().getModel('information').setProperty("/month", sTodayYear + "-" + sTodayMonth);
                 this.getView().getModel('information').setProperty("/deadline", sTodayYear + "-" + sTodayMonth);
-                this.byId('dashinfo').setText('사용자 님, ' + sTodayYear + "-" + sTodayMonth + ' 마감 실적 기준 현황입니다.');
+                this.byId('dashinfo').setText(sTodayYear + "-" + sTodayMonth + ' 마감 실적 기준 현황입니다.');
 
                 //다른 manifest에 속한 카드에 초기 데이터 넘겨주기 세션스토리지
                 sessionStorage.setItem("initSearchModel", 
@@ -1323,7 +1323,7 @@ sap.ui.define([
                 oEvent.getSource()._getCalendar().setShowWeekNumbers(false);
             },
             deadlinchange: function (oEvent) {
-                this.byId('dashinfo').setText('사용자 님, ' + oEvent.getSource().getValue() + ' 마감 실적 기준 현황입니다.');
+                this.byId('dashinfo').setText(oEvent.getSource().getValue() + ' 마감 실적 기준 현황입니다.');
 
                 let dSelectedDate = oEvent.getSource().getDateValue();
                 let sYear = String(dSelectedDate.getFullYear());

@@ -4,7 +4,7 @@
     <Popover 
         id="AiPopover"
         class="sapUiResponsivePadding--header custom-aireport-popover"
-        contentHeight="76px"
+        contentHeight="100px"
         contentWidth="180px"
         placement="Bottom"
         showHeader="false">

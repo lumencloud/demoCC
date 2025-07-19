@@ -74,15 +74,13 @@ module.exports = (srv) => {
                 'case when sum(total_year_amt) <> 0 then (sum(bill_year_amt) + sum(indirect_cost_year) + sum(opp_year_amt)) / sum(total_year_amt) else 0 end as plan_value',
                 'case when sum(total_year_amt) <> 0 then (sum(bill_year_amt) + sum(indirect_cost_year)) / sum(total_year_amt) else 0 end as secured_value',
                 'case when sum(total_year_amt) <> 0 then (sum(opp_year_amt) / sum(total_year_amt)) else 0 end as not_secured_value',
-                'sum(total_year_amt) as total_year_amt',
-                'sum(bill_year_amt) as bill_year_amt',
-                'sum(indirect_cost_year) as indirect_cost_year',
                 'sum(b_mm_amt_sum) as b_mm_amt_sum',
                 'sum(bun_mm_amt_sum) as mm_total_sum',
                 'sum(opp_year_amt) as opp_year_amt',
                 'sum(avg_year_amt) as avg_year_amt',
-                'sum(est_total_year_emp) as est_total_year_emp',
-                'sum(est_avg_year_amt) as est_avg_year_amt'
+                // 'sum(est_total_year_emp) as est_total_year_emp',
+                'sum(est_avg_year_amt) as est_avg_year_amt',
+                'case when (sum(bill_year_amt) + sum(indirect_cost_year) + sum(opp_year_amt) + sum(b_mm_amt_sum)) <> 0 then true else false end as data_flag'
             ];
             const rsp_where_conditions = { 'year': { in: [year, last_year] }, [org_level]: orgInfo.org_ccorg_cd, is_delivery: true };
             const rsp_groupBy_cols = ['year'];
@@ -91,7 +89,7 @@ module.exports = (srv) => {
             let rsp_groupBy = org_level === 'div_ccorg_cd' || org_level === 'hdqt_ccorg_cd' ? [...rsp_groupBy_cols, 'hdqt_ccorg_cd', 'hdqt_name'] : [...rsp_groupBy_cols, 'div_ccorg_cd', 'div_name'];
 
             let org_column = org_level === 'div_ccorg_cd' || org_level === 'hdqt_ccorg_cd' ? ['hdqt_ccorg_cd as ccorg_cd', 'hdqt_id as id', 'hdqt_name as name', 'org_order','org_ccorg_cd','lv3_ccorg_cd', 'lv3_id','lv3_name'] : ['div_ccorg_cd as ccorg_cd', 'div_id as id', 'div_name as name', 'org_order','org_ccorg_cd','lv3_ccorg_cd', 'lv3_id','lv3_name'];
-            let org_where = org_level === 'div_ccorg_cd' || org_level === 'hdqt_ccorg_cd' ? { 'hdqt_ccorg_cd': { '!=': null }, and: { [org_level]: org_ccorg_cd }, 'team_ccorg_cd': null } : { 'div_ccorg_cd': { '!=': null }, and: { [org_level]: org_ccorg_cd }, 'hdqt_ccorg_cd': null, 'team_ccorg_cd': null };
+            let org_where = org_level === 'div_ccorg_cd' || org_level === 'hdqt_ccorg_cd' ? { 'hdqt_ccorg_cd': { '!=': null }, and: { [org_level]: org_ccorg_cd }, 'team_ccorg_cd': null, 'org_tp':'delivery' } : { 'div_ccorg_cd': { '!=': null }, and: { [org_level]: org_ccorg_cd }, 'hdqt_ccorg_cd': null, 'team_ccorg_cd': null, 'org_tp':'delivery' };
             let org_groupBy = org_level === 'div_ccorg_cd' || org_level === 'hdqt_ccorg_cd' ? ['hdqt_ccorg_cd', 'hdqt_id', 'hdqt_name', 'org_order','org_ccorg_cd','lv3_ccorg_cd', 'lv3_id','lv3_name'] : ['div_ccorg_cd', 'div_id', 'div_name', 'org_order','org_ccorg_cd','lv3_ccorg_cd', 'lv3_id','lv3_name'];
 
 
@@ -104,7 +102,7 @@ module.exports = (srv) => {
                 'sum(bun_mm_amt_sum) as mm_total_sum',
                 'sum(opp_year_amt) as opp_year_amt',
                 'sum(avg_year_amt) as avg_year_amt',
-                'sum(est_total_year_emp) as est_total_year_emp',
+                // // 'sum(est_total_year_emp) as est_total_year_emp',
                 'sum(est_avg_year_amt) as est_avg_year_amt'
             ];
             const rsp_sum_where = { 'year': { in: [year, last_year] }, [org_level]: orgInfo.org_ccorg_cd, is_delivery: true };
@@ -117,7 +115,7 @@ module.exports = (srv) => {
                 'sum(bun_mm_amt_sum) as mm_total_sum',
                 'sum(opp_year_amt) as opp_year_amt',
                 'sum(avg_year_amt) as avg_year_amt',
-                'sum(est_total_year_emp) as est_total_year_emp',
+                // // 'sum(est_total_year_emp) as est_total_year_emp',
                 'sum(est_avg_year_amt) as est_avg_year_amt'
             ];
             const lv3_rsp_sum_where = { 'year': { in: [year, last_year] }, 'lv3_ccorg_cd': '610000', is_delivery: true };
@@ -131,10 +129,20 @@ module.exports = (srv) => {
                 SELECT.from(rsp_view).columns(rsp_sum_column).where(rsp_sum_where).groupBy(...rsp_sum_groupBy),
                 SELECT.from(rsp_view).columns(lv3_rsp_sum_column).where(lv3_rsp_sum_where).groupBy(...lv3_rsp_sum_groupBy),
             ]);
-            if(!data.length && !sum_data.length){
+            let b_data = false
+            data.forEach(data => {
+                if(data.data_flag){
+                    b_data = data.data_flag
+                }
+            })
+            if(!b_data){
                 //return req.res.status(204).send();
                 return []
             }
+            // if(!data.length && !sum_data.length){
+            //     //return req.res.status(204).send();
+            //     return []
+            // }
             // 조직 정보가 없는 조직 추가
             // org_full_level_data.push({[org_child_level]: null, "org_ccorg_cd": null, org_ccorg_cd: null, org_name: "기타", org_order: 99999999});
             
@@ -160,9 +168,9 @@ module.exports = (srv) => {
                             display_order: org.org_order,
                             item_order: 1,
                             secured_value: curr_lv3_data?.b_mm_amt_sum / curr_lv3_data?.mm_total_sum,
-                            not_secured_value: (curr_lv3_data?.opp_year_amt / curr_lv3_data?.est_avg_year_amt) / curr_lv3_data?.est_total_year_emp,
+                            not_secured_value: (curr_lv3_data?.opp_year_amt / curr_lv3_data?.est_avg_year_amt) / curr_lv3_data?.mm_total_sum,
                             last_secured_value: last_lv3_data?.b_mm_amt_sum / last_lv3_data?.mm_total_sum,
-                            last_not_secured_value: (last_lv3_data?.opp_year_amt / last_lv3_data?.est_avg_year_amt) / last_lv3_data?.est_total_year_emp,  
+                            last_not_secured_value: (last_lv3_data?.opp_year_amt / last_lv3_data?.est_avg_year_amt) / last_lv3_data?.mm_total_sum,  
                         }
                         o_result[`${org.lv3_ccorg_cd}_mm`]["plan_value"] = o_result[`${org.lv3_ccorg_cd}_mm`].secured_value + o_result[`${org.lv3_ccorg_cd}_mm`].not_secured_value;
                         o_result[`${org.lv3_ccorg_cd}_mm`]["last_plan_value"] = o_result[`${org.lv3_ccorg_cd}_mm`].last_secured_value + o_result[`${org.lv3_ccorg_cd}_mm`].last_not_secured_value;
@@ -190,9 +198,9 @@ module.exports = (srv) => {
                             display_order: org.org_order,
                             item_order: 1,
                             secured_value: curr_data?.b_mm_amt_sum / curr_data?.mm_total_sum,
-                            not_secured_value: (curr_data?.opp_year_amt / curr_data?.est_avg_year_amt) / curr_data?.est_total_year_emp,
+                            not_secured_value: (curr_data?.opp_year_amt / curr_data?.est_avg_year_amt) / curr_data?.mm_total_sum,
                             last_secured_value: last_data?.b_mm_amt_sum / last_data?.mm_total_sum,
-                            last_not_secured_value: (last_data?.opp_year_amt / last_data?.est_avg_year_amt) / last_data?.est_total_year_emp,  
+                            last_not_secured_value: (last_data?.opp_year_amt / last_data?.est_avg_year_amt) / last_data?.mm_total_sum,  
                         }
                         o_result[`${org.ccorg_cd}_mm`]["plan_value"] = o_result[`${org.ccorg_cd}_mm`].secured_value + o_result[`${org.ccorg_cd}_mm`].not_secured_value;
                         o_result[`${org.ccorg_cd}_mm`]["last_plan_value"] = o_result[`${org.ccorg_cd}_mm`].last_secured_value + o_result[`${org.ccorg_cd}_mm`].last_not_secured_value;
@@ -233,9 +241,9 @@ module.exports = (srv) => {
                 display_order: 1,
                 item_order: 1,
                 secured_value: curr_data?.b_mm_amt_sum / curr_data?.mm_total_sum,
-                not_secured_value: curr_data?.est_total_year_emp && curr_data?.est_avg_year_amt ? (curr_data?.opp_year_amt / curr_data?.est_avg_year_amt) / curr_data?.est_total_year_emp : 0,
+                not_secured_value: curr_data?.mm_total_sum && curr_data?.est_avg_year_amt ? (curr_data?.opp_year_amt / curr_data?.est_avg_year_amt) / curr_data?.mm_total_sum : 0,
                 last_secured_value: last_data?.b_mm_amt_sum / last_data?.mm_total_sum,
-                last_not_secured_value: last_data?.est_total_year_emp && last_data?.est_avg_year_amt ? (last_data?.opp_year_amt / last_data?.est_avg_year_amt) / last_data?.est_total_year_emp : 0,                
+                last_not_secured_value: last_data?.mm_total_sum && last_data?.est_avg_year_amt ? (last_data?.opp_year_amt / last_data?.est_avg_year_amt) / last_data?.mm_total_sum : 0,                
             }
             o_total_mm["plan_value"] = o_total_mm.secured_value + o_total_mm.not_secured_value;    
             o_total_mm["last_plan_value"] = o_total_mm.last_secured_value + o_total_mm.last_not_secured_value;
@@ -243,7 +251,7 @@ module.exports = (srv) => {
             o_total_mm["yoy"] = o_total_mm.plan_value - o_total_mm.last_plan_value;
             
             let o_total_cost = {
-                type: "BR(COST)",
+                type: "BR(Cost)",
                 org_id: 'total',
                 org_name: org_level === 'hdqt_ccorg_cd' || org_level === 'team_ccorg_cd' ? orgInfo.org_name : '합계',
                 display_order: 1,
@@ -281,12 +289,12 @@ module.exports = (srv) => {
             })
             let oResult = []
 
-            oResult.push(o_total_mm);
-            oResult.push(o_total_cost);
             
             if(org_level !== 'hdqt_ccorg_cd' && org_level !== 'team_ccorg_cd'){
-                oResult.push(...result_data)
+                oResult.push(o_total_mm);
+                oResult.push(o_total_cost);
             }
+            oResult.push(...result_data)
 
             return oResult;
         } catch(error) { 

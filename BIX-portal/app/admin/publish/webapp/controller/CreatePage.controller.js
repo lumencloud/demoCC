@@ -179,6 +179,7 @@ sap.ui.define([
                 if (sEdit) {
                     Modules.messageBoxConfirm("information", "저장하시겠습니까?",
                         "게시물 저장").then(async (bCheck) => {
+
                             if (bCheck) {
                                 let oPublishData = this.getView().getModel("publishModel").getData();
                                 let oTarget = [], oContent = [];

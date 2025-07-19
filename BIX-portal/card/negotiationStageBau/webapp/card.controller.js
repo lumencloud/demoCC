@@ -11,16 +11,18 @@ sap.ui.define(
     "use strict";
     return BaseController.extend("bix.card.negotiationStageBau.card", {
       _oEventBus: EventBus.getInstance(),
+      _bFlag: true,
 
       onInit: function () {
         this._dataSetting();
         this._oEventBus.subscribe("aiReport", "dateData", this._dataSetting, this)
       },
 
-      _dataSetting: async function (oEvent, sEventId, oData) {
+      _dataSetting: async function (oEvent, sEventId) {
         this.byId("cardContent").setBusy(true)
         let { monday, sunday } = this._setDate();
 
+        let oData = JSON.parse(sessionStorage.getItem("aiWeekReport"));
         // 데이터 호출 병렬 실행
         const oModel = new ODataModel({
           serviceUrl: "../odata/v4/ai-api/",
@@ -33,13 +35,13 @@ sap.ui.define(
 
         await oModel.bindContext(sPath).requestObject().then(
           function (aResult) {
-            Module.displayStatusForEmpty(this.getOwnerComponent().oCard,aResult.value, this.byId("cardContent"));
+            Module.displayStatusForEmpty(this.getOwnerComponent().oCard, aResult.value, this.byId("cardContent"));
             this._modelSetting(aResult.value);
-            this.dataLoad();
+           
           }.bind(this))
           .catch((oErr) => {
-            Module.displayStatus(this.getOwnerComponent().oCard,oErr.error.code, this.byId("cardContent"));
-        });
+            Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
+          });
         this.byId("cardContent").setBusy(false)
       },
 
@@ -72,12 +74,16 @@ sap.ui.define(
         }
         // Account 코드 삭제
         aResult.forEach(a => {
-          a.biz_tp_account_nm = a.biz_tp_account_nm.slice(4)
+          if (a.biz_tp_account_nm) {
+            a.biz_tp_account_nm = a.biz_tp_account_nm.slice(4)
+          } else {
+            a.biz_tp_account_nm = ''
+          }
         })
         // 모델용 객체 생성
         let oModel = {
           iCount: iCount || 0,
-          iAmount: iAmount.toFixed(0) || 0,
+          iAmount: this._formatTotal(iAmount.toFixed()) || 0,
           first: aResult[0],
           second: aResult[1],
           third: aResult[2],
@@ -89,6 +95,10 @@ sap.ui.define(
           oModel["etcCount"] = iCount - 4;
           oModel["etcAmount"] = aResult[4].total_target_amt;
           oModel["etcReason"] = aResult[4].deselected_reason
+        }
+
+        if(this._bFlag){
+          this.dataLoad();
         }
 
         this._oEventBus.publish("aiReport", "negoBauData", oModel)
@@ -115,8 +125,6 @@ sap.ui.define(
           monday: this._formatDate(monday),
           sunday: this._formatDate(sunday)
         }
-
-
       },
 
       _formatDate: function (date) {
@@ -130,7 +138,7 @@ sap.ui.define(
 
         let fNumber = parseFloat(sValue);
         if (Number.isInteger(fNumber)) {
-          let oFormatter = NumberFormat.getIntegerInstance({
+          let oFormatter = NumberFormat.getFloatInstance({
             groupingEnabled: true
           });
           return oFormatter.format(fNumber);
@@ -145,9 +153,10 @@ sap.ui.define(
         }
       },
       dataLoad: function () {
-          this._oEventBus.publish("CardWeekChannel", "CardWeekFullLoad", {
-              cardId: this.getView().getId()
-          })
+        this._oEventBus.publish("CardWeekChannel", "CardWeekFullLoad", {
+          cardId: this.getView().getId()
+        })
+        this._bFlag = false;
       },
 
     })

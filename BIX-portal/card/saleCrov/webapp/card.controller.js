@@ -91,6 +91,15 @@
 
               options: {
                 cutout: '40%',
+                layout:{
+                  padding: {
+                      top: 20,
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                    }
+                  },
+                
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
@@ -101,7 +110,9 @@
                   legend: {
                     display: true,
                     position: 'right',
-                   
+                    tooltip: {
+                      enabled: false
+                    },
                     labels: {
                       font: {
                         size: 14,
@@ -124,12 +135,12 @@
                       size: 14,
                       
                     },
-
+                    
                     backgroundColor : "#ffffff",
                     borderColor: "#d1d3d3",
                     borderWidth: 0.5,
                     borderRadius: 23.16,
-                    padding : 7,
+                    padding : 5,
                     formatter: function (value) {
                       if (value) {
                         var oNumberFormat = NumberFormat.getFloatInstance({
@@ -150,7 +161,7 @@
               plugins: [ChartDataLabels],
             })
 
-            this._ovserveResize(this.byId(this._aContainerId[i]), i)
+            //this._ovserveResize(this.byId(this._aContainerId[i]), i)
 
           }.bind(this));
         }

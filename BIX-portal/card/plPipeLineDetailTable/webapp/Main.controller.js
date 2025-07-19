@@ -20,7 +20,7 @@ sap.ui.define([
             // 테이블에 셀 클릭 이벤트 등록
             var oTable = this.byId(this._sTableId);
 
-            if (oTable) {
+            if (oTable && !oTable?.mEventRegistry?.cellContextmenu) {
                 oTable.attachCellClick(this.onCellClick, this);
 
                 oTable.attachCellContextmenu(this.onCellContextmenu, this);

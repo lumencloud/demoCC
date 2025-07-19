@@ -80,15 +80,8 @@ module.exports = (srv) => {
             const rsp_col_list = ['year', 'month_amt', 'ifnull(sum(total_year_amt), 0) as total_year_amt', 'ifnull(sum(bill_year_amt), 0) as bill_year_amt'];
             const rsp_where_conditions = {'year' : { in: [year, last_year] }, 'month_amt': month, 'is_delivery': true};
             const rsp_groupBy_cols = ['year','month_amt'];
-
-            /**
-             * +++++ TBD +++++
-             * 권한 체크하여 사용자가 조회 가능한 조직인지 판별 후 코드 진행
-             */
-
             /**
              * org_id 파라미터값으로 조직정보 조회
-             * 
              */
             // org 전체 데이터
             let org_query = await SELECT.from(org_full_level);

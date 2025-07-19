@@ -119,22 +119,25 @@
                                     wrapping="true"
                                 />
                                 <Label
-                                    text="추정"
+                                    text="합계"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'forecast_value', targetType: 'any'}
+                                            {path:'forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -198,19 +201,22 @@
                                     text="실적"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'secured_actual_value', targetType: 'any'}
+                                            {path:'secured_actual_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'secured_actual_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -236,6 +242,7 @@
                                     text="확보 추정"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
@@ -249,6 +256,7 @@
                                     tooltip="{
                                         parts:[
                                             {path:'secured_forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -274,19 +282,22 @@
                                     text="미확보"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'not_secured_value', targetType: 'any'}
+                                            {path:'not_secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'not_secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -318,13 +329,15 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'plan_ratio', targetType: 'any'}
+                                            {path:'plan_ratio', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'plan_ratio', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -356,13 +369,15 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'yoy', targetType: 'any'}
+                                            {path:'yoy', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'yoy', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -457,22 +472,25 @@
                                     wrapping="true"
                                 />
                                 <Label
-                                    text="추정"
+                                    text="합계"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'forecast_value', targetType: 'any'}
+                                            {path:'forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -504,13 +522,15 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'secured_value', targetType: 'any'}
+                                            {path:'secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -536,19 +556,22 @@
                                     text="실적"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'secured_actual_value', targetType: 'any'}
+                                            {path:'secured_actual_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'secured_actual_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -574,19 +597,22 @@
                                     text="확보 추정"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'secured_forecast_value', targetType: 'any'}
+                                            {path:'secured_forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'secured_forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -612,19 +638,22 @@
                                     text="미확보"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'not_secured_value', targetType: 'any'}
+                                            {path:'not_secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'not_secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -656,13 +685,15 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'plan_ratio', targetType: 'any'}
+                                            {path:'plan_ratio', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'plan_ratio', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -694,13 +725,15 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'yoy', targetType: 'any'}
+                                            {path:'yoy', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'yoy', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -795,22 +828,25 @@
                                     wrapping="true"
                                 />
                                 <Label
-                                    text="추정"
+                                    text="합계"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'forecast_value', targetType: 'any'}
+                                            {path:'forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -842,13 +878,15 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'secured_value', targetType: 'any'}
+                                            {path:'secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -874,19 +912,22 @@
                                     text="실적"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'secured_actual_value', targetType: 'any'}
+                                            {path:'secured_actual_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'secured_actual_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -912,19 +953,22 @@
                                     text="확보 추정"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'secured_forecast_value', targetType: 'any'}
+                                            {path:'secured_forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'secured_forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -950,19 +994,22 @@
                                     text="미확보"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'not_secured_value', targetType: 'any'}
+                                            {path:'not_secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'not_secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -994,13 +1041,15 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'plan_ratio', targetType: 'any'}
+                                            {path:'plan_ratio', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'plan_ratio', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -1032,13 +1081,15 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'yoy', targetType: 'any'}
+                                            {path:'yoy', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'yoy', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -1133,22 +1184,25 @@
                                     wrapping="true"
                                 />
                                 <Label
-                                    text="추정"
+                                    text="합계"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'forecast_value', targetType: 'any'}
+                                            {path:'forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -1173,19 +1227,22 @@
                                     text="확보"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'secured_value', targetType: 'any'}
+                                            {path:'secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -1211,19 +1268,22 @@
                                     text="미확보"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'not_secured_value', targetType: 'any'}
+                                            {path:'not_secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'not_secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -1255,13 +1315,15 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'plan_ratio', targetType: 'any'}
+                                            {path:'plan_ratio', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'plan_ratio', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -1293,13 +1355,15 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'yoy', targetType: 'any'}
+                                            {path:'yoy', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'yoy', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -1418,22 +1482,25 @@
                                     wrapping="true"
                                 />
                                 <Label
-                                    text="추정"
+                                    text="합계"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'forecast_value', targetType: 'any'}
+                                            {path:'forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -1458,19 +1525,22 @@
                                     text="확보"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'secured_value', targetType: 'any'}
+                                            {path:'secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -1496,19 +1566,22 @@
                                     text="미확보"
                                     textAlign="Center"
                                     width="100%"
+                                    class="plan-emphasize"
                                 />
                             </table:multiLabels>
                             <table:template>
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'not_secured_value', targetType: 'any'}
+                                            {path:'not_secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'not_secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -1563,13 +1636,15 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'yoy', targetType: 'any'}
+                                            {path:'yoy', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
                                             {path:'yoy', targetType: 'any'},
+                                            {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],
                                         formatter: '.onFormatPerformance'                                
@@ -1684,7 +1759,7 @@
                                         wrapping="true"
                                     />
                                     <Label
-                                        text="추정"
+                                        text="합계"
                                         textAlign="Center"
                                         width="100%"
                                     />
@@ -1693,13 +1768,15 @@
                                     <Text emptyIndicatorMode="On"
                                         text="{
                                             parts:[
-                                                {path:'forecast_value', targetType: 'any'}
+                                                {path:'forecast_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                             ],
                                             formatter: '.onFormatPerformance'
                                         }"
                                         tooltip="{
                                             parts:[
                                                 {path:'forecast_value', targetType: 'any'},
+                                                {path:'type', targetType: 'any'},
                                                 {value:'tooltip'}
                                             ],
                                             formatter: '.onFormatPerformance'                                
@@ -1730,13 +1807,15 @@
                                     <Text emptyIndicatorMode="On"
                                         text="{
                                             parts:[
-                                                {path:'secured_value', targetType: 'any'}
+                                                {path:'secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                             ],
                                             formatter: '.onFormatPerformance'
                                         }"
                                         tooltip="{
                                             parts:[
                                                 {path:'secured_value', targetType: 'any'},
+                                                {path:'type', targetType: 'any'},
                                                 {value:'tooltip'}
                                             ],
                                             formatter: '.onFormatPerformance'                                
@@ -1768,13 +1847,15 @@
                                     <Text emptyIndicatorMode="On"
                                         text="{
                                             parts:[
-                                                {path:'not_secured_value', targetType: 'any'}
+                                                {path:'not_secured_value', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                             ],
                                             formatter: '.onFormatPerformance'
                                         }"
                                         tooltip="{
                                             parts:[
                                                 {path:'not_secured_value', targetType: 'any'},
+                                                {path:'type', targetType: 'any'},
                                                 {value:'tooltip'}
                                             ],
                                             formatter: '.onFormatPerformance'                                
@@ -1830,13 +1911,15 @@
                                     <Text emptyIndicatorMode="On"
                                         text="{
                                             parts:[
-                                                {path:'yoy', targetType: 'any'}
+                                                {path:'yoy', targetType: 'any'},
+                                            {path:'type', targetType: 'any'}
                                             ],
                                             formatter: '.onFormatPerformance'
                                         }"
                                         tooltip="{
                                             parts:[
                                                 {path:'yoy', targetType: 'any'},
+                                                {path:'type', targetType: 'any'},
                                                 {value:'tooltip'}
                                             ],
                                             formatter: '.onFormatPerformance'                                

@@ -93,7 +93,7 @@ sap.ui.define(
           return Math.floor(oResult.value.find(oData => oData.display_order == "1").actual_curr_ym_value)
         });
         // 차트 제목 및 주요지표 설정
-        let oNumberFormat = NumberFormat.getIntegerInstance({
+        let oNumberFormat = NumberFormat.getFloatInstance({
           groupingEnabled: true,
           groupingSeparator: ','
         });
@@ -237,7 +237,7 @@ sap.ui.define(
       //   });
 
       //   // 차트 제목 및 주요지표 설정
-      //   let oNumberFormat = NumberFormat.getIntegerInstance({
+      //   let oNumberFormat = NumberFormat.getFloatInstance({
       //     groupingEnabled: true,
       //     groupingSeparator: ','
       //   });
@@ -338,7 +338,7 @@ sap.ui.define(
       //   // });
 
       //   // // 차트 제목 및 주요지표 설정
-      //   // let oNumberFormat = NumberFormat.getIntegerInstance({
+      //   // let oNumberFormat = NumberFormat.getFloatInstance({
       //   //   groupingEnabled: true,
       //   //   groupingSeparator: ','
       //   // });

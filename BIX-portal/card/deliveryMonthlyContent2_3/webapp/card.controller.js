@@ -13,8 +13,8 @@ sap.ui.define([
 
 
         onInit: function () {
-            this._dataSetting();
-            this._oEventBus.subscribe("aireport", "infoSet", this._dataSetting, this);
+            // this._dataSetting();
+            this._oEventBus.subscribe("aireport", "deliContent2_3", this._modelSetting, this);
         },
 
         _dataSetting: async function () {
@@ -42,11 +42,11 @@ sap.ui.define([
                     this.byId("table").setVisibleRowCountMode("Fixed");
                     this.byId("table").setVisibleRowCount(aResult.value.length);
 
-                    this.dataLoad();
                 }.bind(this))
                 .catch((oErr) => {
                     Module.displayStatus(this.byId("table"), oErr.error.code, this.byId("cardContent"));
                 });
+            this.dataLoad();
             this.byId("cardContent").setBusy(false)
         },
 
@@ -57,8 +57,9 @@ sap.ui.define([
             })
         },
 
-        _modelSetting: function (aResult) {
-            this.getView().setModel(new JSONModel(aResult), "Model");
+        _modelSetting: function (sChannel, sEventId, oData) {
+            this.getView().setModel(new JSONModel(oData.data), "Model");
+            this.dataLoad();
         },
 
         onFormatPerformance: function (iValue, sType) {

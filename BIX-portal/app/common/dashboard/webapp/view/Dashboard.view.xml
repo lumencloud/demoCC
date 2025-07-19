@@ -115,6 +115,7 @@
                                     valueFormat="yyyy-MM"
                                     displayFormat="yyyy-MM"
                                     change="deadlinchange"
+                                    editable="{= ${main_userModel>/auth} === '관리자' || ${main_userModel>/auth} === 'SYS ADMIN'}"
                                 />
 
                                 <!-- <Text text="{date>/year}-{date>/month}"/> -->

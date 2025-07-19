@@ -72,7 +72,7 @@
           },
           "model_config": {
             "model_id": "model_02",
-            "model_name": "gpt-4.1-mini",
+            "model_name": "gpt-4.1",
             "model_params": {
                 "temperature": 0.3,
                 "max_tokens": 4000

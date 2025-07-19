@@ -35,7 +35,7 @@ sap.ui.define(
       },
 
       _updateChart: async function (sChannelId, sEventId, oData) {
-        console.log("update activation")
+        //console.log("update activation")
         let oResult = await this._setEventBusData(oData);
 
         this._oMyChart.data.labels = oResult.aLabels;
@@ -94,7 +94,7 @@ sap.ui.define(
         });
 
         // 차트 제목 및 주요지표 설정
-        let oNumberFormat = NumberFormat.getIntegerInstance({
+        let oNumberFormat = NumberFormat.getFloatInstance({
           groupingEnabled: true,
           groupingSeparator: ','
         });
@@ -237,7 +237,7 @@ sap.ui.define(
       //   });
 
       //   // 차트 제목 및 주요지표 설정
-      //   let oNumberFormat = NumberFormat.getIntegerInstance({
+      //   let oNumberFormat = NumberFormat.getFloatInstance({
       //     groupingEnabled: true,
       //     groupingSeparator: ','
       //   });
@@ -326,7 +326,7 @@ sap.ui.define(
       // });
 
       // // 차트 제목 및 주요지표 설정
-      // let oNumberFormat = NumberFormat.getIntegerInstance({
+      // let oNumberFormat = NumberFormat.getFloatInstance({
       //   groupingEnabled: true,
       //   groupingSeparator: ','
       // });

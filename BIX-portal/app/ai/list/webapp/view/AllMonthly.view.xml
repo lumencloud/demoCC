@@ -12,84 +12,84 @@
                 <Carousel width="1000px" height="1457px" id="carousel" pageChanged="onPageChanged">
                     <VBox id="vbox1" class="ai-report-page">
                         <HBox class="ai-report-page-header" justifyContent="End">
-                            <Text text=""/>
+                            <Text text="" />
                         </HBox>
                         <HBox justifyContent="SpaceBetween" renderType="Bare">
                             <VBox width="33%" gap="5px">
-                                <w:Card manifest="../bix/card/deliveryMonthlyTitle1/manifest.json" height="380px" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
-                                <w:Card manifest="../bix/card/deliveryMonthlyContent1_2/manifest.json" height="500px" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
+                                <w:Card manifest="../bix/card/deliveryMonthlyTitle1/manifest.json" height="380px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
+                                <w:Card manifest="../bix/card/deliveryMonthlyContent1_2/manifest.json" height="500px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                                 <VBox class="custom-ai-report-test-card-container border-gray" height="360px">
-                                    <Title text="전년동기 대비 진척도 Gap 비교" width="100%" textAlign="Center" class="bottom-spacing"/>
-                                    <w:Card manifest="../bix/card/deliveryMonthlyContent1_3/manifest.json" height="330px" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
+                                    <Title text="전년동기 대비 진척도 Gap 비교" width="100%" textAlign="Center" class="bottom-spacing" busyIndicatorDelay="0" />
+                                    <w:Card manifest="../bix/card/deliveryMonthlyContent1_3/manifest.json" height="330px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                                 </VBox>
                             </VBox>
                             <VBox width="66%">
-                                <w:Card manifest="../bix/card/deliveryMonthlyTitle2/manifest.json" height="160px" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
-                                <!-- <w:Card manifest="../bix/card/deliveryMonthlyContent1_1/manifest.json" height="1080px" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/> -->
+                                <w:Card manifest="../bix/card/deliveryMonthlyTitle2/manifest.json" height="160px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
+                                <w:Card manifest="../bix/card/deliveryMonthlyContent1_1/manifest.json" height="1080px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                             </VBox>
                         </HBox>
                         <HBox class="ai-report-page-footer" justifyContent="End">
-                            <Text text="1"/>
-                            <Image src="./resource/image/sk.svg"/>
+                            <Text text="1" />
+                            <Image src="./resource/image/sk.svg" />
                         </HBox>
                     </VBox>
-                    <VBox alignItems="Center" renderType="Bare" class="ai-report-page"  >
+                    <VBox alignItems="Center" renderType="Bare" class="ai-report-page">
                         <HBox class="ai-report-page-header" justifyContent="End">
-                            <Text text="{ui>/month}월 Monthly Report"/>
+                            <Text text="{ui>/month}월 Monthly Report" />
                         </HBox>
                         <VBox width="100%" class="custom-ai-report-test-card-container" height="500px">
-                            <Title text="그림 1. Account 별 수주 매출 현황"/>
-                            <w:Card manifest="../bix/card/allMonthlyContent2_1/manifest.json" height="440px" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
+                            <Title text="그림 1. Account 별 매출 현황" />
+                            <w:Card manifest="../bix/card/allMonthlyContent2_1/manifest.json" height="440px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                         </VBox>
                         <VBox width="100%" class="custom-ai-report-test-card-container" height="500px">
-                            <Title text="그림 2. 부문 별 매출 현황"/>
-                            <w:Card manifest="../bix/card/allMonthlyContent2_2/manifest.json" height="440px" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
+                            <Title text="그림 2. 부문 별 매출 현황" />
+                            <w:Card manifest="../bix/card/allMonthlyContent2_2/manifest.json" height="440px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                         </VBox>
                         <HBox width="100%" class="content-layout-2-1" justifyContent="SpaceBetween">
                             <VBox class="custom-ai-report-test-card-container" height="390px">
-                                <Title text="그림 3. 당월 BR 현황"/>
-                                <w:Card manifest="../bix/card/deliveryMonthlyContent2_2/manifest.json" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
+                                <Title text="그림 3. 당월 BR 현황" />
+                                <w:Card manifest="../bix/card/deliveryMonthlyContent2_2/manifest.json" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                             </VBox>
                             <VBox class="custom-ai-report-test-card-container" height="390px">
-                                <Title text="표 1. 당월 RoHc 상세"/>
-                                <w:Card manifest="../bix/card/deliveryMonthlyContent2_3/manifest.json" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
+                                <Title text="표 1. 당월 RoHc 상세" />
+                                <w:Card manifest="../bix/card/deliveryMonthlyContent2_3/manifest.json" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                             </VBox>
                         </HBox>
                         <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
-                            <Text text="2"/>
-                            <Image src="./resource/image/sk.svg"/>
+                            <Text text="2" />
+                            <Image src="./resource/image/sk.svg" />
                         </HBox>
                     </VBox>
-                    <VBox alignItems="Center" renderType="Bare" class="ai-report-page"  >
+                    <VBox alignItems="Center" renderType="Bare" class="ai-report-page">
                         <HBox class="ai-report-page-header" justifyContent="End">
-                            <Text text="{ui>/month}월 Monthly Report"/>
+                            <Text text="{ui>/month}월 Monthly Report" />
                         </HBox>
                         <HBox width="100%" class="content-layout-1-2" justifyContent="SpaceBetween">
-                            <w:Card manifest="../bix/card/deliveryMonthlyContent3_1/manifest.json" height="520px" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
-                            <w:Card manifest="../bix/card/deliveryMonthlyContent3_2/manifest.json" height="520px" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
+                            <w:Card manifest="../bix/card/deliveryMonthlyContent3_1/manifest.json" height="520px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
+                            <w:Card manifest="../bix/card/deliveryMonthlyContent3_2/manifest.json" height="520px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                         </HBox>
                         <VBox width="100%" class="custom-ai-report-test-card-container" height="460px">
-                            <Title text="그림 4. 당해년도 실적 추정"/>
-                            <w:Card manifest="../bix/card/deliveryMonthlyContent3_3/manifest.json" dataMode="Auto" overflow="Default" height="400px" fieldGroupIds="cardGroup"/>
+                            <Title text="그림 4. 당해년도 실적 추정" />
+                            <w:Card manifest="../bix/card/deliveryMonthlyContent3_3/manifest.json" dataMode="Active" overflow="Default" height="400px" busyIndicatorDelay="0" />
                         </VBox>
                         <HBox width="100%" class="content-layout-1-1" justifyContent="SpaceBetween">
                             <VBox class="custom-ai-report-test-card-container" height="300px">
-                                <Title text="그림 5. Deal Stage 별 Pipiline 현황"/>
-                                <w:Card manifest="../bix/card/allMonthlyContent3_4/manifest.json" dataMode="Auto" overflow="Default" height="260px" fieldGroupIds="cardGroup"/>
+                                <Title text="그림 5. Deal Stage 별 Pipiline 현황" />
+                                <w:Card manifest="../bix/card/allMonthlyContent3_4/manifest.json" dataMode="Active" overflow="Default" height="260px" busyIndicatorDelay="0" />
                             </VBox>
                             <VBox class="custom-ai-report-test-card-container" height="300px">
-                                <Title text="그림 6. 수주 금액 별 Pipeline 현황"/>
-                                <w:Card manifest="../bix/card/allMonthlyContent3_5/manifest.json" dataMode="Auto" overflow="Default" height="260px" fieldGroupIds="cardGroup"/>
+                                <Title text="그림 6. 수주 금액 별 Pipeline 현황" />
+                                <w:Card manifest="../bix/card/allMonthlyContent3_5/manifest.json" dataMode="Active" overflow="Default" height="260px" busyIndicatorDelay="0" />
                             </VBox>
                         </HBox>
                         <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
-                            <Text text="3"/>
-                            <Image src="./resource/image/sk.svg"/>
+                            <Text text="3" />
+                            <Image src="./resource/image/sk.svg" />
                         </HBox>
                     </VBox>
                     <VBox alignItems="Center" id="vbox4" class="ai-report-page" renderType="Bare" height="100%">
                         <HBox class="ai-report-page-header" justifyContent="End">
-                            <Text text="{ui>/month}월 Monthly Report"/>
+                            <Text text="{ui>/month}월 Monthly Report" />
                         </HBox>
                         <VBox width="100%" height="360px" class="custom-ai-report-test-card-container" backgroundDesign="Transparent">
                             <Title text="표 2. 당월 Pipeline 실적" />
@@ -97,16 +97,16 @@
                                 <VBox width="50%" class="custom-ai-report-test-card-box1">
                                     <HBox class="custom-ai-report-test-header-box">
                                         <Text text="우선 협상 단계" />
-                                        <Text text="{='(총 ' + ${negoData>/iAmount} +'억원 / '  + ${negoData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                        <Text text="{='(총 ' + ${negoData>/iAmount} +'억원 / '  + ${negoData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" visible="{= %{negoData>/iCount} > 0}" />
                                     </HBox>
-                                    <w:Card id="negotiationStage" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyNegotiationStage/manifest.json" width="100%" height="255px" dataMode="Auto" fieldGroupIds="cardGroup" overflow="Default" />
+                                    <w:Card id="negotiationStage" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyNegotiationStage/manifest.json" width="100%" height="255px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                                 </VBox>
                                 <VBox width="50%" class="custom-ai-report-test-card-box2">
                                     <HBox class="custom-ai-report-test-header-box">
                                         <Text text="계약 완료" />
-                                        <Text text="{='(총 ' + ${comData>/iAmount} +'억원 / '  + ${comData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                        <Text text="{='(총 ' + ${comData>/iAmount} +'억원 / '  + ${comData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" visible="{= %{comData>/iCount} > 0}" />
                                     </HBox>
-                                    <w:Card id="completedContract" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyCompletedContract/manifest.json" width="100%" height="255px" dataMode="Auto" fieldGroupIds="cardGroup" overflow="Default" />
+                                    <w:Card id="completedContract" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyCompletedContract/manifest.json" width="100%" height="255px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                                 </VBox>
                             </HBox>
                         </VBox>
@@ -116,43 +116,40 @@
                                 <VBox width="45%" class="custom-ai-report-test-card-box1">
                                     <HBox class="custom-ai-report-test-header-box" width="100%">
                                         <Text text="신규등록" />
-                                        <Text text="{='(총 ' + ${newData>/iAmount} +'억원 / '  + ${newData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                        <Text text="{='(총 ' + ${newData>/iAmount} +'억원 / '  + ${newData>/iCount} + '건)' }" visible="{= %{newData>/iCount} > 0}" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
                                     </HBox>
-                                    <w:Card id="newRegist" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyNewRegist/manifest.json" height="255px" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
+                                    <w:Card id="newRegist" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyNewRegist/manifest.json" height="255px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                                 </VBox>
                                 <VBox width="65%" class="custom-ai-report-test-card-box2">
                                     <HBox class="custom-ai-report-test-header-box" width="100%">
                                         <Text text="Deal Lost / Deselected" />
-                                        <Text text="{='(총 ' + ${deselData>/iAmount} +'억원 / '  + ${deselData>/iCount} + '건)' }" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
+                                        <Text text="{='(총 ' + ${deselData>/iAmount} +'억원 / '  + ${deselData>/iCount} + '건)' }" visible="{= %{deselData>/iCount} > 0}" class="custom-ai-report-test-bau-text sapUiTinyMarginBegin" />
                                     </HBox>
-                                    <w:Card id="deselected" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyDeselected/manifest.json" height="255px" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
+                                    <w:Card id="deselected" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyDeselected/manifest.json" height="255px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                                 </VBox>
                             </HBox>
                         </VBox>
                         <VBox width="100%" height="360px" backgroundDesign="Transparent" class="custom-ai-report-test-card-container">
                             <Title text="표 4. 입찰 예정 사업" />
                             <VBox width="100%">
-                                <w:Card id="scheduledBiddingProjects" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyScheduledBiddingProjects/manifest.json" width="100%" height="255px" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/>
+                                <w:Card id="scheduledBiddingProjects" class="custom-ai-report-test-card-content" manifest="../bix/card/monthlyScheduledBiddingProjects/manifest.json" width="100%" height="255px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                             </VBox>
                         </VBox>
                         <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
-                            <Text text="4"/>
-                            <Image src="./resource/image/sk.svg"/>
+                            <Text text="4" />
+                            <Image src="./resource/image/sk.svg" />
                         </HBox>
                     </VBox>
-                    <VBox alignItems="Center"   class="ai-report-page" renderType="Bare" height="100%">
+                    <VBox alignItems="Center" class="ai-report-page" renderType="Bare" height="100%">
                         <HBox class="ai-report-page-header" justifyContent="End">
-                            <Text text="{ui>/month}월 Monthly Report"/>
+                            <Text text="{ui>/month}월 Monthly Report" />
                         </HBox>
                         <VBox width="100%" class="custom-ai-report-test-card-container">
-                            <!-- <w:Card manifest="../bix/card/aiReportMonthlyAiInsight/manifest.json" width="100%" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/> -->
-                        </VBox>
-                        <VBox width="100%" class="custom-ai-report-test-card-container">
-                            <!-- <w:Card manifest="../bix/card/aiReportMonthlyAiInsightSmry/manifest.json" width="100%" dataMode="Auto" overflow="Default" fieldGroupIds="cardGroup"/> -->
+                            <w:Card manifest="../bix/card/aiReportMonthlyAiInsight/manifest.json" width="100%" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                         </VBox>
                         <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
-                            <Text text="5"/>
-                            <Image src="./resource/image/sk.svg"/>
+                            <Text text="5" />
+                            <Image src="./resource/image/sk.svg" />
                         </HBox>
                     </VBox>
                 </Carousel>

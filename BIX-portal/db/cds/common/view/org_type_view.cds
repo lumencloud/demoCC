@@ -3,11 +3,6 @@ using common.org_type as common_org_type from '../org_type';
 using common.code_header as common_code_header from '../code';
 using common.code_item as common_code_item from '../code';
 
-
-/**
- * 등록일 : 250513
- * 등록자 : 이금복
- */
 namespace common;
 
 /**

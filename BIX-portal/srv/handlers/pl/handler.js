@@ -20,13 +20,13 @@ module.exports = class PL_Service extends cds.ApplicationService {
         /**
          * [실적PL] PL 디테일 테이블 엑셀 pl 데이터 호출 API
          */
-        const get_actual_pl_org_detail_excel = require('./api/get_actual_pl_org_detail_excel');
-        get_actual_pl_org_detail_excel(this);
+        // const get_actual_pl_org_detail_excel = require('./api/get_actual_pl_org_detail_excel');
+        // get_actual_pl_org_detail_excel(this);
         /**
          * [실적PL] PL 디테일 테이블 엑셀 목표 데이터 호출 API
          */
-        const get_actual_pl_org_detail_target_excel = require('./api/get_actual_pl_org_detail_target_excel');
-        get_actual_pl_org_detail_target_excel(this);
+        // const get_actual_pl_org_detail_target_excel = require('./api/get_actual_pl_org_detail_target_excel');
+        // get_actual_pl_org_detail_target_excel(this);
 
         
         /**
@@ -157,6 +157,9 @@ module.exports = class PL_Service extends cds.ApplicationService {
 
         const get_forecast_pl = require('./api/get_forecast_pl');
         get_forecast_pl(this);
+
+        const get_pl_excel = require('./api/get_pl_excel');
+        get_pl_excel(this);
 
         const get_plan_dt_sale = require('./api/get_plan_dt_sale');
         get_plan_dt_sale(this);
@@ -348,6 +351,8 @@ module.exports = class PL_Service extends cds.ApplicationService {
          */
         const get_actual_m_pl_total = require('./api/get_actual_m_pl_total');
         get_actual_m_pl_total(this);
+        const get_actual_m_pl_total_org = require('./api/get_actual_m_pl_total_org');
+        get_actual_m_pl_total_org(this);
 
         // function 핸들러 소스코드 분리
         // const get_pl_treemap = require('./get_pl_treemap');

@@ -13,8 +13,8 @@ sap.ui.define(
       _oEventBus: EventBus.getInstance(),
 
       onInit: function () {
-        this._dataSetting();
-        this._oEventBus.subscribe("aireport", "infoSet", this._dataSetting, this)
+        // this._dataSetting();
+        this._oEventBus.subscribe("aireport", "lost", this._modelSetting, this)
       },
 
       _dataSetting: async function () {
@@ -59,12 +59,18 @@ sap.ui.define(
         })
       },
 
-      _modelSetting: function (aResult) {
-
+      _modelSetting: function (aResChannel, sEventId, oData) {
+        let aResult = oData.data
         // 총 금액
         let iAmount = 0;
         aResult.forEach((oResult) => iAmount += oResult.rodr_amt)
-        
+        // 실주 사유 빈값 처리
+        aResult.map((oResult) => {
+          if (oResult.cls_rsn_tp_nm === '' ) {
+            oResult.cls_rsn_tp_nm = "없음"
+          }
+        })
+
         // 기타를 최하단으로 정렬
         if (aResult) {
           aResult.sort((a, b) => {
@@ -94,7 +100,7 @@ sap.ui.define(
         // 모델용 객체 생성
         let oModel = {
           iCount: iCount || 0,
-          iAmount: iAmount.toFixed(0) || 0,
+          iAmount: this._formatTotal(iAmount.toFixed()) || 0,
           first: aResult[0],
           second: aResult[1],
           third: aResult[2],
@@ -106,8 +112,9 @@ sap.ui.define(
           oModel["etcCount"] = aResult[4].rodr_cnt
           oModel["etcAmount"] = aResult[4].rodr_amt.toFixed(1)
           oModel["etcName"] = aResult[4].biz_tp_account_nm
+          oModel["cls_rsn_tp_nm"] = aResult[4].cls_rsn_tp_nm
         }
-
+        this.dataLoad();
         this._oEventBus.publish("aiReport", "deselMonthData", oModel)
         this.getOwnerComponent().setModel(new JSONModel(oModel), "Model");
 
@@ -148,7 +155,7 @@ sap.ui.define(
 
         let fNumber = parseFloat(sValue);
         if (Number.isInteger(fNumber)) {
-          let oFormatter = NumberFormat.getIntegerInstance({
+          let oFormatter = NumberFormat.getFloatInstance({
             groupingEnabled: true
           });
           return oFormatter.format(fNumber);

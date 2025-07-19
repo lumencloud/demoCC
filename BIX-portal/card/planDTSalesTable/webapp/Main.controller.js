@@ -41,20 +41,24 @@ sap.ui.define([
          */
         _aTableLists: [],
 
-        onInit: async function () {
+        onInit: function () {
             // 데이터 불러오기 전에 모든 테이블이 보여서 먼저 선언
             this.getView().setModel(new JSONModel({}), "uiModel");
 
+            this._asyncInit();
+
+            this._oEventBus.subscribe("pl", "search", this._bindTable, this);
+            this._oEventBus.subscribe("pl", "detailSelect", this._changeDetailSelect, this);
+            
+            this._aiPopupManager = new AIPopupManager();
+        },
+        _asyncInit: async function () {
             // 초기 JSON 모델 설정
             await this._setModel();
 
             // 테이블 바인딩
             this._bindTable();
-            this._oEventBus.subscribe("pl", "search", this._bindTable, this);
-
-            this._aiPopupManager = new AIPopupManager();
         },
-
         /**
          * JSON 모델 설정
          */
@@ -63,8 +67,9 @@ sap.ui.define([
             let oSearchData = JSON.parse(sessionStorage.getItem("initSearchModel"));
 
             // 현재 해시를 기준으로 DB에서 Select에 들어갈 카드 정보를 불러옴
-            let aHash = Modules.getHashArray();
-            let sSelectPath = `/pl_content_view(page_path='${aHash[0]}',position='detail',grid_layout_info=null,detail_path='${aHash[2]}',detail_info='${aHash[3]}')/Set`;
+            let oHashData = this.getOwnerComponent().oCard.getModel("hashModel").getData();
+
+            let sSelectPath = `/pl_content_view(page_path='${oHashData.page}',position='detail',grid_layout_info=null,detail_path='${oHashData.detail}',detail_info='${oHashData.detailType}')/Set`;
 
             // 로직에 따라서 조직 필터링
             let aOrgFilter = [`(length(sub_key) gt 0 and sub_key ne 'org_delivery' and sub_key ne 'org_account' and sub_key ne 'org')`];
@@ -87,6 +92,13 @@ sap.ui.define([
             let aSelectData = aSelectContexts.map(oContext => oContext.getObject());
 
             // 카드 정보를 selectModel로 설정 (sub_key, sub_text)
+            if(oSearchData.org_level !== "lv1" && oSearchData.org_level !== "lv2"){
+                let aOrgData = aSelectData.find(data => data.sub_key === 'org_delivery' || data.sub_key === 'org_account')
+                if(!!aOrgData){
+                    let aOrgSubText = aOrgData.sub_text.split(' ')
+                    aOrgData.sub_text = aOrgSubText[aOrgSubText.length-1]
+                }
+            }
             this.getView().setModel(new JSONModel(aSelectData), "selectModel");
 
             // 기본적으로 첫 번째 항목의 테이블을 보여줌
@@ -108,6 +120,21 @@ sap.ui.define([
         },
 
         /**
+         * 뒤로가기, 앞으로가기에 의해 변경된 URL에 따라 detailSelect 다시 설정
+         * @param {String} sChannelId 
+         * @param {String} sEventId 
+         * @param {Object} oEventData 
+         */
+        _changeDetailSelect: function (sChannelId, sEventId, oEventData) {
+            // DOM이 있을 때만 detailSelect를 변경
+            let oDom = this.getView().getDomRef();
+            if (oDom) {
+                let sKey = oEventData["detailSelect"];
+                this.byId("detailSelect").setSelectedKey(sKey);
+            }
+        },
+        
+        /**
          * Select 변경 이벤트
          * @param {Event} oEvent 
          */
@@ -118,26 +145,29 @@ sap.ui.define([
             let oUiModel = this.getView().getModel("uiModel");
             oUiModel.setProperty("/tableKind", sKey);
 
+            // detailCard Component 반환
+            let oCard = this.getOwnerComponent().oCard;
+            let oCardComponent = oCard._oComponent;
+
+            // PL 실적 hashModel에 detailSelect 업데이트
+            let oHashModel = oCardComponent.getModel("hashModel");
+            oHashModel.setProperty("/detailSelect", sKey);
+
+            // PL 실적 Manifest Routing
+            let oHashData = oHashModel.getData();
+            let sRoute = (oHashData["page"] === "actual" ? "RouteActual" : "RoutePlan");
+            oCardComponent.getRouter().navTo(sRoute, {
+                pageView: oHashData["pageView"],
+                detail: oHashData["detail"],
+                detailType: oHashData["detailType"],
+                orgId: oHashData["orgId"],
+                detailSelect: oHashData["detailSelect"],
+            });
+
             // 선택한 항목의 테이블만 병합
             let oItem = oEvent.getParameters()["item"];
             let iTableIndex = oSelect.indexOfItem(oItem);
             await this._setTableMerge([this._aTableLists[iTableIndex]]);
-
-            // 해시 마지막 배열을 sKey로 변경
-            let sCurrHash = HashChanger.getInstance().getHash();
-            let aHash = sCurrHash.split("/");
-
-            // 배열 두 번 제거 (조직 ID, Select Key)
-            let sOrgId = aHash.pop();
-            aHash.pop();
-
-            // 배열 두 번 추가 (조직 ID, Select Key)
-            aHash.push(sKey);
-            aHash.push(sOrgId);
-
-            // 해시 조합
-            let sNewHash = aHash.join("/");
-            HashChanger.getInstance().setHash(sNewHash);
         },
 
         _setBusy: function (bType) {
@@ -164,9 +194,11 @@ sap.ui.define([
 
             // detailSelect 해시에 따른 Select 선택
             let oSelect = this.byId("detailSelect");
-            let aHash = Modules.getHashArray();
-            let sDetailKey = aHash?.[4];
-            if (sDetailKey) {   // 해시가 있는 경우 Select 설정
+            let oHashData = this.getOwnerComponent().oCard.getModel("hashModel").getData();
+            let sDetailKey = oHashData["detailSelect"];
+            let oSelectData = this.getView().getModel("selectModel").getData();
+            let bCheck = oSelectData.find(data => data.sub_key === sDetailKey)
+            if (bCheck) {   // 해시가 있는 경우 Select 설정
                 oSelect.setSelectedKey(sDetailKey);
             } else {    // 없는 경우 첫 번째 Select 항목 선택
                 let oFirstDetailKey = this.getView().getModel("selectModel").getProperty("/0/sub_key");
@@ -186,7 +218,6 @@ sap.ui.define([
             const oPlModel = this.getOwnerComponent().getModel("pl");
 
             let aBindingPath = [];
-            let oSelectData = this.getView().getModel("selectModel").getData();
             if (oSelectData.find(oData => oData.sub_key === "org")) {   // 조직
                 aBindingPath.push(`/get_forecast_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oData.orgId}')`);
             }
@@ -248,14 +279,27 @@ sap.ui.define([
         _setTable: function () {
             const oCustomerTable = this.getView().getControlsByFieldGroupId("member_year").find(object => object.getFieldGroupIds().length > 0);
             const oCustomerData = oCustomerTable.getModel().getData();
-            if (oCustomerData[0]) {
+            // if (oCustomerData[0]) {
                 const oTaskTable = this.getView().getControlsByFieldGroupId("task_year").find(object => object.getFieldGroupIds().length > 0);
                 const oTaskData = oTaskTable.getModel().getData();
                 const oCustommerColumns = ["name", "total_sale"];
                 const oTaskColumns = ["name", "total_sale"];
 
-                const sCustomerYear = Object.keys(oCustomerData[0]).filter(key => /^\d{4}$/.test(key))
-                const sTaskYear = Object.keys(oTaskData[0]).filter(key => /^\d{4}$/.test(key))
+                //임시처리
+                let sCustomerYear
+                if (oCustomerData[0]) {
+                    sCustomerYear = Object.keys(oCustomerData[0]).filter(key => /^\d{4}$/.test(key))
+                }else{
+                    sCustomerYear = ['2024', '2025']
+                }
+
+                let sTaskYear
+                if (oTaskData[0]) {
+                    sTaskYear = Object.keys(oTaskData[0]).filter(key => /^\d{4}$/.test(key))
+                }else{
+                    sTaskYear = ['2024', '2025', '2026', '2027', '2028', '2029', '2030'];
+                }
+                //임시처리
 
                 oCustommerColumns.splice(1, 0, ...sCustomerYear);
                 oTaskColumns.splice(1, 0, ...sTaskYear);
@@ -330,7 +374,7 @@ sap.ui.define([
                 })
                 oCustomerTable.bindRows("/");
                 oTaskTable.bindRows("/");
-            }
+            // }
         },
 
         _setVisibleRowCount: function (aResults) {
@@ -340,7 +384,7 @@ sap.ui.define([
                 // 처음 화면 렌더링시 table의 visibleCountMode auto 와 <FlexItemData growFactor="1"/>상태에서
                 // 화면에 꽉 찬 테이블의 row 갯수를 전역변수에 저장하기 위함
 
-                if (oTable) {
+                if (oTable && !oTable?.mEventRegistry?.cellContextmenu) {
                     oTable.attachCellClick(this.onCellClick, this);
                     oTable.attachCellContextmenu(this.onCellContextmenu, this);
                 }
@@ -432,6 +476,13 @@ sap.ui.define([
                 this._excludeClick = true;
             }
 
+            const sTableKind = this.getView().getModel("uiModel").getData().tableKind
+            if(sTableKind==="org_delivery"||sTableKind==="org_account" || sTableKind==="account"){
+                this._excludeClick = !Module.checkAiPopupDisplay(oRowData,["forecast_value","secured_value","not_secured_value"]);
+
+            }
+            
+
             // org와 account만 우클릭 메뉴 AI Report 활성화
             let sKey = this.byId("detailSelect").getSelectedKey();
             if (!sKey.includes("org") && sKey !== "account") {
@@ -452,39 +503,40 @@ sap.ui.define([
                 return
             }
 
-            // 분석 데이터 준비
-            const oAnalysisData = this._prepareAnalysisData();
-
             // 현재 sub_Key 값으로 account 인지 확인
             let oSelect = this.byId("detailSelect");
             const sSelectedKey = oSelect.getSelectedKey()
+            this._sSelectedKey = sSelectedKey;
             const aItems = oSelect.getItems();
             const oSelectedItem = aItems.find(item => item.getKey() === sSelectedKey);
 
             this._selectedSubTitle = oSelectedItem.getText();
 
+            // 분석 데이터 준비
+            const oAnalysisData = this._prepareAnalysisData();
+
             //aireport에서 불러들일 값을 sessionStorage에 저장
-            if (oSelect.getSelectedKey() === "account") {
+            if (sSelectedKey === "account") {
                 sessionStorage.setItem("aiModel",
                     JSON.stringify({
-                        aiOrgId: this._selectedOrgId,
-                        aiOrgName: this._selectedOrgName,
-                        aiType: this._selectedType,
-                        aiSubTitle: this._selectedSubTitle,
-                        aiSubKey: oSelectedItem.getKey(),
-                        aiAccountCd: this._selectedAccountCd,
-                        aiAccountNm: this._selectedAccountNm,                            
+                        orgId: this._selectedOrgId,
+                        orgNm: this._selectedOrgName,
+                        type: this._selectedType,
+                        subTitle: this._selectedSubTitle,
+                        subKey: oSelectedItem.getKey(),
+                        accountCd: this._selectedAccountCd,
+                        accountNm: this._selectedAccountNm,                            
                         aiAccount: true
                     })
                 )
             } else {
                 sessionStorage.setItem("aiModel",
                     JSON.stringify({
-                        aiOrgId: this._selectedOrgId,
-                        aiOrgName: this._selectedOrgName,
-                        aiType: this._selectedType,
-                        aiSubTitle: this._selectedSubTitle,
-                        aiSubKey: oSelectedItem.getKey()
+                        orgId: this._selectedOrgId,
+                        orgNm: this._selectedOrgName,
+                        type: this._selectedType,
+                        subTitle: this._selectedSubTitle,
+                        subKey: oSelectedItem.getKey()
                     })
                 )
             }
@@ -518,7 +570,25 @@ sap.ui.define([
                 subTitle: this._selectedSubTitle
             };
 
-            if (this._selectedSubTitle === "Account") {
+            if (this._sSelectedKey === "org_delivery") {  // Delivery 조직
+                params = {
+                    year: String(dYearMonth.getFullYear()),
+                    month: String(dYearMonth.getMonth() + 1).padStart(2, "0"),
+                    org_id: this._selectedOrgId || oSessionData.orgId,
+                    org_tp: 'delivery'
+                };
+            }
+
+            else if (this._sSelectedKey === "org_account") {   // Account 조직
+                params = {
+                    year: String(dYearMonth.getFullYear()),
+                    month: String(dYearMonth.getMonth() + 1).padStart(2, "0"),
+                    org_id: this._selectedOrgId || oSessionData.orgId,
+                    org_tp: 'account'
+                };
+            }
+
+            else if (this._sSelectedKey === "account") { // Account 고객사
                 params = {
                     year: String(dYearMonth.getFullYear()),
                     month: String(dYearMonth.getMonth() + 1).padStart(2, "0"),
@@ -528,7 +598,7 @@ sap.ui.define([
 
                 tokenData = {
                     yearMonth: dYearMonth,
-                    orgName: this._selectedOrgName,
+                    orgName: this._selectedAccountNm,
                     menuName: "DT 매출 상세",
                     type: this._selectedType,
                     subTitle: this._selectedSubTitle
@@ -547,6 +617,9 @@ sap.ui.define([
             const oTable = oEvent.getSource();
             let sBindingPath = oTable._sBindingPath;
             let func_nm = sBindingPath.split("/")[1].split("(")[0];
+            if (func_nm.includes("dt_account")) {
+                func_nm = "get_plan_cstco_by_biz_account_dt"
+            }
 
             // 1단계: 인터랙션 처리
             InteractionUtils.handleTableInteraction(this, oEvent, oTable.getId(), {

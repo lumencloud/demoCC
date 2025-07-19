@@ -34,15 +34,19 @@ sap.ui.define([
         _sTableId: undefined,
 
         onInit: async function () {
-            // 초기 JSON 모델 설정
-            await this._setModel();
-
-            // 테이블 바인딩
-            this._bindTable();
+            this._asyncInit();
             this._oEventBus.subscribe("pl", "search", this._bindTable, this);
 
             this._aiPopupManager = new AIPopupManager();
         },
+        _asyncInit: async function () {
+            
+            // 초기 JSON 모델 설정
+            await this._setModel();
+            // 테이블 바인딩
+            this._bindTable();
+        },
+
 
         /**
          * JSON 모델 설정
@@ -58,7 +62,7 @@ sap.ui.define([
             // 화면에 보일 테이블을 전역 변수에 저장
             this.getView().getControlsByFieldGroupId("content").forEach(object => {
                 if (object.isA("sap.ui.table.Table") && object.getFieldGroupIds().length > 0) {
-                    let sub_key = object.getFieldGroupIds().find(sId => sId === oAiData.aiSubKey);
+                    let sub_key = object.getFieldGroupIds().find(sId => sId === oAiData.subKey);
 
                     // sub_key가 일치하는 테이블의 로컬 ID를 저장
                     if (!!sub_key) {
@@ -76,7 +80,7 @@ sap.ui.define([
             // 선택한 key로 화면에 보여줄 테이블을 결정
             let sKey = /** @type {Select} */ (oEvent.getSource()).getSelectedKey();
             let oUiModel = this.getView().getModel("uiModel");
-            oUiModel.setProperty("/aiSubKey", sKey);
+            oUiModel.setProperty("/subKey", sKey);
 
             // 테이블 병합
             await this._setTableMerge();
@@ -98,7 +102,7 @@ sap.ui.define([
             HashChanger.getInstance().setHash(sNewHash);
 
             // PL에 detailSelect 해시 변경 EventBus 전송
-            this._oEventBus.publish("pl", "setHashModel");
+            this._oEventBus.publish("pl", "setHashModel", {system: true});
 
             // let aTableList = ["actualDTSalesTable1", "actualDTSalesTable2", "actualDTSalesTable3"]
             // setTimeout(() => {
@@ -113,6 +117,10 @@ sap.ui.define([
         },
 
         _bindTable: async function (sChannelId, sEventId, oData) {
+            // DOM이 없는 경우 Return
+            let oDom = this.getView().getDomRef();
+            if (!oDom) return;
+            
             // 검색 조건
             let oAiData = this.getView().getModel("uiModel").getData();
             let oSearchData = this.getView().getModel("searchModel").getData();
@@ -127,23 +135,29 @@ sap.ui.define([
             const oPlModel = this.getOwnerComponent().getModel("pl");
 
             // sub_key에 따른 api 변경
-            let sKey = oAiData.aiSubKey;
+            let sKey = oAiData.subKey;
             let sBindingPath;
             if (sKey === "org") {
-                sBindingPath = `/get_actual_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}')`;
+                sBindingPath = `/get_actual_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}')`;
             } else if (sKey === "org_delivery") {
-                sBindingPath = `/get_actual_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}',org_tp='delivery')`
+                sBindingPath = `/get_actual_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}',org_tp='delivery')`
             } else if (sKey === "org_account") {
-                sBindingPath = `/get_actual_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}',org_tp='account')`
+                sBindingPath = `/get_actual_dt_org_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}',org_tp='account')`
             } else if (sKey === "account") {
-                sBindingPath = `/get_cstco_by_biz_account_dt(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}',account_cd='${oAiData.aiAccountCd}')`
+                sBindingPath = `/get_cstco_by_biz_account_dt(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}',account_cd='${oAiData.accountCd}')`
             } else if (sKey === "relsco") { // 대내/대외
-                sBindingPath = `/get_actual_dt_task_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.aiOrgId}')`
+                sBindingPath = `/get_actual_dt_task_oi(year='${iYear}',month='${sMonth}',org_id='${oAiData.orgId}')`
             }
 
             await Promise.all([
                 oPlModel.bindContext(sBindingPath).requestObject(),
             ]).then(function (aResults) {
+
+                const oTable = this.byId(this._sTableId);
+                const oBox = oTable.getParent();
+                Module.displayStatusForEmpty(oTable, aResults[0].value, oBox);
+
+
                 // aResults[1].value = aResults[1].value.filter(item => item.type === "매출")
 
                 // account일 때 매출만 필터링
@@ -152,7 +166,6 @@ sap.ui.define([
                 }
 
                 // 테이블의 이름 없는 빈 모델에 데이터 저장
-                let oTable = this.byId(this._sTableId);
                 oTable.setModel(new JSONModel(aResults[0].value));
 
                 // this 변수에 테이블에 바인딩된 path 저장
@@ -160,6 +173,12 @@ sap.ui.define([
 
                 // 테이블 로우 셋팅
                 this._setVisibleRowCount(aResults);
+                
+
+                if (sKey === "account") {
+                    oTable.setVisibleRowCountMode("Fixed")
+                    oTable.setVisibleRowCount(5);
+                }
             }.bind(this)
             ).catch(function (oError) {
                 console.log("데이터 로드 실패 ", oError);
@@ -178,7 +197,7 @@ sap.ui.define([
 
             // 처음 화면 렌더링시 table의 visibleCountMode auto 와 <FlexItemData growFactor="1"/>상태에서
             // 화면에 꽉 찬 테이블의 row 갯수를 전역변수에 저장하기 위함
-            if (oTable) {
+            if (oTable && !oTable?.mEventRegistry?.cellContextmenu) {
                 oTable.attachCellClick(this.onCellClick, this);
                 oTable.attachCellContextmenu(this.onCellContextmenu, this);
             }
@@ -231,8 +250,7 @@ sap.ui.define([
          */
         onRowSelectionChange: function (oEvent) {
             let aRowMergeInfo = Module._tableRowGrouping(oEvent.getSource());
-            Module.setMergeTableRowClick(oEvent.getSource(), aRowMergeInfo);
-        },        
+        },
 
         /**
          * 셀 우클릭 이벤트 핸들러 - AI 분석 실행
@@ -242,7 +260,7 @@ sap.ui.define([
 
             // 클릭 이벤트 로직으로 org_id 추출
             this.onCellClick(oEvent);
-            
+
             //타입변경시 flag
             this.typeChangeFlag = false;
 
@@ -254,19 +272,18 @@ sap.ui.define([
             const oAnalysisData = this._prepareAnalysisData();
 
             let oUiData = this.getView().getModel("uiModel").getData();
-            this._selectedSubTitle = oUiData.aiSubTitle;
+            this._selectedSubTitle = oUiData.subTitle;
 
             //aireport에서 불러들일 값을 sessionStorage에 저장
             sessionStorage.setItem("aiModel",
                 JSON.stringify({
-                    aiOrgId: this._selectedOrgId,
-                    aiType: this._selectedType,
-                    aiSubTitle: this._selectedSubTitle,
-                    aiSubKey: oUiData.aiSubKey
+                    orgId: this._selectedOrgId,
+                    subTitle: this._selectedSubTitle,
+                    subKey: oUiData.subKey
                 })
             )
 
-            if (oUiData.aiSubKey === "task" || oUiData.aiSubKey === "account") return;
+            if (oUiData.subKey === "task" || oUiData.subKey === "account") return;
 
             // 팝업 표시 및 분석 ID 획득
             const sAnalysisId = this._aiPopupManager.showLoadingPopup(
@@ -295,7 +312,7 @@ sap.ui.define([
                 yearMonth: dYearMonth,
                 orgName: this._selectedOrgName || oSearchData.orgNm,
                 menuName: "DT 매출 상세",
-                subTitle: oUiData.aiSubTitle
+                subTitle: oUiData.subTitle
             };
 
             return { params, tokenData };

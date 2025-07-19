@@ -56,7 +56,9 @@ module.exports = (srv) => {
             let org_column = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? ['hdqt_id as id', 'hdqt_name as name', 'org_order','lv3_ccorg_cd','lv3_id','lv3_name'] : ['div_id as id', 'div_name as name', 'org_order','lv3_ccorg_cd','lv3_id','lv3_name'];
             let org_where = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? { 'hdqt_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'team_id': null } : { 'div_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'hdqt_id': null, 'team_id': null };
             let org_groupBy = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? ['hdqt_id', 'hdqt_name', 'org_order','lv3_ccorg_cd','lv3_id','lv3_name'] : ['div_id', 'div_name', 'org_order','lv3_ccorg_cd','lv3_id','lv3_name'];
-    
+            if(['lv1_id','lv2_id'].includes(org_col_nm)){
+                org_where = {...org_where,'org_tp':'account'}
+            }
             let a_not_secured_data = ['Lead', 'Identified', 'Validated', 'Qualified', 'Negotiated']
             let i_index = i_month === 12 ? 12 : i_month + 1
     
@@ -262,9 +264,9 @@ module.exports = (srv) => {
                     
                     if(['lv1_id','lv2_id'].includes(org_col_nm) && org.lv3_ccorg_cd === '610000'){
                         if (!o_result[`${org.lv3_ccorg_cd}_order`]) {
-                            o_result[`${org.lv3_ccorg_cd}_order`] = { display_order: (org?.org_order ?? 0), item_order: 1, div_name: org.lv3_name, div_id: org.lv3_ccorg_cd, type: '수주', not_secured_total: 0 }
-                            o_result[`${org.lv3_ccorg_cd}_sale`] = { display_order: (org?.org_order ?? 0), item_order: 2, div_name: org.lv3_name, div_id: org.lv3_ccorg_cd, type: '매출', not_secured_total: 0 }
-                            o_result[`${org.lv3_ccorg_cd}_count`] = { display_order: (org?.org_order ?? 0), item_order: 3, div_name: org.lv3_name, div_id: org.lv3_ccorg_cd, type: '건수', not_secured_total: 0 }
+                            o_result[`${org.lv3_ccorg_cd}_order`] = { display_order: (org?.org_order ?? 0), item_order: 1, div_name: org.lv3_name, div_id: org.lv3_id, type: '수주', not_secured_total: 0 }
+                            o_result[`${org.lv3_ccorg_cd}_sale`] = { display_order: (org?.org_order ?? 0), item_order: 2, div_name: org.lv3_name, div_id: org.lv3_id, type: '매출', not_secured_total: 0 }
+                            o_result[`${org.lv3_ccorg_cd}_count`] = { display_order: (org?.org_order ?? 0), item_order: 3, div_name: org.lv3_name, div_id: org.lv3_id, type: '건수', not_secured_total: 0 }
                         }
                         aDealCode.forEach(o_code => {
                             let s_data_column = o_code.value.toLowerCase().replace('-', '_').replace(' ', '_') + '_data';
@@ -394,9 +396,9 @@ module.exports = (srv) => {
                     let o_pl = pl_data.filter(pl => pl.id === org.id);
                     if(['lv1_id','lv2_id'].includes(org_col_nm) && org.lv3_ccorg_cd === '610000'){
                         if (!o_result[`${org.lv3_ccorg_cd}_order`]) {
-                            o_result[`${org.lv3_ccorg_cd}_order`] = { display_order: (org?.org_order ?? 0), item_order: 1, div_name: org.lv3_name, div_id: org.lv3_ccorg_cd, type: '수주', ...data_column }
-                            o_result[`${org.lv3_ccorg_cd}_sale`] = { display_order: (org?.org_order ?? 0), item_order: 2, div_name: org.lv3_name, div_id: org.lv3_ccorg_cd, type: '매출', ...data_column }
-                            o_result[`${org.lv3_ccorg_cd}_cnt`] = { display_order: (org?.org_order ?? 0), item_order: 3, div_name: org.lv3_name, div_id: org.lv3_ccorg_cd, type: '건수', ...data_column }
+                            o_result[`${org.lv3_ccorg_cd}_order`] = { display_order: (org?.org_order ?? 0), item_order: 1, div_name: org.lv3_name, div_id: org.lv3_id, type: '수주', ...data_column }
+                            o_result[`${org.lv3_ccorg_cd}_sale`] = { display_order: (org?.org_order ?? 0), item_order: 2, div_name: org.lv3_name, div_id: org.lv3_id, type: '매출', ...data_column }
+                            o_result[`${org.lv3_ccorg_cd}_cnt`] = { display_order: (org?.org_order ?? 0), item_order: 3, div_name: org.lv3_name, div_id: org.lv3_id, type: '건수', ...data_column }
                         }
                         a_data_key.forEach(key => {
                             o_result[`${org.lv3_ccorg_cd}_order`][`${key}`] += o_pl.reduce((iSum,oData) => iSum += oData?.[`rodr_${key}`]??0,0);

@@ -49,10 +49,7 @@ view ai_agent_bau_view2(start_date : String(10), end_date : String(10)) as
             and :end_date
             and (
                     deal_stage_cd     =       'Lead'
-                                                    // or deal_stage_cd     =       'Identified'
-                                                    // or deal_stage_cd     =       'Registered'
-                                                    // or deal_stage_cd     =       'Validated'
-                                              )
+                    )
                 and ifnull(length(dgtr_task_cd),0) = 0
                 and weekly_yn         =       true
             group by

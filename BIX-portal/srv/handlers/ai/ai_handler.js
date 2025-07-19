@@ -252,8 +252,51 @@ module.exports = (srv) => {
     /**
      * 보고서 에이전트 처리
      */
-    const handleReportContentAgent = async (selectedAgentId, context, processedData, agentExecutor, progressCallback) => {
+    const handleReportAgent = async (selectedAgentId, context, processedData, agentExecutor, progressCallback) => {
         logger.info(`${selectedAgentId} 보고서 에이전트로 처리`);
+        
+        let parsedContext;
+        if (typeof context === 'string') {
+            try {
+                parsedContext = JSON.parse(context);
+            } catch (error) {
+                logger.error("JSON 파싱 오류:", error);
+                parsedContext = context;
+            }
+        }
+        else {
+            parsedContext = context;
+        }
+
+        const userInput = parsedContext.context?.userInput || parsedContext.content?.text;
+        
+        // 에이전트 실행
+        const agentResult = await agentExecutor.executeAgent(selectedAgentId, {
+            user_input: userInput
+        });
+        
+        progressCallback(progressConfig.agentExecuted);
+        
+        // 결과 포맷팅
+        return {
+            execution_id: agentResult.execution_id,
+            agent_id: agentResult.agent_id,
+            status: agentResult.status,
+            executive_summary: agentResult.results.final_outputs.final,
+            execution_time: {
+                start: agentResult.start_time,
+                end: agentResult.end_time,
+                seconds: agentResult.execution_time_seconds || "N/A"
+            },
+            execution_stats: agentResult.results.execution_stats
+        };
+    };
+
+    /**
+     * 보고서 컨텐츠 에이전트 처리
+     */
+    const handleReportContentAgent = async (selectedAgentId, context, processedData, agentExecutor, progressCallback) => {
+        logger.info(`${selectedAgentId} 보고서 컨텐츠 에이전트로 처리`);
         
         let parsedContext;
         if (typeof context === 'string') {
@@ -313,8 +356,9 @@ module.exports = (srv) => {
             "DT매출/마진": "AI/Data 기술 기반의 디지털 전환 사업에서 발생하는 매출/마진, AI 기반 프로젝트 (금액)",
             "Offshoring(MM 비례 절감액)": "AGS 인력을 활용한 비용 효율화 방식, 국내 BP(외주) 사용대비 AGS(해외개발인력)을 통한 효율 비용",
             "Non-M/M": "구독형 서비스, 기존 수주 베이스가 아닌 사업",
-            "BR": "BR(Billing Rate)은 프로젝트에 참여한 인력의 투입 비율과 인건비 수준을 반영하여, 각 인력이 프로젝트에 얼마만큼의 비용 가치를 기여했는지를 계산하는 지표 (비율)",
-            "RoHC": "당생산성을 의미하며, 구성원 한 명이 얼마만큼의 매출을 만들어내는지를 나타내는 지표 (비율)",
+            "BR(MM)": "BR(Billing Rate)은 프로젝트에 참여한 인력의 투입 비율과 인건비 수준을 반영하여, 각 인력이 프로젝트에 얼마만큼의 비용 가치를 기여했는지를 계산하는 지표 (비율)",
+            "BR(Cost)": "BR(Billing Rate)은 프로젝트에 참여한 인력의 투입 비율과 인건비 수준을 반영하여, 각 인력이 프로젝트에 얼마만큼의 비용 가치를 기여했는지를 계산하는 지표 (비율)",
+            "RoHC": "인당생산성을 의미하며, 구성원 한 명이 얼마만큼의 매출을 만들어내는지를 나타내는 지표 (비율)",
             "OR/UR/Normal": "OR (Over Run): 초기 계획보다 기간이나 비용이 초과된 상태 → 손해 발생 가능. UR (Under Run): 초기 계획보다 빠른 완료 또는 예산 절감 → 마진 증가. Normal: 계획대로 마무리된 경우",
             // "EXPENSE": "경비, 사업 수행을 위해 발생하는 일반적 운영비용으로, SG&A에 포함되는 간접 비용",
             // "INVEST": "투자비, 당장은 매출에 마이너스가 되지만 추후 더 큰 이익을 기대하고 사용하는 비용",
@@ -323,7 +367,7 @@ module.exports = (srv) => {
             "투자비": "당장은 매출에 마이너스가 되지만 추후 더 큰 이익을 기대하고 사용하는 비용 (금액)",
             "인건비": "프로젝트를 수행하는 사내 및 외주 인력 등에게 지급되는 비용 (금액)",
             "수주": "고객사와 새롭게 진행하기로 계약한 프로젝트의 금액으로, 아직 프로젝트를 시작하지는 않아서 매출에 잡히지는 않음 (금액)",
-            "수주 건수": "새로운 프로젝트를 진행할 것으로 계약을 끝낸 건의 개수 (개수)"
+            "건수": "새로운 프로젝트를 진행할 것으로 계약을 끝낸 건의 개수 (개수)"
         };
 
         if (selectedItem) {
@@ -418,6 +462,9 @@ module.exports = (srv) => {
                         else if (agentConfig.analysis.includes(selectedAgentId)) {
                             formattedResult = await handleAnalysisAgent(selectedAgentId, context, processedData, agentExecutor, progressCallback);
                         }
+                        else if (agentConfig.report.includes(selectedAgentId)) {
+                            formattedResult = await handleReportAgent(selectedAgentId, context, processedData, agentExecutor, progressCallback);
+                        }
                         else if (agentConfig.reportContent.includes(selectedAgentId)) {
                             formattedResult = await handleReportContentAgent(selectedAgentId, context, processedData, agentExecutor, progressCallback);
                         }
@@ -434,6 +481,9 @@ module.exports = (srv) => {
                         }
                         else if (agentConfig.analysis.includes(selectedAgentId)) {
                             agentType = 'analysis';
+                        }
+                        else if (agentConfig.analysis.includes(selectedAgentId)) {
+                            agentType = 'report';
                         }
                         else if (agentConfig.reportContent.includes(selectedAgentId)) {
                             agentType = 'reportContent';

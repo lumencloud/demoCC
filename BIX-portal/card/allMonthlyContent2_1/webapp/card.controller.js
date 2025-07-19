@@ -1,3 +1,4 @@
+
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
@@ -20,10 +21,9 @@ sap.ui.define([
             this._createId();
 
             // 차트 설정
-            this._setChart();
+            // this._setChart();
 
-            this._oEventBus.subscribe("aireport", "infoSet", this._updateChart, this);
-
+            this._oEventBus.subscribe("aireport", "allContent2_1", this._setChart, this);
         },
 
         /**
@@ -39,9 +39,9 @@ sap.ui.define([
             this._iMinHeight = 400;
         },
 
-        _updateChart: async function () {
+        _updateChart: async function (sChannel, sEventId, oData) {
             this.getOwnerComponent().oCard.setBusy(true);
-            let aResults = await this._dataSetting();
+            let aResults = await this._dataSetting(oData.data);
 
             this._oMyChart[0].data.labels = aResults.aLabel
             this._oMyChart[0].data.datasets[0].data = aResults.aMarginRate
@@ -55,13 +55,16 @@ sap.ui.define([
             this._oMyChart[0].config._config.options.plugins.groupLabels.labels = aResults.aSubLabel
 
             this._oMyChart[0].update();
-            this.getOwnerComponent().oCard.setBusy(false);
+            this.dataLoad();
+            setTimeout(()=>{
+                this.getOwnerComponent().oCard.setBusy(false);
+            }, 300)
         },
 
-        _setChart: async function () {
+        _setChart: async function (sChannel, sEventId, oData) {
             // 카드
             const oCard = this.getOwnerComponent().oCard;
-
+            oCard.setBusy(true)
             let subLabels = {
                 id: "subLabels",
                 afterDatasetsDraw(chart, args, pluginOptions) {
@@ -74,7 +77,7 @@ sap.ui.define([
                     let grouped = {}
                     aSubLabel.forEach((divName, idx) => {
                         if (!grouped[divName]) {
-                            grouped[divName] = { start: idx , end: idx };
+                            grouped[divName] = { start: idx, end: idx };
                         } else {
                             grouped[divName].end = idx;
                         }
@@ -101,7 +104,17 @@ sap.ui.define([
                         // 2. 금액(합계)
                         let sumValue = sumMap.get(divName);
                         if (sumValue !== undefined) {
-                            let format = sumValue.toFixed(0) + '억';
+
+
+                            var oNumberFormat = NumberFormat.getFloatInstance({
+                                groupingEnabled: true,
+                                groupingSeparator: ',',
+                                groupingSize: 3,
+                                decimals: 0
+                            });
+
+                            let format = oNumberFormat.format(sumValue) + "억";
+
                             let sign = sumValue >= 0 ? '+' : '-';
                             let color = sumValue >= 0 ? "#222" : "red";
                             ctx.font = 'bold 12px sans-serif'
@@ -110,7 +123,7 @@ sap.ui.define([
                         }
 
                         ctx.restore();
-                 
+
                         if (i === groupNames.length - 1) { return; }
 
                         let lastIdx = info.end;
@@ -118,7 +131,7 @@ sap.ui.define([
                         ctx.save();
                         ctx.beginPath();
                         ctx.moveTo(lineX, bottom);
-                        ctx.lineTo(lineX, bottom + 140);
+                        ctx.lineTo(lineX, bottom + 100);
                         ctx.strokeStyle = '#000';
                         ctx.lineWidth = 1;
                         ctx.setLineDash([4.2]);
@@ -134,15 +147,18 @@ sap.ui.define([
             let oParentElement = document.getElementById(sCardId).parentElement;
             let iBoxWidth = Math.floor(oParentElement.clientWidth / window.innerWidth * 90);
             let iBoxHeight = Math.floor(oParentElement.clientHeight / window.innerHeight * 90);
+            
+            this._oEventBus.subscribe("aireport", "allContent2_1", this._updateChart, this);
 
             for (let i = 0; i < this._aCanvasId.length; i++) {
                 let oHTML = this.byId("html" + i);
                 oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:950px; height:400px; min-height:400px'><canvas id='${this._aCanvasId[i]}' /></div>`);
                 oHTML.attachEvent("afterRendering", async function () {
+                  
                     // 차트 구성
                     const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[i])).getContext("2d");
                     //데이터 요청
-                    let aData = await this._dataSetting();
+                    let aData = await this._dataSetting(oData.data);
                     this._oMyChart[i] = new Chart(ctx, {
 
                         type: "bar",
@@ -153,15 +169,21 @@ sap.ui.define([
                                 {
                                     label: "당월 마진율",
                                     data: aData.aMarginRate,
-                                    backgroundColor: "red",
-                                    borderColor: "red",
+                                    backgroundColor: "#FF7A01",
+                                    borderColor: "#FF7A01",
                                     type: "line",
                                     yAxisID: 'y1',
                                     datalabels: {
-                                        color: "red",
-                                        offset: -25,
+                                        color: "#FF7A01",
+                                        offset: -30,
                                         size: 8,
                                     },
+                                    fill: false,
+                                    pointBackgroundColor: "#FF7A01",
+                                    pointBorderColor: "white",
+                                    pointBorderWidth: 3,
+                                    pointRadius: 6,
+
 
                                 },
                                 {
@@ -193,7 +215,7 @@ sap.ui.define([
                                 {
                                     label: "목표 실적(매출)",
                                     data: aData.aSalesTarget,
-                                    backgroundColor: "#ddd",
+                                    backgroundColor: "#EDf0f4",
                                     yAxisID: "y",
                                     stack: 1,
 
@@ -228,7 +250,7 @@ sap.ui.define([
                                 {
                                     label: "목표 실적(마진)",
                                     data: aData.aMarginTarget,
-                                    backgroundColor: "#ddd",
+                                    backgroundColor: "#EDf0f4",
                                     yAxisID: "y",
                                     stack: 2,
 
@@ -253,34 +275,35 @@ sap.ui.define([
                             },
                             plugins: {
                                 legend: {
-                                    display: false,
+                                    display: true,
                                     position: 'bottom',
                                     labels: {
+                                        padding: 60,
                                         usePointStyle: true,
                                         generateLabels(chart) {
                                             return [
                                                 {
                                                     text: '당월 마진율',
-                                                    fillStyle: 'red',
-                                                    strokeStyle: 'red',
+                                                    fillStyle: '#FF7A01',
+                                                    strokeStyle: '#FF7A01',
                                                     lineWidth: 1,
-                                                    hidden: false,
                                                     datasetIndex: 0,
                                                     pointStyle: 'line'
+
                                                 },
-                                                {
-                                                    text: '목표 마진율',
-                                                    fillStyle: 'pink',
-                                                    strokeStyle: 'pink',
-                                                    lineWidth: 1,
-                                                    hidden: false,
-                                                    datasetIndex: 1,
-                                                    pointStyle: 'line'
-                                                },
+                                                // {
+                                                //     text: '목표 마진율',
+                                                //     fillStyle: 'pink',
+                                                //     strokeStyle: 'pink',
+                                                //     lineWidth: 1,
+                                                //     hidden: false,
+                                                //     datasetIndex: 1,
+                                                //     pointStyle: 'line'
+                                                // },
                                                 {
                                                     text: '목표 실적',
-                                                    fillStyle: '#ddd',
-                                                    strokeStyle: '#ddd',
+                                                    fillStyle: '#EDf0f4',
+                                                    strokeStyle: '#EDf0f4',
                                                     lineWidth: 1,
                                                     hidden: false,
                                                     datasetIndex: 2,
@@ -300,6 +323,9 @@ sap.ui.define([
                                         }
                                     }
 
+                                },
+                                tooltip: {
+                                    enabled: false
                                 },
                                 datalabels: {
                                     clip: false,
@@ -338,8 +364,16 @@ sap.ui.define([
                                             value = context.chart.data.datasets[1].data[context.dataIndex]
                                         }
 
-                                        if (value > 100) {
-                                            var oNumberFormat = NumberFormat.getIntegerInstance({
+                                        if (context.dataset.label === '당월 마진율') {
+                                            var oNumberFormat = NumberFormat.getFloatInstance({
+                                                groupingEnabled: true,
+                                                groupingSeparator: ',',
+                                                groupingSize: 3,
+                                                decimals: 1
+                                            });
+                                            return oNumberFormat.format(value) + "%";
+                                        } else {
+                                            var oNumberFormat = NumberFormat.getFloatInstance({
                                                 groupingEnabled: true,
                                                 groupingSeparator: ',',
                                                 groupingSize: 3,
@@ -350,21 +384,35 @@ sap.ui.define([
                                             } else {
                                                 return oNumberFormat.format(value / 100000000);
                                             }
-                                        } else if (value <= 100 && value >= 0) {
-                                            var oNumberFormat = NumberFormat.getIntegerInstance({
-                                                groupingEnabled: true,
-                                                groupingSeparator: ',',
-                                                groupingSize: 3,
-                                                decimals: 1
-                                            });
-                                            return oNumberFormat.format(value) + "%";
-                                        } else if (value < 0) {
-                                            return null;
                                         }
+
+                                        // if (value > 100) {
+                                        //     var oNumberFormat = NumberFormat.getFloatInstance({
+                                        //         groupingEnabled: true,
+                                        //         groupingSeparator: ',',
+                                        //         groupingSize: 3,
+                                        //         decimals: 0
+                                        //     });
+                                        //     if (value < 100000000) {
+                                        //         return 0
+                                        //     } else {
+                                        //         return oNumberFormat.format(value / 100000000);
+                                        //     }
+                                        // } else if (value <= 100 && value >= 0) {
+                                        //     var oNumberFormat = NumberFormat.getFloatInstance({
+                                        //         groupingEnabled: true,
+                                        //         groupingSeparator: ',',
+                                        //         groupingSize: 3,
+                                        //         decimals: 1
+                                        //     });
+                                        //     return oNumberFormat.format(value) + "%";
+                                        // } else if (value < 0) {
+                                        //     return null;
+                                        // }
                                     }
                                 }, groupLabels: {
-                                    labels: aData.aSubLabel,
-                                    divNameSums: aData.divNameSums
+                                    labels: aData.aSubLabel || "",
+                                    divNameSums: aData.divNameSums || ""
                                 }
                             },
                             scales: {
@@ -383,8 +431,8 @@ sap.ui.define([
                                             size: 8,
                                             weight: 600
                                         },
-                                        maxRotation : 0,
-                                        minRotation : 0
+                                        maxRotation: 0,
+                                        minRotation: 0
 
                                     }
                                 },
@@ -392,6 +440,9 @@ sap.ui.define([
                                     type: "linear",
                                     display: true,
                                     position: 'left',
+                                    grid: {
+                                        display: false
+                                    },
                                     stacked: true,
                                     ticks: {
                                         callback: function (value) {
@@ -442,12 +493,14 @@ sap.ui.define([
 
                     })
 
-                    this.dataLoad();
+                  
 
 
-                    this._ovserveResize(this.byId(this._aContainerId[i]), i)
+                    //this._ovserveResize(this.byId(this._aContainerId[i]), i)
                 }.bind(this));
             }
+            this.dataLoad();
+            oCard.setBusy(false)
         },
 
         dataLoad: function () {
@@ -457,8 +510,15 @@ sap.ui.define([
             })
         },
 
-        _dataSetting: async function () {
-            let aResults = await this._setData();
+        _dataSetting: async function (oData) {
+            // let aResults = await this._setData();
+            let aResults = oData.map(oObj => {
+                if(oObj.account_nm){
+                    oObj["account_nm"] = oObj["account_nm"].substring(4);
+                }
+                return oObj;
+            });;
+
             let aData;
             let aSales = [];
             let aSalesTarget = [];
@@ -514,7 +574,7 @@ sap.ui.define([
                 this._resizeObserver = new ResizeObserver(() => {
                     this._oMyChart[i].resize()
                 })
-                this._resizeObserver.observe(oElement)
+                
             }
         },
 
@@ -550,7 +610,7 @@ sap.ui.define([
                 .catch((oErr) => {
                     Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
                 });
-                
+
 
             return aData;
         },

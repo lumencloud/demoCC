@@ -41,23 +41,9 @@ module.exports = (srv) => {
             const { year, month, org_id, org_tp } = req.data;
 
             // QUERY 공통 파라미터 선언
-
-            /**
-             * +++++ TBD +++++
-             * 권한 체크하여 사용자가 조회 가능한 조직인지 판별 후 코드 진행
-             */
-
             /**
              * org_id 파라미터값으로 조직정보 조회 및 버전 확인
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_ccorg_cd'
-                when lv2_id = '${org_id}' THEN 'lv2_ccorg_cd'
-                when lv3_id = '${org_id}' THEN 'lv3_ccorg_cd'
-                when div_id = '${org_id}' THEN 'div_ccorg_cd'
-                when hdqt_id = '${org_id}' THEN 'hdqt_ccorg_cd'
-                when team_id = '${org_id}' THEN 'team_ccorg_cd'
-                end as org_level`;
             const org_child_col = `case
                 when lv1_id = '${org_id}' THEN 'div_ccorg_cd'
                 when lv2_id = '${org_id}' THEN 'div_ccorg_cd'
@@ -71,7 +57,7 @@ module.exports = (srv) => {
             const version_where = { 'tag': 'C' };
 
             const [orgInfo, versionInfo] = await Promise.all([
-                SELECT.one.from(org_full_level).columns([org_col, org_child_col, 'org_ccorg_cd', 'org_name']).where({ 'org_id': org_id }),
+                SELECT.one.from(org_full_level).columns(['org_level', org_child_col, 'org_ccorg_cd', 'org_name']).where({ 'org_id': org_id }),
                 SELECT.one.from(version).columns(version_column).where(version_where),
             ]);
 
@@ -81,7 +67,7 @@ module.exports = (srv) => {
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             //조직 정보를 where 조건에 추가
-            let org_level = orgInfo.org_level;
+            let org_level = orgInfo.org_level+'_ccorg_cd';
             let org_child_level = orgInfo.org_child_level;
             let org_name = orgInfo.org_name;
 
@@ -91,11 +77,11 @@ module.exports = (srv) => {
             let a_sum_indirect = []
             let a_sum_total = []
             for(let i = 1; i<=Number(month); i++){
-                a_sum_b_mm.push(`ifnull(sum(b_mm_m${i}_amt), 0)`)
-                a_sum_bun_mm.push(`ifnull(sum(bun_mm_m${i}_amt), 0)`)
-                a_sum_bill.push(`ifnull(sum(bill_m${i}_amt), 0)`)
-                a_sum_indirect.push(`ifnull(sum(indirect_cost_m${i}), 0)`)
-                a_sum_total.push(`ifnull(sum(total_m${i}_amt), 0)`)
+                a_sum_b_mm.push(`sum(b_mm_m${i}_amt)`)
+                a_sum_bun_mm.push(`sum(bun_mm_m${i}_amt)`)
+                a_sum_bill.push(`sum(bill_m${i}_amt)`)
+                a_sum_indirect.push(`sum(indirect_cost_m${i})`)
+                a_sum_total.push(`sum(total_m${i}_amt)`)
             }
             let s_sum_b_mm = a_sum_b_mm.join(' + ')
             let s_sum_bun_mm = a_sum_bun_mm.join(' + ')
@@ -107,16 +93,26 @@ module.exports = (srv) => {
              * 타겟 뷰 조회용 컬럼
              */
             const rsp_column = ['year', org_child_level,
-                `case when ifnull(sum(bun_mm_m${Number(month)}_amt), 0) <> 0 then (ifnull(sum(b_mm_m${Number(month)}_amt), 0))/(ifnull(sum(bun_mm_m${Number(month)}_amt), 0)) else 0 end as mm_month_sum_value`,
-                `case when ifnull(sum(total_m${Number(month)}_amt), 0) <> 0 then (ifnull(sum(bill_m${Number(month)}_amt), 0) + ifnull(sum(indirect_cost_m${Number(month)}), 0))/(ifnull(sum(total_m${Number(month)}_amt), 0)) else 0 end as cost_month_sum_value`,
-                `ifnull(sum(b_mm_m${Number(month)}_amt), 0) as sum_b_mm`,
-                `ifnull(sum(bun_mm_m${Number(month)}_amt), 0) as sum_bun_mm`,
-                `ifnull(sum(bill_m${Number(month)}_amt), 0) as sum_bill`,
-                `ifnull(sum(indirect_cost_m${Number(month)}), 0) as sum_indirect`,
-                `ifnull(sum(total_m${Number(month)}_amt), 0) as sum_total`
+                `case when ifnull(${s_sum_bun_mm}, 0) <> 0 then ifnull(${s_sum_b_mm}, 0)/ifnull(${s_sum_bun_mm}, 0) else 0 end as mm_month_sum_value`,
+                `case when ifnull(${s_sum_total}, 0) <> 0 then (ifnull(${s_sum_bill}, 0) + ifnull(${s_sum_indirect},0))/ifnull(${s_sum_total}, 0) else 0 end as cost_month_sum_value`,
+                `ifnull(${s_sum_b_mm}, 0) as sum_b_mm`,
+                `ifnull(${s_sum_bun_mm}, 0) as sum_bun_mm`,
+                `ifnull(${s_sum_bill}, 0) as sum_bill`,
+                `ifnull(${s_sum_indirect}, 0) as sum_indirect`,
+                `ifnull(${s_sum_total}, 0) as sum_total`
+                // `case when ifnull(sum(bun_mm_m${Number(month)}_amt), 0) <> 0 then (ifnull(sum(b_mm_m${Number(month)}_amt), 0))/(ifnull(sum(bun_mm_m${Number(month)}_amt), 0)) else 0 end as mm_month_sum_value`,
+                // `case when ifnull(sum(total_m${Number(month)}_amt), 0) <> 0 then (ifnull(sum(bill_m${Number(month)}_amt), 0) + ifnull(sum(indirect_cost_m${Number(month)}), 0))/(ifnull(sum(total_m${Number(month)}_amt), 0)) else 0 end as cost_month_sum_value`,
+                // `ifnull(sum(b_mm_m${Number(month)}_amt), 0) as sum_b_mm`,
+                // `ifnull(sum(bun_mm_m${Number(month)}_amt), 0) as sum_bun_mm`,
+                // `ifnull(sum(bill_m${Number(month)}_amt), 0) as sum_bill`,
+                // `ifnull(sum(indirect_cost_m${Number(month)}), 0) as sum_indirect`,
+                // `ifnull(sum(total_m${Number(month)}_amt), 0) as sum_total`
             ];
             const rsp_where_condition = { 'year': { in: [year] }, [org_level]: orgInfo.org_ccorg_cd, is_delivery: true };
-            let rsp_where = org_tp ? { ...rsp_where_condition, 'org_tp' : org_tp } : rsp_where_condition;
+            let rsp_where = rsp_where_condition
+            if(org_tp === 'account'){
+                rsp_where ={ ...rsp_where_condition, 'org_tp' : org_tp }
+            }
             const rsp_groupBy = ['year', org_child_level];
 
             // 선택한 조직에 따른 조직 호출 (부문보다 높을 시 부문 단위, 부문일 때 본부 단위, 본부일 때 팀 단위)
@@ -143,6 +139,16 @@ module.exports = (srv) => {
 
             let curr_rsp = rsp_data.filter(rsp => rsp.year === year)
 
+            //ackerton 로직
+            let ackerton_list = [];
+            if((orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2') && org_tp !== 'account'){
+                org_full_level_data.forEach(data=>{
+                    if (!ackerton_list.find(data2 => data2 === data[org_child_level]) && data[org_child_level] && data['lv3_ccorg_cd'] === '610000') {
+                        ackerton_list.push(data.org_id);
+                    };
+                });
+            };
+
             // 선택한 조직의 하위 조직들을 기반으로 반복문 실행
             org_full_level_data.forEach(org_data => {
                 const curr_rsp_data = curr_rsp.find(oData => org_data[org_child_level] === oData[org_child_level]);
@@ -155,8 +161,8 @@ module.exports = (srv) => {
                     br_cost: (curr_rsp_data?.cost_month_sum_value ?? 0),
                 }
 
-                if(org_level.includes("lv1")){
-                    if(org_data.org_tp !== 'account'){
+                if(org_level === "lv1_ccorg_cd" || org_level === "lv2_ccorg_cd"){
+                    if(org_data.org_tp !== 'account' && !ackerton_list.includes(temp_data.org_id)){
                         result_data.push(temp_data);
                     };
                 }else{

@@ -112,7 +112,7 @@ sap.ui.define([
             let oTable = this.byId("actualDTSalesOrgTable")
             // 처음 화면 렌더링시 table의 visibleCountMode auto 와 <FlexItemData growFactor="1"/>상태에서
             // 화면에 꽉 찬 테이블의 row 갯수를 전역변수에 저장하기 위함
-            if (oTable) {
+            if (oTable && !oTable?.mEventRegistry?.cellContextmenu) {
                 oTable.attachCellClick(this.onCellClick, this);
                 oTable.attachCellContextmenu(this.onCellContextmenu, this);
             }

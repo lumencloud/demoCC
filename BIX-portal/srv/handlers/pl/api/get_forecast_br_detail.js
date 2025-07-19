@@ -23,7 +23,7 @@ module.exports = (srv) => {
             // (서비스에 등록할 필요는 없음)
             /**
              * rsp.wideview_view [비용 집계]
-             * [부문/본부/팀 + 년,month_amt,금액] 프로젝트 비용 집계 뷰
+             * [부문/본부/팀 + 년,month_emp,금액] 프로젝트 비용 집계 뷰
              */
             const rsp_view = db.entities('rsp').wideview_view;
             /**
@@ -66,8 +66,8 @@ module.exports = (srv) => {
             for(let i = 1; i<=12; i++){
                 rsp_column.push(`sum(opp_m${i}_amt) as opp_m${i}_value`)
                 rsp_column.push(`sum(avg_m${i}_amt) as avg_m${i}_value`)
-                rsp_column.push(`sum(bun_mm_m${i}_amt) as total_m${i}_value`)
-                rsp_column.push(`sum(b_mm_m${i}_amt) as secured_m${i}_value`)
+                rsp_column.push(`sum(bun_mm_m${i}_amt) as bun_mm_m${i}_value`)
+                rsp_column.push(`sum(b_mm_m${i}_amt) as b_mm_m${i}_value`)
             }
             
             // DB 쿼리 실행 (병렬)
@@ -116,15 +116,17 @@ module.exports = (srv) => {
                 // 월별 합계 필드 추가
                 for (let i = 1; i <= 12; i++) {
                     let i_month = Number(month)
-                    let total_value = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData[`total_m${i}_value`], 0);
-                    let secured_value = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData[`secured_m${i}_value`], 0);;
+                    let bun_mm_m_value = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData[`bun_mm_m${i}_value`], 0);
+                    let b_mm_m_value = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData[`b_mm_m${i}_value`], 0);
                     let opp_value = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData[`opp_m${i}_value`], 0);
                     let avg_value = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData[`avg_m${i}_value`], 0);
+                    let secured_value = bun_mm_m_value === 0 ? 0 : b_mm_m_value/bun_mm_m_value
+                    let not_secured_value = bun_mm_m_value === 0 || avg_value === 0 ? 0 : opp_value/avg_value/bun_mm_m_value
                     let forecast_value;
                     if(i<=i_month){
-                        forecast_value = total_value === 0 ? 0 : secured_value/total_value
+                        forecast_value = secured_value
                     }else{
-                        forecast_value = total_value === 0 || avg_value === 0 ? 0 : opp_value/avg_value/total_value
+                        forecast_value = not_secured_value
                     }
                     o_final[`m_${i}_data`] = forecast_value;
                 }

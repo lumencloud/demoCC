@@ -35,7 +35,10 @@ class AgentExecutor {
         // 현황분석 에이전트 로드
         this.loadAgentFromFile('analysis_agent', paths.ANALYSIS_AGENT_PATH);
         
-        // 리포트 에이전트 로드
+        // 보고서 에이전트 로드
+        this.loadAgentFromFile('report_agent', paths.REPORT_AGENT_PATH);
+
+        // 보고서 컨텐츠 에이전트 로드
         this.loadAgentFromFile('report_content_agent', paths.REPORT_CONTENT_AGENT_PATH);
     }
 

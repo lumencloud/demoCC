@@ -19,10 +19,10 @@
         
         <content>
             <VBox width="100%" height="100%">
-                        <VBox id="planBrBox1" busyIndicatorDelay="0" visible="{=${uiModel>/tableKind} === 'org'}" class="custom-vbox-wrap-table" height="100%">
+                <VBox id="planBrBox1" busyIndicatorDelay="0" visible="{=${uiModel>/tableKind} === 'org'}" class="custom-vbox-wrap-table" height="100%">
                     <table:Table
                         id="planBrTable1"
-                        rows="{path:'oBrTableModel>/'}"
+                        rows="{path:'/'}"
                         class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
                         selectionMode="Single" 
                         selectionBehavior="RowOnly" 
@@ -32,13 +32,14 @@
                         fixedColumnCount="1"
                         busyIndicatorDelay="0"
                         visibleRowCountMode="Auto"
+                        fieldGroupIds="content,org"
                         noData=" "
                     >
 
                     <table:extension>
                         <OverflowToolbar width="100%" height="3rem" style="Standard">
-                            <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                            <Text text="세부데이터"/>
+                            <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                            <Text text="세부 데이터" class="table-title"/>
                             <ToolbarSpacer visible="false"/>
                             <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false" />
                             <ToolbarSeparator />
@@ -65,8 +66,8 @@
                                     
                                 <table:template>
                                     <Text emptyIndicatorMode="On"
-                                        text="{oBrTableModel>org_name}"
-                                        tooltip="{oBrTableModel>org_name}"
+                                        text="{org_name}"
+                                        tooltip="{org_name}"
                                         wrapping="false"
                                         width="100%"
                                         textAlign="Begin"
@@ -90,20 +91,20 @@
                                         text="연간 추정"
                                         wrapping="true"
                                     />
-                                    <Label text="추정" textAlign="Center" width="100%"/>
+                                    <Label text="합계" textAlign="Center" width="100%"/>
                                 </table:multiLabels>
                                 <table:template>
                                     <Text emptyIndicatorMode="On"
                                         text="{
                                             parts:[
-                                                {path:'oBrTableModel>plan_value', targetType: 'any'}
+                                                {path:'plan_value', targetType: 'any'}
 
                                             ],
                                             formatter: '.onFormatPerformance'
                                         }"
                                         tooltip="{
                                             parts:[
-                                                {path:'oBrTableModel>plan_value', targetType: 'any'},
+                                                {path:'plan_value', targetType: 'any'},
                                                 {value:'tooltip'}
                                             ],
                                             formatter: '.onFormatPerformance'                                
@@ -135,14 +136,14 @@
                                     <Text emptyIndicatorMode="On"
                                         text="{
                                             parts:[
-                                                {path:'oBrTableModel>secured_value', targetType: 'any'}
+                                                {path:'secured_value', targetType: 'any'}
 
                                             ],
                                             formatter: '.onFormatPerformance'
                                         }"
                                         tooltip="{
                                             parts:[
-                                                {path:'oBrTableModel>secured_value', targetType: 'any'},
+                                                {path:'secured_value', targetType: 'any'},
                                                 {value:'tooltip'}
                                             ],
                                             formatter: '.onFormatPerformance'                                
@@ -174,13 +175,13 @@
                                     <Text emptyIndicatorMode="On"
                                         text="{
                                             parts:[
-                                                {path:'oBrTableModel>not_secured_value', targetType: 'any'}
+                                                {path:'not_secured_value', targetType: 'any'}
                                             ],
                                             formatter: '.onFormatPerformance'
                                         }"
                                         tooltip="{
                                             parts:[
-                                                {path:'oBrTableModel>not_secured_value', targetType: 'any'},
+                                                {path:'not_secured_value', targetType: 'any'},
                                                 {value:'tooltip'}
                                             ],
                                             formatter: '.onFormatPerformance'                                
@@ -212,13 +213,13 @@
                                     <Text emptyIndicatorMode="On"
                                         text="{
                                             parts:[
-                                                {path:'oBrTableModel>plan_ratio', targetType: 'any'}
+                                                {path:'plan_ratio', targetType: 'any'}
                                             ],
                                             formatter: '.onFormatPerformance'
                                         }"
                                         tooltip="{
                                             parts:[
-                                                {path:'oBrTableModel>plan_ratio', targetType: 'any'},
+                                                {path:'plan_ratio', targetType: 'any'},
                                                 {value:'tooltip'}
                                             ],
                                             formatter: '.onFormatPerformance'                                
@@ -250,13 +251,13 @@
                                     <Text emptyIndicatorMode="On"
                                         text="{
                                             parts:[
-                                                {path:'oBrTableModel>yoy', targetType: 'any'}
+                                                {path:'yoy', targetType: 'any'}
                                             ],
                                             formatter: '.onFormatPerformance'
                                         }"
                                         tooltip="{
                                             parts:[
-                                                {path:'oBrTableModel>yoy', targetType: 'any'},
+                                                {path:'yoy', targetType: 'any'},
                                                 {value:'tooltip'}
                                             ],
                                             formatter: '.onFormatPerformance'                                

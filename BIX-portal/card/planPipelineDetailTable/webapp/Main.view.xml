@@ -47,7 +47,7 @@
                 >
                     <table:Table
                         id="pipeDetailTable1"
-                        rows="{path:'oDealTableModel>/'}"
+                        rows="{path:'/'}"
                         selectionMode="Single" 
                         selectionBehavior="RowOnly" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
@@ -57,6 +57,7 @@
                         visibleRowCountMode="Auto"
                         fixedColumnCount="2"
                         noData=" "
+                        fieldGroupIds="content,deal_stage"
                     >
                         <table:layoutData>
                             <FlexItemData growFactor="1" />
@@ -76,8 +77,8 @@
                                 <table:template>
                                     <Text
                                         emptyIndicatorMode="On"
-                                        text="{oDealTableModel>div_name}"
-                                        tooltip="{oDealTableModel>div_name}"
+                                        text="{div_name}"
+                                        tooltip="{div_name}"
                                         wrapping="false"
                                         width="100%"
                                         textAlign="Begin"
@@ -98,8 +99,8 @@
                                 <table:template>
                                     <Text
                                         emptyIndicatorMode="On"
-                                        text="{oDealTableModel>type}"
-                                        tooltip="{oDealTableModel>type}"
+                                        text="{type}"
+                                        tooltip="{type}"
                                         wrapping="false"
                                         width="100%"
                                         textAlign="Center"
@@ -125,14 +126,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oDealTableModel>total_data', targetType: 'any'},
-                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                        {path:'total_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oDealTableModel>total_data', targetType: 'any'},
+                                        {path:'total_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -164,14 +165,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oDealTableModel>not_secured_total', targetType: 'any'},
-                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                        {path:'not_secured_total', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oDealTableModel>not_secured_total', targetType: 'any'},
+                                        {path:'not_secured_total', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -202,14 +203,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oDealTableModel>lead_data', targetType: 'any'},
-                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                        {path:'lead_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oDealTableModel>lead_data', targetType: 'any'},
+                                        {path:'lead_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -238,14 +239,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oDealTableModel>identified_data', targetType: 'any'},
-                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                        {path:'identified_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oDealTableModel>identified_data', targetType: 'any'},
+                                        {path:'identified_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -274,14 +275,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oDealTableModel>validated_data', targetType: 'any'},
-                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                        {path:'validated_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oDealTableModel>validated_data', targetType: 'any'},
+                                        {path:'validated_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -310,14 +311,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oDealTableModel>qualified_data', targetType: 'any'},
-                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                        {path:'qualified_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oDealTableModel>qualified_data', targetType: 'any'},
+                                        {path:'qualified_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -346,14 +347,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oDealTableModel>negotiated_data', targetType: 'any'},
-                                        {path:'oDealTableModel>type', targetType: 'any'}
+                                        {path:'negotiated_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oDealTableModel>negotiated_data', targetType: 'any'},
+                                        {path:'negotiated_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -380,7 +381,7 @@
                 >
                     <table:Table
                         id="pipeDetailTable2"
-                        rows="{path:'oMonthTableModel>/'}"
+                        rows="{path:'/'}"
                         selectionMode="Single" 
                         selectionBehavior="RowOnly" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
@@ -390,6 +391,7 @@
                         visibleRowCountMode="Auto"
                         fixedColumnCount="2"
                         noData=" "
+                        fieldGroupIds="content,month"
                     >
                         <table:layoutData>
                             <FlexItemData growFactor="1" />
@@ -409,8 +411,8 @@
                                 <table:template>
                                     <Text
                                         emptyIndicatorMode="On"
-                                        text="{oMonthTableModel>div_name}"
-                                        tooltip="{oMonthTableModel>div_name}"
+                                        text="{div_name}"
+                                        tooltip="{div_name}"
                                         wrapping="false"
                                         width="100%"
                                         textAlign="Begin"
@@ -433,8 +435,8 @@
                                 <table:template>
                                     <Text
                                         emptyIndicatorMode="On"
-                                        text="{oMonthTableModel>type}"
-                                        tooltip="{oMonthTableModel>type}"
+                                        text="{type}"
+                                        tooltip="{type}"
                                         wrapping="false"
                                         width="100%"
                                         textAlign="Center"
@@ -457,14 +459,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>total_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'total_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>total_data', targetType: 'any'},
+                                        {path:'total_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -492,14 +494,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_01_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'m_01_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_01_data', targetType: 'any'},
+                                        {path:'m_01_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -527,14 +529,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_02_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'m_02_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_02_data', targetType: 'any'},
+                                        {path:'m_02_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -562,14 +564,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_03_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'m_03_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_03_data', targetType: 'any'},
+                                        {path:'m_03_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -597,14 +599,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_04_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'m_04_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_04_data', targetType: 'any'},
+                                        {path:'m_04_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -632,14 +634,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_05_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'m_05_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_05_data', targetType: 'any'},
+                                        {path:'m_05_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -667,14 +669,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_06_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'m_06_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_06_data', targetType: 'any'},
+                                        {path:'m_06_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -702,14 +704,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_07_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'m_07_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_07_data', targetType: 'any'},
+                                        {path:'m_07_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -737,14 +739,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_08_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'m_08_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_08_data', targetType: 'any'},
+                                        {path:'m_08_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -772,14 +774,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_09_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'m_09_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_09_data', targetType: 'any'},
+                                        {path:'m_09_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -807,14 +809,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_10_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'m_10_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_10_data', targetType: 'any'},
+                                        {path:'m_10_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -842,14 +844,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_11_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'m_11_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_11_data', targetType: 'any'},
+                                        {path:'m_11_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -877,14 +879,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_12_data', targetType: 'any'},
-                                        {path:'oMonthTableModel>type', targetType: 'any'}
+                                        {path:'m_12_data', targetType: 'any'},
+                                        {path:'type', targetType: 'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oMonthTableModel>m_12_data', targetType: 'any'},
+                                        {path:'m_12_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -909,7 +911,7 @@
                 >
                     <table:Table
                         id="pipeDetailTable3"
-                        rows="{path:'oRodrTableModel>/'}"
+                        rows="{path:'/'}"
                         selectionMode="Single" 
                         selectionBehavior="RowOnly" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
@@ -919,6 +921,7 @@
                         visibleRowCountMode="Auto"
                         fixedColumnCount="2"
                         noData=" "
+                        fieldGroupIds="content,rodr"
                     >
                         <table:layoutData>
                             <FlexItemData growFactor="1" />
@@ -938,7 +941,7 @@
                                 <table:template>
                                     <Text
                                         emptyIndicatorMode="On"
-                                        text="{oRodrTableModel>div_name}"
+                                        text="{div_name}"
                                         wrapping="false"
                                         width="100%"
                                         textAlign="Begin"
@@ -962,7 +965,7 @@
                                 <table:template>
                                     <Text
                                         emptyIndicatorMode="On"
-                                        text="{oRodrTableModel>type}"
+                                        text="{type}"
                                         wrapping="false"
                                         width="100%"
                                         textAlign="Center"
@@ -985,14 +988,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oRodrTableModel>total_data', targetType: 'any'},
-                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                        {path:'total_data', targetType: 'any'},
+                                        {path:'type', targetType:'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oRodrTableModel>total_data', targetType: 'any'},
+                                        {path:'total_data', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -1019,14 +1022,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oRodrTableModel>more10bil', targetType: 'any'},
-                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                        {path:'more10bil', targetType: 'any'},
+                                        {path:'type', targetType:'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oRodrTableModel>more10bil', targetType: 'any'},
+                                        {path:'more10bil', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -1053,14 +1056,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oRodrTableModel>5bil_10bil', targetType: 'any'},
-                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                        {path:'5bil_10bil', targetType: 'any'},
+                                        {path:'type', targetType:'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oRodrTableModel>5bil_10bil', targetType: 'any'},
+                                        {path:'5bil_10bil', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -1087,14 +1090,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oRodrTableModel>3bil_5bil', targetType: 'any'},
-                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                        {path:'3bil_5bil', targetType: 'any'},
+                                        {path:'type', targetType:'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oRodrTableModel>3bil_5bil', targetType: 'any'},
+                                        {path:'3bil_5bil', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -1121,14 +1124,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oRodrTableModel>1bil_3bil', targetType: 'any'},
-                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                        {path:'1bil_3bil', targetType: 'any'},
+                                        {path:'type', targetType:'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oRodrTableModel>1bil_3bil', targetType: 'any'},
+                                        {path:'1bil_3bil', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -1155,14 +1158,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oRodrTableModel>500mil_1bil', targetType: 'any'},
-                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                        {path:'500mil_1bil', targetType: 'any'},
+                                        {path:'type', targetType:'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oRodrTableModel>500mil_1bil', targetType: 'any'},
+                                        {path:'500mil_1bil', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -1189,14 +1192,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oRodrTableModel>100mil_500mil', targetType: 'any'},
-                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                        {path:'100mil_500mil', targetType: 'any'},
+                                        {path:'type', targetType:'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oRodrTableModel>100mil_500mil', targetType: 'any'},
+                                        {path:'100mil_500mil', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],
@@ -1223,14 +1226,14 @@
                                         emptyIndicatorMode="On"
                                         text="{
                                     parts:[
-                                        {path:'oRodrTableModel>less100mil', targetType: 'any'},
-                                        {path:'oRodrTableModel>type', targetType:'any'}
+                                        {path:'less100mil', targetType: 'any'},
+                                        {path:'type', targetType:'any'}
                                     ],
                                     formatter: '.onFormatPerformance'
                                 }"
                                         tooltip="{
                                     parts:[
-                                        {path:'oRodrTableModel>less100mil', targetType: 'any'},
+                                        {path:'less100mil', targetType: 'any'},
                                         {value:''},
                                         {value:'tooltip'}
                                     ],

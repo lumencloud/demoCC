@@ -14,7 +14,7 @@ module.exports = (srv) => {
         const pl_if_wideview = db.entities('pl').if_wideview;
 
         const empty_prj = await SELECT.distinct.from(common_project_platform).columns('prj_no')
-            .where({ 'prj_no': { 'not like': '%-O%' }, and: { 'ver': ver, or: { 'ver': ver_last } }, and: { cstco_cd: null, or: { prj_tp_cd: null, or: { relsco_yn: null } } } });
+            .where({ 'prj_no': { 'not like': '%-O%' }, prj_tp_cd: null, and: { 'ver': ver, or: { 'ver': ver_last } } });
 
         if (empty_prj?.length <= 0) return;
 
@@ -112,6 +112,4 @@ module.exports = (srv) => {
         }
 
     })
-
-    // return oReturn;
 }

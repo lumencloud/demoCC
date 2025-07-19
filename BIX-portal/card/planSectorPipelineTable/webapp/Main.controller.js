@@ -101,8 +101,8 @@ sap.ui.define([
                 aColumnsVisible[sFindColumn] = bResult
             }
             this.getView().setModel(new JSONModel(aColumnsVisible), "oColumnsVisibleModel")
-            console.log(this.getView().getModel("oColumnsVisibleModel"))
-            //console.log(this.getView().getModel("oMonthTableModel"))
+            //console.log(this.getView().getModel("oColumnsVisibleModel"))
+            ////console.log(this.getView().getModel("oMonthTableModel"))
         },
 
         onFirstVisibleRowChanged: function () {

@@ -66,7 +66,7 @@
                         </VBox>
                         <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin" wrap="Wrap" renderType="Bare" alignContent="Center">
                             <Text emptyIndicatorMode="On" text=" {Model>/account1thName} 등 {Model>/etcCount}건"  tooltip="{Model>/account1thName} 등 {Model>/etcCount}건"/>                        
-                            <Text emptyIndicatorMode="On" text="({Model>/etcAmount}억, 주요 실주 사유({Model>/etc/cls_rsn_tp_nm}))" tooltip="({Model>/etcAmount}억, 주요 실주 사유({Model>/etc/cls_rsn_tp_nm}))" class="custom-negative-state sapUiTinyMarginBegin"/>
+                            <Text emptyIndicatorMode="On" text="({Model>/etcAmount}억, 주요 실주 사유({Model>/cls_rsn_tp_nm}))" tooltip="({Model>/etcAmount}억, 주요 실주 사유({Model>/cls_rsn_tp_nm}))" class="custom-negative-state sapUiTinyMarginBegin"/>
                         </HBox>
                     </HBox>                    
                 </VBox>

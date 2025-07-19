@@ -7,7 +7,7 @@
     <form:SimpleForm id="cardContent" class="custom-back-white" >
         <form:content>
             <VBox class="ai-report-box">
-                <HBox width="100%" justifyContent="Start" alignItems="Center" class="custom-ai-report-subtitle-box" visible="false" id="cardTitle">
+                <HBox width="100%" justifyContent="Start" alignItems="Center" class="custom-ai-report-subtitle-box" visible="true" id="cardTitle">
                     <Text text="DT Pipeline : " class="custom-negative-state"/>
                     <Text text="{mainTitleModel>/sTotalRodr}"/>
                     <Text text="{mainTitleModel>/sTotalGap}" class="custom-negative-state"/>
@@ -23,14 +23,19 @@
                     </VBox>
 
                     <VBox class="custom-card-box-padding">
-                        <List items="{LLMModel>/summary}" showSeparators="None" backgroundDesign="Transparent">
-                            <CustomListItem >
-                                <HBox width="100%" >
-                                    <core:Icon src="sap-icon://circle-task-2" class="custom-ai-report-test-aiIcon sapUiTinyMarginEnd" size="7px"/>
-                                    <Text text="{LLMModel>}" wrapping="true" class="custom-ai-report-test-card-content"/>
-                                </HBox>
-                            </CustomListItem>
-                        </List>
+                        <VBox class="custom-card-box-padding">
+                            <VBox busy="{LLMModel>/isLoading}">
+                                <List items="{LLMModel>/summary}" showSeparators="None" backgroundDesign="Transparent"
+                                    noDataText="{= ${LLMModel>/isLoading} ? 'AI 보고서 생성중입니다.' : '데이터가 없습니다.'}">
+                                    <CustomListItem >
+                                        <HBox width="100%" >
+                                            <core:Icon src="sap-icon://circle-task-2" class="custom-ai-report-test-aiIcon sapUiTinyMarginEnd" size="7px"/>
+                                            <Text text="{LLMModel>}" wrapping="true" class="custom-ai-report-test-card-content"/>
+                                        </HBox>
+                                    </CustomListItem>
+                                </List>
+                            </VBox>
+                        </VBox>
                     </VBox>
                 </VBox>
             </VBox>

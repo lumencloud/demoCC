@@ -36,14 +36,30 @@ sap.ui.define([
          */
         _oSearchData: {},
 
-        onInit: async function () {
+        onInit: function () {
             // 초기 JSON 모델 설정
             // await this._setModel();
-            this._bindTable();
+            //this._bindTable();
+            this._asyncInit();
+
             this._oEventBus.subscribe("pl", "search", this._bindTable, this);
 
             this._aiPopupManager = new AIPopupManager();
+
+
+            this.byId("pipeDetailTable1").attachCellClick(this.onCellClick, this);
+            this.byId("pipeDetailTable1").attachCellContextmenu(this.onCellContextmenu, this);
+            this.byId("pipeDetailTable2").attachCellClick(this.onCellClick, this);
+            this.byId("pipeDetailTable2").attachCellContextmenu(this.onCellContextmenu, this);
+            this.byId("pipeDetailTable3").attachCellClick(this.onCellClick, this);
+            this.byId("pipeDetailTable3").attachCellContextmenu(this.onCellContextmenu, this);
+
         },
+        _asyncInit: async function () {
+            // 테이블 바인딩
+            this._bindTable();
+        },
+
 
         /**
          * JSON 모델 설정
@@ -106,7 +122,7 @@ sap.ui.define([
             // HashChanger.getInstance().setHash(sNewHash);
 
             // // PL에 detailSelect 해시 변경 EventBus 전송
-            // this._oEventBus.publish("pl", "setHashModel");
+            // this._oEventBus.publish("pl", "setHashModel", {system: true});
         },
 
         _setBusy: function (bFlag) {
@@ -115,8 +131,8 @@ sap.ui.define([
 
         _bindTable: async function (sChannelId, sEventId, oData) {
             // DOM이 없는 경우 Return
-            // let oDom = this.getView().getDomRef();
-            // if (!oDom) return;
+            let oDom = this.getView().getDomRef();
+            if (!oDom) return;
 
             // detailSelect 해시에 따른 Select 선택
             // let oSelect = this.byId("detailSelect");
@@ -151,7 +167,7 @@ sap.ui.define([
 
 
 
-            let sOrgId = oAiData.aiOrgId;
+            let sOrgId = oAiData.orgId;
 
 
             const oModel = new ODataModel({
@@ -160,7 +176,7 @@ sap.ui.define([
                 operationMode: "Server"
             });
 
-            let sDealPath = `/get_forecast_pl_pipeline_org_detail(year='${iYear}',month='${sMonth}',org_id='${sOrgId}')`
+            let sDealPath = `/get_forecast_pl_pipeline_org_detail(year='${iYear}',month='${sMonth}',org_id='${sOrgId}',ai_flag=true)`
 
 
             await Promise.all([
@@ -168,13 +184,16 @@ sap.ui.define([
             ]).then(function (aResults) {
 
                 let oData = aResults[0].value[0]
+
+
+
                 let aOrg = oData.org
                 // let aMonth = oData.month
                 // let aDeal = oData.deal
                 // let aRodr = oData.rodr
-                let aMonth = oData.month.filter(pl => pl.type === oAiData.aiType)
-                let aDeal = oData.deal.filter(pl => pl.type === oAiData.aiType)
-                let aRodr = oData.rodr.filter(pl => pl.type === oAiData.aiType)
+                let aMonth = oData.month.filter(pl => pl.type === oAiData.type)
+                let aDeal = oData.deal.filter(pl => pl.type === oAiData.type)
+                let aRodr = oData.rodr.filter(pl => pl.type === oAiData.type)
                 // totalData 추가해서 모델 바인딩
                 this.getView().setModel(new JSONModel({ org_id: aOrg[0].org_id }), "uiModel");
                 this.getView().setModel(new JSONModel(aResults[0].value), "tableModel");
@@ -183,8 +202,11 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel(aDeal), "oDealTableModel");
                 this.getView().setModel(new JSONModel(aRodr), "oRodrTableModel");
 
+                Module.displayStatusForEmpty(this.byId("pipeDetailTable1"), aMonth, this.byId("pipeDetailBox1"));
+                Module.displayStatusForEmpty(this.byId("pipeDetailTable2"), aDeal, this.byId("pipeDetailBox1"));
+                Module.displayStatusForEmpty(this.byId("pipeDetailTable3"), aRodr, this.byId("pipeDetailBox1"));
 
-                this._dataLength = [aDeal.length, aMonth.length,aRodr.length];
+                this._dataLength = [aDeal.length, aMonth.length, aRodr.length];
 
 
                 this._monthVisibleSetting(oData.month);
@@ -220,7 +242,7 @@ sap.ui.define([
 
         _setVisibleRowCount: function (aResults) {
             //테이블 리스트
-        let aTableLists = this._aTableLists
+            let aTableLists = this._aTableLists
 
 
 
@@ -241,13 +263,13 @@ sap.ui.define([
                     oTable.setVisibleRowCountMode("Auto")
                 } else {
                     oTable.setVisibleRowCountMode("Fixed")
-                    oTable.setVisibleRowCount( this._dataLength[i])
+                    oTable.setVisibleRowCount(this._dataLength[i])
                 }
             }
         },
 
         _monthVisibleSetting: function (aResults) {
-            if (aResults.length <= 0 ) return;
+            if (aResults.length <= 0) return;
             let aColumnsVisible = {};
             for (let i = 1; i < 13; i++) {
                 let sFindColumn = "m_" + String(i).padStart(2, "0") + "_data"
@@ -255,30 +277,36 @@ sap.ui.define([
                 aColumnsVisible[sFindColumn] = bResult
             }
             this.getView().setModel(new JSONModel(aColumnsVisible), "oColumnsVisibleModel")
-            //console.log(this.getView().getModel("oColumnsVisibleModel"))
-            //console.log(this.getView().getModel("oMonthTableModel"))
+            ////console.log(this.getView().getModel("oColumnsVisibleModel"))
+            ////console.log(this.getView().getModel("oMonthTableModel"))
         },
 
         _setTableMerge: function () {
 
-            let oTable1 = this.byId("pipeDetailTable1")
-            let oTable2 = this.byId("pipeDetailTable2")
-            let oTable3 = this.byId("pipeDetailTable3")
+            Module.setTableMergeWithAltColor(this.byId("pipeDetailTable1"), "oDealTableModel");
+            Module.setTableMergeWithAltColor(this.byId("pipeDetailTable2"), "oMonthTableModel");
+            Module.setTableMergeWithAltColor(this.byId("pipeDetailTable3"), "oRodrTableModel");
 
-            oTable1.attachCellClick(this.onCellClick, this);
-            oTable1.attachCellContextmenu(this.onCellContextmenu, this);
-            oTable2.attachCellClick(this.onCellClick, this);
-            oTable2.attachCellContextmenu(this.onCellContextmenu, this);
-            oTable3.attachCellClick(this.onCellClick, this);
-            oTable3.attachCellContextmenu(this.onCellContextmenu, this);
+            // let oTable1 = this.byId("pipeDetailTable1")
+            // let oTable2 = this.byId("pipeDetailTable2")
+            // let oTable3 = this.byId("pipeDetailTable3")
 
-            Module.setTableMergeWithAltColor(oTable1, "oDealTableModel");
-            Module.setTableMergeWithAltColor(oTable2, "oMonthTableModel");
-            Module.setTableMergeWithAltColor(oTable3, "oRodrTableModel");
-        },
+            // if (oTable1 && !oTable1?.mEventRegistry?.cellContextmenu) {
+            //     oTable1.attachCellClick(this.onCellClick, this);
+            //     oTable1.attachCellContextmenu(this.onCellContextmenu, this);
+            // }
+            // if (oTable2 && !oTable2?.mEventRegistry?.cellContextmenu) {
+            //     oTable2.attachCellClick(this.onCellClick, this);
+            //     oTable2.attachCellContextmenu(this.onCellContextmenu, this);
+            // }
+            // if (oTable3 && !oTable3?.mEventRegistry?.cellContextmenu) {
+            //     oTable3.attachCellClick(this.onCellClick, this);
+            //     oTable3.attachCellContextmenu(this.onCellContextmenu, this);
+            // }
 
-        onAfterRendering: function () {
-            this._setTableMerge();
+            // Module.setTableMergeWithAltColor(oTable1, "oDealTableModel");
+            // Module.setTableMergeWithAltColor(oTable2, "oMonthTableModel");
+            // Module.setTableMergeWithAltColor(oTable3, "oRodrTableModel");
         },
 
 
@@ -334,10 +362,10 @@ sap.ui.define([
             //aireport에서 불러들일 값을 sessionStorage에 저장
             sessionStorage.setItem("aiModel",
                 JSON.stringify({
-                    aiOrgId: this._selectedOrgId,
-                    aiOrgName: this._selectedOrgName,
-                    aiType: oAiData.aiType,
-                    aiSubTitle: oAiData.aiSubTitle,
+                    orgId: this._selectedOrgId,
+                    orgNm: this._selectedOrgName,
+                    type: oAiData.type,
+                    subTitle: oAiData.subTitle,
                     aiTableId: oAiData.aiTableId,
                     aiTableName: oAiData.aiTableName
                 })
@@ -351,7 +379,7 @@ sap.ui.define([
             );
 
             // AI 분석 시작
-            this._startAnalysis(oEvent, oAnalysisData.params, sAnalysisId);
+            //this._startAnalysis(oEvent, oAnalysisData.params, sAnalysisId);
         },
 
         _prepareAnalysisData: function () {
@@ -370,12 +398,10 @@ sap.ui.define([
                 yearMonth: dYearMonth,
                 orgName: this._selectedOrgName,
                 menuName: "부문 Pipeline 상세",
-                type: oAiData.aiType,
+                type: oAiData.type,
                 subTitle: oAiData.aiTableName
             };
 
-            console.log("oAiData   :   ", oAiData)
-            console.log("tokenData,", tokenData)
 
             return { params, tokenData };
         },

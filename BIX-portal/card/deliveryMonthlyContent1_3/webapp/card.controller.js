@@ -21,9 +21,8 @@ sap.ui.define([
             this._createId();
 
             // 차트 설정
-            this._setChart();
-            this._oEventBus.subscribe("aireport", "infoSet", this._updateChart, this);
-
+            // this._setChart();
+            this._oEventBus.subscribe("aireport", "deliContent1_3", this._setChart, this);
         },
 
         /**
@@ -39,16 +38,19 @@ sap.ui.define([
 
         },
 
-        _updateChart: async function () {
-            this.byId("cardContent").setBusy(true);
-            let aResults = await this._dataSetting();
+        _updateChart: async function (sChannel, sEventId, oData) {
+            this.getOwnerComponent().oCard.setBusy(true);
+            let aResults = await this._dataSetting(oData.data);
             this._oMyChart.data.labels = aResults.aLabel
             this._oMyChart.data.datasets[0].data = aResults.aData
             this._oMyChart.update();
-            this.byId("cardContent").setBusy(false);
+            this.dataLoad();
+            setTimeout(() => {
+                this.getOwnerComponent().oCard.setBusy(false);
+            }, 300)
         },
 
-        _setChart: async function () {
+        _setChart: async function (sChannel, sEventId, oData) {
             this.byId("cardContent").setBusy(true);
             // 카드
             const oCard = this.getOwnerComponent().oCard;
@@ -59,11 +61,13 @@ sap.ui.define([
             let iBoxWidth = Math.floor(oParentElement.clientWidth / window.innerWidth * 100);
             let iBoxHeight = Math.floor(oParentElement.clientHeight / window.innerHeight * 95);
 
-            let aData = await this._dataSetting();
+            let aData = await this._dataSetting(oData.data);
+            this._oEventBus.subscribe("aireport", "deliContent1_3", this._updateChart, this);
 
             let oHTML = this.byId("html0");
             oHTML.setContent(`<div id='${this._aContainerId}' class='custom-chart-container' style='width:300px; height:250px; min-height:250px'><canvas id='${this._aCanvasId}' /></div>`);
             oHTML.attachEvent("afterRendering", async function () {
+
                 // 차트 구성
                 const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[0])).getContext("2d");
                 //데이터 요청
@@ -107,6 +111,9 @@ sap.ui.define([
                                 display: false,
                                 position: 'bottom',
                             },
+                            tooltip: {
+                                enabled: false
+                            },
                             datalabels: {
                                 clip: false,
                                 display: true,
@@ -125,7 +132,7 @@ sap.ui.define([
                                 },
                                 offset: -3,
                                 formatter: function (value) {
-                                    var oNumberFormat = NumberFormat.getIntegerInstance({
+                                    var oNumberFormat = NumberFormat.getFloatInstance({
                                         groupingEnabled: true,
                                         groupingSeparator: ',',
                                         groupingSize: 3,
@@ -185,12 +192,12 @@ sap.ui.define([
                 })
 
 
-                this.dataLoad();
-
-
+                
+                
                 this._ovserveResize(this.byId(this._aContainerId))
-
+                
             }.bind(this));
+            this.dataLoad();
             this.byId("cardContent").setBusy(false);
         },
 
@@ -200,16 +207,18 @@ sap.ui.define([
                 this._resizeObserver = new ResizeObserver(() => {
                     this._oMyChart.resize()
                 })
-                this._resizeObserver.observe(oElement)
+
             }
         },
 
 
-        _dataSetting: async function () {
-            let aResults = await this._setData();
-            let oValue = aResults[0].value[0];
-            let sOrgType = aResults[1]['orgType'];
-            let sOrgId = aResults[1]['orgId'];
+        _dataSetting: async function (oDataResult) {
+            // let aResults = await this._setData();
+            let oSessionData = JSON.parse(sessionStorage.getItem("aiReport"))
+
+            let oValue = oDataResult[0];
+            let sOrgType = oSessionData['type'];
+            let sOrgId = oSessionData['orgId'];
             let aLabel, aData;
             if (sOrgId === '5') {
                 switch (sOrgType) {
@@ -217,7 +226,7 @@ sap.ui.define([
                         aData = [oValue.sale_gap, oValue.margin_gap, oValue.margin_rate_gap, oValue.dt_gap]
                         break;
                     case 'account': aLabel = ["매출", "DT 매출", "RoHC", "공헌이익"]
-                        aData = [oValue.sale_gap, oValue.dt_gap, oValue.rohc_gap, oValue.contribytion_gap]
+                        aData = [oValue.sale_gap, oValue.dt_gap, oValue.rohc_gap, oValue.contribution_gap]
                         break;
                     case 'delivery': aLabel = ["마진율", "DT 매출", "BR(Cost)", "RoHC"]
                         aData = [oValue.margin_rate_gap, oValue.dt_gap, oValue.br_cost_gap, oValue.rohc_gap]
@@ -227,7 +236,7 @@ sap.ui.define([
                 // Cloud
                 aLabel = ["매출", "마진율", "DT 매출", "BR(Cost)", "RoHC", "공헌이익", "Non-MM"]
                 aData = [oValue.sale_gap, oValue.margin_rate_gap,
-                oValue.dt_gap, oValue.br_cost_gap, oValue.rohc_gap, oValue.contribytion_gap, oValue.nonmm_gap]
+                oValue.dt_gap, oValue.br_cost_gap, oValue.rohc_gap, oValue.contribution_gap, oValue.nonmm_gap]
             }
             let oData = {
                 aLabel,

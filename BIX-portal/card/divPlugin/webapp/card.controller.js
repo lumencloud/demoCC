@@ -32,12 +32,12 @@ sap.ui.define([
         _updateChart: async function (){
             let aData = await this._setData()
 
-            let oChart = this._oMyChart
+            let oChart = await this._oMyChart
             oChart.data.labels = aData.aLabel
             oChart.data.datasets[0].data = aData.aLast;
             oChart.data.datasets[1].data = aData.aCurr;
-            oChart.config._config.options.plugins.groupLabels.divNameSums = aData.aGroup
-            oChart.config._config.options.plugins.groupLabels.labels =  aData.aGroupValue
+            oChart.config._config.options.plugins.groupLabels.divNameSums = aData.aGroupValue
+            oChart.config._config.options.plugins.groupLabels.labels =  aData.aGroup
             oChart.update();
 
 
@@ -60,7 +60,7 @@ sap.ui.define([
             let sCardId = oCard.getId();
             let oParentElement = document.getElementById(sCardId).parentElement;
             let iBoxWidth = Math.floor(oParentElement.clientWidth / window.innerWidth * 95);
-            let iBoxHeight = Math.floor(oParentElement.clientHeight / window.innerHeight * 90);
+            let iBoxHeight = Math.floor(oParentElement.clientHeight / window.innerHeight * 100);
 
             const oNumberFormat = NumberFormat.getFloatInstance({
                 groupingEnabled: true,
@@ -129,8 +129,9 @@ sap.ui.define([
                         // }
                         if (i === groupNames.length - 1) { return; }
 
+
                         let lastIdx = info.end;
-                        let lineX = xScale.getPixelForValue(lastIdx) + 25;
+                        let lineX = xScale.getPixelForValue(lastIdx) + (xScale.getPixelForValue(lastIdx) - xScale.getPixelForValue(lastIdx-1))/2;
                         ctx.save();
                         ctx.beginPath();
                         ctx.moveTo(lineX, top);
@@ -154,11 +155,9 @@ sap.ui.define([
 
                 
                 // 차트 색상
-                let sChartColor1 = getComputedStyle(document.documentElement).getPropertyValue('--custom_Chart5');
-                let sChartColor2 = getComputedStyle(document.documentElement).getPropertyValue('--custom_Chart6');
-                let sChartColor3 = getComputedStyle(document.documentElement).getPropertyValue('--custom_black4');
-                let sChartColor4 = getComputedStyle(document.documentElement).getPropertyValue('--custom_black5');
-                let sChartColor5 = getComputedStyle(document.documentElement).getPropertyValue('--custom_black6');
+                let sChartColor1 = "#FA4646"
+                let sChartColor2 = "#2D99FF"
+                let sChartColor4 = "#ECEDEE"
                 const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._sCanvasId)).getContext("2d");
                 this._oMyChart = new Chart(ctx, {
                     type: "bar",
@@ -170,17 +169,28 @@ sap.ui.define([
                                 data: aData.aLast,
                                 borderRadius: 3,
                                 backgroundColor: sChartColor4,
-                                yAxisID: 'y'
+                                yAxisID: 'y',             
+                                datalabels:{
+                                    color: "black",
+                                    size:12,                                                                                                 
+                                },                   
                             },
                             {
-                                label: "올해",
+                                label: "매출",
                                 data: aData.aCurr,
                                 borderRadius: 3,
                                 backgroundColor: function (oContext) {  // 0보다 작으면 빨간색 적용
                                     let index = oContext.dataIndex;
                                     return (aData.aCurr[index] - aData.aLast[index] < 0) ?  sChartColor1 : sChartColor2;
                                 },
-                                yAxisID: 'y'
+                                yAxisID: 'y',    
+                                datalabels:{
+                                    color: function (oContext) {  // 0보다 작으면 빨간색 적용
+                                        let index = oContext.dataIndex;
+                                        return (aData.aCurr[index] - aData.aLast[index] < 0) ?  sChartColor1 : sChartColor2;
+                                    },
+                                    size:12,                                                                                                 
+                                },                            
                             }
                         ]
                     },
@@ -199,104 +209,74 @@ sap.ui.define([
                             legend: {
                                 display: true,
                                 position: 'bottom',
+                                labels:{
+                                    usePointStyle: true,
+                                    generateLabels(chart){
+                                        return[
+                                            {
+                                                text:'전년도',
+                                                fillStyle:sChartColor4,
+                                                strokeStyle: sChartColor4,
+                                                lineWidth: 1,
+                                                hidden: false,
+                                                datasetIndex: 0,
+                                                pointStyle: 'circle',
+                                                pointBackgroundColor : sChartColor4,
+                                                pointBorderColor : "white",
+                                                pointBorderWidth: 3,
+                                                pointRadius: 6,
+                                            },
+                                            {
+                                                text:'매출(전년대비 상승)',
+                                                fillStyle:sChartColor2,
+                                                strokeStyle: sChartColor2,
+                                                lineWidth: 1,
+                                                hidden: false,
+                                                datasetIndex: 1,
+                                                pointStyle: 'circle',
+                                                pointBackgroundColor : sChartColor2,
+                                                pointBorderColor : "white",
+                                                pointBorderWidth: 3,
+                                                pointRadius: 6,
+                                            },
+                                            {
+                                                text:'매출(전년대비 하락)',
+                                                fillStyle:sChartColor1,
+                                                strokeStyle: sChartColor1,
+                                                lineWidth: 1,
+                                                hidden: false,
+                                                datasetIndex: 1,
+                                                pointStyle: 'circle',
+                                                pointBackgroundColor : sChartColor1,
+                                                pointBorderColor : "white",
+                                                pointBorderWidth: 3,
+                                                pointRadius: 6,
+                                            },
+                                            
+
+                                        ]
+                                    }
+                                }
                             },
-                            // annotation: {
-                            //     annotations: [
-                            //         {
-                            //             type: "line",
-                            //             scaleID: "x",
-                            //             value: 2.5, // 세로 구분선 X축 위치
-                            //             borderColor: sChartColor3,   // 점선 색
-                            //             borderWidth: 2, // 점선 두께
-                            //             borderDash: [5, 5],   // 점선 패턴 길이
-                            //         },
-                            //         {
-                            //             type: "line",
-                            //             scaleID: "x",
-                            //             value: 4.5, // 세로 구분선 X축 위치
-                            //             borderColor: sChartColor3,   // 점선 색
-                            //             borderWidth: 2, // 점선 두께
-                            //             borderDash: [5, 5],   // 점선 패턴 길이
-                            //         },
-                            //         {
-                            //             type: "line",
-                            //             scaleID: "x",
-                            //             value: 8.5, // 세로 구분선 X축 위치
-                            //             borderColor: sChartColor3,   // 점선 색
-                            //             borderWidth: 2, // 점선 두께
-                            //             borderDash: [5, 5],   // 점선 패턴 길이
-                            //         },
+                            tooltip:{
+                                callbacks:{
+                                    label :
+                                    function(context){
+                                        let value = context.parsed.y;
 
-                            //         {
-                            //             type: "label",
-                            //             xValue: 1,
-                            //             yValue: 2750,
-                            //             content: ["AT/DT", "+175"],
-                            //             color: sChartColor2,
-                            //             font: [{ size: 20 }, { size: 20, weight: "bold" }],
-                            //         },
-                            //         {
-                            //             type: "label",
-                            //             xValue: 3.5,
-                            //             yValue: 2750,
-                            //             content: ["Hi-Tech.", "+119"],
-                            //             color: sChartColor2,
-                            //             font: [{ size: 20 }, { size: 20, weight: "bold" }],
-                            //         },
-                            //         {
-                            //             type: "label",
-                            //             xValue: 6.5,
-                            //             yValue: 2750,
-                            //             content: ["제조/Global", "△182"],
-                            //             color:  sChartColor1,
-                            //             font: [{ size: 20 }, { size: 20, weight: "bold" }],
-                            //         },
-                            //         {
-                            //             type: "label",
-                            //             xValue: 11,
-                            //             yValue: 2750,
-                            //             content: ["금융/전략", "+100"],
-                            //             color: sChartColor2,
-                            //             font: [{ size: 20 }, { size: 20, weight: "bold" }],
-                            //         },
-
-                            //         {
-                            //             type: "label",
-                            //             xValue: 1,
-                            //             yValue: 2000,
-                            //             content: ["SKT +151", "SKB +24", "기타ICT계열 +0"],
-                            //             color: sChartColor2,
-                            //             font: { size: 14 },
-                            //             color: [ sChartColor1,  sChartColor1, sChartColor2, sChartColor2],
-                            //         },
-                            //         {
-                            //             type: "label",
-                            //             xValue: 3.5,
-                            //             yValue: 2000,
-                            //             content: ["SKHy +99", "반도체계열 +20"],
-                            //             color: sChartColor2,
-                            //             font: { size: 14 }
-                            //         },
-                            //         {
-                            //             type: "label",
-                            //             xValue: 7.5,
-                            //             yValue: 2000,
-                            //             content: ["SKI △120", "SKON △114", "대내기타제조 +32", "대외제조 + 19"],
-                            //             color: [ sChartColor1,  sChartColor1, sChartColor2, sChartColor2],
-                            //             font: { size: 14 }
-                            //         },
-                            //         {
-                            //             type: "label",
-                            //             xValue: 11,
-                            //             yValue: 2000,
-                            //             content: ["금융 △90", "공공 + 8", "대내물류/서비스 △9", "유통/물류/서비스 +57", "대외Cloud + 134"],
-                            //             color: [ sChartColor1, sChartColor2,  sChartColor1, sChartColor2, sChartColor2],
-                            //             font: { size: 14 }
-                            //         },
-                            //     ]
-                            // },
+                                        var oNumberFormat = NumberFormat.getIntegerInstance({
+                                            groupingEnabled: true,
+                                            groupingSeparator: ',',
+                                            groupingSize: 3,
+                                            decimals: 0
+                                        });
+                                        return `${oNumberFormat.format(value/100000000)}억`;
+                                    }
+                                }   
+                            },
                             datalabels: {   // 데이터라벨 플러그인
-                                
+                                clip:false,
+                                display:true,
                                 color: "#555",
                                 align: "top",
                                 anchor: "end",
@@ -307,9 +287,7 @@ sap.ui.define([
                                     return oNumberFormat.format(iValue / 100000000);
                                 }
                                 },
-                                font: {
-                                    weight: 700
-                                }
+                                
 
                             },
                              groupLabels: {

@@ -321,6 +321,11 @@ modules:
           target-path: resources/ 
 
         - artifacts:
+            - bixcardcompletedContractBau.zip
+          name: bixcardcompletedContractBau
+          target-path: resources/ 
+
+        - artifacts:
             - bixcardscheduledBiddingProjects.zip
           name: bixcardscheduledBiddingProjects
           target-path: resources/ 
@@ -383,6 +388,11 @@ modules:
         - artifacts:
             - bixcardsaleRelsco.zip
           name: bixcardsaleRelsco
+          target-path: resources/
+
+        - artifacts:
+            - bixcardsaleRelsco2.zip
+          name: bixcardsaleRelsco2
           target-path: resources/
         
         - artifacts:
@@ -500,11 +510,12 @@ modules:
             - bixcarddeliverymonthlycontent3_3.zip
           name: bixcarddeliverymonthlycontent3_3
           target-path: resources/
+     
         - artifacts:
             - bixcardmonthlycompletedcontract.zip
           name: bixcardmonthlycompletedcontract
           target-path: resources/
-
+     
         - artifacts:
             - bixcardmonthlydeselected.zip
           name: bixcardmonthlydeselected
@@ -550,6 +561,11 @@ modules:
         - artifacts:
             - bixcardactualCompanyChart.zip
           name: bixcardactualCompanyChart
+          target-path: resources/
+
+        - artifacts:
+            - bixcardplanPipelineDetailChart.zip
+          name: bixcardplanPipelineDetailChart
           target-path: resources/
          
 
@@ -1204,6 +1220,16 @@ modules:
         - npm run build:cf
       supported-platforms: []
 
+  - name: bixcardcompletedContractBau
+    type: html5
+    path: ./completedContractBau
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []
+
   - name: bixcardscheduledBiddingProjects
     type: html5
     path: ./scheduledBiddingProjects
@@ -1330,6 +1356,16 @@ modules:
   - name: bixcardsaleRelsco
     type: html5
     path: ./saleRelsco
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []
+
+  - name: bixcardsaleRelsco2
+    type: html5
+    path: ./saleRelsco2
     build-parameters:
       build-result: dist
       builder: custom
@@ -1642,6 +1678,16 @@ modules:
   - name: bixcardactualCompanyChart
     type: html5
     path: ./actualCompanyChart
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardplanPipelineDetailChart
+    type: html5
+    path: ./planPipelineDetailChart
     build-parameters:
       build-result: dist
       builder: custom

@@ -171,7 +171,6 @@ class DataFetcherTool {
                         // 실제 API 핸들러 함수 호출
                         handler(tempSrv);
                     } catch (error) {
-                        console.log("오류 !!! ");
                         reject(error);
                     }
                 });

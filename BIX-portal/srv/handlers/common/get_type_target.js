@@ -165,10 +165,10 @@ module.exports = (srv) => {
                 })
             }
 
-            return aRes
+            return aRes;
         } catch(error) { 
             console.error(error); 
-            return {code:error.code, message:error.message, isError: true} 
+            return {code:error.code, message:error.message, isError: true};
         } 
     })
 };

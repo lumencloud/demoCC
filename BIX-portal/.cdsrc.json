@@ -1,19 +1,27 @@
 {
     "requires": {
         "application-logging": true,
+        "db": { "kind": "hana" },
         "[hybrid]": {
-            "db": "hana"
+            "db": {
+                "kind": "hana",
+                "pool": {
+                    "max": 100,
+                    "min": 10
+                }
+            }
         },
         "[production]": {
-            "db": "hana",
+            "db": {
+                "kind": "hana",
+                "pool": {
+                    "max": 200,
+                    "min": 20
+                }
+            },
             "auth": "xsuaa"
         },
-        "db": "hana",
-        "connectivity": true,
-        "pool": {
-          "max": 100,
-          "min": 0
-        }
+        "connectivity": true
     },
     "build": {
         "target": "gen",

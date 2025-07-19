@@ -61,7 +61,6 @@ module.exports = (srv) => {
             let pl_view = pl_org_view
             if(org_level_id !== 'lv1_id' && org_level_id !== 'lv2_id' && ((org_tp === 'hybrid' && lv3_ccorg_cd === '237100') || org_tp === 'account')){
                 pl_view = pl_account_view
-                console.log('account')
             }
 
             /**

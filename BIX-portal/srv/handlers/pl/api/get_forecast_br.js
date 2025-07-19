@@ -66,7 +66,7 @@ module.exports = (srv) => {
                 'sum(b_mm_amt_sum) as b_mm_amt_sum',
                 'sum(opp_year_amt) as opp_year_amt',
                 'sum(avg_year_amt) as avg_year_amt',
-                'sum(est_total_year_emp) as est_total_year_emp',
+                // 'sum(est_total_year_emp) as est_total_year_emp',
                 'sum(est_avg_year_amt) as est_avg_year_amt'
             ];
             const rsp_where = { 'year': year, 'is_delivery': true, [orgInfo.org_level]: orgInfo.org_ccorg_cd };
@@ -106,7 +106,7 @@ module.exports = (srv) => {
                 let sum_opp = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData.opp_year_amt, 0) || 0;
                 let sum_avg = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData.avg_year_amt, 0) || 0;
                 let sum_mm = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData.total_year_emp, 0) || 0;
-                let sum_est_total_emp = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData.est_total_year_emp, 0) || 0;
+                // let sum_est_total_emp = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData.est_total_year_emp, 0) || 0;
                 let sum_est_avg = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData.est_avg_year_amt, 0) || 0;
                 let sum_secured = a_filtered_rsp_data.reduce((iSum, oData) => iSum += oData.b_mm_amt_sum, 0) || 0;
                 let i_target = target_data.find(oData => oData.org_ccorg_cd === o_rsp_data.ccorg_cd)?.target_br_mm || 0;
@@ -125,7 +125,7 @@ module.exports = (srv) => {
                     team_name: (org_flag === "div") ? `소계 : ${o_rsp_data.div_name}` : (org_flag === "hdqt") ? `소계 : ${o_rsp_data.hdqt_name}` : o_rsp_data.team_name,
                     forecast_value: total_value ? (secured_value + not_secured_value) / total_value : 0,
                     secured_value: total_value ? (secured_value / total_value) : 0,
-                    not_secured_value: total_value ? (not_secured_value / sum_est_total_emp) : 0,
+                    not_secured_value: total_value ? (not_secured_value / total_value) : 0,
                     target: i_target,
                 }
 

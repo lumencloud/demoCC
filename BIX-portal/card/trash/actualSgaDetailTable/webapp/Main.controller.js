@@ -62,7 +62,7 @@ sap.ui.define([
                 }
             })
 
-            // console.log(oTable.getBinding("rows"));
+            // //console.log(oTable.getBinding("rows"));
 
             // 날짜 입력 값 받아 수정
             // let oTemp = { year: String(sYear).substring(2) };

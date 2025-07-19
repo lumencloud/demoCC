@@ -10,11 +10,11 @@
     
 >
      <table:Table
-        id="plUiTable"
+        id="table"
         class="custom-table-container custom-table-header custom-table-body custom-pl-table custom-table-first-emphasis custom-uiTable-selection custom-inherit-height" 
         selectionMode="Single" 
         selectionBehavior="RowOnly" 
-        rowSelectionChange="onRowSelectionChange"
+        rowSelectionChange=".onRowSelectionChange"
         enableColumnReordering="false"
         fixedColumnCount="1"
         busyIndicatorDelay="0"

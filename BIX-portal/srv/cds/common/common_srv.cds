@@ -16,7 +16,7 @@ using from '../../../db/cds/rsp/org_total_labor';
 using from '../../../db/cds/rsp/org_b_labor';
 using from '../../../db/cds/rsp/opp_labor';
 using common as orgFull from '../../../db/cds/common/view/org_full_level_view';
-using common as pjrBD from '../../../db/cds/common/view/project_biz_domain_view';
+using common as prjBD from '../../../db/cds/common/view/project_biz_domain_view';
 using common.pl_content_view as common_pl_content_view from '../../../db/cds/common/view/pl_content_view';
 // using common.pl_content_view_test as common_pl_content_view_test from '../../../db/cds/common/view/pl_content_view';
 using common.get_card_name_view as cardNameView from '../../../db/cds/common/view/get_card_name_view';
@@ -259,9 +259,9 @@ service ComService {
             category: :category
         );
 
-    view org_full_level as select from orgFull.org_full_level_view;
+    view org_full_level as select from orgFull.org_full_level_view order by org_sort_order;
     view latest_org as select from orgFull.latest_org_view;
-    view project_biz_domain_view as select from pjrBD.project_biz_domain_view;
+    view project_biz_domain_view as select from prjBD.project_biz_domain_view;
 
     view interface_log_view as
         select from common_interface_log_view

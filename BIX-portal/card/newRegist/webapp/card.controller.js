@@ -11,32 +11,35 @@ sap.ui.define(
     "use strict";
     return BaseController.extend("bix.card.newRegist.card", {
       _oEventBus: EventBus.getInstance(),
+      _bflag : true,
 
       onInit: function () {
         this._dataSetting();
         this._oEventBus.subscribe("aiReport", "dateData", this._dataSetting, this)
       },
 
-      _dataSetting: async function (oEvent, sEventId, oData) {
+      _dataSetting: async function (oEvent, sEventId) {
         this.byId("cardContent").setBusy(true);
         let { monday, sunday } = this._setDate();
+
+        let oData = JSON.parse(sessionStorage.getItem("aiWeekReport"));
 
         const oModel = new ODataModel({
           serviceUrl: "../odata/v4/ai-api/",
           synchronizationMode: "None",
           operationMode: "Server"
         });
-        let sPath = oData ? `/ai_agent_view2(start_date='${oData.start_date}',end_date=${oData.end_date})/Set` :
-          `/ai_agent_view2(start_date='${monday}',end_date=${sunday})/Set`
+        let sPath = oData ? `/ai_agent_view2(start_date='${oData.start_date}',end_date='${oData.end_date}')/Set` :
+          `/ai_agent_view2(start_date='${monday}',end_date='${sunday}')/Set`
 
         await oModel.bindContext(sPath).requestObject().then(
           function (aResult) {
-            Module.displayStatusForEmpty(this.getOwnerComponent().oCard,aResult.value, this.byId("cardContent"));
+            Module.displayStatusForEmpty(this.getOwnerComponent().oCard, aResult.value, this.byId("cardContent"));
             this._modelSetting(aResult.value);
-            this.dataLoad();
+         
           }.bind(this))
           .catch((oErr) => {
-              Module.displayStatus(this.getOwnerComponent().oCard,oErr.error.code, this.byId("cardContent"));
+            Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
           });
         this.byId("cardContent").setBusy(false);
       },
@@ -47,14 +50,21 @@ sap.ui.define(
 
         // 총 금액
         let iAmount = 0;
-        aResult.forEach((oResult) => iAmount += Number(oResult.total_target_amt))
+        aResult.forEach((oResult) => iAmount += Number(oResult.total_target_amt) / 100000000)
+
+        // 억 정리
+        aResult.forEach((oResult) => oResult.total_target_amt = (oResult.total_target_amt / 100000000).toFixed(1))
 
         // 수주금액순 정렬
         aResult.sort((a, b) => b.total_target_amt - a.total_target_amt)
 
         // Account 코드 삭제
         aResult.forEach(a => {
-          a.biz_tp_account_nm = a.biz_tp_account_nm.slice(4)
+          if (a.biz_tp_account_nm) {
+            a.biz_tp_account_nm = a.biz_tp_account_nm.slice(4)
+          } else {
+            a.biz_tp_account_nm = ''
+          }
         })
 
         // 그룹별로 분류
@@ -75,25 +85,30 @@ sap.ui.define(
         // 모델용 객체 생성
         let oModel = {
           iCount: iCount || 0,
-          iAmount: iAmount.toFixed(0) || 0,
+          iAmount: iAmount.toFixed() || 0,
           first: aResult[0] || null,
           second: aResult[1] || null,
           third: aResult[2] || null,
           forth: aResult[3] || null
         }
 
-        if (aGroupedArray[0]) {
-          oModel["account1thName"] = aGroupedArray[0][0].biz_tp_account_nm
-          oModel["account1thCount"] = aGroupedArray[0].length
-        }
-
-        if (aGroupedArray[1]) {
-          oModel["account2ndName"] = aGroupedArray[1][0].biz_tp_account_nm
-          oModel["account2ndCount"] = aGroupedArray[1].length
+        if (aResult.length > 4) {
+          if (aGroupedArray[0]) {
+            oModel["account1thName"] = aGroupedArray[0][0].biz_tp_account_nm
+            oModel["account1thCount"] = aGroupedArray[0].length
+          }
+          if (aGroupedArray[1]) {
+            oModel["account2ndName"] = aGroupedArray[1][0].biz_tp_account_nm
+            oModel["account2ndCount"] = aGroupedArray[1].length
+          }
         }
 
         this._oEventBus.publish("aiReport", "newData", oModel)
         this.getOwnerComponent().setModel(new JSONModel(oModel), "Model");
+
+        if(this._bflag){
+          this.dataLoad();
+        }
 
         let subTitle = `(총 ${iAmount.toFixed(2)}억원 / ${iCount}건)`
         if (this.getOwnerComponent().oCard.getAggregation("_header")) {
@@ -132,7 +147,7 @@ sap.ui.define(
 
         let fNumber = parseFloat(sValue);
         if (Number.isInteger(fNumber)) {
-          let oFormatter = NumberFormat.getIntegerInstance({
+          let oFormatter = NumberFormat.getFloatInstance({
             groupingEnabled: true
           });
           return oFormatter.format(fNumber);
@@ -147,9 +162,10 @@ sap.ui.define(
         }
       },
       dataLoad: function () {
-          this._oEventBus.publish("CardWeekChannel", "CardWeekFullLoad", {
-              cardId: this.getView().getId()
-          })
+        this._oEventBus.publish("CardWeekChannel", "CardWeekFullLoad", {
+          cardId: this.getView().getId()
+        })
+        this._bFlag = false;
       },
     })
   }

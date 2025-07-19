@@ -57,11 +57,11 @@ module.exports = (srv) => {
             let lv3_ccorg_cd = orgInfo.lv3_ccorg_cd;
             let org_tp = orgInfo.org_tp;
 
-            let s_org_tp = 'delivery'
-            let pl_view = pl_org_view
+            // let s_org_tp = 'delivery'
+            // let pl_view = pl_org_view
             if(org_col_nm !== 'lv1_id' && org_col_nm !== 'lv2_id' && ((org_tp === 'hybrid' && lv3_ccorg_cd === '237100') || org_tp === 'account')){
-                pl_view = pl_account_view
-                s_org_tp = 'account'
+                // pl_view = pl_account_view
+                // s_org_tp = 'account'
             }
 
             /**
@@ -93,13 +93,14 @@ module.exports = (srv) => {
             let pl_groupBy = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? [...pl_groupBy_cols, 'hdqt_ccorg_cd', 'hdqt_name'] : [...pl_groupBy_cols, 'div_ccorg_cd', 'div_name'];
 
             let org_column = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? ['hdqt_ccorg_cd as ccorg_cd', 'hdqt_name as name', 'org_order','org_id','lv3_ccorg_cd','lv3_id','lv3_name','org_tp'] : ['div_ccorg_cd as ccorg_cd', 'div_name as name', 'org_order','org_id','lv3_ccorg_cd','lv3_id','lv3_name','org_tp'];
-            let org_where = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? { 'hdqt_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'team_id': null,'org_tp':s_org_tp } : { 'div_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'hdqt_id': null, 'team_id': null,'org_tp':s_org_tp };
+            let org_where = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? { 'hdqt_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'team_id': null} : { 'div_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'hdqt_id': null, 'team_id': null};
             let org_groupBy = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? ['hdqt_ccorg_cd', 'hdqt_name', 'org_order','org_id','lv3_ccorg_cd','lv3_id','lv3_name','org_tp'] : ['div_ccorg_cd', 'div_name', 'org_order','org_id','lv3_ccorg_cd','lv3_id','lv3_name','org_tp'];
 
             // DB 쿼리 실행 (병렬)
-            const [query, org_data] = await Promise.all([
+            const [query, account_query, org_data] = await Promise.all([
                 // PL 실적, 목표 조회
-                SELECT.from(pl_view).columns(pl_column).where(pl_where).groupBy(...pl_groupBy),
+                SELECT.from(pl_org_view).columns(pl_column).where(pl_where).groupBy(...pl_groupBy),
+                SELECT.from(pl_account_view).columns(pl_column).where(pl_where).groupBy(...pl_groupBy),
                 SELECT.from(org_full_level).columns(org_column).where(org_where).groupBy(...org_groupBy)
             ]);
             if(!query.length){
@@ -114,7 +115,11 @@ module.exports = (srv) => {
             const curr_t_pl = query.filter(pl => pl.relsco_yn && pl.year === year),
                 curr_f_pl = query.filter(pl => !pl.relsco_yn && pl.year === year),
                 last_t_pl = query.filter(pl => pl.relsco_yn && pl.year === last_year),
-                last_f_pl = query.filter(pl => !pl.relsco_yn && pl.year === last_year);
+                last_f_pl = query.filter(pl => !pl.relsco_yn && pl.year === last_year),
+                curr_account_t_pl = account_query.filter(pl => pl.relsco_yn && pl.year === year),
+                curr_account_f_pl = account_query.filter(pl => !pl.relsco_yn && pl.year === year),
+                last_account_t_pl = account_query.filter(pl => pl.relsco_yn && pl.year === last_year),
+                last_account_f_pl = account_query.filter(pl => !pl.relsco_yn && pl.year === last_year);
 
             /**
              * 총합데이터
@@ -122,16 +127,18 @@ module.exports = (srv) => {
             o_total['t_sale'] = { "display_order": 0, "item_order": 1, "type1": "대내", "type2": "매출", "org_name": '합계', "org_id":'total' }
             o_total['f_sale'] = { "display_order": 0, "item_order": 2, "type1": "대외", "type2": "매출", "org_name": '합계', "org_id":'total' }
 
-            o_total[`t_sale`]['secured_value'] = curr_t_pl.reduce((iSum, oData) => iSum += oData.secured_sale, 0)
-            o_total[`t_sale`]['not_secured_value'] = curr_t_pl.reduce((iSum, oData) => iSum += oData.not_secured_sale, 0)
-            o_total[`t_sale`]['forecast_value'] = curr_t_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0)
-            o_total[`t_sale`]['last_forecast_value'] = last_t_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0)
+            o_total[`t_sale`]['secured_value'] = curr_t_pl.reduce((iSum, oData) => iSum += oData.secured_sale, 0) + curr_account_t_pl.reduce((iSum, oData) => iSum += oData.secured_sale, 0)
+            o_total[`t_sale`]['not_secured_value'] = curr_t_pl.reduce((iSum, oData) => iSum += oData.not_secured_sale, 0) + curr_account_t_pl.reduce((iSum, oData) => iSum += oData.not_secured_sale, 0)
+            o_total[`t_sale`]['forecast_value'] = curr_t_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0) + curr_account_t_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0)
+            o_total[`t_sale`]['last_forecast_value'] = last_t_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0) + last_account_t_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0)
+            o_total[`t_sale`]['yoy'] = o_total[`t_sale`]['forecast_value'] - o_total[`t_sale`]['last_forecast_value']
 
-            o_total[`f_sale`]['secured_value'] = curr_f_pl.reduce((iSum, oData) => iSum += oData.secured_sale, 0)
-            o_total[`f_sale`]['not_secured_value'] = curr_f_pl.reduce((iSum, oData) => iSum += oData.not_secured_sale, 0)
-            o_total[`f_sale`]['forecast_value'] = curr_f_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0)
-            o_total[`f_sale`]['last_forecast_value'] = last_f_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0)
-
+            o_total[`f_sale`]['secured_value'] = curr_f_pl.reduce((iSum, oData) => iSum += oData.secured_sale, 0) + curr_account_f_pl.reduce((iSum, oData) => iSum += oData.secured_sale, 0)
+            o_total[`f_sale`]['not_secured_value'] = curr_f_pl.reduce((iSum, oData) => iSum += oData.not_secured_sale, 0) + curr_account_f_pl.reduce((iSum, oData) => iSum += oData.not_secured_sale, 0)
+            o_total[`f_sale`]['forecast_value'] = curr_f_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0) + curr_account_f_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0)
+            o_total[`f_sale`]['last_forecast_value'] = last_f_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0) + last_account_f_pl.reduce((iSum, oData) => iSum += oData.secured_sale + oData.not_secured_sale, 0)
+            o_total[`f_sale`]['yoy'] = o_total[`f_sale`]['forecast_value'] - o_total[`f_sale`]['last_forecast_value']
+            
             /**
              * 년도별로 분류한 데이터를 조직별로 정리
              */
@@ -140,6 +147,12 @@ module.exports = (srv) => {
                 let o_curr_f_pl = curr_f_pl.find(pl => pl.ccorg_cd === org.ccorg_cd);
                 let o_last_t_pl = last_t_pl.find(pl => pl.ccorg_cd === org.ccorg_cd);
                 let o_last_f_pl = last_f_pl.find(pl => pl.ccorg_cd === org.ccorg_cd);
+                if(org.org_tp === 'account'){
+                    o_curr_t_pl = curr_account_t_pl.find(pl => pl.ccorg_cd === org.ccorg_cd);
+                    o_curr_f_pl = curr_account_f_pl.find(pl => pl.ccorg_cd === org.ccorg_cd);
+                    o_last_t_pl = last_account_t_pl.find(pl => pl.ccorg_cd === org.ccorg_cd);
+                    o_last_f_pl = last_account_f_pl.find(pl => pl.ccorg_cd === org.ccorg_cd);
+                }
                 if(['lv1_id','lv2_id'].includes(org_col_nm) && org.lv3_ccorg_cd === '610000'){
                     if (!o_result[`${org.lv3_ccorg_cd}_t_sale`]) {
                         o_result[`${org.lv3_ccorg_cd}_t_sale`] = {

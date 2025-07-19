@@ -4,7 +4,7 @@
     xmlns:w="sap.ui.integration.widgets"
 	xmlns:card="sap.f.cards"
 	busyIndicatorDelay="0">
-    <Dialog class="sapUiContentPadding custom-aireport" draggable="true" resizable="false" showHeader="false" contentWidth="90rem" contentHeight="85vh" maxHeight="800px">
+    <Dialog class="sapUiContentPadding custom-aireport" draggable="true" resizable="false" showHeader="false" contentWidth="90rem" contentHeight="85vh" >
         <content>
 			<VBox width="100%" height="100%" class="sapUiNoContentPadding">
 				<!-- 상단 헤더 영역 -->
@@ -19,12 +19,12 @@
 					
 					
 				</OverflowToolbar>
-				<OverflowToolbar width="100%" height="2rem" style="Standard" class="custom-dialog-toolbar">
+				<OverflowToolbar width="100%" height="1.438rem" style="Standard" class="custom-dialog-toolbar">
 
 				</OverflowToolbar>
 				
 				<!-- 메인 컨텐츠 영역 -->
-				<HBox width="100%" height="500px" class="sapUiContentPadding">
+				<HBox width="100%" height="500px" class="sapUiContentPadding mcustom-aireport-main-content">
 					<!-- 왼쪽: 세부 데이터 영역 -->
 					<VBox width="50%" height="100%" class="sapUiTinyMarginEnd custom-aireport-content-box">
 					
@@ -37,11 +37,14 @@
 					<!-- 오른쪽: AI 현황 하이라이트 영역 -->
 					<VBox width="50%" height="100%" class="sapUiTinyMarginStart custom-aireport-content-box">
 						<Panel width="100%" height="500px" class="sapUiNoMarginTop custom-aireport-panel">
-							<HBox alignItems="Center" gap="3px" class="highlight-title">
-								<Image src="./resource/image/ai_icon.png" width="14px"/>
-								<Text text="AI 현황 하이라이트"></Text>							
-							</HBox>
-							<VBox width="100%" height="calc(100% - 30px)" class="custom-formattedText-background sapMFontSizeXLarge">
+						<!--  타 -->
+							<headerToolbar>
+								<OverflowToolbar class="highlight-title">
+									<Image src="./resource/image/ai_icon.png" width="16px"/>
+									<Text text="AI 현황 하이라이트"></Text>							
+								</OverflowToolbar>
+							</headerToolbar>
+							<VBox width="100%" height="calc(100% - 30px)" class="custom-formattedText-background custom-nopadding-top sapMFontSizeXLarge">
 								<core:HTML id="highlightText"/>
 							</VBox>
 

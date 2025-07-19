@@ -27,7 +27,7 @@
                     busyIndicatorDelay="0"
                     height="100%"
                     width="100%" 
-                    visible="{=${uiModel>/aiSubKey} === 'org'}"
+                    visible="{=${uiModel>/subKey} === 'org'}"
                 >
                     <table:Table
                         id="actualSaleMarginDetailTable1"
@@ -45,8 +45,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false"/>
                                 <ToolbarSeparator visible="false" />
@@ -381,7 +381,7 @@
                     busyIndicatorDelay="0"
                     height="100%"
                     width="100%" 
-                    visible="{=${uiModel>/aiSubKey} === 'org_delivery'}"
+                    visible="{=${uiModel>/subKey} === 'org_delivery'}"
                 >
                     <table:Table
                         id="actualSaleMarginDetailTable2"
@@ -399,8 +399,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false"/>
                                 <ToolbarSeparator visible="false" />
@@ -735,7 +735,7 @@
                     busyIndicatorDelay="0"
                     height="100%"
                     width="100%" 
-                    visible="{=${uiModel>/aiSubKey} === 'org_account'}"
+                    visible="{=${uiModel>/subKey} === 'org_account'}"
                 >
                     <table:Table
                         id="actualSaleMarginDetailTable3"
@@ -753,8 +753,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false"/>
                                 <ToolbarSeparator visible="false" />
@@ -1088,7 +1088,7 @@
                     class="custom-vbox-wrap-table"
                     busyIndicatorDelay="0"
                     height="100%"
-                    visible="{=${uiModel>/aiSubKey} === 'account'}"
+                    visible="{=${uiModel>/subKey} === 'account'}"
                 >
                     <table:Table
                         id="actualSaleMarginDetailTable4"
@@ -1106,8 +1106,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <ToolbarSeparator />
                                 <Text emptyIndicatorMode="On"  text="단위 (억)"  visible="false"/>
@@ -1444,7 +1444,7 @@
                     class="custom-vbox-wrap-table"
                     busyIndicatorDelay="0"
                     height="100%"
-                    visible="{=${uiModel>/aiSubKey} === 'relsco'}"
+                    visible="{=${uiModel>/subKey} === 'relsco'}"
                 >
                     <table:Table
                         id="actualSaleMarginDetailTable5"
@@ -1461,8 +1461,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <ToolbarSeparator />
                                 <Text emptyIndicatorMode="On"  text="단위 (억)"  visible="false"/>
@@ -1742,7 +1742,7 @@
                     busyIndicatorDelay="0"
                     height="100%"
                     class="custom-vbox-wrap-table"
-                    visible="{=${uiModel>/aiSubKey} === 'crov'}"
+                    visible="{=${uiModel>/subKey} === 'crov'}"
                 >
                     <table:Table
                         id="actualSaleMarginDetailTable4"
@@ -1760,8 +1760,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <ToolbarSeparator />
                                 <Text emptyIndicatorMode="On"  text="단위 (억)"  visible="false"/>

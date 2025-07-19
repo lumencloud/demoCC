@@ -52,7 +52,6 @@ module.exports = (srv) => {
             /**
              * 실적 조회용 SELECT 컬럼 - 전사, 부문, 본부 공통으로 사용되는 컬럼 조건 (+ 연, 월, 부문, 본부 조건별 추가)
              */
-
             let a_sale_column = [];
             let a_margin_column = [];
             let a_sga_column = [];
@@ -101,41 +100,29 @@ module.exports = (srv) => {
              * org_id 파라미터값으로 조직정보 조회
              * 
              */
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_id'
-                when lv2_id = '${org_id}' THEN 'lv2_id'
-                when lv3_id = '${org_id}' THEN 'lv3_id'
-                when div_id = '${org_id}' THEN 'div_id'
-                when hdqt_id = '${org_id}' THEN 'hdqt_id'
-                when team_id = '${org_id}' THEN 'team_id'
-                end as org_level`;
-            let orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd','org_tp'])
+            let orgInfo = await SELECT.one.from(org_full_level).columns(['org_level', 'org_ccorg_cd', 'org_tp', 'lv3_ccorg_cd'])
                 .where`org_id = ${org_id} and (lv1_id = ${org_id} or lv2_id = ${org_id} or lv3_id = ${org_id} or div_id = ${org_id} or hdqt_id = ${org_id} or team_id = ${org_id})`;
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
             // 조직 정보를 where 조건에 추가
-            let org_col_nm = orgInfo.org_level;
+            let org_col_nm = orgInfo.org_level+'_id';
 
             let pl_column = pl_col_list;
             let pl_where = org_col_nm === 'lv1_id' ? pl_where_conditions : { ...pl_where_conditions, [org_col_nm]: org_id };
-            // pl_where = org_tp ? { ...pl_where, 'org_tp' : org_tp } : pl_where;
             
             let pl_groupBy = pl_groupBy_cols;
 
             let sga_column = sga_col_list;
             let sga_where = org_col_nm === 'lv1_id' ? sga_where_conditions : { ...sga_where_conditions, [org_col_nm]: org_id };
-            sga_where = org_tp ? { ...sga_where, 'org_tp' : org_tp } : sga_where;
             let sga_groupBy = sga_groupBy_cols;
 
             let dt_pl_column = dt_pl_col_list;
             let dt_pl_where = org_col_nm === 'lv1_id' ? dt_pl_where_conditions : { ...dt_pl_where_conditions, [org_col_nm]: org_id };
-            // dt_pl_where = org_tp ? { ...dt_pl_where, 'org_tp' : org_tp } : dt_pl_where;
             let dt_pl_groupBy = dt_pl_groupBy_cols;
 
             let non_mm_column = non_mm_col_list;
             let non_mm_where = org_col_nm === 'lv1_id' ? non_mm_where_conditions : { ...non_mm_where_conditions, [org_col_nm]: org_id };
-            // non_mm_where = org_tp ? { ...non_mm_where, 'org_tp' : org_tp } : non_mm_where;
             let non_mm_groupBy = non_mm_groupBy_cols;
 
             const rsp_column = ['year',
@@ -143,15 +130,15 @@ module.exports = (srv) => {
                 s_rsp_total_amt_ym,
             ];
             const rsp_where_conditions = { 'year': { in: [year, last_year] }, [org_col_nm]: org_id, is_delivery: true };
-            let rsp_where = org_tp ? { ...rsp_where_conditions, 'org_tp' : org_tp } : rsp_where_conditions;
+            let rsp_where = rsp_where_conditions
             const rsp_groupBy = ['year'];
 
             let pl_view_select, dt_view_select, nonmm_view_select;
-            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.org_tp === 'hybrid' || orgInfo.org_tp === 'account' || org_tp === 'account'){
+            if((org_col_nm !== 'lv1_id' || org_col_nm !== 'lv2_id') && orgInfo.lv3_ccorg_cd === '237100' || orgInfo.org_tp === 'account' || org_tp === 'account'){
                 pl_view_select = account_pl_view;
                 dt_view_select = account_dt_view;
                 nonmm_view_select = account_non_mm_view;
-            }else if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id'|| orgInfo.org_tp === 'delivery'){
+            }else{
                 pl_view_select = pl_view;
                 dt_view_select = dt_view;
                 nonmm_view_select = non_mm_view;
@@ -194,33 +181,42 @@ module.exports = (srv) => {
             let last_rohc = (rsp_last_y_row?.['total_year_amt'] ?? 0) !== 0 ? ((pl_last_y_row?.["margin_amount_sum"] ?? 0) - (sga_last_y_row?.["sga_amount_sum"] ?? 0)) / rsp_last_y_row['total_year_amt'] : 0;
             let curr_contribution = (pl_curr_y_row?.["margin_amount_sum"] ?? 0) - (sga_curr_y_row?.["sga_amount_sum"] ?? 0);
             let last_contribution = (pl_last_y_row?.["margin_amount_sum"] ?? 0) - (sga_last_y_row?.["sga_amount_sum"] ?? 0);
+            let sga, sga_yoy;
+            if(orgInfo.org_level === 'lv1'){
+                sga = sga_exp_curr_y_row?.["sga_amount_sum"] ?? 0;
+                sga_yoy = (sga_exp_last_y_row?.["sga_amount_sum"] ?? 0) === 0 ? 0 : (((sga_exp_curr_y_row?.["sga_amount_sum"] ?? 0) - (sga_exp_last_y_row?.["sga_amount_sum"] ?? 0)) / (sga_exp_last_y_row?.["sga_amount_sum"] ?? 0));
+            }else{
+                sga = sga_curr_y_row?.["sga_amount_sum"] ?? 0;
+                sga_yoy = (sga_last_y_row?.["sga_amount_sum"] ?? 0) === 0 ? 0 : (((sga_curr_y_row?.["sga_amount_sum"] ?? 0) - (sga_last_y_row?.["sga_amount_sum"] ?? 0)) / (sga_last_y_row?.["sga_amount_sum"] ?? 0));
+            };
+            
             //전사 부문에서만 profit, profit-yoy 사용
             const temp_data =
             {
-                "sale": pl_curr_y_row?.["sale_amount_sum"] ?? 0,
-                "sale_yoy": (pl_last_y_row?.["sale_amount_sum"] ?? 0) === 0 ? 0 : (((pl_curr_y_row?.["sale_amount_sum"] ?? 0) - (pl_last_y_row?.["sale_amount_sum"] ?? 0)) / (pl_last_y_row?.["sale_amount_sum"] ?? 0)) * 100,
-                "margin": pl_curr_y_row?.["margin_amount_sum"] ?? 0,
-                "margin_yoy": (pl_last_y_row?.["margin_amount_sum"] ?? 0) === 0 ? 0 : (((pl_curr_y_row?.["margin_amount_sum"] ?? 0) - (pl_last_y_row?.["margin_amount_sum"] ?? 0)) / (pl_last_y_row?.["margin_amount_sum"] ?? 0)) * 100,
-                "margin_rate": curr_margin_rate * 100,
-                "margin_rate_yoy": (last_margin_rate) === 0 ? 0 : ((curr_margin_rate - last_margin_rate) / last_margin_rate )* 100,
-                "sga": sga_curr_y_row?.["sga_amount_sum"] ?? 0,
-                "sga_yoy": (sga_last_y_row?.["sga_amount_sum"] ?? 0) === 0 ? 0 : (((sga_curr_y_row?.["sga_amount_sum"] ?? 0) - (sga_last_y_row?.["sga_amount_sum"] ?? 0)) / (sga_last_y_row?.["sga_amount_sum"] ?? 0)) * 100,
-                "contribytion": curr_contribution,
-                "contribytion_yoy": last_contribution === 0 ? 0 : ((curr_contribution - last_contribution) / last_contribution)*100,
-                "dt": dt_pl_curr_y_row?.['sale_amount_sum'] ?? 0,
-                "dt_yoy": (dt_pl_last_y_row?.["sale_amount_sum"] ?? 0) === 0 ? 0 : (((dt_pl_curr_y_row?.["sale_amount_sum"] ?? 0) - (dt_pl_last_y_row?.["sale_amount_sum"] ?? 0)) / (dt_pl_last_y_row?.["sale_amount_sum"] ?? 0)) * 100,
+                "sale": Math.round((pl_curr_y_row?.["sale_amount_sum"] ?? 0)/100000000),
+                "sale_yoy": parseFloat(((pl_last_y_row?.["sale_amount_sum"] ?? 0) === 0 ? 0 : (((pl_curr_y_row?.["sale_amount_sum"] ?? 0) - (pl_last_y_row?.["sale_amount_sum"] ?? 0)) / (pl_last_y_row?.["sale_amount_sum"] ?? 0)) * 100).toFixed(1)),
+                "margin": Math.round((pl_curr_y_row?.["margin_amount_sum"] ?? 0)/100000000),
+                "margin_yoy": parseFloat(((pl_last_y_row?.["margin_amount_sum"] ?? 0) === 0 ? 0 : (((pl_curr_y_row?.["margin_amount_sum"] ?? 0) - (pl_last_y_row?.["margin_amount_sum"] ?? 0)) / (pl_last_y_row?.["margin_amount_sum"] ?? 0)) * 100).toFixed(1)),
+                "margin_rate": parseFloat((curr_margin_rate * 100).toFixed(1)),
+                "margin_rate_yoy": parseFloat(((last_margin_rate) === 0 ? 0 : ((curr_margin_rate - last_margin_rate) / last_margin_rate )* 100).toFixed(1)),
+                "sga": Math.round(sga/100000000),
+                "sga_yoy": parseFloat((sga_yoy * 100).toFixed(1)),
+                "contribytion": Math.round((curr_contribution)/100000000),
+                "contribytion_yoy": parseFloat((last_contribution === 0 ? 0 : ((curr_contribution - last_contribution) / last_contribution)*100).toFixed(1)),
+                "dt": Math.round((dt_pl_curr_y_row?.['sale_amount_sum'] ?? 0)/100000000),
+                "dt_yoy": parseFloat(((dt_pl_last_y_row?.["sale_amount_sum"] ?? 0) === 0 ? 0 : (((dt_pl_curr_y_row?.["sale_amount_sum"] ?? 0) - (dt_pl_last_y_row?.["sale_amount_sum"] ?? 0)) / (dt_pl_last_y_row?.["sale_amount_sum"] ?? 0)) * 100).toFixed(1)),
                 "offshoring": 0,
                 "offshoring_yoy": 0,
-                "nonMM": curr_non_mm?.sale_amount_sum ?? 0,
-                "nonMM_yoy": (last_non_mm?.sale_amount_sum ?? 0) === 0 ? 0 : (((curr_non_mm?.sale_amount_sum ?? 0) - (last_non_mm?.sale_amount_sum ?? 0)) / (last_non_mm?.sale_amount_sum ?? 0)) * 100,
-                "br": (rsp_curr_y_row?.mm_value ?? 0) *100,
-                "br_yoy": (rsp_last_y_row?.mm_value ?? 0) === 0 ? 0 : (((rsp_curr_y_row?.mm_value ?? 0) - (rsp_last_y_row?.mm_value ?? 0)) / (rsp_last_y_row?.mm_value ?? 0)) * 100,
-                "rohc": curr_rohc,
-                "rohc_yoy": curr_rohc === 0 ? 0 : ((curr_rohc - last_rohc) / last_rohc) * 100,
-                "profit": curr_contribution - (sga_exp_curr_y_row?.sga_amount_sum ?? 0), 
-                "profit_yoy": (last_contribution - (sga_exp_last_y_row?.sga_amount_sum ?? 0)) === 0 ? 0 : (((curr_contribution - (sga_exp_curr_y_row?.sga_amount_sum ?? 0)) - ((last_contribution - (sga_exp_last_y_row?.sga_amount_sum ?? 0)))) / (last_contribution - (sga_exp_last_y_row?.sga_amount_sum ?? 0)))*100,
-                "profit_rate": (pl_curr_y_row?.["sale_amount_sum"] ?? 0) === 0 ? 0 : ((curr_contribution - (sga_exp_curr_y_row?.sga_amount_sum ?? 0)) / (pl_curr_y_row?.["sale_amount_sum"] ?? 0)) *100, 
-                "profit_rate_yoy": (pl_last_y_row?.["sale_amount_sum"] ?? 0) === 0 ? 0 : (((pl_curr_y_row?.["sale_amount_sum"] ?? 0) === 0 ? 0 : (((curr_contribution - (sga_exp_curr_y_row?.sga_amount_sum ?? 0)) / (pl_curr_y_row?.["sale_amount_sum"] ?? 0)) *100) - (((last_contribution - (sga_exp_last_y_row?.sga_amount_sum ?? 0)) / (pl_last_y_row?.["sale_amount_sum"] ?? 0)) *100)) / (((last_contribution - (sga_exp_last_y_row?.sga_amount_sum ?? 0)) / (pl_last_y_row?.["sale_amount_sum"] ?? 0)) *100)) *100, 
+                "nonMM": Math.round((curr_non_mm?.sale_amount_sum ?? 0)/100000000),
+                "nonMM_yoy": parseFloat(((last_non_mm?.sale_amount_sum ?? 0) === 0 ? 0 : (((curr_non_mm?.sale_amount_sum ?? 0) - (last_non_mm?.sale_amount_sum ?? 0)) / (last_non_mm?.sale_amount_sum ?? 0)) * 100).toFixed(1)),
+                "br": parseFloat(((rsp_curr_y_row?.mm_value ?? 0) *100).toFixed(1)),
+                "br_yoy": parseFloat(((rsp_last_y_row?.mm_value ?? 0) === 0 ? 0 : (((rsp_curr_y_row?.mm_value ?? 0) - (rsp_last_y_row?.mm_value ?? 0)) / (rsp_last_y_row?.mm_value ?? 0)) * 100).toFixed(1)),
+                "rohc": parseFloat((curr_rohc).toFixed(1)),
+                "rohc_yoy": parseFloat((curr_rohc === 0 ? 0 : ((curr_rohc - last_rohc) / last_rohc) * 100).toFixed(1)),
+                "profit": Math.round((curr_contribution - (sga_exp_curr_y_row?.sga_amount_sum ?? 0))/100000000), 
+                "profit_yoy": parseFloat(((last_contribution - (sga_exp_last_y_row?.sga_amount_sum ?? 0)) === 0 ? 0 : (((curr_contribution - (sga_exp_curr_y_row?.sga_amount_sum ?? 0)) - ((last_contribution - (sga_exp_last_y_row?.sga_amount_sum ?? 0)))) / (last_contribution - (sga_exp_last_y_row?.sga_amount_sum ?? 0)))*100).toFixed(1)),
+                "profit_rate": parseFloat(((pl_curr_y_row?.["sale_amount_sum"] ?? 0) === 0 ? 0 : ((curr_contribution - (sga_exp_curr_y_row?.sga_amount_sum ?? 0)) / (pl_curr_y_row?.["sale_amount_sum"] ?? 0)) *100).toFixed(1)), 
+                "profit_rate_yoy": parseFloat(((pl_last_y_row?.["sale_amount_sum"] ?? 0) === 0 ? 0 : (((pl_curr_y_row?.["sale_amount_sum"] ?? 0) === 0 ? 0 : (((curr_contribution - (sga_exp_curr_y_row?.sga_amount_sum ?? 0)) / (pl_curr_y_row?.["sale_amount_sum"] ?? 0)) *100) - (((last_contribution - (sga_exp_last_y_row?.sga_amount_sum ?? 0)) / (pl_last_y_row?.["sale_amount_sum"] ?? 0)) *100)) / (((last_contribution - (sga_exp_last_y_row?.sga_amount_sum ?? 0)) / (pl_last_y_row?.["sale_amount_sum"] ?? 0)) *100)) *100).toFixed(1)), 
             };
             oResult.push(temp_data);
 

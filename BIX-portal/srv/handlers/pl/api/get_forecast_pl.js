@@ -182,7 +182,7 @@ module.exports = (srv) => {
             const sga_data =
             {
                 "display_order": 4,
-                "type": "SG&A",
+                "type": "사업 SG&A",
                 "forecast_value": o_sga_row.forecast_value,
                 "secured_value": o_sga_row.secured_value,
                 "not_secured_value": 0,

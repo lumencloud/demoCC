@@ -15,7 +15,7 @@ sap.ui.define([
     "use strict";
 
     return Controller.extend("bix.card.sgaDetailTableAiReport.Main", {
-        _sTableId: "table",
+        _sTableId: undefined,
         /**
          * @type {sap.ui.core.EventBus} 글로벌 이벤트버스
          */
@@ -38,8 +38,8 @@ sap.ui.define([
 
             //카드가 aireport에 로드된 경우 안의 값을 저장
             var oSessionData = JSON.parse(sessionStorage.getItem("aiModel"));
-            this.aiType = oSessionData.aiType;
-            this.getView().setModel(new JSONModel({ type: this.aiType }), "setType");
+            this.type = oSessionData.type;
+            this.getView().setModel(new JSONModel({ type: this.type }), "setType");
 
 
             let aTypeData = [
@@ -48,13 +48,24 @@ sap.ui.define([
                 { "type_key": "INVEST", "type_text": "투자비" }
             ]
 
+
+            // 화면에 보일 테이블을 전역 변수에 저장
+            this.getView().getControlsByFieldGroupId("content").forEach(object => {
+                if (object.isA("sap.ui.table.Table") && object.getFieldGroupIds().length > 0) {
+                    this._sTableId = this.getView().getLocalId(object.getId());
+                }
+            })
+
+
+
+
             let oAiData = JSON.parse(sessionStorage.getItem("aiModel"))
 
             // 카드 정보를 selectModel로 설정 (sub_key, sub_text)
             this.getView().setModel(new JSONModel(aTypeData), "typeModel");
 
 
-            this.getView().setModel(new JSONModel({ type: oAiData.aiType }), "uiModel");
+            this.getView().setModel(new JSONModel({ type: oAiData.type }), "uiModel");
 
 
             // AI 팝업 매니저 초기화
@@ -62,7 +73,7 @@ sap.ui.define([
 
             // 테이블 이벤트 등록
             var oTable = this.byId(this._sTableId);
-            if (oTable) {
+            if (oTable && !oTable?.mEventRegistry?.cellContextmenu) {
                 oTable.attachCellClick(this.onCellClick, this);
                 oTable.attachCellContextmenu(this.onCellContextmenu, this);
             }
@@ -86,9 +97,9 @@ sap.ui.define([
             //aireport에서 불러들일 값을 sessionStorage에 저장
             sessionStorage.setItem("aiModel",
                 JSON.stringify({
-                    aiOrgId: oAiData.aiOrgId,
-                    aiOrgName: oAiData.aiOrgName,
-                    aiType: oTypeSelect.getSelectedKey(),
+                    orgId: oAiData.orgId,
+                    orgNm: oAiData.orgNm,
+                    type: oTypeSelect.getSelectedKey(),
                 })
             )
 
@@ -171,7 +182,7 @@ sap.ui.define([
 
             //팀단위 접근 방지
             if (oSessionData.org_level === "lv1") {//전사
-                if (oSessionAiData.aiOrgTypeCode) {
+                if (oSessionAiData.orgTypeCode) {
                     if (oSessionAiData.singleRowAi) {
                         return
                     } else {
@@ -186,20 +197,20 @@ sap.ui.define([
             // 분석 데이터 준비
             const oAnalysisData = this._prepareAnalysisData();
 
-            var aiOrgTypeCode = false;
+            var orgTypeCode = false;
 
             //팀단위 접근 방지
             if (this._seletedDivId !== "5") {
-                aiOrgTypeCode = true
+                orgTypeCode = true
             }
 
             //aireport에서 불러들일 값을 sessionStorage에 저장
             sessionStorage.setItem("aiModel",
                 JSON.stringify({
-                    aiOrgId: this._selectedOrgId,
-                    aiType: this._seletedType,
-                    aiOrgTypeCode: aiOrgTypeCode,
-                    singleRowAi: oSessionAiData.aiOrgId,
+                    orgId: this._selectedOrgId,
+                    type: this._seletedType,
+                    orgTypeCode: orgTypeCode,
+                    singleRowAi: oSessionAiData.orgId,
                     singleRowAi_Nm: oAnalysisData.tokenData.orgName
                 })
             )
@@ -233,12 +244,12 @@ sap.ui.define([
             const params = {
                 year: String(dYearMonth.getFullYear()),
                 month: String(dYearMonth.getMonth() + 1).padStart(2, "0"),
-                org_id: oAiData.aiOrgId || oSessionData.orgId
+                org_id: oAiData.orgId || oSessionData.orgId
             };
 
 
             //aireport인 경우 
-            if (oAiData.aiOrgId) {
+            if (oAiData.orgId) {
                 this._bindTable();
             }
 
@@ -397,6 +408,13 @@ sap.ui.define([
             });
         },
 
+
+        _setBusy: async function (bType) {
+            const oTable = this.byId(this._sTableId);
+            const oBox = oTable.getParent();
+            oBox.setBusy(bType);
+        },
+
         /**
          * 테이블 바인딩
          * @param {String} sChannelId 
@@ -414,78 +432,119 @@ sap.ui.define([
             this._oSearchData = oData;
 
             // 검색 파라미터
-            this.getView().setBusy(true);
+            this._setBusy(true);
 
             let dYearMonth = new Date(oData.yearMonth);
             let iYear = dYearMonth.getFullYear();
             let sMonth = String(dYearMonth.getMonth() + 1).padStart(2, "0");
             let oAiData = JSON.parse(sessionStorage.getItem("aiModel"))
-            let sOrgId = oAiData.aiOrgId;
+            let sOrgId = oAiData.orgId;
+
+            if(!sOrgId){
+                return
+            }
 
             const oSgaModel = this.getOwnerComponent().getModel("sga");
             const sBindingPath = `/get_actual_sga(year='${iYear}',month='${sMonth}',org_id='${sOrgId}')`;
-            const oBinding = oSgaModel.bindContext(sBindingPath);
-            try {
-                let aResults = await oBinding.requestObject();
-                aResults = aResults.value;
-    
-                const aFilteredResults = aResults.filter(item => item.type === oAiData.aiType)
-    
-                this.getView().setModel(new JSONModel(aFilteredResults), "sgaDetailTreeTableModel");
-    
+            //const oBinding = oSgaModel.bindContext(sBindingPath);
+
+            
+            await Promise.all([
+                oSgaModel.bindContext(sBindingPath).requestObject(),
+            ]).then(function (aResults) {
+
+                aResults[0].value = aResults[0].value.filter(oData => oData.type === oAiData.type);
+
+                const oTable = this.byId(this._sTableId);
+                const oBox = oTable.getParent();
+                Module.displayStatusForEmpty(oTable, aResults[0].value, oBox);
+
+
+
+                // 테이블의 이름 없는 빈 모델에 데이터 저장
+                oTable.setModel(new JSONModel(aResults[0].value));
+
+                // this 변수에 테이블에 바인딩된 path 저장
+                oTable._sBindingPath = sBindingPath;
+
                 // 테이블 로우 셋팅
-                this._setVisibleRowCount();
-    
-                // 셀 병합
-                let oTable = this.byId("table");
-                await Module.setTableMergeWithAltColor(oTable, "sgaDetailTreeTableModel");
-                // await Module.setTableCellClass(oTable);
-
-            } catch (oError) {
+                this._setVisibleRowCount(aResults);
+                Module.setTableMergeWithAltColor(oTable);
+            }.bind(this)
+            ).catch(function (oError) {
                 console.log("데이터 로드 실패 ", oError);
-                MessageToast.show("데이터 호출에 실패하였습니다.")
 
-            } finally {
-                this.getView().setBusy(false);
-            }
+                MessageToast.show("데이터 호출에 실패하였습니다.")
+            }).finally(() => {
+                this._setBusy(false);
+            });
+
+            
+
+            // try {
+            //     let aResults = await oBinding.requestObject();
+            //     aResults = aResults.value;
+    
+            //     const aFilteredResults = aResults.filter(item => item.type === oAiData.type)
+
+            //     const oTable = this.byId(this._sTableId);
+            //     const oBox = oTable.getParent();
+            //     Module.displayStatusForEmpty(oTable, aFilteredResults, oBox);
+                
+            //     this.getView().setModel(new JSONModel(aFilteredResults), "sgaDetailTreeTableModel");
+    
+            //     // 테이블 로우 셋팅
+            //     this._setVisibleRowCount();
+    
+            //     // 셀 병합
+            //     await Module.setTableMergeWithAltColor(oTable, "sgaDetailTreeTableModel");
+            //     // await Module.setTableCellClass(oTable);
+
+            // } catch (oError) {
+            //     console.log("데이터 로드 실패 ", oError);
+            //     MessageToast.show("데이터 호출에 실패하였습니다.")
+
+            // } finally {
+            //     this.getView().setBusy(false);
+            // }
 
 
         },
         /**
          * odata 호출 및 데이터 구성
          */
-        _callDataSgaTable: async function () {
-            // 새로운 검색 조건이 같은 경우 return
-            let oData = JSON.parse(sessionStorage.getItem("initSearchModel"));
-            let aKeys = Object.keys(oData);
-            let isDiff = aKeys.find(sKey => oData[sKey] !== this._oSearchData[sKey]);
-            if (!isDiff) return;
+        // _callDataSgaTable: async function () {
+        //     // 새로운 검색 조건이 같은 경우 return
+        //     let oData = JSON.parse(sessionStorage.getItem("initSearchModel"));
+        //     let aKeys = Object.keys(oData);
+        //     let isDiff = aKeys.find(sKey => oData[sKey] !== this._oSearchData[sKey]);
+        //     if (!isDiff) return;
 
-            // 새로운 검색 조건 저장
-            this._oSearchData = oData;
+        //     // 새로운 검색 조건 저장
+        //     this._oSearchData = oData;
 
-            // 검색 파라미터
-            this.getView().setBusy(true);
+        //     // 검색 파라미터
+        //     this._setBusy(true);
 
-            let dYearMonth = new Date(oData.yearMonth);
-            let iYear = dYearMonth.getFullYear();
-            let iLastYear = dYearMonth.getFullYear() - 1;
-            let iMonth = dYearMonth.getMonth() + 1;
-            let sOrgId = oData.orgId;
+        //     let dYearMonth = new Date(oData.yearMonth);
+        //     let iYear = dYearMonth.getFullYear();
+        //     let iLastYear = dYearMonth.getFullYear() - 1;
+        //     let iMonth = dYearMonth.getMonth() + 1;
+        //     let sOrgId = oData.orgId;
 
 
-            let oAiData = JSON.parse(sessionStorage.getItem("aiModel"));
+        //     let oAiData = JSON.parse(sessionStorage.getItem("aiModel"));
 
-            //aimodel에 iorg값이 있는경우 그부분으로 테이블 세팅
-            if (oAiData.aiOrgId) {
-                sOrgId = oAiData.aiOrgId;
-            } else {
-                sOrgId = oData.orgId;
-            }
+        //     //aimodel에 iorg값이 있는경우 그부분으로 테이블 세팅
+        //     if (oAiData.orgId) {
+        //         sOrgId = oAiData.orgId;
+        //     } else {
+        //         sOrgId = oData.orgId;
+        //     }
 
-            if (oAiData.singleRowAi) {
-                sOrgId = oAiData.aiOrgId
-            }
+        //     if (oAiData.singleRowAi) {
+        //         sOrgId = oAiData.orgId
+        //     }
 
             //odata 호출 로직 삭제. 코드는 일단 보관///////////////////////////////////////////////////////////////////////////////////////////////////
             // //조직 정보 검색
@@ -865,17 +924,17 @@ sap.ui.define([
 
             //로직 변경되어어야 함.////////////////////////////////////////////////////////////////////////////////////////////////////
             // //선택된 구분의 데이터만 필터링
-            // if (this.aiType === "LABOR") {//인건비
+            // if (this.type === "LABOR") {//인건비
             //     aRes = aRes.filter(item => item.type === "LABOR")
-            // } else if (this.aiType === "EXPENSE") {//경비
+            // } else if (this.type === "EXPENSE") {//경비
             //     aRes = aRes.filter(item => item.type === "EXPENSE")
-            // } else if (this.aiType === "INVEST") {//투자비
+            // } else if (this.type === "INVEST") {//투자비
             //     aRes = aRes.filter(item => item.type === "INVEST")
             // }
 
             // //본부 단일행인경우에는 합계 제외
             // if (oAiData.singleRowAi) {
-            //     aRes = aRes.filter(item => item.div_id === oAiData.aiOrgId)
+            //     aRes = aRes.filter(item => item.div_id === oAiData.orgId)
             //     //팀의 합계가 본부가 되어서
             //     aRes.forEach(item=>{
             //         item.org_name = oAiData.singleRowAi_Nm
@@ -885,28 +944,31 @@ sap.ui.define([
             // this.getView().setModel(new JSONModel(aRes), "sgaDetailTreeTableModel");
             // // 테이블 로우 셋팅
             // this._setVisibleRowCount();
-        },
+        //},
 
-        _setVisibleRowCount: function () {
-            //모델 값 가져오기
-            let aModelArray = this.getView().getModel("sgaDetailTreeTableModel").getData()
-
-            //테이블 리스트
+        _setVisibleRowCount: function (aResults) {
 
             // 테이블 아이디로 테이블 객체
-            let oTable = this.byId("table")
+            const oTable = this.byId(this._sTableId);
+
             // 처음 화면 렌더링시 table의 visibleCountMode auto 와 <FlexItemData growFactor="1"/>상태에서
             // 화면에 꽉 찬 테이블의 row 갯수를 전역변수에 저장하기 위함
+            if (oTable && !oTable?.mEventRegistry?.cellContextmenu) {
+                oTable.attachCellClick(this.onCellClick, this);
+                oTable.attachCellContextmenu(this.onCellContextmenu, this);
+            }
+
             if (this._iColumnCount === null) {
                 this._iColumnCount = oTable.getVisibleRowCount();
             }
+
             // 전역변수의 row 갯수 기준을 넘어가면 rowcountmode를 자동으로 하여 넘치는것을 방지
             // 전역변수의 row 갯수 기준 이하면 rowcountmode를 수동으로 하고, 각 데이터의 길이로 지정
-            if (aModelArray.length > this._iColumnCount) {
+            if (aResults[0].value.length > this._iColumnCount) {
                 oTable.setVisibleRowCountMode("Auto")
             } else {
                 oTable.setVisibleRowCountMode("Fixed")
-                oTable.setVisibleRowCount(aModelArray.length)
+                oTable.setVisibleRowCount(aResults[0].value.length);
             }
         },
 
@@ -1095,7 +1157,7 @@ sap.ui.define([
 
 
                 // 테이블 로우 셋팅
-                this._setVisibleRowCount();
+                //this._setVisibleRowCount();
 
                 //visible 처리로인해 테이블 다시 머지
                 Module.setTableMergeWithAltColor(oTable, "sgaDetailTreeTableModel");
@@ -1106,7 +1168,7 @@ sap.ui.define([
          * @param {String} sOrgId 
          */
         _SettingDetailTable: async function (sOrgId, sType) {
-            this.getView().setBusy(true);
+            this._setBusy(true);
 
             // 기존 handler 호출 로직
             let oData = JSON.parse(sessionStorage.getItem("initSearchModel"));
@@ -1124,18 +1186,25 @@ sap.ui.define([
             let aResults = await oBinding.requestObject();
             aResults = aResults.value;
             this.getView().setModel(new JSONModel(aResults), "sgaDetailTableModel");
-            this.getView().setBusy(false);
+            
+            const oTable = this.byId("actualSgaDetailTable");
+            
+            oTable.setVisibleRowCountMode("Fixed")
+            oTable.setVisibleRowCount(5)
+            if(aResults.length<5){
+                oTable.setVisibleRowCount(aResults.length)
+            }
 
             // odata 직접 호출 로직 구성.
             // await this._callDataSgaDetailTable(sType, sOrgId);
 
-            // console.log(oTable.getBinding("rows"));
+            // //console.log(oTable.getBinding("rows"));
 
             // 날짜 입력 값 받아 수정
             // let oTemp = { year: String(sYear).substring(2) };
             // this.getView().setModel(new JSONModel(oTemp), "tableYearModel");
 
-            this.getView().setBusy(false);
+            this._setBusy(false);
         },
 
         // /**

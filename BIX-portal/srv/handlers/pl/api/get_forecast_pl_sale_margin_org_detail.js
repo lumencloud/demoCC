@@ -109,14 +109,20 @@ module.exports = (srv) => {
             let pl_column = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? [...pl_col_list, 'hdqt_ccorg_cd as ccorg_cd', 'hdqt_name as name'] : [...pl_col_list, 'div_ccorg_cd as ccorg_cd', 'div_name as name'];
             let pl_where = org_col_nm === 'lv1_id' ? pl_where_conditions : { ...pl_where_conditions, [org_col_nm]: org_id }
             let pl_groupBy = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? [...pl_groupBy_cols, 'hdqt_ccorg_cd', 'hdqt_name'] : [...pl_groupBy_cols, 'div_ccorg_cd', 'div_name'];
-
+            
             /**
              * 부문, 본부 레벨 조회일 경우, 본부별로 조회, 그 외 부문별로 조회
              */
             let org_column = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? ['hdqt_ccorg_cd as ccorg_cd', 'hdqt_name as name', 'org_order', 'org_id','lv3_ccorg_cd','lv3_id','lv3_name'] : ['div_ccorg_cd as ccorg_cd', 'div_name as name', 'org_order', 'org_id','lv3_ccorg_cd','lv3_id','lv3_name'];
-            let org_where = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? { 'hdqt_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'team_id': null,'org_tp':org_tp } : { 'div_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'hdqt_id': null, 'team_id': null,'org_tp':org_tp };
+            let org_where = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? { 'hdqt_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'team_id': null } : { 'div_id': { '!=': null }, and: { [org_col_nm]: org_id }, 'hdqt_id': null, 'team_id': null };
             let org_groupBy = org_col_nm === 'div_id' || org_col_nm === 'hdqt_id' ? ['hdqt_ccorg_cd', 'hdqt_name', 'org_order', 'org_id','lv3_ccorg_cd','lv3_id','lv3_name'] : ['div_ccorg_cd', 'div_name', 'org_order', 'org_id','lv3_ccorg_cd','lv3_id','lv3_name'];
 
+            if(!!org_tp && org_col_nm.includes('lv')){
+                org_where = {...org_where, 'org_tp': org_tp}
+            }
+            if(org_tp === 'delivery' && (['lv1_id','lv2_id'].includes(org_col_nm))){
+                pl_where = {...pl_where, 'org_tp': 'delivery'}
+            }
 
             // DB 쿼리 실행 (병렬)
             const [query, target_query, org_data] = await Promise.all([
@@ -147,26 +153,34 @@ module.exports = (srv) => {
 
             o_total['sale'] = { "display_order": 0, "item_order": 1, "type": "매출", "org_name": '합계', "org_id": 'total' }
             o_total['margin'] = { "display_order": 0, "item_order": 2, "type": "마진", "org_name": '합계', "org_id": 'total' }
+            o_total['margin_rate'] = { "display_order": 0, "item_order": 3, "type": "마진율", "org_name": '합계', "org_id": 'total' }
 
             o_total[`sale`]['secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_sale, 0)
             o_total[`margin`]['secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_margin, 0)
+            o_total[`margin_rate`]['secured_value'] = o_total[`sale`]['secured_value'] === 0 ? 0 : o_total[`margin`]['secured_value']/o_total[`sale`]['secured_value']
             // 실적 및 확보 추정
             if (month) {
                 o_total[`sale`]['secured_actual_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_actual_sale, 0)
                 o_total[`margin`]['secured_actual_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_actual_margin, 0)
                 o_total[`sale`]['secured_forecast_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_forecast_sale, 0)
                 o_total[`margin`]['secured_forecast_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.secured_forecast_margin, 0)
+                o_total[`margin_rate`]['secured_actual_value'] = o_total[`sale`]['secured_actual_value'] === 0 ? 0 : o_total[`margin`]['secured_actual_value']/o_total[`sale`]['secured_actual_value']
+                o_total[`margin_rate`]['secured_forecast_value'] = o_total[`sale`]['secured_forecast_value'] === 0 ? 0 : o_total[`margin`]['secured_forecast_value']/o_total[`sale`]['secured_forecast_value']
             }
 
             o_total[`sale`]['not_secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.not_secured_sale, 0)
             o_total[`margin`]['not_secured_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.not_secured_margin, 0)
             o_total[`sale`]['forecast_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.forecast_sale, 0)
             o_total[`margin`]['forecast_value'] = curr_pl.reduce((iSum, oData) => iSum += oData.forecast_margin, 0)
+            o_total[`margin_rate`]['not_secured_value'] = o_total[`sale`]['not_secured_value'] === 0 ? 0 : o_total[`margin`]['not_secured_value']/o_total[`sale`]['not_secured_value']
+            o_total[`margin_rate`]['forecast_value'] = o_total[`sale`]['forecast_value'] === 0 ? 0 : o_total[`margin`]['forecast_value']/o_total[`sale`]['forecast_value']
 
             o_total[`sale`]['plan_ratio'] = o_total[`sale`]['forecast_value'] - ((o_total_target?.target_sale??0) * 100000000)
             o_total[`margin`]['plan_ratio'] = o_total[`margin`]['forecast_value'] - ((o_total_target?.target_margin??0) * 100000000)
             o_total[`sale`]['yoy'] = o_total[`sale`]['forecast_value'] - i_last_forecast_sale
             o_total[`margin`]['yoy'] = o_total[`margin`]['forecast_value'] - i_last_forecast_margin
+            o_total[`margin_rate`]['plan_ratio'] = o_total[`margin_rate`]['forecast_value'] - ((o_total_target?.target_sale??0) === 0 ? 0 : (o_total_target?.target_margin??0)/(o_total_target.target_sale))
+            o_total[`margin_rate`]['yoy'] = o_total[`margin_rate`]['forecast_value'] - (i_last_forecast_sale === 0 ? 0 : i_last_forecast_margin/i_last_forecast_sale)
 
 
             /**
@@ -208,6 +222,13 @@ module.exports = (srv) => {
                             "plan_ratio" : 0,
                             "yoy" : 0,
                         }
+                        o_result[`${org.lv3_ccorg_cd}_margin_rate`] = {
+                            "display_order": org.org_order,
+                            "item_order": 3,
+                            "type": "마진율",
+                            "org_name": org.lv3_name,
+                            "org_id": org.lv3_id
+                        }
                     }
                     o_result[`${org.lv3_ccorg_cd}_sale`]['secured_value'] += (o_pl?.secured_sale ?? 0)
                     o_result[`${org.lv3_ccorg_cd}_margin`]['secured_value'] += (o_pl?.secured_margin ?? 0)
@@ -245,15 +266,25 @@ module.exports = (srv) => {
                             "org_name": org.name,
                             "org_id": org.org_id
                         }
+                        o_result[`${org.ccorg_cd}_margin_rate`] = {
+                            "display_order": org.org_order,
+                            "item_order": 3,
+                            "type": "마진율",
+                            "org_name": org.name,
+                            "org_id": org.org_id
+                        }
                     }
                     o_result[`${org.ccorg_cd}_sale`]['secured_value'] = (o_pl?.secured_sale ?? 0)
                     o_result[`${org.ccorg_cd}_margin`]['secured_value'] = (o_pl?.secured_margin ?? 0)
+                    o_result[`${org.ccorg_cd}_margin_rate`]['secured_value'] = o_result[`${org.ccorg_cd}_sale`]['secured_value'] === 0 ? 0 : o_result[`${org.ccorg_cd}_margin`]['secured_value']/o_result[`${org.ccorg_cd}_sale`]['secured_value']
                     // 실적 및 확보 추정
                     if (month) {
                         o_result[`${org.ccorg_cd}_sale`]['secured_actual_value'] = (o_pl?.secured_actual_sale ?? 0)
                         o_result[`${org.ccorg_cd}_margin`]['secured_actual_value'] = (o_pl?.secured_actual_margin ?? 0)
                         o_result[`${org.ccorg_cd}_sale`]['secured_forecast_value'] = (o_pl?.secured_forecast_sale ?? 0)
                         o_result[`${org.ccorg_cd}_margin`]['secured_forecast_value'] = (o_pl?.secured_forecast_margin ?? 0)
+                        o_result[`${org.ccorg_cd}_margin_rate`]['secured_actual_value'] = o_result[`${org.ccorg_cd}_sale`]['secured_actual_value'] === 0 ? 0 : o_result[`${org.ccorg_cd}_margin`]['secured_actual_value']/o_result[`${org.ccorg_cd}_sale`]['secured_actual_value']
+                        o_result[`${org.ccorg_cd}_margin_rate`]['secured_forecast_value'] = o_result[`${org.ccorg_cd}_sale`]['secured_forecast_value'] === 0 ? 0 : o_result[`${org.ccorg_cd}_margin`]['secured_forecast_value']/o_result[`${org.ccorg_cd}_sale`]['secured_forecast_value']
                     }
     
                     o_result[`${org.ccorg_cd}_sale`]['not_secured_value'] = (o_pl?.not_secured_sale ?? 0)
@@ -266,9 +297,28 @@ module.exports = (srv) => {
                     o_result[`${org.ccorg_cd}_margin`]['plan_ratio'] = o_result[`${org.ccorg_cd}_margin`]['forecast_value'] - ((o_target?.target_margin ?? 0) * 100000000)
                     o_result[`${org.ccorg_cd}_sale`]['yoy'] = o_result[`${org.ccorg_cd}_sale`]['forecast_value'] - o_result[`${org.ccorg_cd}_margin`]['forecast_value']
                     o_result[`${org.ccorg_cd}_margin`]['yoy'] = o_result[`${org.ccorg_cd}_margin`]['forecast_value'] - o_result[`${org.ccorg_cd}_margin`]['last_forecast_value']
+                    o_result[`${org.ccorg_cd}_margin_rate`]['not_secured_value'] = o_result[`${org.ccorg_cd}_sale`]['not_secured_value'] === 0 ? 0 : o_result[`${org.ccorg_cd}_margin`]['not_secured_value']/o_result[`${org.ccorg_cd}_sale`]['not_secured_value']
+                    o_result[`${org.ccorg_cd}_margin_rate`]['forecast_value'] = o_result[`${org.ccorg_cd}_sale`]['forecast_value'] === 0 ? 0 : o_result[`${org.ccorg_cd}_margin`]['forecast_value']/o_result[`${org.ccorg_cd}_sale`]['forecast_value']
+                    o_result[`${org.ccorg_cd}_margin_rate`]['last_forecast_value'] = o_result[`${org.ccorg_cd}_sale`]['last_forecast_value'] === 0 ? 0 : o_result[`${org.ccorg_cd}_margin`]['last_forecast_value']/o_result[`${org.ccorg_cd}_sale`]['last_forecast_value']
+                    o_result[`${org.ccorg_cd}_margin_rate`]['plan_ratio'] = o_result[`${org.ccorg_cd}_margin_rate`]['forecast_value'] - ((o_target?.target_sale ?? 0) === 0 ? 0 : (o_target?.target_margin ?? 0)/o_target.target_sale)
+                    o_result[`${org.ccorg_cd}_margin_rate`]['yoy'] = o_result[`${org.ccorg_cd}_margin_rate`]['forecast_value'] - o_result[`${org.ccorg_cd}_margin_rate`]['last_forecast_value']
                 }
             })
-
+            if(['lv1_id','lv2_id'].includes(org_col_nm)){
+                if(o_result[`610000_sale`]){
+                    let o_target = target_query.find(target => target.org_ccorg_cd === '610000')
+                    o_result[`610000_margin_rate`]['secured_value'] = o_result[`610000_sale`]['secured_value'] === 0 ? 0 : o_result[`610000_margin`]['secured_value']/o_result[`610000_sale`]['secured_value']
+                    o_result[`610000_margin_rate`]['not_secured_value'] = o_result[`610000_sale`]['not_secured_value'] === 0 ? 0 : o_result[`610000_margin`]['not_secured_value']/o_result[`610000_sale`]['not_secured_value']
+                    o_result[`610000_margin_rate`]['forecast_value'] = o_result[`610000_sale`]['forecast_value'] === 0 ? 0 : o_result[`610000_margin`]['forecast_value']/o_result[`610000_sale`]['forecast_value']
+                    o_result[`610000_margin_rate`]['last_forecast_value'] = o_result[`610000_sale`]['last_forecast_value'] === 0 ? 0 : o_result[`610000_margin`]['last_forecast_value']/o_result[`610000_sale`]['last_forecast_value']
+                    o_result[`610000_margin_rate`]['plan_ratio'] = o_result[`610000_margin_rate`]['forecast_value'] - ((o_target?.target_sale ?? 0) === 0 ? 0 : (o_target?.target_margin ?? 0)/o_target.target_sale)
+                    o_result[`610000_margin_rate`]['yoy'] = o_result[`610000_margin_rate`]['forecast_value'] - o_result[`610000_margin_rate`]['last_forecast_value']
+                    if (month) {
+                        o_result[`610000_margin_rate`]['secured_actual_value'] = o_result[`610000_sale`]['secured_actual_value'] === 0 ? 0 : o_result[`610000_margin`]['secured_actual_value']/o_result[`610000_sale`]['secured_actual_value']
+                        o_result[`610000_margin_rate`]['secured_forecast_value'] = o_result[`610000_sale`]['secured_forecast_value'] === 0 ? 0 : o_result[`610000_margin`]['secured_forecast_value']/o_result[`610000_sale`]['secured_forecast_value']
+                    }
+                }
+            }
             let a_result = Object.values(o_result);
             let a_total = Object.values(o_total);
 

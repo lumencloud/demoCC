@@ -55,14 +55,14 @@
                     </HBox>
                 </VBox>
 
-                <VBox class="custom-card-box-padding" visible="{=!!${Model>/etcName}}">
+                <VBox class="custom-card-box-padding" visible="{=!!${Model>/etcAmount} || !!${Model>/etcName}}">
                     <HBox>
                         <VBox class="custom-card-circle-box gray" width="15%">
                             <Text emptyIndicatorMode="On" text="기타" textAlign="Center" width="100%"/>
                         </VBox>
                         <HBox width="85%" class="custom-card-box-one-line sapUiTinyMarginBegin" wrap="Wrap" renderType="Bare" alignContent="Center">
                             <Text emptyIndicatorMode="On" text=" {Model>/etcName} 등 {Model>/etcCount}건"  tooltip="{Model>/etcName} 등 {Model>/etcCount}건"/>
-                            <Text emptyIndicatorMode="On" text="({Model>/etcAmount}억, 주요 실주 사유({Model>/etc/deselected_reason}))" tooltip="({Model>/etcAmount}억, 주요 실주 사유({Model>/etc/deselected_reason}))" class="custom-negative-state sapUiTinyMarginBegin"/>
+                            <Text emptyIndicatorMode="On" text="{Model>/etcAmount}억, 주요 실주 사유({Model>/etcReason})" tooltip="({Model>/etcAmount}억, 주요 실주 사유({Model>/etcReason}))" class="custom-negative-state sapUiTinyMarginBegin"/>
                         </HBox>
                     </HBox>
                 </VBox>

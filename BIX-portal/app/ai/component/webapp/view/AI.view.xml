@@ -55,10 +55,10 @@
                                                     </HBox>
                                                 </TileContent>
                                             </GenericTile>
-                                            <GenericTile header="보고서" fieldGroupIds="aiTile" class="tile-navy" press="onAiTilePress" state="Disabled">
+                                            <GenericTile header="보고서" fieldGroupIds="aiTile" class="tile-navy" press="onAiTilePress">
                                                 <TileContent>
                                                     <HBox justifyContent="SpaceBetween">
-                                                        <tnt:InfoLabel text="준비중" colorScheme="2"/>
+                                                        <tnt:InfoLabel text="전문가" colorScheme="2"/>
                                                         <Image src="./resource/icon/ai_icon11.png"/>
                                                     </HBox>
                                                 </TileContent>
@@ -239,7 +239,7 @@
                                                                 <VBox visible="{= ${chat>navigationData/type} === 'no_menu'}" 
                                                                     class="navigation-no-menu">
                                                                     <Text class="navigation-text navigation-message"/>
-                                                                    <Button text="메인 화면으로 이동" 
+                                                                    <Button text="🏠 메인 화면으로 이동" 
                                                                             press="onMainNavigationPress" 
                                                                             type="Emphasized"
                                                                             class="navigation-button-main"/>
@@ -255,7 +255,7 @@
                                                                             showSeparators="None"
                                                                             class="navigation-menu-list">
                                                                             <CustomListItem class="navigation-menu-item">
-                                                                                <Button text="{chat>name}" 
+                                                                                <Button text="{= '🔗 ' + ${chat>name}}"
                                                                                         press="onMenuNavigationPress" 
                                                                                         type="Transparent"
                                                                                         width="100%"
@@ -263,6 +263,43 @@
                                                                             </CustomListItem>
                                                                         </List>
                                                                     </VBox>
+                                                                </VBox>
+                                                            </VBox>
+
+                                                            <!-- 보고선 에이전트 영역 -->
+                                                            <VBox visible="{chat>hasReport}" class="ai-report-section">
+                                                                <!-- 보고서 찾기 실패: 월마감 보고서로 안내 -->
+                                                                <VBox visible="{= ${chat>reportData/type} === 'no_report'}" 
+                                                                    class="no-report">
+                                                                    <Button text="📊 월마감 전사 보고서 보기" 
+                                                                            press="onDefaultReportPress" 
+                                                                            type="Emphasized"
+                                                                            class="report-button-main"/>
+                                                                </VBox>
+
+                                                                <!-- 2개 이상 보고서: 선택 가능한 링크들 -->
+                                                                <VBox visible="{= ${chat>reportData/type} === 'multiple_reports'}" 
+                                                                    class="multiple-reports">
+                                                                    <VBox class="report-buttons-container">
+                                                                        <List items="{chat>reportData/reports}" 
+                                                                            mode="None" 
+                                                                            showSeparators="None"
+                                                                            class="navigation-menu-list">
+                                                                            <CustomListItem class="navigation-menu-item">
+                                                                                <Button text="{= '📊 ' + ${chat>name}}" 
+                                                                                        press="onReportOpenPress" 
+                                                                                        type="Transparent"
+                                                                                        width="100%"
+                                                                                        class="report-button"/>
+                                                                            </CustomListItem>
+                                                                        </List>
+                                                                    </VBox>
+                                                                </VBox>
+
+                                                                <!-- 보고서 처리 오류 -->
+                                                                <VBox visible="{= ${chat>reportData/type} === 'error'}" 
+                                                                    class="no-report">
+                                                                    <Text text="{chat>reportData/message}" class="report-text report-message"/>
                                                                 </VBox>
                                                             </VBox>
                                                             
@@ -324,15 +361,34 @@
         <f:footer>
             <Toolbar class="custom-ai-toolbar">
                 <ToolbarSpacer />
-                <SearchField 
-                    id="SearchFieldId"
-                    placeholder="궁금한 사항을 입력해 주세요"
-                    class="custom-ai-searchField"
-                    showSearchButton="true"
-                    search="onSearch">
-                </SearchField>
+                    <!-- SearchField에서 버튼 숨기기 -->
+                    <SearchField 
+                        id="SearchFieldId"
+                        placeholder="궁금한 사항을 입력해 주세요"
+                        class="custom-ai-searchField"
+                        showSearchButton="false"
+                        search="onSearch"
+                        enabled="{= !${chat>/isLoading}}">
+                    </SearchField>
+                    <!-- 전송 버튼 -->
+                    <Button 
+                        icon="sap-icon://paper-plane"
+                        press="onSearch"
+                        visible="{= !${chat>/isLoading}}"
+                        enabled="{= !${chat>/isLoading}}"
+                        type="Transparent"
+                        class="custom-send-button"
+                        tooltip="전송"/>
+                    <!-- 중지 버튼 -->
+                    <Button 
+                        icon="sap-icon://stop"
+                        press="onStopChat" 
+                        visible="{chat>/isLoading}" 
+                        type="Transparent"
+                        class="custom-stop-button"
+                        tooltip="대화 중지"/>
                 <ToolbarSpacer /> 
             </Toolbar>
         </f:footer>
-    </f:DynamicPage>    
+    </f:DynamicPage>
 </mvc:View>

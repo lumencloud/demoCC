@@ -12,9 +12,8 @@
 >
     <form:SimpleForm id="cardContent" class="custom-back-white">
         <form:content>
-            <VBox width="100%" height="100%" alignItems="Center">
-                <HBox width="97%" height="100%" justifyContent="SpaceBetween">
-                    <VBox width="45%" height="100%" justifyContent="Center">                    
+                <HBox width="100%" height="100%" justifyContent="SpaceBetween">
+                    <VBox width="22%" height="100%" justifyContent="Center">                    
                         <HBox justifyContent="SpaceBetween">
                             <VBox>
                                 <HBox alignItems="Center">
@@ -22,7 +21,7 @@
                                         text="매출"
                                         class="custom-card-sub-title"
                                     />
-                                    <Text text="(누계)"></Text>
+                                    <!-- <Text text="(누계)"></Text> -->
                                 </HBox>
                             </VBox>
                             <VBox>
@@ -47,7 +46,7 @@
                                 </HBox>
 
                                 <HBox width="100%" justifyContent="End" class="sapUiTinyMarginTop custom-dashboard-card-text">
-                                    <Text
+                                    <!-- <Text
                                         emptyIndicatorMode="On"
                                         text="{
                                                     parts:[
@@ -63,9 +62,9 @@
                                                     ],
                                                     formatter: '.onFormatPerformance'                                
                                                 }"
-                                    />
+                                    /> -->
 
-                                    <Text text="/" class="sapUiTinyMarginBeginEnd"/>
+                                    <Text text="목표" class="sapUiTinyMarginBeginEnd"/>
 
                                     <Text
                                         emptyIndicatorMode="On"
@@ -79,15 +78,15 @@
                                         tooltip="{
                                                     parts:[
                                                         {path:'SaleModel>/purpose', targetType: 'any'},
-                                                        {value:'tooltip_billion'}
+                                                        {value:'tooltip'}
                                                     ],
                                                     formatter: '.onFormatPerformance'                                
                                                 }"
                                     />
                                 </HBox>
 
-                                <HBox id="icon_box1">         
-                                    <Text text="전년대비 "/>                           
+                                <!-- <HBox id="icon_box1">         
+                                    <Text text="전년대비" class="sapUiTinyMarginEnd"/>                           
                                     <Text                                        
                                         emptyIndicatorMode="On"
                                         id="Icon_text1"
@@ -110,7 +109,7 @@
                                             }"
                                     />
                                     
-                                </HBox>
+                                </HBox> -->
                             </VBox>
                         
                         </HBox>
@@ -149,8 +148,8 @@
                             />                        
                         </HBox>                    
                     </VBox>
-
-                    <VBox width="45%" height="100%" justifyContent="Center">                    
+                    
+                    <VBox width="22%" height="100%" justifyContent="Center">                    
                         <HBox justifyContent="SpaceBetween">
                             <VBox>
                                 <HBox alignItems="Center">
@@ -158,13 +157,13 @@
                                         text="마진"
                                         class="custom-card-sub-title"
                                     />
-                                    <Text text="(누계)"></Text>
+                                    
                                 </HBox>
                             </VBox>
                             <VBox>
                                 <HBox width="100%" justifyContent="End">
                                     <Title
-                                        class="custom-positive-state bold size"
+                                        class="custom-negative-state bold size custom-percent-line-height"
                                         text="{
                                                         parts:[
                                                             {path:'MarginModel>/value', targetType: 'any'},
@@ -175,7 +174,7 @@
                                         tooltip="{
                                                         parts:[
                                                             {path:'MarginModel>/value', targetType: 'any'},
-                                                            {value:'tooltip'}
+                                                            {value:'tooltip_percent'}
                                                         ],
                                                         formatter: '.onFormatPerformance'                                
                                                     }"
@@ -183,25 +182,25 @@
                                 </HBox>
 
                                 <HBox width="100%" justifyContent="End" class="sapUiTinyMarginTop custom-dashboard-card-text">
-                                    <Text
+                                    <!-- <Text
                                         emptyIndicatorMode="On"
                                         text="{
                                                     parts:[
                                                         {path:'MarginModel>/value', targetType: 'any'},
-                                                        {value:'billion'}
+                                                        {value:'percent'}
                                                     ],
                                                     formatter: '.onFormatPerformance'
                                                 }"
                                         tooltip="{
                                                     parts:[
                                                         {path:'MarginModel>/value', targetType: 'any'},
-                                                        {value:'tooltip'}
+                                                        {value:'tooltip_percent'}
                                                     ],
                                                     formatter: '.onFormatPerformance'                                
                                                 }"
-                                    />
+                                    /> -->
 
-                                    <Text text="/" class="sapUiTinyMarginBeginEnd"/>
+                                    <Text text="목표" class="sapUiTinyMarginBeginEnd"/>
 
                                     <Text
                                         emptyIndicatorMode="On"
@@ -215,144 +214,6 @@
                                         tooltip="{
                                                     parts:[
                                                         {path:'MarginModel>/purpose', targetType: 'any'},
-                                                        {value:'tooltip_billion'}
-                                                    ],
-                                                    formatter: '.onFormatPerformance'                                
-                                                }"
-                                    />
-                                </HBox>
-
-                                <HBox id="icon_box2">          
-                                    <Text text="전년대비 "/>                                                     
-                                    <Text                                        
-                                        emptyIndicatorMode="On"
-                                        id="Icon_text2"
-                                        class="custom-text-bold"
-                                        width="100%"
-                                        textAlign="End"
-                                        text="{
-                                                parts:[
-                                                    {path:'MarginModel>/contrast', targetType: 'any'},
-                                                    {value:'contrast_percent'}
-                                                ],
-                                                formatter: '.onFormatPerformance'
-                                            }"
-                                        tooltip="{
-                                                parts:[
-                                                    {path:'MarginModel>/contrast', targetType: 'any'},
-                                                    {value:'tooltip_percent'}
-                                                ],
-                                                formatter: '.onFormatPerformance'                                
-                                            }"
-                                    />
-                                    
-                                </HBox>
-                            </VBox>
-                        
-                        </HBox>
-
-                        <HBox width="100%">
-                            <ProgressIndicator
-                                id="pi-without-animation2"
-                                percentValue='{MarginModel>/percent}'
-                                class="custom-progress-indicator green"
-                                showValue="true"
-                                state="None"
-                            >
-                                <layoutData>
-                                    <FlexItemData growFactor="1"/>
-                                </layoutData>
-                            </ProgressIndicator>
-
-                            <Text
-                                emptyIndicatorMode="On"
-                                width="100%"
-                                class="sapUiSmallMarginTop custom-text-bold  custom-tiny-top-margin"
-                                text="{
-                                                    parts:[
-                                                        {path:'MarginModel>/percent', targetType: 'any'},
-                                                        {value:'percent2'}
-                                                    ],
-                                                    formatter: '.onFormatPerformance'
-                                                }"
-                                tooltip="{
-                                                    parts:[
-                                                        {path:'MarginModel>/percent', targetType: 'any'},
-                                                        {value:'tooltip_percent'}
-                                                    ],
-                                                    formatter: '.onFormatPerformance'                                
-                                                }"
-                            />                        
-                        </HBox>                    
-                    </VBox>
-                </HBox>
-
-                <HBox width="97%" height="100%" justifyContent="SpaceBetween" class="sapUiMediumMarginTop">
-                    <VBox width="45%" height="100%" justifyContent="Center">                    
-                        <HBox justifyContent="SpaceBetween">
-                            <VBox>
-                                <HBox alignItems="Center">
-                                    <Title
-                                        text="마진율"
-                                        class="custom-card-sub-title"
-                                    />
-                                    
-                                </HBox>
-                            </VBox>
-                            <VBox>
-                                <HBox width="100%" justifyContent="End">
-                                    <Title
-                                        class="custom-negative-state bold size custom-percent-line-height"
-                                        text="{
-                                                        parts:[
-                                                            {path:'MarginRateModel>/value', targetType: 'any'},
-                                                            {value:'percent'}
-                                                        ],
-                                                        formatter: '.onFormatPerformance'
-                                                    }"
-                                        tooltip="{
-                                                        parts:[
-                                                            {path:'MarginRateModel>/value', targetType: 'any'},
-                                                            {value:'tooltip_percent'}
-                                                        ],
-                                                        formatter: '.onFormatPerformance'                                
-                                                    }"
-                                    />
-                                </HBox>
-
-                                <HBox width="100%" justifyContent="End" class="sapUiTinyMarginTop custom-dashboard-card-text">
-                                    <Text
-                                        emptyIndicatorMode="On"
-                                        text="{
-                                                    parts:[
-                                                        {path:'MarginRateModel>/value', targetType: 'any'},
-                                                        {value:'percent'}
-                                                    ],
-                                                    formatter: '.onFormatPerformance'
-                                                }"
-                                        tooltip="{
-                                                    parts:[
-                                                        {path:'MarginRateModel>/value', targetType: 'any'},
-                                                        {value:'tooltip_percent'}
-                                                    ],
-                                                    formatter: '.onFormatPerformance'                                
-                                                }"
-                                    />
-
-                                    <Text text="/" class="sapUiTinyMarginBeginEnd"/>
-
-                                    <Text
-                                        emptyIndicatorMode="On"
-                                        text="{
-                                                    parts:[
-                                                        {path:'MarginRateModel>/purpose', targetType: 'any'},
-                                                        {value:'percent'}
-                                                    ],
-                                                    formatter: '.onFormatPerformance'
-                                                }"
-                                        tooltip="{
-                                                    parts:[
-                                                        {path:'MarginRateModel>/purpose', targetType: 'any'},
                                                         {value:'tooltip_percent'}
                                                     ],
                                                     formatter: '.onFormatPerformance'                                
@@ -360,8 +221,8 @@
                                     />
                                 </HBox>
 
-                                <HBox id="icon_box3">   
-                                    <Text text="전년대비 "/>                                                            
+                                <!-- <HBox id="icon_box3">   
+                                    <Text text="전년대비" class="sapUiTinyMarginEnd"/>                                                            
                                     <Text                                        
                                         emptyIndicatorMode="On"
                                         id="Icon_text3"
@@ -370,21 +231,21 @@
                                         textAlign="End"
                                         text="{
                                                 parts:[
-                                                    {path:'MarginRateModel>/contrast', targetType: 'any'},
+                                                    {path:'MarginModel>/contrast', targetType: 'any'},
                                                     {value:'contrast_percent'}
                                                 ],
                                                 formatter: '.onFormatPerformance'
                                             }"
                                         tooltip="{
                                                 parts:[
-                                                    {path:'MarginRateModel>/contrast', targetType: 'any'},
+                                                    {path:'MarginModel>/contrast', targetType: 'any'},
                                                     {value:'tooltip_percent'}
                                                 ],
                                                 formatter: '.onFormatPerformance'                                
                                             }"
                                     />
                                     
-                                </HBox>
+                                </HBox> -->
                             </VBox>
                         
                         </HBox>
@@ -392,7 +253,7 @@
                         <HBox width="100%">
                             <ProgressIndicator
                                 id="pi-without-animation3"
-                                percentValue='{MarginRateModel>/percent}'
+                                percentValue='{MarginModel>/percent}'
                                 class="custom-progress-indicator red"
                                 showValue="true"
                                 state="None"
@@ -408,14 +269,14 @@
                                 class="sapUiSmallMarginTop custom-text-bold custom-tiny-top-margin"
                                 text="{
                                                     parts:[
-                                                        {path:'MarginRateModel>/percent', targetType: 'any'},
+                                                        {path:'MarginModel>/percent', targetType: 'any'},
                                                         {value:'percent2'}
                                                     ],
                                                     formatter: '.onFormatPerformance'
                                                 }"
                                 tooltip="{
                                                     parts:[
-                                                        {path:'MarginRateModel>/percent', targetType: 'any'},
+                                                        {path:'MarginModel>/percent', targetType: 'any'},
                                                         {value:'tooltip_percent'}
                                                     ],
                                                     formatter: '.onFormatPerformance'                                
@@ -423,8 +284,7 @@
                             />                        
                         </HBox>                    
                     </VBox>
-
-                    <VBox width="45%" height="100%" justifyContent="Center">                    
+                    <VBox width="22%" height="100%" justifyContent="Center">                    
                         <HBox justifyContent="SpaceBetween">
                             <VBox>
                                 <HBox alignItems="Center">
@@ -456,7 +316,7 @@
                                 </HBox>
 
                                 <HBox width="100%" justifyContent="End" class="sapUiTinyMarginTop custom-dashboard-card-text">
-                                    <Text
+                                    <!-- <Text
                                         emptyIndicatorMode="On"
                                         text="{
                                                     parts:[
@@ -472,9 +332,9 @@
                                                     ],
                                                     formatter: '.onFormatPerformance'                                
                                                 }"
-                                    />
+                                    />-->
 
-                                    <Text text="/" class="sapUiTinyMarginBeginEnd"/>
+                                    <Text text="목표" class="sapUiTinyMarginBeginEnd"/> 
 
                                     <Text
                                         emptyIndicatorMode="On"
@@ -488,15 +348,15 @@
                                         tooltip="{
                                                     parts:[
                                                         {path:'SGAModel>/purpose', targetType: 'any'},
-                                                        {value:'tooltip_billion'}
+                                                        {value:'tooltip'}
                                                     ],
                                                     formatter: '.onFormatPerformance'                                
                                                 }"
                                     />
                                 </HBox>
 
-                                <HBox id="icon_box4"> 
-                                    <Text text="전년대비"/>       
+                                <!-- <HBox id="icon_box4"> 
+                                    <Text text="전년대비" class="sapUiTinyMarginEnd"/>       
                                     <Text                                        
                                         emptyIndicatorMode="On"
                                         id="Icon_text4"
@@ -519,7 +379,7 @@
                                             }"
                                     />
                                     
-                                </HBox>
+                                </HBox> -->
                             </VBox>
                         
                         </HBox>
@@ -558,9 +418,144 @@
                             />                        
                         </HBox>                    
                     </VBox>
+
+                    <VBox width="22%" height="100%" justifyContent="Center">                    
+                        <HBox justifyContent="SpaceBetween">
+                            <VBox>
+                                <HBox alignItems="Center">
+                                    <Title
+                                        text="영업이익"
+                                        class="custom-card-sub-title"
+                                    />
+                                    <!-- <Text text="(누계)"></Text> -->
+                                </HBox>
+                            </VBox>
+                            <VBox>
+                                <HBox width="100%" justifyContent="End">
+                                    <Title
+                                        class="custom-positive-state bold size"
+                                        text="{
+                                                        parts:[
+                                                            {path:'ProfitModel>/value', targetType: 'any'},
+                                                            {value:'billion'}
+                                                        ],
+                                                        formatter: '.onFormatPerformance'
+                                                    }"
+                                        tooltip="{
+                                                        parts:[
+                                                            {path:'ProfitModel>/value', targetType: 'any'},
+                                                            {value:'tooltip'}
+                                                        ],
+                                                        formatter: '.onFormatPerformance'                                
+                                                    }"
+                                    />
+                                </HBox>
+
+                                <HBox width="100%" justifyContent="End" class="sapUiTinyMarginTop custom-dashboard-card-text">
+                                    <!-- <Text
+                                        emptyIndicatorMode="On"
+                                        text="{
+                                                    parts:[
+                                                        {path:'ProfitModel>/value', targetType: 'any'},
+                                                        {value:'billion'}
+                                                    ],
+                                                    formatter: '.onFormatPerformance'
+                                                }"
+                                        tooltip="{
+                                                    parts:[
+                                                        {path:'ProfitModel>/value', targetType: 'any'},
+                                                        {value:'tooltip_percent'}
+                                                    ],
+                                                    formatter: '.onFormatPerformance'                                
+                                                }"
+                                    /> -->
+
+                                    <Text text="목표" class="sapUiTinyMarginBeginEnd"/>
+
+                                    <Text
+                                        emptyIndicatorMode="On"
+                                        text="{
+                                                    parts:[
+                                                        {path:'ProfitModel>/purpose', targetType: 'any'},
+                                                        {value:''}
+                                                    ],
+                                                    formatter: '.onFormatPerformance'
+                                                }"
+                                        tooltip="{
+                                                    parts:[
+                                                        {path:'ProfitModel>/purpose', targetType: 'any'},
+                                                        {value:'tooltip'}
+                                                    ],
+                                                    formatter: '.onFormatPerformance'                                
+                                                }"
+                                    />
+                                </HBox>
+
+                                <!-- <HBox id="icon_box2">          
+                                    <Text text="전년대비" class="sapUiTinyMarginEnd"/>                                                     
+                                    <Text                                        
+                                        emptyIndicatorMode="On"
+                                        id="Icon_text2"
+                                        class="custom-text-bold"
+                                        width="100%"
+                                        textAlign="End"
+                                        text="{
+                                                parts:[
+                                                    {path:'ProfitModel>/contrast', targetType: 'any'},
+                                                    {value:'contrast_percent'}
+                                                ],
+                                                formatter: '.onFormatPerformance'
+                                            }"
+                                        tooltip="{
+                                                parts:[
+                                                    {path:'ProfitModel>/contrast', targetType: 'any'},
+                                                    {value:'tooltip_percent'}
+                                                ],
+                                                formatter: '.onFormatPerformance'                                
+                                            }"
+                                    />
+                                    
+                                </HBox> -->
+                            </VBox>
+                        
+                        </HBox>
+
+                        <HBox width="100%">
+                            <ProgressIndicator
+                                id="pi-without-animation2"
+                                percentValue='{ProfitModel>/percent}'
+                                class="custom-progress-indicator green"
+                                showValue="true"
+                                state="None"
+                            >
+                                <layoutData>
+                                    <FlexItemData growFactor="1"/>
+                                </layoutData>
+                            </ProgressIndicator>
+
+                            <Text
+                                emptyIndicatorMode="On"
+                                width="100%"
+                                class="sapUiSmallMarginTop custom-text-bold  custom-tiny-top-margin"
+                                text="{
+                                                    parts:[
+                                                        {path:'ProfitModel>/percent', targetType: 'any'},
+                                                        {value:'percent2'}
+                                                    ],
+                                                    formatter: '.onFormatPerformance'
+                                                }"
+                                tooltip="{
+                                                    parts:[
+                                                        {path:'ProfitModel>/percent', targetType: 'any'},
+                                                        {value:'tooltip_percent'}
+                                                    ],
+                                                    formatter: '.onFormatPerformance'                                
+                                                }"
+                            />                        
+                        </HBox>                    
+                    </VBox>
                 
                 </HBox>
-        </VBox> 
         </form:content>
     </form:SimpleForm>
 </mvc:View>

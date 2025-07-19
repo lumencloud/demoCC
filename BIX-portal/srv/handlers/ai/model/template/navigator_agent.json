@@ -44,7 +44,7 @@
         }
       },
       {
-        "step_id": "extract_meta_navigation_route",
+        "step_id": "extract_menu_navigation_route",
         "step_sequence": 3,
         "component": {
           "id": "tool_02",

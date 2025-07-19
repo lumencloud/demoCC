@@ -10,7 +10,7 @@
     
 >
      <table:Table
-        id="forecastPlUiTable"
+        id="table"
         class="custom-table-container custom-table-header custom-table-body custom-pl-table custom-table-first-emphasis custom-uiTable-selection custom-inherit-height custom-selection-radius" 
         selectionMode="Single" 
         selectionBehavior="RowOnly" 
@@ -45,7 +45,7 @@
                 </table:customData>
             </table:Column>
             <table:Column hAlign="Center" resizable="false">
-                <Label text="연간 추정" wrapping="true"/>
+                <Label text="연간 합계" wrapping="true" class="plan-emphasize"/>
                 <table:template>
                     <Text text="{
                         parts: [
@@ -65,7 +65,7 @@
                 </table:template>
             </table:Column>
             <table:Column hAlign="Center" width="auto" resizable="false">
-                <Label text="확보"/>
+                <Label text="확보" class="plan-emphasize"/>
                 <table:template>
                     <Text
                     text="{
@@ -86,7 +86,7 @@
                 </table:template>
             </table:Column>
             <table:Column hAlign="Center" width="auto" resizable="false" >
-                <Label text="미확보"/>
+                <Label text="미확보" class="plan-emphasize"/>
                 <table:template>
                     <Text
                     text="{

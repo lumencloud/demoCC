@@ -17,11 +17,12 @@
         
     >
         <tnt:header>
-            <tnt:ToolHeader width="100%" style="Standard" height="3.75rem" class="custom-portalheader">
+            <tnt:ToolHeader id="toolHeader" width="100%" style="Standard" height="3.75rem" class="custom-portalheader">
+                <FlexBox id="pinBox" height="100%"/>
                 <Image
+                    id="logo"
                     width="4.5rem"
                     src="./resource/image/sk.svg"
-                    press="onPressHome"
                     tooltip="{i18n>p_t_homebtn}"
                     class="sapUiTinyMarginBeginEnd custom-logo" >
                     <layoutData>
@@ -112,53 +113,13 @@
                 width="10rem"
                 design="Decorated"
             >
-                <tnt:NavigationList id="navList"> <!--items="{path: 'main_menuModel>/'}"-->
-                    <!-- <tnt:NavigationListGroup text="{ path:'main_menuModel>i18nTitle_i18nKey',
-                                        formatter: '.formatI18nMenuTitle'}"
-                        items="{path: 'main_menuModel>Child', templateShareable:false}">
-                        <tnt:NavigationListItem
-                            text="{ path:'main_menuModel>i18nTitle_i18nKey',
-                                        formatter: '.formatI18nMenuTitle'}"
-                            enabled="{main_menuModel>use_yn}"
-                            icon="{main_menuModel>iconSrc}"
-                            expanded="false"
-                            selectable="false"
-                            press="onClickTopMenu"
-                            key="{main_menuModel>ID}"
-                            items="{path: 'main_menuModel>Child',
-                                    templateShareable:false}"
-                        >
-                            <tnt:NavigationListItem
-                            
-                                text="{ path:'main_menuModel>i18nTitle_i18nKey',
-                                        formatter: '.formatI18nMenuTitle'}"
-                                key="{main_menuModel>code}"
-                                icon="{main_menuModel>iconSrc}"
-                                enabled="{main_menuModel>use_yn}"
-                                select="onSideMenuSelect"
-                            />
-                        </tnt:NavigationListItem>
-                    </tnt:NavigationListGroup> -->
+                <tnt:NavigationList id="navList">
                 </tnt:NavigationList>
                 <tnt:fixedItem>
                     <tnt:NavigationList>
                         <tnt:NavigationListItem icon="sap-icon://decline" press="onCloseSideMenu" selectable="false"/>
-                        <!-- <tnt:NavigationListItem icon="sap-icon://action-settings" text="설정"/>  -->
-                        <!-- <tnt:NavigationListItem icon="sap-icon://sys-help" text="FAQ"/> -->
-                        <!-- <tnt:NavigationListItem icon="sap-icon://email" text="시스템 문의"/> -->
                         
                     </tnt:NavigationList>
-                    <!-- <tnt:NavigationList items="{path: 'main_menuModel>/', filters: {path: 'i18nTitle_i18nKey', operator: 'Contains', value1: 'admin'}}">
-                        <tnt:NavigationListItem
-                            text="{ path:'main_menuModel>i18nTitle_i18nKey',
-                                        formatter: '.formatI18nMenuTitle'}"
-                            enabled="{main_menuModel>use_yn}"
-                            expanded="true"
-                            selectable="false"
-                            press="onClickTopMenu"
-                            key="{main_menuModel>ID}"
-                        />
-                    </tnt:NavigationList> -->
                     
                 </tnt:fixedItem>
                 
@@ -166,7 +127,6 @@
         </tnt:sideContent>
         <tnt:mainContents>
             <f:FlexibleColumnLayout class="custom-main-flexible-app" id="fcl" stateChange="onStateChanged" layout="{mainControl>/layout}" backgroundDesign="Solid" />
-            <!-- <Image id="chatbotBtn" width="3.75rem" src="./resource/image/ai.png" class="custom-chatbot-btn" press="onExpandAI_Area"/> -->
         </tnt:mainContents>
     </tnt:ToolPage>
 </mvc:View>

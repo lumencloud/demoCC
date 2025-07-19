@@ -564,8 +564,8 @@ sap.ui.define([
          */
         _resetAiModel: function () {
             sessionStorage.setItem("aiModel", JSON.stringify({
-                aiOrgId: '',
-                aiType: '',
+                orgId: '',
+                type: '',
                 aiOrgTypeCode: false
             }));
         },

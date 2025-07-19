@@ -17,6 +17,7 @@
                 <Text text="{ui>/date}" />
             </VBox>
             <HBox justifyContent="Center" alignItems="Center" class="board-footer">
+                <!--Link text="경영정보 시스템 Portal Link" press="onPressLink" /-->
                 <Link text="경영정보 시스템 Portal Link" press="onPressLink" />
             </HBox >
         </VBox>

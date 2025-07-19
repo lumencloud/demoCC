@@ -23,7 +23,7 @@
                                 format: 'yyyyMM',
                                 pattern: 'yyyy-MM'
                             }
-                        }" change="onChangeSearch"/>
+                        }" change="onChangeSearch" editable="{= ${main_userModel>/auth} === '관리자' || ${main_userModel>/auth} === 'SYS ADMIN'}"/>
                 </HBox>
                 <HBox width="100%" alignContent="Center" alignItems="Center" justifyContent="Center" class="custom-dashboard-datepicker">
                     <Label text="조직" class="sapUiTinyMarginEnd" />
@@ -42,7 +42,7 @@
         </customHeader>
         <subHeader>
             <Toolbar height="4.5rem" style="Clear" design="Solid" class="custom-border-radius custom-pl-section-padding sapUiSmallMarginBottom">
-                <SegmentedButton id="plTypeButton" selectedKey="{hashModel>/page}" selectionChange="onSelectionChange" class="custom-segment-btn" >
+                <SegmentedButton id="plTypeButton" selectedKey="{hashModel>/page}" selectionChange=".onSelectionChange" class="custom-segment-btn" >
                     <items>
                         <SegmentedButtonItem key="actual" icon="sap-icon://vertical-bar-chart" text="실적PL" tooltip="실적"/>
                         <SegmentedButtonItem key="plan" icon="sap-icon://vertical-bullet-chart" text="추정PL" tooltip="계획" />
@@ -52,8 +52,9 @@
 
                 <ToolbarSpacer />
 
-                <Button text="엑셀" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false"/>
-                <Button text="AI 스페셜리스트" type="Ghost" class="custom-text-semibol custom-ai-btn" icon="sap-icon://ai" press="onExpandAI"/>
+                <Button text="엑셀" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload"
+                    visible="{= ${main_userModel>/auth} === '관리자' || ${main_userModel>/auth} === 'SYS ADMIN'}"/>
+                <Button text="AI 스페셜리스트" class="custom-text-semibol custom-ai-btn" icon="sap-icon://ai" press="onExpandAI"/>
 
                 <ToolbarSeparator visible="false"/>
 

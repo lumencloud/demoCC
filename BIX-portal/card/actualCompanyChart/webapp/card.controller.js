@@ -27,6 +27,56 @@ sap.ui.define([
             this._oEventBus.subscribe("pl", "search", this._dataRequest, this);
 
         },
+        
+        _setSelect: async function () {
+            // 검색 조건
+            let oSearchData = JSON.parse(sessionStorage.getItem("initSearchModel"));
+            
+            // 현재 해시를 기준으로 DB에서 Select에 들어갈 카드 정보를 불러옴
+            let oHashData = this.getOwnerComponent().oCard.getModel("hashModel").getData();
+
+            let sSelectPath = `/pl_content_view(page_path='${oHashData.page}',position='detail',grid_layout_info=null,detail_path='${oHashData.detail}',detail_info='${oHashData.detailType}')/Set`;
+
+            // 로직에 따라서 조직 필터링
+            let aOrgFilter = [`(length(sub_key) gt 0 and sub_key ne 'org_delivery' and sub_key ne 'org_account' and sub_key ne 'org')`];
+            if (oSearchData.org_level === "lv1" || oSearchData.org_level === "lv2") {   // lv1 또는 lv2
+                aOrgFilter.push(`(sub_key eq 'org_delivery' or sub_key eq 'org_account')`);
+            } else if ((oSearchData.org_level === "lv3" && oSearchData.org_tp === "hybrid") || oSearchData.org_tp === "account") {  // CCO 및 account조직
+                aOrgFilter.push(`(sub_key eq 'org_account')`);
+            } else {    // 그 외
+                aOrgFilter.push(`(sub_key eq 'org')`);
+            };
+
+            // 조직 필터링 배열을 문자열로 변경
+            let sOrgFilter = aOrgFilter.join(" or ");
+
+            // 데이터 호출
+            const oListBinding = this.getOwnerComponent().getModel("cm").bindList(sSelectPath, null, null, null, {
+                $filter: sOrgFilter
+            });
+            let aSelectContexts = await oListBinding.requestContexts();
+            let aSelectData = aSelectContexts.map(oContext => oContext.getObject());
+
+            // 카드 정보를 selectModel로 설정 (sub_key, sub_text)
+            if(oSearchData.org_level !== "lv1" && oSearchData.org_level !== "lv2"){
+                let aOrgData = aSelectData.find(data => data.sub_key === 'org_delivery' || data.sub_key === 'org_account')
+                if(!!aOrgData){
+                    let aOrgSubText = aOrgData.sub_text.split(' ')
+                    aOrgData.sub_text = aOrgSubText[aOrgSubText.length-1]
+                }
+            }
+            this.getView().setModel(new JSONModel(aSelectData), "selectModel");
+            
+            // // Select
+            // this.getView().setModel(new JSONModel([
+            //     { key: "org", name: "조직별" },
+            //     { key: "Account", name: "Account별" },
+            // ]), "selectModel");
+
+            //uiChange
+
+            this.getView().setModel(new JSONModel({ key: "org" }), "uiModel")
+        },
 
         _dataRequest: async function(){
             
@@ -40,8 +90,8 @@ sap.ui.define([
             let iBoxHeight = Math.floor(oParentElement.clientHeight / window.innerHeight * 90);
 
             // 각 카드 크기 지정
-            this.byId("vBox").setHeight(iBoxHeight*0.8+"vh")
-            this.byId("vBox2").setHeight(iBoxHeight*0.8+"vh")
+            // this.byId("vBox").setHeight(iBoxHeight*0.8+"vh")
+            // this.byId("vBox2").setHeight(iBoxHeight*0.8+"vh")
             this.byId("vbm").setHeight(iBoxHeight*0.9+"vh")
                     
             let oData = JSON.parse(sessionStorage.getItem("initSearchModel"));
@@ -63,7 +113,9 @@ sap.ui.define([
             await Promise.all([
                 oModel.bindContext(sMapPath).requestObject()
             ]).then(function(aResults){
+                this.getView().setModel(new JSONModel(aResults[0].value), "totalData")
                 this._regionSetting(aResults[0].value)
+            
             }.bind(this))
             .catch((oErr) => {
                 Modules.displayStatus(this.getOwnerComponent().oCard,oErr.error.code, this.byId("flexBox"));
@@ -148,9 +200,10 @@ sap.ui.define([
         },
 
         _regionSetting: function (aResults){
+            //console.log(aResults)
             let aData = [
                 {
-                    name: "미국법인",
+                    name: aResults[3].org_name,
                     code: "US",
                     sale: aResults[3].actual_curr_ym_value,
                     margin: aResults[4].actual_curr_ym_value,
@@ -206,15 +259,8 @@ sap.ui.define([
 
                     // Dialog Open 전 실행
                     oDialog.attachBeforeOpen(function (oEvent) {
-                        // 더미 데이터 설정
-                        let oDummy = [
-                            { type: "수주", month: "500", year: "5500" },
-                            { type: "매출", month: "1500", year: "16000" },
-                            { type: "마진", month: "300", year: "3200" },
-                            { type: "SG&A", month: "200", year: "2100" },
-                            { type: "공헌이익", month: "100", year: "10500" },
-                        ]
-                        oDialog.setModel(new JSONModel(oDummy), "tableModel");
+                        // 데이터 가져오기
+                        let aData = this.getView().getModel("totalData").getData()
 
                         // uiModel 설정
                         let oRegionData = this.getView().getModel("regionModel").getData();
@@ -224,6 +270,22 @@ sap.ui.define([
                             oEvent.preventDefault();
                         } else {
                             oDialog.setModel(new JSONModel({ title: oSelectedRegion.name }), "uiModel");
+                            let aResult = aData.filter(oData => oData.org_name === oSelectedRegion.name);                            
+                            
+                            let bindData = [];
+                            
+                            aResult.forEach(
+                                function(result){
+                                    let oData = {
+                                        type : result.type,
+                                        value : this.onFormatRegion(result.actual_curr_ym_value, result.type, "value"),
+                                        purpose : this.onFormatRegion(result.target_curr_y_value, result.type, "purpose"),
+                                    }
+                                    bindData.push(oData)
+                                }.bind(this)                                
+                            )
+
+                            oDialog.setModel(new JSONModel(bindData), "tableModel");
                         }
                     }.bind(this));
                 }.bind(this));
@@ -232,6 +294,29 @@ sap.ui.define([
             // Dialog Open
             this._oDetailDialog._code = sCode;
             this._oDetailDialog.open();
+        },
+
+        onFormatRegion: function (iValue, sType, sType2) {
+            if(sType==="매출" || sType==="마진"){
+                if(sType2 === "purpose"){iValue = iValue*100000000}
+                var oNumberFormat = NumberFormat.getFloatInstance({
+                    groupingEnabled: true,
+                    groupingSeparator: ',',
+                    groupingSize: 3,
+                    decimals: 1
+                });
+                return oNumberFormat.format(iValue/100000000) + "억";
+            } else if(sType === "마진율"){
+                if(sType2 === "value"){iValue = iValue*100}
+                var oNumberFormat = NumberFormat.getFloatInstance({
+                    groupingEnabled: true,
+                    groupingSeparator: ',',
+                    groupingSize: 3,
+                    decimals: 2
+                });
+                return oNumberFormat.format(iValue)+ "%";
+
+            };
         },
 
         onCloseDetailDialog: function () {

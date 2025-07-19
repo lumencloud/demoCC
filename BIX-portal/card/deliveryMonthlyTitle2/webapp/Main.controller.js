@@ -24,7 +24,7 @@ sap.ui.define([
 			this.byId("cardContent").setBusy(true);
 			let oSessionData = JSON.parse(sessionStorage.getItem("aiReport"))			
 
-			this.getView().setModel(new JSONModel({month: Number(oSessionData.month), title: oSessionData.title}),"ui");
+			this.getView().setModel(new JSONModel({month: String(Number(oSessionData.month)), title: oSessionData.title}),"ui");
 
 			this.byId("cardContent").setBusy(false);
 			this.dataLoad();

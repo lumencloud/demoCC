@@ -30,20 +30,19 @@ module.exports = (srv) => {
             const i_month = Number(month);
 
             // 조직 정보 얻음
-            const org_col = `case
-                when lv1_id = '${org_id}' THEN 'lv1_id'
-                when lv2_id = '${org_id}' THEN 'lv2_id'
-                when lv3_id = '${org_id}' THEN 'lv3_id'
-                when div_id = '${org_id}' THEN 'div_id'
-                when hdqt_id = '${org_id}' THEN 'hdqt_id'
-                when team_id = '${org_id}' THEN 'team_id'
-                end as org_level`;
-            const orgInfo = await SELECT.one.from(org_full_level).columns([org_col, 'org_ccorg_cd', "org_name"]).where({ 'org_id': org_id });
-            if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
+            let orgInfo, org_col_nm, org_ccorg_col, org_ccorg_cd
+            if(org_id !== '999990'){
+                orgInfo = await SELECT.one.from(org_full_level).columns(['org_ccorg_cd', "org_name", 'org_level']).where({ 'org_id': org_id });
+                if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
-            const org_col_nm = orgInfo.org_level;
-            const org_ccorg_col = org_col_nm.split('_',1) + '_ccorg_cd';
-            const org_ccorg_cd = orgInfo.org_ccorg_cd;
+                org_col_nm = orgInfo.org_level + '_id';
+                org_ccorg_col = org_col_nm.split('_',1) + '_ccorg_cd';
+                org_ccorg_cd = orgInfo.org_ccorg_cd;
+            }else{
+                org_col_nm = 'div_id';
+                org_ccorg_col = 'ccorg_cd';
+                org_ccorg_cd = '999990';
+            }
 
             //얻은 데이터를 통해 수치 데이터 추가
             let query, s_col_nm;
@@ -54,7 +53,7 @@ module.exports = (srv) => {
                     add_column.push(`sum(exp_m${i}_amt) as exp_m${i}_amt`);
                 };
 
-                const sga_expense_col_list = ['year', 'description', 'commitment_item', ...add_column];
+                const sga_expense_col_list = ['year', 'trim(description) as description', 'trim(commitment_item) as commitment_item', ...add_column];
                 const sga_expense_where_conditions = { 'year': { in: [year, last_year] }, 'shared_exp_yn': false };
                 const sga_expense_groupBy_cols = ['year', 'description', 'commitment_item'];
                 const sga_expense_orderBy_cols = ['commitment_item', 'year'];
@@ -81,6 +80,9 @@ module.exports = (srv) => {
             }else{
                 return;
             };
+            if(!query.length){
+                return;
+            }
 
             let a_list = []
             query.filter(data => {
@@ -135,7 +137,7 @@ module.exports = (srv) => {
                 let cost_gap = (cost_curr_ym - cost_last_ym);
 
                 let oTemp = {
-                    name: cost_name,
+                    name: cost_name.trim(),
                     cost_curr_ym: cost_curr_ym,
                     cost_last_ym: cost_last_ym,
                     cost_total_curr_y: cost_total_curr_y,

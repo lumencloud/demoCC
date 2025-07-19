@@ -73,7 +73,7 @@ sap.ui.define(
         // 모델용 객체 생성
         let oModel = {
           iCount: iCount || 0,
-          iAmount: iAmount.toFixed(0) || 0,
+          iAmount: this._formatTotal(iAmount.toFixed()) || 0,
           first: aResult[0] || null,
           second: aResult[1] || null,
           third: aResult[2] || null,
@@ -138,7 +138,7 @@ sap.ui.define(
 
         let fNumber = parseFloat(sValue);
         if (Number.isInteger(fNumber)) {
-          let oFormatter = NumberFormat.getIntegerInstance({
+          let oFormatter = NumberFormat.getFloatInstance({
             groupingEnabled: true
           });
           return oFormatter.format(fNumber);

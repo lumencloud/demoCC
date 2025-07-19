@@ -12,5 +12,6 @@ module.exports = {
     QUICK_ANSWER_AGENT_PATH: path.join(MODELS_DIR, 'template/quick_answer_agent.json'),
     NAVIGATOR_AGENT_PATH: path.join(MODELS_DIR, 'template/navigator_agent.json'),
     ANALYSIS_AGENT_PATH: path.join(MODELS_DIR, 'template/analysis_agent.json'),
+    REPORT_AGENT_PATH: path.join(MODELS_DIR, 'template/report_agent.json'),
     REPORT_CONTENT_AGENT_PATH: path.join(MODELS_DIR, 'template/report_content_agent.json'),
 };

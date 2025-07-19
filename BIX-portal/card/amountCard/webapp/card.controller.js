@@ -48,18 +48,30 @@ sap.ui.define(
         let aResult = await oModel.bindContext(`/get_actual_pl_total(year='${iYear}',month='${sMonth}')`).requestObject().catch((oErr) => {
           Modules.displayStatus(this.getOwnerComponent().oCard,oErr.error.code, this.byId("cardContent"));
         });          
-        let aConvert = await this._dataConvert(aResult.value);
 
+        //console.log(aResult)
+        let aConvert = await this._dataConvert(aResult.value);
+        let oSumeData = await this._dataSum(aConvert)
         this.getView().setModel(new JSONModel(aConvert[0]), "SaleModel")
         this.getView().setModel(new JSONModel(aConvert[1]), "MarginModel")
-        this.getView().setModel(new JSONModel(aConvert[2]), "MarginRateModel")
-        this.getView().setModel(new JSONModel(aConvert[3]), "SGAModel")
-        this._setUi(aConvert[0].contrast, 1)
-        this._setUi(aConvert[1].contrast, 2)
-        this._setUi(aConvert[2].contrast, 3)
-        this._setUi(aConvert[3].contrast, 4)
+        this.getView().setModel(new JSONModel(oSumeData), "SGAModel")
+        this.getView().setModel(new JSONModel(aConvert[6]), "ProfitModel")
+        // this._setUi(aConvert[0].contrast, 1)
+        // this._setUi(aConvert[7].contrast, 2)
+        // this._setUi(aConvert[2].contrast, 3)
+        // this._setUi(oSumeData.contrast, 4)
 
         this.byId("cardContent").setBusy(false);
+      },
+
+      _dataSum(aConvert){
+        return {
+          "value" : aConvert[3].value + aConvert[5].value,
+          "purpose" : aConvert[3].purpose + aConvert[5].purpose,
+          "percent" : aConvert[3].percent + aConvert[5].percent,
+          "contrast" : aConvert[3].contrast + aConvert[5].contrast,
+          "type" : (aConvert[3].contrast + aConvert[5].contrast) > 0 ? true : false,
+        }
       },
 
       _dataConvert(aResult){
@@ -74,11 +86,11 @@ sap.ui.define(
             if(oData.target_curr_y_value===0){
               percent = 0;
             } else {
-              if(oData.type === "마진율"){
-                percent = oData.actual_curr_ym_value/(oData.target_curr_y_value) * 100
-              } else {
+              // if(oData.type === "마진율" || oData.type === "영업이익률"){
+              //   percent = oData.actual_curr_ym_value/(oData.target_curr_y_value) * 100
+              // } else {
                 percent = oData.actual_curr_ym_value/(oData.target_curr_y_value*100000000) * 100
-              }
+              // }
               
             }
             
@@ -95,6 +107,9 @@ sap.ui.define(
             } else if (contrast < 0){
               type = false;
             }
+
+            let name = oData.type
+
              
 
             let oConvertData = {
@@ -102,7 +117,8 @@ sap.ui.define(
               "purpose" : purpose,
               "percent" : percent,
               "contrast" : contrast,
-              "type" : type
+              "type" : type,
+              "name" : name
             }
             
             aConvert.push(oConvertData)
@@ -113,13 +129,13 @@ sap.ui.define(
       },
 
       _setUi: function (iChk, sAdditionalId) {
-        let oHBox = this.byId("icon_box"+sAdditionalId)
+        // let oHBox = this.byId("icon_box"+sAdditionalId)
         let oIconText = this.byId("Icon_text"+sAdditionalId)
         if (iChk > 0) {
-          oHBox.addStyleClass("custom-box-empty green sapUiTinyMarginTop")
+          // oHBox.addStyleClass("custom-box-empty green sapUiTinyMarginTop")
           oIconText.addStyleClass("custom-positive-state")
         } else if (iChk < 0) {
-          oHBox.addStyleClass("custom-box-empty red sapUiTinyMarginTop")
+          // oHBox.addStyleClass("custom-box-empty red sapUiTinyMarginTop")
           oIconText.addStyleClass("custom-negative-state")
 
         }

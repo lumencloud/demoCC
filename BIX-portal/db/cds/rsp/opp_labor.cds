@@ -13,7 +13,7 @@ entity opp_labor : managed {
     key ccorg_cd           : String(10) not null @title: 'ERP Cost Center';
         biz_opp_no         : String(8)           @title: '사업기회 번호';
         prj_tp_cd          : String(20)          @title: '프로젝트 타입코드명';
-        prj_tp_nm          : String(20) not null @title: '프로젝트 타입명';
+        prj_tp_nm          : String(20)          @title: '프로젝트 타입명';
         prfm_str_dt        : Date                @title: '사업 수행 시작 일자';
         prfm_end_dt        : Date                @title: '사업 수행 종료 일자';
         received_order_amt : Decimal(18, 2)      @title: '수주 금액';

@@ -150,6 +150,8 @@ view project_view as
                          then sfdc3.deal_stage_chg_dt
                 end           as deal_stage_chg_dt      : Date,
                 case
+                    when bd_bix.dgtr_task_cd          is not null
+                         then bd_bix.dgtr_task_cd
                     when sfdc1.dgtr_task_cd           is not null
                          and sfdc1.dgtr_task_cd       <>     ''
                          then sfdc1.dgtr_task_cd
@@ -248,9 +250,7 @@ view project_view as
                     and prj.prj_no in (
                         select distinct prj_no from pl_wideview
                         where
-                                src_type in (
-                                'E', 'WO', 'D'
-                            )
+                                src_type <> 'P'
                             and ver      in (
                                 select ver from common_version
                                 where
@@ -302,9 +302,7 @@ view project_view as
                     and last_prj.prj_no in (
                         select distinct prj_no from pl_wideview
                         where
-                                src_type in (
-                                'E', 'WO', 'D'
-                            )
+                                src_type <> 'P'
                             and ver      in (
                                 select ver from common_version
                                 where
@@ -347,7 +345,7 @@ view project_view as
                     'PLATFORM' as if_source   : String(10)
                 from common_project_platform as platform
                 left join common_project as prj
-                    on(
+                    on (
                             platform.ver             in (
                             select ver from common_version
                             where
@@ -375,7 +373,7 @@ view project_view as
                     )
             ) as actual_prj
             left join common_code_item as tp
-                on(
+                on (
                        upper(replace(
                         actual_prj.prj_tp_cd, ' ', ''
                     ))              = upper(replace(
@@ -513,12 +511,21 @@ view project_view as
             ) as sfdc3
                 on  actual_prj.ver    = sfdc3.ver
                 and actual_prj.prj_no = sfdc3.prj_no_sfdc
+            // left join (
+            //     SELECT max(ver) as ver, code, name, relsco_yn, biz_tp_account_cd
+            //     FROM common_customer
+            //     GROUP BY code, name, relsco_yn, biz_tp_account_cd
+            // ) as customer
             left join common_customer as customer
-                on actual_prj.ver = customer.ver
+                on customer.ver in (
+                    select ver from common_version
+                    where
+                        tag in ('C')
+                )
                 and case
                         when left(
                                  actual_prj.cstco_cd, 4
-                             )    = '0000'
+                             )  =  '0000'
                              then substring(
                                       actual_prj.cstco_cd, 5
                                   )
@@ -544,6 +551,9 @@ view project_view as
                     (
                                actual_prj.if_source =  'PLATFORM'
                         and    actual_prj.seq       =  master.seq
+                        and    substring(
+                            actual_prj.ver, 2, 4
+                        )                           =  master.year
                     )
                     or (
                         (

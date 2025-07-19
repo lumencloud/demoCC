@@ -32,33 +32,18 @@ sap.ui.define([
         /**
          * @type {Array} View의 모든 테이블 배열
          */
-        _aTableLists : ["actualCompanyTable1"],
+        _aTableLists: [],
 
-        /**
-         * @type {Array} View의 모든 테이블 배열
-         */
-        _aBoxList: [
-            "actualCompanyBox5"
-        ],
-
-        onInit: async function () {
-            // 초기 JSON 모델 설정
-            await this._setModel();
-
-            this._aTableLists = [];
-            // this._aTableLists에 fieldGroupId가 content인 요소의 localId를 담음
-            this.getView().getControlsByFieldGroupId("content").forEach(object => {
-                if (object.isA("sap.ui.table.Table") && object.getFieldGroupIds().length > 0) {
-                    let sLocalId = this.getView().getLocalId(object.getId());
-                    this._aTableLists.push(sLocalId);
-                }
-            })
-
-            // 테이블 바인딩
-            this._bindTable();
+        onInit: function () {
+            this._asyncInit();
             this._oEventBus.subscribe("pl", "search", this._bindTable, this);
         },
-
+        _asyncInit: async function () {
+            // 초기 JSON 모델 설정
+            await this._setModel();
+            // 테이블 바인딩
+            this._bindTable();
+        },
         onBeforeRendering() {
             this.bDialog = Module.checkIsDialog(this);
         },
@@ -67,9 +52,38 @@ sap.ui.define([
          * JSON 모델 설정
          */
         _setModel: async function () {
-            this.getView().setModel(new JSONModel({
-                tableKind: "sub_company"
-            }), "uiModel");
+            // 데이터 불러오기 전에 모든 테이블이 보여서 먼저 선언
+            this.getView().setModel(new JSONModel({}), "uiModel");
+
+            // 현재 해시를 기준으로 DB에서 Select에 들어갈 카드 정보를 불러옴
+            let oHashData = this.getOwnerComponent().oCard.getModel("hashModel").getData();
+
+            let sSelectPath = `/pl_content_view(page_path='${oHashData.page}',position='detail',grid_layout_info=null,detail_path='${oHashData.detail}',detail_info='${oHashData.detailType}')/Set`;
+            const oListBinding = this.getOwnerComponent().getModel("cm").bindList(sSelectPath, null, null, null, {
+                $filter: `length(sub_key) gt 0`
+            });
+            let aSelectContexts = await oListBinding.requestContexts();
+            let aSelectData = aSelectContexts.map(oContext => oContext.getObject());
+
+            // 카드 정보를 selectModel로 설정 (sub_key, sub_text)
+            this.getView().setModel(new JSONModel(aSelectData), "selectModel");
+
+            // 기본적으로 첫 번째 항목의 테이블을 보여줌
+            this.getView().setModel(new JSONModel({ tableKind: aSelectData[0].sub_key }), "uiModel");
+
+            // this._aTableLists에 fieldGroupId가 content인 요소 및 SelectModel에 포함된 테이블의 localId를 담음
+            this._aTableLists = [];
+            this.getView().getControlsByFieldGroupId("content").forEach(object => {
+                if (object.isA("sap.ui.table.Table") && object.getFieldGroupIds().length > 0) {
+                    let sub_key = object.getFieldGroupIds().find(sId => !!aSelectData.find(oData => oData.sub_key === sId));
+
+                    if (!!sub_key) {
+                        let sLocalId = this.getView().getLocalId(object.getId());
+
+                        this._aTableLists.push(sLocalId);
+                    }
+                }
+            })
         },
 
         /**
@@ -77,12 +91,35 @@ sap.ui.define([
          * @param {Event} oEvent 
          */
         onUiChange: async function (oEvent) {
+            // 선택한 key로 화면에 보여줄 테이블을 결정
+            let oSelect = /** @type {Select} */ (oEvent.getSource());
+            let sKey = (oSelect).getSelectedKey();
             let oUiModel = this.getView().getModel("uiModel");
-            oUiModel.setProperty("/tableKind", oEvent.getSource().getSelectedKey())
+            oUiModel.setProperty("/tableKind", sKey);
 
-            setTimeout(() => {
-                this._aTableLists.forEach(sTableId => this.byId(sTableId).rerender())
-            }, 0);
+            // detailCard Component 반환
+            let oCard = this.getOwnerComponent().oCard;
+            let oCardComponent = oCard._oComponent;
+
+            // PL 실적 hashModel에 detailSelect 업데이트
+            let oHashModel = oCardComponent.getModel("hashModel");
+            oHashModel.setProperty("/detailSelect", sKey);
+
+            // PL 실적 Manifest Routing
+            let oHashData = oHashModel.getData();
+            let sRoute = (oHashData["page"] === "actual" ? "RouteActual" : "RoutePlan");
+            oCardComponent.getRouter().navTo(sRoute, {
+                pageView: oHashData["pageView"],
+                detail: oHashData["detail"],
+                detailType: oHashData["detailType"],
+                orgId: oHashData["orgId"],
+                detailSelect: oHashData["detailSelect"],
+            });
+
+            // 선택한 항목의 테이블만 병합
+            let oItem = oEvent.getParameters()["item"];
+            let iTableIndex = oSelect.indexOfItem(oItem);
+            await this._setTableMerge([this._aTableLists[iTableIndex]]);
         },
 
         _bindTable: async function (sChannelId, sEventId, oData) {
@@ -103,39 +140,53 @@ sap.ui.define([
             let sMonth = String(dYearMonth.getMonth() + 1).padStart(2, "0");
 
             let sOrgId = oData.orgId;
-            
+
             const oPlModel = this.getOwnerComponent().getModel("pl");
-            let sOwnPath = `/get_actual_sale_sub_company_pl(year='${iYear}',month='${sMonth}',org_id='${sOrgId}')`
+            let aBindingPath = [];
+            aBindingPath.push(`/get_actual_sale_sub_company_pl(year='${iYear}',month='${sMonth}',org_id='${sOrgId}')`)
 
-            await Promise.all([
-                oPlModel.bindContext(sOwnPath).requestObject(),
-            ]).then(function (aResults) {
-                Module.displayStatusForEmpty(this.byId("actualCompanyTable1"),aResults[0].value, this.byId("actualCompanyBox5"));
-                //열 정리
-                aResults[0].value = aResults[0].value.sort((a, b) => a.display_order - b.display_order); // display_order 로 정렬
-                
+            await Promise.all(
+                aBindingPath.map(sPath => oPlModel.bindContext(sPath).requestObject()))
+                .then((aResults) => {
 
-                // 모델바인딩 (테이블 당 하나의 모델만 사용하므로 따로 view에 모델을 선언하지 않고 각 테이블에 JSONModel을 바인딩)
-                this._aTableLists.forEach((sTableName, index) => {
-                    let oTable = this.byId(sTableName);
-                    
-                    oTable.setModel(new JSONModel(aResults[index].value));
+                    this._aTableLists.forEach((sTableId, index) => {
+                        let oTable = this.byId(sTableId);
+                        let oBox = oTable.getParent();
+
+                        // Empty 상태 설정
+                        Module.displayStatusForEmpty(oTable, aResults[index].value, oBox);
+
+                        //정렬
+                        aResults[index].value = aResults[index].value.sort((a, b) => a.display_order - b.display_order);
+
+                        // _sBindingPath 설정
+                        oTable._sBindingPath = aBindingPath[index];
+
+                        // 테이블에 모델 바인딩
+                        oTable.setModel(new JSONModel(aResults[index].value));
+                    })
+
+                    this._setVisibleRowCount(aResults);
                 })
-                
-                // 테이블 로우 셋팅
-                this._setVisibleRowCount(aResults);
-                
-            }.bind(this))
-            .catch((oErr) => {
-                Modules.displayStatus(this.byId("actualCompanyTable1"),oErr.error.code, this.byId("actualCompanyBox5"));
-            });
+                .catch((oErr) => {
+                    // 추후 호출 분리 필요
+                    this._aTableLists.forEach((sTableId, index) => {
+                        let oTable = this.byId(sTableId);
+                        let oBox = oTable.getParent();
+                        Module.displayStatus(oTable, oErr.error.code, oBox);
+                    })
+                });
 
             await this._setTableMerge(this._aTableLists);
-            this._setBusy(false);
+            this._setBusy(false)
         },
 
-        _setBusy: async function (bType) {
-            this._aBoxList.forEach(sBoxId => this.byId(sBoxId).setBusy(bType))
+        _setBusy: function (bType) {
+            // 모든 박스 setBusy 설정
+            this._aTableLists.forEach(sTableId => {
+                let oBox = this.byId(sTableId).getParent();
+                oBox.setBusy(bType);
+            })
         },
 
         _setVisibleRowCount: function (aResults) {
@@ -145,10 +196,10 @@ sap.ui.define([
                 // 처음 화면 렌더링시 table의 visibleCountMode auto 와 <FlexItemData growFactor="1"/>상태에서
                 // 화면에 꽉 찬 테이블의 row 갯수를 전역변수에 저장하기 위함
 
-                // if (oTable) {
-                //     oTable.attachCellClick(this.onCellClick, this);
-                //     oTable.attachCellContextmenu(this.onCellContextmenu, this);
-                // }
+                if (oTable && !oTable?.mEventRegistry?.cellContextmenu) {
+                    oTable.attachCellClick(this.onCellClick, this);
+                    oTable.attachCellContextmenu(this.onCellContextmenu, this);
+                }
 
                 if (this._iColumnCount === null) {
                     this._iColumnCount = oTable.getVisibleRowCount();
@@ -165,7 +216,16 @@ sap.ui.define([
                 }
             }
         },
-
+        
+         /**
+         * 셀 우클릭 이벤트 핸들러 
+         */
+         onCellContextmenu: function (oEvent) {
+            // oEvent.preventDefault();
+        },
+        onCellClick: function (oEvent) {
+            // oEvent.preventDefault();
+        },
         /**
          * 테이블의 첫 번째 행 변경 이벤트
          * @param {Event} oEvent 
@@ -190,19 +250,6 @@ sap.ui.define([
 
                 Module.setTableMergeWithAltColor(oTable);
             }
-        },
-
-        onAfterRendering: function () {
-            this._aTableLists.forEach(
-                function (sTableId) {
-                    let oTable = this.byId(sTableId);
-                }.bind(this)
-            )
-        },
-
-        onRowSelectionChange: function (oEvent) {
-            let aRowMergeInfo = Module._tableRowGrouping(oEvent.getSource());
-            Module.setMergeTableRowClick(oEvent.getSource(), aRowMergeInfo);
         },
 
         onFormatPerformance: function (iValue1, iValue2, sType, sTooltip) {

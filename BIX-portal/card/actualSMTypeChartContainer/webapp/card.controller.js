@@ -55,7 +55,7 @@ sap.ui.define([
             await Promise.all([
                 oModel.bindContext(sOrgPath).requestObject()                
             ]).then(function(aResults){
-                console.log(aResults[0].value)
+                //console.log(aResults[0].value)
                 this._chartSetting(aResults[0].value)                
             }.bind(this)
             )

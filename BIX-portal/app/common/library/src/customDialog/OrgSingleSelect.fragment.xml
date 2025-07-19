@@ -31,7 +31,8 @@
 							$count: true,
 							arrayNames: ['children'],
 							numberOfExpandedLevels: 6
-						}
+						},
+						sorter: {path: 'org_order'}
 					}"
 					busyIndicatorDelay="0">
 					<table:rowMode>

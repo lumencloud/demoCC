@@ -37,7 +37,14 @@
         "settings": {
           "odataVersion": "4.0"
         }
-      }
+      },
+			"plService": {
+				"uri": "../../../odata/v4/pl_api/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "4.0"
+				}
+			}
     }
   },
   "sap.ui": {
@@ -98,7 +105,16 @@
           "autoExpandSelect": true,
           "earlyRequests": true
         }
-      }
+      },
+			"pl": {
+				"dataSource": "plService",
+				"preload": true,
+				"settings": {
+					"operationMode": "Server",
+					"autoExpandSelect": true,
+					"earlyRequests": true
+				}
+			}
     },
     "resources": {
       "css": [
@@ -127,14 +143,14 @@
         },
         {
           "name": "RouteActual",
-          "pattern": "actual/:pageView:/:detail:/:detailType:/:orgId:/:detailSelect:",
+          "pattern": "actual/:pageView:/:detail:/:detailType:/:detailSelect:/:orgId:",
           "target": [
             "TargetSplitter"
           ]
         },
         {
           "name": "RoutePlan",
-          "pattern": "plan/:pageView:/:detail:/:detailType:/:orgId:/:detailSelect:",
+          "pattern": "plan/:pageView:/:detail:/:detailType:/:detailSelect:/:orgId:",
           "target": [
             "TargetSplitter"
           ]

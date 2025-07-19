@@ -25,9 +25,9 @@ module.exports = async function (year, a_target_list) {
         { value: 'C02', name: '영업이익', target: 'target_sale_profit' },  // profit_target_amt
         { value: 'C03', name: '전사영업이익', target: 'target_total_profit' },  // total_profit_target_amt
         { value: 'C04', name: '총액 인건비', target: 'target_total_labor' },  // total_labor_target_amt
-        // {value:'C05',name:'인건비',target:'target_labor'},  // labor_target_amt
+        { value: 'C05', name: '인건비', target: 'target_labor' },  // labor_target_amt
         // {value:'C06',name:'투자비',target:'target_invest'},  // invest_target_amt
-        // {value:'C07',name:'경비',target:'target_expense' },  // expense_target_amt
+        { value: 'C07', name: '경비', target: 'target_expense' },  // expense_target_amt
         { value: 'C08', name: '전사SG&A', target: 'target_total_sga' },
     ]
 

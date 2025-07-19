@@ -7,19 +7,27 @@ sap.ui.define(
     "sap/ui/core/format/NumberFormat",
     "../../main/util/Module",
   ],
-  function (BaseController, EventBus, ODataModel, JSONModel, NumberFormat,Module) {
+  function (BaseController, EventBus, ODataModel, JSONModel, NumberFormat, Module) {
     "use strict";
     return BaseController.extend("bix.card.completedContractBau.card", {
       _oEventBus: EventBus.getInstance(),
+      _bFlag: true,
 
       onInit: function () {
         this._dataSetting();
         this._oEventBus.subscribe("aiReport", "dateData", this._dataSetting, this)
       },
 
-      _dataSetting: async function (oEvent, sEventId, oData) {
+      _dataSetting: async function (oEvent, sEventId) {
         this.byId("cardContent").setBusy(true);
         let { monday, sunday } = this._setDate();
+
+        let oData = JSON.parse(sessionStorage.getItem("aiWeekReport"));
+
+        const nextMonday = this._addWeekToDateString(monday);
+        const nextSunday = this._addWeekToDateString(sunday);
+        const nextStartDay = this._addWeekToDateString(oData.start_date);
+        const nextEndDay = this._addWeekToDateString(oData.end_date);
 
         // 데이터 호출 병렬 실행
         const oModel = new ODataModel({
@@ -28,19 +36,29 @@ sap.ui.define(
           operationMode: "Server"
         });
 
-        let sPath = oData ? `/ai_agent_bau_view5(start_date='${oData.start_date}',end_date=${oData.end_date})/Set` :
-          `/ai_agent_bau_view5(start_date='${monday}',end_date=${sunday})/Set`
+        let sPath = oData ? `/ai_agent_bau_view5(start_date='${nextStartDay}',end_date=${nextEndDay})/Set` :
+          `/ai_agent_bau_view5(start_date='${nextMonday}',end_date=${nextSunday})/Set`
         await oModel.bindContext(sPath).requestObject().then(
           function (aResult) {
 
-            Module.displayStatusForEmpty(this.getOwnerComponent().oCard,aResult.value, this.byId("cardContent"));
+            Module.displayStatusForEmpty(this.getOwnerComponent().oCard, aResult.value, this.byId("cardContent"));
             this._modelSetting(aResult.value);
-            this.dataLoad();
+
           }.bind(this))
           .catch((oErr) => {
-            Module.displayStatus(this.getOwnerComponent().oCard,oErr.error.code, this.byId("cardContent"));
-        });
+            Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
+          });
         this.byId("cardContent").setBusy(false);
+      },
+
+      // 차주 입찰 예정 사업 테이블 "차주" 계산을 위한 1주 추가 함수
+      _addWeekToDateString: function (sDate) {
+        const date = new Date(sDate);
+        date.setDate(date.getDate() + 7);
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
       },
 
       _modelSetting: function (aResult) {
@@ -72,13 +90,16 @@ sap.ui.define(
         }
         // Account 코드 삭제
         aResult.forEach(a => {
-          a.biz_tp_account_nm = a.biz_tp_account_nm.slice(4)
+          if (a.biz_tp_account_nm) {
+            a.biz_tp_account_nm = a.biz_tp_account_nm.slice(4)
+          } else {
+            a.biz_tp_account_nm = ''
+          }
         })
-
         // 모델용 객체 생성
         let oModel = {
           iCount: iCount || 0,
-          iAmount: iAmount.toFixed(0) || 0,
+          iAmount: this._formatTotal(iAmount.toFixed()) || 0,
           first: aResult[0],
           second: aResult[1],
           third: aResult[2],
@@ -87,13 +108,16 @@ sap.ui.define(
 
         if (aResult[4]) {
           oModel["etcName"] = aResult[4].biz_tp_account_nm
-          oModel["etcCount"] = iCount - 4;
+          oModel["etcCount"] = aResult[4].record_count
           oModel["etcAmount"] = aResult[4].total_target_amt;
-          oModel["etcReason"] = aResult[4].deselected_reason
         }
 
         this._oEventBus.publish("aiReport", "comBauData", oModel)
         this.getOwnerComponent().setModel(new JSONModel(oModel), "Model");
+
+        if (this._bFlag) {
+          this.dataLoad();
+        }
 
         let subTitle = `(총 ${iAmount.toFixed(2)}억원 / ${iCount}건)`
         if (this.getOwnerComponent().oCard.getAggregation("_header")) {
@@ -131,7 +155,7 @@ sap.ui.define(
 
         let fNumber = parseFloat(sValue);
         if (Number.isInteger(fNumber)) {
-          let oFormatter = NumberFormat.getIntegerInstance({
+          let oFormatter = NumberFormat.getFloatInstance({
             groupingEnabled: true
           });
           return oFormatter.format(fNumber);
@@ -146,9 +170,10 @@ sap.ui.define(
         }
       },
       dataLoad: function () {
-          this._oEventBus.publish("CardWeekChannel", "CardWeekFullLoad", {
-              cardId: this.getView().getId()
-          })
+        this._oEventBus.publish("CardWeekChannel", "CardWeekFullLoad", {
+          cardId: this.getView().getId()
+        })
+        this._bFlag = false;
       },
 
     })

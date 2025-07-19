@@ -54,6 +54,7 @@ module.exports = (srv) => {
 
             if (!orgInfo) return '조직 조회 실패'; // 화면 조회 시 유효하지 않은 조직코드 입력시 예외처리 추가 필요 throw error
 
+            let a_not_secured_data = ['Lead', 'Identified', 'Validated', 'Qualified', 'Negotiated']
 
             // 월 기준
             if (type === "month") {
@@ -84,7 +85,7 @@ module.exports = (srv) => {
                 rodr_column.push(`${s_rodr_total} as total_data`);
                 count_column.push(`${s_count_total} as total_data`);
 
-                const pl_where = { 'year': year, [orgInfo.org_level]: orgInfo.org_ccorg_cd, biz_tp_account_cd: account_cd, weekly_yn: false };
+                const pl_where = { 'year': year, [orgInfo.org_level]: orgInfo.org_ccorg_cd, biz_tp_account_cd: account_cd, weekly_yn: false, 'deal_stage_cd': { in: a_not_secured_data } };
                 const pl_groupBy = ['cstco_cd'];
 
                 // customer 설정
@@ -165,7 +166,7 @@ module.exports = (srv) => {
                     `'건수' as type`,
                 ];
 
-                const pl_where = { 'year': year, [orgInfo.org_level]: orgInfo.org_ccorg_cd, biz_tp_account_cd: account_cd, weekly_yn: false };
+                const pl_where = { 'year': year, [orgInfo.org_level]: orgInfo.org_ccorg_cd, biz_tp_account_cd: account_cd, weekly_yn: false, 'deal_stage_cd': { in: a_not_secured_data } };
                 const pl_groupBy = ['cstco_cd'];
 
                 // customer 설정
@@ -213,13 +214,13 @@ module.exports = (srv) => {
 
                 const sale_column = ['cstco_cd',
                     `sum(${s_sale_total}) as total_data`,
-                    `sum(case when ${s_sale_total} <= 100000000 then ${s_sale_total} else 0 end) as amt1`,
-                    `sum(case when ${s_sale_total} > 100000000 and ${s_sale_total} <= 500000000 then ${s_sale_total} else 0 end) as amt2`,
-                    `sum(case when ${s_sale_total} > 500000000 and ${s_sale_total} <= 1000000000 then ${s_sale_total} else 0 end) as amt3`,
-                    `sum(case when ${s_sale_total} > 1000000000 and ${s_sale_total} <= 3000000000 then ${s_sale_total} else 0 end) as amt4`,
-                    `sum(case when ${s_sale_total} > 3000000000 and ${s_sale_total} <= 5000000000 then ${s_sale_total} else 0 end) as amt5`,
-                    `sum(case when ${s_sale_total} > 5000000000 and ${s_sale_total} <= 10000000000 then ${s_sale_total} else 0 end) as amt6`,
-                    `sum(case when ${s_sale_total} > 10000000000 then ${s_sale_total} else 0 end) as amt7`,
+                    `sum(case when ${s_rodr_total} <= 100000000 then ${s_sale_total} else 0 end) as amt1`,
+                    `sum(case when ${s_rodr_total} > 100000000 and ${s_rodr_total} <= 500000000 then ${s_sale_total} else 0 end) as amt2`,
+                    `sum(case when ${s_rodr_total} > 500000000 and ${s_rodr_total} <= 1000000000 then ${s_sale_total} else 0 end) as amt3`,
+                    `sum(case when ${s_rodr_total} > 1000000000 and ${s_rodr_total} <= 3000000000 then ${s_sale_total} else 0 end) as amt4`,
+                    `sum(case when ${s_rodr_total} > 3000000000 and ${s_rodr_total} <= 5000000000 then ${s_sale_total} else 0 end) as amt5`,
+                    `sum(case when ${s_rodr_total} > 5000000000 and ${s_rodr_total} <= 10000000000 then ${s_sale_total} else 0 end) as amt6`,
+                    `sum(case when ${s_rodr_total} > 10000000000 then ${s_sale_total} else 0 end) as amt7`,
                     `'매출' as type`,
                 ];
 
@@ -247,7 +248,7 @@ module.exports = (srv) => {
                     `'건수' as type`,
                 ];
 
-                const pl_where = { 'year': year, [orgInfo.org_level]: orgInfo.org_ccorg_cd, biz_tp_account_cd: account_cd, weekly_yn: false };
+                const pl_where = { 'year': year, [orgInfo.org_level]: orgInfo.org_ccorg_cd, biz_tp_account_cd: account_cd, weekly_yn: false, 'deal_stage_cd': { in: a_not_secured_data } };
                 const pl_groupBy = ['cstco_cd'];
 
                 // customer 설정

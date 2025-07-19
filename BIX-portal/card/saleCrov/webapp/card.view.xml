@@ -23,6 +23,7 @@
                     id="sideBox"
                     width="35%"
                     justifyContent="Center"
+                    class="sapUiTinyMarginTop"
                 >
                     <HBox
                         justifyContent="SpaceBetween"

@@ -13,9 +13,7 @@ sap.ui.define([
     "use strict";
 
     return Controller.extend("bix.card.forecastPlUiTable.Main", {
-        _sTableId: "forecastPlUiTable",
         _oEventBus: EventBus.getInstance(),
-
 
         onInit: function () {
             this._oEventBus.subscribe("pl", "search", this._bindTable, this);
@@ -23,9 +21,7 @@ sap.ui.define([
             this._oEventBus.subscribe("pl", "selectMasterTable", this.onRowSelectionChange, this);
             this._bindTable();
         },
-        onAfterRendering: function () {
-            let oTable = this.byId(this._sTableId);           
-        },
+
         /**
          * Pl 대시보드 검색 이벤트
          * @param {Event} oEvent 
@@ -41,7 +37,7 @@ sap.ui.define([
             let sOrgId = oData.orgId;
 
             // 새로운 테이블 경로
-            let oTable = this.byId(this._sTableId);
+            let oTable = this.byId("table");
             let sLastPath = oTable.getBinding("rows")?.getPath();
             let sNewPath = `/get_forecast_pl(year='${iYear}',month='${sMonth}',org_id='${sOrgId}')`
 
@@ -67,7 +63,7 @@ sap.ui.define([
             })
 
             await Module.setTableMergeWithAltColor(oTable);
-            // console.log(oTable.getBinding("rows"));
+            // //console.log(oTable.getBinding("rows"));
             
             // 날짜 입력 값 받아 수정
             // let oTemp = { year: String(sYear).substring(2) };
@@ -135,44 +131,41 @@ sap.ui.define([
          * PL 테이블 행 클릭 이벤트
          * @param {Event} oEvent 
          */
-        onRowSelectionChange: function (oEvent, sEventId, oData) {
+        onRowSelectionChange: function (oEvent, sEventId, oEventData) {
             if(!sEventId){
                 let oContext = oEvent.getParameters()["rowContext"];
     
                 // type이 SG&A일 때
                 let oBindingObject = oContext?.getObject();
-                if (oBindingObject?.type === "매출") {
+                if (oBindingObject?.type === "매출" || oBindingObject?.type === "마진") {
                     this._oEventBus.publish("pl", "detail", { detail: "saleMargin" });
                 } else if (oBindingObject?.type === "SG&A") {
-                    // this._oEventBus.publish("pl", "detail", { detail: "sga" });
+                    this._oEventBus.publish("pl", "detail", { detail: "sga" });
                 }
     
-                let oTable = this.byId("forecastPlUiTable");
+                let oTable = this.byId("table");
                 if(oTable.getSelectedIndex() !== -1){
                     const aHash = window.location.hash.split('#/')[2];
                     const oUrlParams = aHash.split('/')
                     this._oEventBus.publish("pl", "selectMasterTable",  { detail: oUrlParams[2], page: oUrlParams[0], table:'pl' });
                 }
             }else{
-                if(oData['page'] === "plan"){
-                    let oTable = this.byId("forecastPlUiTable");
-                    if (oData['table'] === "oi") {
-                        oTable.setSelectedIndex(-1)
-                        return
+                if(oEventData['page'] === "plan"){
+                    let oTable = this.byId("table");
+                    if (!oTable) return;
+
+                    // detail에 따른 테이블(pl, oi) 분기처리
+                    let sTableType = (oEventData['detail'] === 'saleMargin' || oEventData['detail'] === 'sga') ? "pl" : "oi";
+                    if (sTableType === "oi") {
+                        oTable.setSelectedIndex(-1);
+                        return;
                     }
-                    if (oData['table'] === "pl") {
-                        return
-                    }
-                    let sType = oData['detail'] === 'saleMargin' ? "매출" : oData['detail'] === 'sga' ? "SG&A" : null
-                    if(!oTable) return;
-                    let aRows = oTable.getBinding("rows").getContexts();
-                    let iIndex = -1
-                    aRows.forEach(a=>{
-                        if (a.getObject()['type'] === sType){
-                            iIndex = a.getIndex()
-                        }
-                    })
-                    oTable.setSelectedIndex(iIndex)
+
+                    // 타입에 맞는 행 선택
+                    let sType = oEventData['detail'] === 'saleMargin' ? "매출" : oEventData['detail'] === 'sga' ? "사업 SG&A" : null
+                    let aBindingData = oTable.getBinding("rows").getContexts().map(oData => oData.getObject());
+                    let index = aBindingData.findIndex(oData => oData["type"] === sType) ?? -1;
+                    oTable.setSelectedIndex(index);
                 }
             }
 
@@ -374,7 +367,7 @@ sap.ui.define([
             }
         },
         _clearSelection: function () {
-            let oTable = this.byId("forecastPlUiTable");
+            let oTable = this.byId("table");
             if (oTable.getSelectedIndices().length > 0) {
                 oTable.clearSelection();
             }

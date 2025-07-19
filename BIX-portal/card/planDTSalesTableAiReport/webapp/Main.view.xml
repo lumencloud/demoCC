@@ -19,7 +19,7 @@
         
         <content>
             <VBox height="100%" width="100%">
-                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'org'}" class="custom-vbox-wrap-table" height="100%">
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/subKey} === 'org'}" class="custom-vbox-wrap-table" height="100%">
                     <table:Table
                         id="planDTSalesTable1"
                         rows="{path:'/'}"
@@ -36,8 +36,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false"/>
                                 <ToolbarSeparator visible="false"/>
@@ -85,7 +85,7 @@
                                         wrapping="false"
                                     />
                                     <Label
-                                        text="추정"
+                                        text="합계"
                                         textAlign="Center"
                                         width="100%"
                                     />
@@ -274,7 +274,7 @@
                     </table:Table>
                 </VBox>
 
-                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'org_delivery'}" class="custom-vbox-wrap-table" height="100%">
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/subKey} === 'org_delivery'}" class="custom-vbox-wrap-table" height="100%">
                     <table:Table
                         id="planDTSalesTable2"
                         rows="{path:'/'}"
@@ -291,8 +291,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false"/>
                                 <ToolbarSeparator visible="false"/>
@@ -340,7 +340,7 @@
                                         wrapping="false"
                                     />
                                     <Label
-                                        text="추정"
+                                        text="합계"
                                         textAlign="Center"
                                         width="100%"
                                     />
@@ -529,7 +529,7 @@
                     </table:Table>
                 </VBox>
 
-                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'org_account'}" class="custom-vbox-wrap-table" height="100%">
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/subKey} === 'org_account'}" class="custom-vbox-wrap-table" height="100%">
                     <table:Table
                         id="planDTSalesTable3"
                         rows="{path:'/'}"
@@ -546,8 +546,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false"/>
                                 <ToolbarSeparator visible="false"/>
@@ -595,7 +595,7 @@
                                         wrapping="false"
                                     />
                                     <Label
-                                        text="추정"
+                                        text="합계"
                                         textAlign="Center"
                                         width="100%"
                                     />
@@ -784,7 +784,7 @@
                     </table:Table>
                 </VBox>
 
-                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'account'}" class="custom-vbox-wrap-table" height="100%">
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/subKey} === 'account'}" class="custom-vbox-wrap-table" height="100%">
                     <table:Table
                         id="planDTSalesTable4"
                         rows="{path:'/'}"
@@ -801,8 +801,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" visible="false" />
                                 <ToolbarSeparator visible="false" />
@@ -854,7 +854,7 @@
                                         wrapping="false"
                                     />
                                     <Label
-                                        text="추정"
+                                        text="합계"
                                         textAlign="Center"
                                         width="100%"
                                     />
@@ -1011,7 +1011,7 @@
                     </table:Table>
                 </VBox>
                 
-                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'task'}" class="custom-vbox-wrap-table" height="100%">
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/subKey} === 'task'}" class="custom-vbox-wrap-table" height="100%">
                     <table:Table
                         id="planDTSalesTable5"
                         rows="{path:'/'}"
@@ -1027,8 +1027,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" />
                                 <ToolbarSeparator />
@@ -1078,7 +1078,7 @@
                                         wrapping="false"
                                     />
                                     <Label
-                                        text="추정"
+                                        text="합계"
                                         textAlign="Center"
                                         width="100%"
                                     />
@@ -1266,7 +1266,7 @@
 
                 </VBox>
                 
-                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'member_year'}" class="custom-vbox-wrap-table" height="100%">
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/subKey} === 'member_year'}" class="custom-vbox-wrap-table" height="100%">
                     <table:Table
                         id="planDTSalesTable6"
                         class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
@@ -1281,8 +1281,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" />
                                 <ToolbarSeparator />
@@ -1295,7 +1295,7 @@
                     </table:Table>
                 </VBox>
 
-                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/aiSubKey} === 'task_year'}" class="custom-vbox-wrap-table" height="100%">
+                <VBox busyIndicatorDelay="0" visible="{=${uiModel>/subKey} === 'task_year'}" class="custom-vbox-wrap-table" height="100%">
                     <table:Table
                         id="planDTSalesTable7"
                         rows="{path:'/'}"
@@ -1311,8 +1311,8 @@
                         <table:extension>
                             <OverflowToolbar width="100%" height="3rem" style="Standard" class="custom-aireport-header">
 
-                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="26px" height="23px"/>
-                                <Text text="세부데이터"/>
+                                <Image src="./resource/icon/aipopup/aipopup_icon01.png" width="24px" height="24px"/>
+                                <Text text="세부 데이터" class="table-title"/>
                                 <ToolbarSpacer />
                                 <Button text="엑셀 다운로드" class="custom-text-semibold" icon="sap-icon://excel-attachment" type="Neutral" press="onExcelDownload" />
                                 <ToolbarSeparator />

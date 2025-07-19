@@ -14,6 +14,15 @@
 				"Component",
 				"Card"
 			]
+		},		
+		"dataSources": {			
+			"cmService": {
+				"uri": "../../../odata/v4/cm/",
+				"type": "OData",
+				"settings": {
+				"odataVersion": "4.0"
+				}
+			}
 		}
 	},
 	"sap.ui": {
@@ -25,7 +34,17 @@
 		}
 	},
 	"sap.ui5": {
-		"models": {},
+		"models": {		
+			"cm": {
+				"dataSource": "cmService",
+				"preload": true,
+				"settings": {
+				"operationMode": "Server",
+				"autoExpandSelect": true,
+				"earlyRequests": true
+				}
+			}
+		},
 		"resources": {
 			"css": [
 				{
