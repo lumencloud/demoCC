@@ -1,5 +1,5 @@
-using dashboard as dashboard from '../../../db/cds/common/dashboard';
-using common as common from '../../../db/cds/common/dashboard';
+using common.dashboard_set as dashboard_set_ from '../../../db/cds/common/dashboard_set';
+using common as common from '../../../db/cds/common/dashboard_content';
 using common.card_list_view as common_card_list_view from '../../../db/cds/common/view/card_list_view';
 
 @impl    : 'srv/handlers/common/publish_srv.js'
@@ -17,19 +17,7 @@ service PublishService {
         },
         {grant: 'READ'}
     ]
-    entity Menu              as projection on dashboard.Menu;
-
-    @restrict: [
-        {
-            grant: [
-                'CREATE',
-                'UPDATE'
-            ],
-            to   : 'bix-portal-system-admin'
-        },
-        {grant: 'READ'}
-    ]
-    entity dashboard_set     as projection on dashboard.dashboard_set;
+    entity dashboard_set     as projection on dashboard_set_;
 
     @restrict: [
         {
@@ -42,16 +30,7 @@ service PublishService {
         {grant: 'READ'}
     ]
     entity dashboard_content as projection on common.dashboard_content;
-
-    view GetGroupMenuDetail as select from dashboard.GetGroupMenuDetail;
-    view GetMenuTarget as select from dashboard.GetMenuTarget;
-    view GetHomeRoutableMenu as select from dashboard.GetMenuView;
-    view GetMenuContent as select from dashboard.GetMenuContent;
-    view GetAllCardList as select from dashboard.GetAllCardList;
-    view GetGroupMenuAll as select from dashboard.GetGroupMenuAll;
-    view GetGroupMenuGroup as select from dashboard.GetGroupMenuGroup;
-    view GetMyWorkCheck as select from dashboard.GetMyWorkCheck;
-    view GetCode as select from dashboard.GetCode;
+    
     /**
      * 명칭 수정 필요
      */

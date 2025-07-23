@@ -12,6 +12,10 @@ using from '../../../db/cds/pl/view/sfdc_contract_view';
 using from '../../../db/cds/pl/view/wideview_rodr_org_view';
 using from '../../../db/cds/sga/view/wideview_unpivot_view';
 using from '../../../db/cds/common/view/target_view';
+using from '../../../db/cds/common/view/account_view';
+using from '../../../db/cds/common/view/dt_task_view';
+using from '../../../db/cds/common/account_customer_map';
+using from '../../../db/cds/common/account_org_map';
 using from '../../../db/cds/pl/sfdc_contract';
 using from '../../../db/cds/sc/pl_wideview';
 using from '../../../db/cds/oi/view/wideview_view';
@@ -43,7 +47,7 @@ service PL_Service {
     /**
      * [실적PL] PL 디테일 테이블 pl 데이터 호출 API
      */
-    function get_actual_pl_org_detail(year : String(4), month : String(2), org_id : String(10))                                                               returns array of oPlOrgDetailResult;
+    // function get_actual_pl_org_detail(year : String(4), month : String(2), org_id : String(10))                                                               returns array of oPlOrgDetailResult;
     type oPlOrgDetailResult {}
     /**
      * [실적PL] PL 디테일 테이블 목표 데이터 호출 API
@@ -60,17 +64,17 @@ service PL_Service {
     function get_actual_non_mm_account_oi(year : String(4), month : String(2), org_id : String(10))                                                           returns array of oRes;
     function get_actual_non_mm_lob_oi(year : String(4), month : String(2), org_id : String(10))                                                               returns array of oRes;
     function get_actual_sale_org_pl(year : String(4), month : String(2), org_id : String(10), org_tp : String(20), display_type : String(10))                                            returns array of oRes;
-    function get_actual_sale_org_pl_total(year : String(4), month : String(2))                                                                                returns array of oRes;
+    // function get_actual_sale_org_pl_total(year : String(4), month : String(2))                                                                                returns array of oRes;
     function get_actual_sale_sub_company_pl(year : String(4), month : String(2), org_id : String(10))                                                         returns array of oRes;
     function get_actual_sale_account_pl(year : String(4), month : String(2), org_id : String(10), display_type : String(10))                                  returns array of oRes;
     function get_actual_sale_relsco_pl(year : String(4), month : String(2), org_id : String(10))                                                              returns array of oRes;
-    function get_actual_sale_relsco_pl_total(year : String(4), month : String(2))                                                                             returns array of oRes;
+    // function get_actual_sale_relsco_pl_total(year : String(4), month : String(2))                                                                             returns array of oRes;
     function get_actual_sale_crov_pl(year : String(4), month : String(2), org_id : String(10))                                                                returns array of oRes;
-    function get_actual_sale_crov_pl_total(year : String(4), month : String(2))                                                                               returns array of oRes;
+    // function get_actual_sale_crov_pl_total(year : String(4), month : String(2))                                                                               returns array of oRes;
     function get_actual_dt_account_oi(year : String(4), month : String(2), org_id : String(10))                                                               returns array of oRes;
     function get_actual_rohc_org_oi(year : String(4), month : String(2), org_id : String(10))                                                                 returns array of oRes;
     function get_actual_rohc_account_oi(year : String(4), month : String(2), org_id : String(10))                                                             returns array of oRes;
-    function get_actual_sale_chart_pl(year : String(4), month : String(2), org_id : String(10))                                                               returns array of oRes;
+    // function get_actual_sale_chart_pl(year : String(4), month : String(2), org_id : String(10))                                                               returns array of oRes;
     function get_cstco_by_biz_account(year : String(4), month : String(2), org_id : String(10), account_cd : String(30))                                      returns array of oRes;
     function get_cstco_by_biz_account_dt(year : String(4), month : String(2), org_id : String(10), account_cd : String(30))                                   returns array of oRes;
     function get_plan_cstco_by_biz_account(year : String(4), month : String(2), org_id : String(10), account_cd : String(30))                                 returns array of oRes;
@@ -180,7 +184,7 @@ service PL_Service {
     /**
      * [추정PL] OI 테이블 데이터 호출 API
      */
-    function get_plan_dt_sale(year : String(4), org_id : String(10))                                                                                          returns array of oDtRes;
+    // function get_plan_dt_sale(year : String(4), org_id : String(10))                                                                                          returns array of oDtRes;
 
     type oDtRes {
         display_order    : Integer; // seq
@@ -192,15 +196,15 @@ service PL_Service {
         plan_ratio       : Double;
     };
 
-    function get_plan_dt_sale_excel(year : String(4), org_id : String(10))                                                                                    returns array of oDtExcelRes;
+    // function get_plan_dt_sale_excel(year : String(4), org_id : String(10))                                                                                    returns array of oDtExcelRes;
     type oDtExcelRes {};
     function get_actual_br_org_detail(year : String(4), month : String(2), org_id : String(10))                                                               returns array of oBrOrgDetail;
     type oBrOrgDetail {};
     /**
      * [월별 실적PL] PL 테이블 데이터 호출 api
      */
-    function get_actual_m_pl(year : String(4), month : String(2), org_id : String(10))                                                                        returns array of oMonthly;
-    function get_actual_m_pl_total(year : String(4), month : String(2))                                                                                       returns array of oMonthly;
+    // function get_actual_m_pl(year : String(4), month : String(2), org_id : String(10))                                                                        returns array of oMonthly;
+    // function get_actual_m_pl_total(year : String(4), month : String(2))                                                                                       returns array of oMonthly;
     function get_actual_m_pl_total_org(year : String(4), month : String(2), org_id : String(10))                                                              returns array of oMonthly;
     function get_ai_forecast_m_pl(year : String(4), month : String(2), org_id : String(10), org_tp : String(10))                                              returns array of oMonthly;
     function get_ai_forecast_pl(year : String(4), org_id : String(10), org_tp : String(10))                                                                   returns array of oMonthly;
@@ -215,7 +219,7 @@ service PL_Service {
     /**
      * [월별 추정 Trend] 월별 추정 Trend 테이블 데이터 호출 api
      */
-    function get_forecast_trend(year : String(4), org_id : String(10))                                                                                        returns array of oMonthly;
+    // function get_forecast_trend(year : String(4), org_id : String(10))                                                                                        returns array of oMonthly;
 
     type oMonthly {
         display_order : Integer;
@@ -259,7 +263,7 @@ service PL_Service {
         m_12_data     : Double;
     }
 
-    function get_forecast_m_pl_excel(year : String(4), org_id : String(10))                                                                                   returns array of oMonthlyForecastExcel;
+    // function get_forecast_m_pl_excel(year : String(4), org_id : String(10))                                                                                   returns array of oMonthlyForecastExcel;
     type oMonthlyForecastExcel {}
     // /**
     //  * [추정 미확보PL] 추정 미확보PL pipeline 테이블 데이터 호출 api
@@ -272,6 +276,7 @@ service PL_Service {
     function get_forecast_pl_pipeline_detail(year : String(4), month : String(2), org_id : String(10), type : String(10), display_type : String(10))          returns array of oForecastPipelineDetail;
     type oForecastPipelineDetail {}
     function get_forecast_pl_pipeline_org_detail(year : String(4), month : String(2), org_id : String(10), ai_flag : Boolean)                                                    returns array of oForecastPipelineOrgDetail;
+    function get_forecast_pl_pipeline_org_chart(year : String(4), month : String(2), org_id : String(10), type : String(5), ai_flag : Boolean)                                                    returns array of oForecastPipelineOrgDetail;
     type oForecastPipelineOrgDetail {}
     /**
      * [추정 미확보PL] 추정 미확보PL pipeline 디테일 테이블 데이터 호출 api
@@ -286,7 +291,7 @@ service PL_Service {
     /**
      * [월별 추정 미확보PL] PL 전체 데이터 엑셀 다운로드 호출 api
      */
-    function get_actual_pl_excel(year : String(4), month : String(2), org_id : String(10))                                                                    returns array of oPlExcel;
+    // function get_actual_pl_excel(year : String(4), month : String(2), org_id : String(10))                                                                    returns array of oPlExcel;
 
     type oPlExcel {
         // lv1_id;
@@ -312,14 +317,14 @@ service PL_Service {
     /**
      * [실적PL] DT과제별 연간 총 수주금액 테이블 데이터 호출 API
      */
-    function get_rodr_dt_y()                                                                                                                                  returns array of oRodrDtYearResult;
+    // function get_rodr_dt_y()                                                                                                                                  returns array of oRodrDtYearResult;
     type oRodrDtYearResult {}
-    function get_rodr_dt_y_excel()                                                                                                                            returns array of oRodrDtYearExcelResult;
+    // function get_rodr_dt_y_excel()                                                                                                                            returns array of oRodrDtYearExcelResult;
     type oRodrDtYearExcelResult {}
     /**
      * [실적PL] ACCOUNT별 연간 총 수주금액 테이블 데이터 호출 API
      */
-    function get_rodr_account_y()                                                                                                                             returns array of oRodrAccountYearResult;
+    // function get_rodr_account_y()                                                                                                                             returns array of oRodrAccountYearResult;
     type oRodrAccountYearResult {}
     function get_rodr_account_y_excel()                                                                                                                       returns array of oRodrAccountYearExcelResult;
     type oRodrAccountYearExcelResult {}
@@ -395,10 +400,10 @@ service PL_Service {
     function get_actual_m_pl_oi(year : String(4), month : String(2), org_id : String(10), org_tp : String(15))                                                returns array of oActualMPlOiRes;
     type oActualMPlOiRes {};
     // ai account 6p 당월 누계 실적
-    function get_actual_m_account_pl_oi(year : String(4), month : String(2), org_id : String(10))                                                             returns array of oActualMAccountPlOiRes;
+    // function get_actual_m_account_pl_oi(year : String(4), month : String(2), org_id : String(10))                                                             returns array of oActualMAccountPlOiRes;
     type oActualMAccountPlOiRes {};
     // ai 7p 당월 누계 목표 대비 실적
-    function get_actual_m_target_pl_oi(year : String(4), month : String(2), org_id : String(10))                                                              returns array of oActualMTargetPlOiRes;
+    // function get_actual_m_target_pl_oi(year : String(4), month : String(2), org_id : String(10))                                                              returns array of oActualMTargetPlOiRes;
     type oActualMTargetPlOiRes {};
     // ai 8p 당월 BR 현황
     function get_actual_m_br_org_detail(year : String(4), month : String(2), org_id : String(10), org_tp : String(15))                                        returns array of oActualMBrOrgRes;
@@ -416,7 +421,7 @@ service PL_Service {
     function get_actual_m_rate_gap_pl_oi(year : String(4), month : String(2), org_id : String(10), org_tp : String(15))                                       returns array of oActualMRateGapRes;
     type oActualMRateGapRes {};
     // 추가- ai account 6p 전년동기 대비 진척도 gap
-    function get_actual_m_account_rate_gap_pl_oi(year : String(4), month : String(2), org_id : String(10))                                                    returns array of oActualMAccountRateGapRes;
+    // function get_actual_m_account_rate_gap_pl_oi(year : String(4), month : String(2), org_id : String(10))                                                    returns array of oActualMAccountRateGapRes;
     type oActualMAccountRateGapRes {};
     // ai 8p account별 매출,마진,마진율 현황
     function get_actual_m_account_sale_pl(year : String(4), month : String(2), org_id : String(10), org_tp : String(15))                                      returns array of oActualMAccountSaleRes;

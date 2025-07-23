@@ -1,4 +1,4 @@
-using dashboard.dashboard_set as dashboard_set from './dashboard';
+using common.dashboard_set as dashboard_set from './dashboard_set';
 
 namespace common;
 

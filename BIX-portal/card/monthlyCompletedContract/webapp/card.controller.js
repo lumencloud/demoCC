@@ -14,7 +14,17 @@ sap.ui.define(
 
       onInit: function () {
         // this._dataSetting();
-        this._oEventBus.subscribe("aireport", "contract", this._modelSetting, this)
+        this._oEventBus.subscribe("aireport", "contract", this._modelSetting, this);
+        this._oEventBus.publish("aireport", "isCardSubscribed");
+        this._oEventBus.subscribe("aireport", "setBusy", this._setBusy, this);
+
+        this._setModel();
+      },
+      _setModel: function () {
+        this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+      },
+      _setBusy: function () {
+        this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
       },
 
       _dataSetting: async function () {
@@ -41,7 +51,6 @@ sap.ui.define(
             Module.displayStatusForEmpty(this.getOwnerComponent().oCard, aResult.value, this.byId("cardContent"));
             this._modelSetting(aResult.value);
 
-            this.dataLoad();
           }.bind(this))
           .catch((oErr) => {
             Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
@@ -104,6 +113,7 @@ sap.ui.define(
         }
        
         this.dataLoad();
+        this.getView().getModel("ui").setProperty("/bBusyFlag", false);
         this._oEventBus.publish("aiReport", "comMonthData", oModel)
         this.getOwnerComponent().setModel(new JSONModel(oModel), "Model");
 

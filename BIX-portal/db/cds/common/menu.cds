@@ -4,14 +4,12 @@ using {
     cuid,
     managed
 } from '@sap/cds/common';
-using common.i18n as i18n from './i18n';
 
 /**
  * 메뉴 테이블
  */
 entity menu : cuid, managed {
     name             : String(30);
-    i18nTitle        : Association to one i18n;
     sort_order       : Integer;
     description      : String(200);
     iconSrc          : String(100);
@@ -40,6 +38,4 @@ entity menu : cuid, managed {
     Parent           : Association to one menu;
     Child            : Composition of many menu
                            on Child.Parent = $self;
-// Roles       : Composition of many RoleMenuMappings
-//                   on Roles.menu = $self;
 }

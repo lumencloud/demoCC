@@ -62,7 +62,7 @@ sap.ui.define([
 
             oBox.addItem(oHTML);
 
-            oHTML.attachEvent("afterRendering", function () {
+            oHTML.attachEventOnce("afterRendering", function () {
                 const ctx = document.getElementById("monthlyChart").getContext("2d");
 
                 const cData = {
@@ -149,7 +149,7 @@ sap.ui.define([
         //     });
         //     oBox.addItem(oHTML);
 
-        //     oHTML.attachEvent("afterRendering", function () {
+        //     oHTML.attachEventOnce("afterRendering", function () {
 
         //         // 데이터 설정
         //         const data = {

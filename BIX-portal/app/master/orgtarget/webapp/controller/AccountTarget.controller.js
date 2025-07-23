@@ -97,11 +97,13 @@ sap.ui.define([
                         fieldGroupIds:'Input',
                         value:{
                             path:`addTargetModel>new_${oProperty['value']}_data`,
-                            type:'sap.ui.model.type.Integer',
+                            type:'sap.ui.model.type.Float',
                             formatOptions:{
                                 groupSeparator: ',',
                                 groupingEnabled: true,
-                                maxIntegerDigits: 99
+                                maxIntegerDigits: 99,
+                                minFractionDigits:0,
+                                maxFractionDigits: 2
                             }
                         },
                         visible:'{uiModel>/edit}',
@@ -222,11 +224,13 @@ sap.ui.define([
                         placeholder:'금액 입력',
                         value:{
                             path:`excelUploadModel>${oProperty['value']}`,
-                            type:'sap.ui.model.type.Integer',
+                            type:'sap.ui.model.type.Float',
                             formatOptions:{
                                 groupSeparator: ',',
                                 groupingEnabled: true,
-                                maxIntegerDigits: 99
+                                maxIntegerDigits: 99,
+                                minFractionDigits:0,
+                                maxFractionDigits: 2
                             }
                         },
                         liveChange: ($event) => { this.onExcelUploadLiveChange($event,'Number')},
@@ -534,7 +538,7 @@ sap.ui.define([
                     oSource.setValueStateText("Account를 입력해주세요.");
                 }
             } else if (sFlag === "Number") { // 숫자
-                if(Number(sValue) === 0 && !sValuePath.includes("A02") && sValue.includes(".")) {                   // 0일때 0넣기
+                if(Number(sValue) === 0 && !sValue.includes(".")) {                   // 0일때 0넣기
                     oValueModel.setProperty(sValuePath, 0);
                     oSource.setValue(0);
                     oSource.setValueState(coreLib.ValueState.None);
@@ -542,7 +546,16 @@ sap.ui.define([
                 else {   // 값이 있을 때 유효성 검사
                     let sNewValue = this._validateField(sValue, sFlag);
                     if (sNewValue !== null) { // 값이 유효할 때
-                        if(!sValuePath.includes("A02") || (sValuePath.includes("A02") && sNewValue.split(".")[1] !== '')){
+                        if(sNewValue.includes('.')){
+                            let aPart = sNewValue.split('.');
+                            if(aPart[1].length>2){
+                                sNewValue = aPart[0] + '.' + aPart[1].substr(0,2);
+                            }
+                            if(aPart[1] !== '' && aPart[1] !== '0'){
+                                oSource.setValue(Number(sNewValue))
+                                oValueModel.setProperty(sValuePath, Number(sNewValue));
+                            }
+                        }else{
                             oValueModel.setProperty(sValuePath, Number(sNewValue));
                         }
 
@@ -680,14 +693,17 @@ sap.ui.define([
                     let sNewValue = this._validateField(sValue, sFlag);
 
                     if (!!sNewValue) { // 값이 유효할 때
-                        const oNumberFormat = NumberFormat.getIntegerInstance({
-                            groupingEnabled: true,
-                            groupingSeparator: ',',
-                        });
-                        let sFormatValue = Number(sNewValue);
-
-                        oSource.setValue(sFormatValue);
-                        oSource.setValueState(coreLib.ValueState.None);
+                        if(sNewValue.includes('.')){
+                            let aPart = sNewValue.split('.');
+                            if(aPart[1].length>2){
+                                sNewValue = aPart[0] + '.' + aPart[1].substr(0,2);
+                            }
+                            if(aPart[1] !== '' && aPart[1] !== '0'){
+                                oSource.setValue(Number(sNewValue))
+                            }
+                        }else{
+                            oSource.setValue(Number(sNewValue))
+                        }
                     } else {    // 유효하지 않을 때
                         oSource.setValue(sLastValue);
                         oSource.setValueState(coreLib.ValueState.Error);

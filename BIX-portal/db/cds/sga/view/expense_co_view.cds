@@ -18,30 +18,27 @@ view expense_co_view as
             ccorg_cd,
             gl_account,
             commitment_item,
-            sum(co_m1_amt) as co_m1_amt : Decimal(18,2) @title : '1월 위임 비용',
-            sum(co_m2_amt) as co_m2_amt : Decimal(18,2) @title : '2월 위임 비용',
-            sum(co_m3_amt) as co_m3_amt : Decimal(18,2) @title : '3월 위임 비용',
-            sum(co_m4_amt) as co_m4_amt : Decimal(18,2) @title : '4월 위임 비용',
-            sum(co_m5_amt) as co_m5_amt : Decimal(18,2) @title : '5월 위임 비용',
-            sum(co_m6_amt) as co_m6_amt : Decimal(18,2) @title : '6월 위임 비용',
-            sum(co_m7_amt) as co_m7_amt : Decimal(18,2) @title : '7월 위임 비용',
-            sum(co_m8_amt) as co_m8_amt : Decimal(18,2) @title : '8월 위임 비용',
-            sum(co_m9_amt) as co_m9_amt : Decimal(18,2) @title : '9월 위임 비용',
-            sum(co_m10_amt) as co_m10_amt : Decimal(18,2) @title : '10월 위임 비용',
-            sum(co_m11_amt) as co_m11_amt : Decimal(18,2) @title : '11월 위임 비용',
-            sum(co_m12_amt) as co_m12_amt : Decimal(18,2) @title : '12월 위임 비용'
+            sum(co_m1_amt)  as co_m1_amt  : Decimal(18, 2) @title: '1월 위임 비용',
+            sum(co_m2_amt)  as co_m2_amt  : Decimal(18, 2) @title: '2월 위임 비용',
+            sum(co_m3_amt)  as co_m3_amt  : Decimal(18, 2) @title: '3월 위임 비용',
+            sum(co_m4_amt)  as co_m4_amt  : Decimal(18, 2) @title: '4월 위임 비용',
+            sum(co_m5_amt)  as co_m5_amt  : Decimal(18, 2) @title: '5월 위임 비용',
+            sum(co_m6_amt)  as co_m6_amt  : Decimal(18, 2) @title: '6월 위임 비용',
+            sum(co_m7_amt)  as co_m7_amt  : Decimal(18, 2) @title: '7월 위임 비용',
+            sum(co_m8_amt)  as co_m8_amt  : Decimal(18, 2) @title: '8월 위임 비용',
+            sum(co_m9_amt)  as co_m9_amt  : Decimal(18, 2) @title: '9월 위임 비용',
+            sum(co_m10_amt) as co_m10_amt : Decimal(18, 2) @title: '10월 위임 비용',
+            sum(co_m11_amt) as co_m11_amt : Decimal(18, 2) @title: '11월 위임 비용',
+            sum(co_m12_amt) as co_m12_amt : Decimal(18, 2) @title: '12월 위임 비용'
         from (
             select
-                ver,
-                year,
-                month,
+                version.ver,
+                exp_co.year,
+                version.month,
                 case
-                    when
-                        ot.replace_ccorg_cd is not null
-                    then
-                        ot.replace_ccorg_cd
-                    else
-                        exp_co.ccorg_cd
+                    when ot.replace_ccorg_cd is not null
+                         then ot.replace_ccorg_cd
+                    else exp_co.ccorg_cd
                 end as ccorg_cd : String(10) @title: 'ERP Cost Center',
                 gl_account,
                 commitment_item,
@@ -60,12 +57,20 @@ view expense_co_view as
             from sga_expense_co as exp_co
             left join common_org_type as ot
                 on exp_co.ccorg_cd = ot.ccorg_cd
-            where
-                ver in (
-                    select ver from common_version
-                    where
-                           tag = 'C'
-                        or tag = 'Y'
+            inner join common_version as version
+                on (
+                        version.tag  = 'C'
+                    and exp_co.year  = version.year
+                    and exp_co.month = version.month
+                )
+                or (
+                        version.tag  = 'Y'
+                    and exp_co.year  = version.year
+                    and exp_co.month = case
+                                           when version.month = '13'
+                                                then '12'
+                                           else version.month
+                                       end
                 )
         )
         group by

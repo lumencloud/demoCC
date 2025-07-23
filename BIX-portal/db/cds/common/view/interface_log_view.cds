@@ -21,6 +21,7 @@ view interface_log_view as
                 source,
                 table_name,
                 procedure_name,
+                log,
                 case
                     when max(case
                                  when success_yn = true
@@ -39,7 +40,8 @@ view interface_log_view as
                 if_step,
                 source,
                 table_name,
-                procedure_name
+                procedure_name,
+                log
         ) as log
         left join common_interface_check as chk
             on  log.ver        = chk.ver
@@ -55,6 +57,7 @@ view interface_log_view as
         key table_name,
         key success_yn,
         key createdAt,
+            log,
             procedure_name,
             confirm_yn: Boolean,
             row_count : Integer

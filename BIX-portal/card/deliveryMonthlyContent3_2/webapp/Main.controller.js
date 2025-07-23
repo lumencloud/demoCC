@@ -9,6 +9,7 @@ sap.ui.define([
 
 	return Controller.extend("bix.card.deliveryMonthlyContent3_2.Main", {
 		_oEventBus: EventBus.getInstance(),
+		_bFlag: true, // 카드 로드 예외 처리
 		onInit: function () {
 			// 초기 로딩 상태 설정
 			this.getView().setModel(new JSONModel({
@@ -16,7 +17,7 @@ sap.ui.define([
 				"title": "",
 				"full": ""
 			}), "LLMModel");
-
+			this._oEventBus.publish("aireport", "isCardSubscribed");
 			this._dataSetting();
 		},
 
@@ -218,7 +219,6 @@ sap.ui.define([
 					console.error("보고서 컨텐츠 생성 오류:", error);
 					this._setFallbackData();
 					MessageToast.show("보고서 컨텐츠 생성 중 오류가 발생했습니다.");
-					this.dataLoad();
 				}.bind(this))
 				.finally(function () {
 					oModel.setProperty("/isLoading", false);
@@ -253,11 +253,11 @@ sap.ui.define([
 				oModel.setProperty("/isLoading", false);
 
 				console.log("보고서 컨텐츠 데이터 로드 완료:", oReportData);
-				this.dataLoad();
+					this.dataLoad();
 			} catch (error) {
 				console.error("보고서 컨텐츠 결과 처리 오류:", error);
 				this._setFallbackData();
-				this.dataLoad();
+					this.dataLoad();
 			}
 		},
 
@@ -291,7 +291,6 @@ sap.ui.define([
 			} catch (error) {
 				console.error("보고서 컨텐츠 내용 파싱 오류:", error);
 				console.log("파싱 실패한 원본 내용:", content);
-				this.dataLoad();
 				this._setFallbackData();
 			}
 		},
@@ -371,7 +370,7 @@ Deal Stage별 파이프라인 분석 결과, 초기 단계인 'Lead'가 36건(1,
 		dataLoad: function () {
 			this._oEventBus.publish("CardChannel", "CardFullLoad", {
 				cardId: this.getView().getId()
-			});
-		}
+			})
+		},
 	});
 });

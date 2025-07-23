@@ -14,7 +14,7 @@ sap.ui.define([
         _aContainerId: [],
         _oEventBus: EventBus.getInstance(),
         _oMyChart: [],
-
+        _sOrgTp: undefined,
 
         onInit: function () {
             // component별 id 설정
@@ -22,11 +22,19 @@ sap.ui.define([
 
             // 차트 설정
             // this._setChart();
-
+            this._oEventBus.publish("aireport", "isCardSubscribed");
             this._oEventBus.subscribe("aireport", "allContent3_5", this._setChart, this);	
 
+            this._oEventBus.subscribe("aireport", "setBusy", this._setBusy, this);
 
+			this._setModel();
         },
+        _setModel: function () {
+			this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+		},
+		_setBusy: function () {
+			this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+		},
 
         /**
          * Component별 유일한 ID 생성
@@ -42,8 +50,7 @@ sap.ui.define([
         },
 
         _updateChart: async function (sChannel, sEventId, oData) {
-            // this.byId("cardContent").setBusy(true)
-            this.getOwnerComponent().oCard.setBusy(true);
+            if (this.getView()._sOrgTp !== oData.org_tp) return;
             let aResults = await this._dataSetting(oData.data);
 
             this._oMyChart[0].data.labels = aResults.aLabel
@@ -52,13 +59,14 @@ sap.ui.define([
             this._oMyChart[0].data.datasets[2].data = aResults.aSale
 
             this._oMyChart[0].update();
-            setTimeout(()=>{
-                this.getOwnerComponent().oCard.setBusy(false);
-            }, 300)
+         
         },
 
         _setChart: async function (sChannel, sEventId, oData) {
-            this.byId("cardContent").setBusy(true)
+            if (!this.getView()._sOrgTp) {
+                this.getView()._sOrgTp = oData.org_tp
+            }
+            if (this.getView()._sOrgTp !== oData.org_tp) return;
             // 카드
             const oCard = this.getOwnerComponent().oCard;
 
@@ -77,7 +85,7 @@ sap.ui.define([
             for (let i = 0; i < this._aCanvasId.length; i++) {
                 let oHTML = this.byId("html" + i);
                 oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:450px; height:250px; min-height:250px'><canvas id='${this._aCanvasId[i]}' /></div>`);
-                oHTML.attachEvent("afterRendering", async function () {
+                oHTML.attachEventOnce("afterRendering", async function () {
                     // 차트 구성
                     const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[i])).getContext("2d");
                     //데이터 요청
@@ -234,8 +242,7 @@ sap.ui.define([
                 //this._ovserveResize(this.byId(this._aContainerId[i]), i)
             }.bind(this));
 
-}
-            this.byId("cardContent").setBusy(false)
+        }  this.getView().getModel("ui").setProperty("/bBusyFlag", false);
         },
 
 		dataLoad : function(){

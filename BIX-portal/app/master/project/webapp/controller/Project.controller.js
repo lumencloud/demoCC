@@ -54,11 +54,17 @@ sap.ui.define([
             // 검색창 , UI 초기화
             this.getView().setModel(new JSONModel({ edit: false, hasPendingChanges: false }), "uiModel");
 
-            const oBinding = this.getOwnerComponent().getModel().bindContext("/latest_org", null, {
-                $filter: "parent eq null"
-            });
-            let oRequest = await oBinding.requestObject();
+            const andFilter = new Filter([
+                    new Filter("org_id", FilterOperator.NE, null),
+                    new Filter([
+                        new Filter("org_parent", FilterOperator.EQ, null),
+                        new Filter("org_parent", FilterOperator.EQ, ''),
+                    ], false)
+                ], true)
 
+            const oBinding = this.getOwnerComponent().getModel().bindContext("/org_full_level", null, null, andFilter);
+            let oRequest = await oBinding.requestObject();            
+            
             // 최상위 부모 값
             let oParentOrg = oRequest.value[0];
 

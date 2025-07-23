@@ -16,14 +16,15 @@ sap.ui.define(
       onInit: function () {
         this._dataSetting();
         this._oEventBus.subscribe("aiReport", "dateDataTable", this._dataSetting, this)
+        this._oEventBus.subscribe("aiReport", "dateLoadTable", this._dataSetting, this)
       },
 
-      _dataSetting: async function (oEvent, sEventId) {
+      _dataSetting: async function (oEvent, sEventId, oDataModel) {
         this.byId("cardContent").setBusy(true);
         let { monday, sunday } = this._setDate();
 
-        let oData = JSON.parse(sessionStorage.getItem("aiWeekReport"));
-
+        // let oData = JSON.parse(sessionStorage.getItem("aiWeekReport"));
+        let oData = oDataModel
         const oModel = new ODataModel({
           serviceUrl: "../odata/v4/ai-api/",
           synchronizationMode: "None",
@@ -37,7 +38,9 @@ sap.ui.define(
           function (aResult) {
             Module.displayStatusForEmpty(this.byId("table"), aResult.value, this.byId("cardContent"));
             this._modelSetting(aResult.value);
-           
+            if(sEventId === 'dateDataTable' || sEventId === undefined){
+              this.dataLoad();
+            }
           }.bind(this))
           .catch((oErr) => {
             Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
@@ -82,10 +85,6 @@ sap.ui.define(
           oModel.splice(4, 1)
         }
 
-        if(this._bFlag){
-          this.dataLoad();
-        }
-
         this.getView().setModel(new JSONModel(oModel), "model");
         let oTable = this.byId("table")
         Module.setTableMerge(oTable, "model", 3);
@@ -114,8 +113,6 @@ sap.ui.define(
           monday: this._formatDate(monday),
           sunday: this._formatDate(sunday)
         }
-
-
       },
 
       _formatDate: function (date) {

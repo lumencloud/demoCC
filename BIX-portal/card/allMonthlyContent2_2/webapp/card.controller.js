@@ -18,13 +18,21 @@ sap.ui.define([
         onInit: function () {
             // component별 id 설정
             this._createId();
-
+            this._oEventBus.publish("aireport", "isCardSubscribed");
             // 차트 설정
             // this._setChart();
-
             this._oEventBus.subscribe("aireport", "allContent2_2", this._setChart, this);
+           
+            this._oEventBus.subscribe("aireport", "setBusy", this._setBusy, this);
 
+			this._setModel();
         },
+        _setModel: function () {
+			this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+		},
+		_setBusy: function () {
+			this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+		},
 
         /**
          * Component별 유일한 ID 생성
@@ -40,7 +48,7 @@ sap.ui.define([
         },
 
         _updateChart: async function (sChannel, sEventId, oData) {
-            this.getOwnerComponent().oCard.setBusy(true)
+           
             let aResults = await this._dataSetting(oData.data);
 
             this._oMyChart[0].data.labels = aResults.aLabel
@@ -55,9 +63,7 @@ sap.ui.define([
 
             this.dataLoad();
             this._oMyChart[0].update();
-            setTimeout(() => {
-                this.getOwnerComponent().oCard.setBusy(false);
-            }, 300)
+            
         },
 
         _setChart: async function (sChannel, sEventId, oData) {
@@ -81,7 +87,7 @@ sap.ui.define([
             for (let i = 0; i < this._aCanvasId.length; i++) {
                 let oHTML = this.byId("html" + i);
                 oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:950px; height:380px; min-height:380px'><canvas id='${this._aCanvasId[i]}' /></div>`);
-                oHTML.attachEvent("afterRendering", async function () {
+                oHTML.attachEventOnce("afterRendering", async function () {
                     // 차트 구성
                     const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[i])).getContext("2d");
                     //데이터 요청
@@ -408,7 +414,8 @@ sap.ui.define([
                 }.bind(this));
             }
             this.dataLoad();
-            this.byId("cardContent").setBusy(false)
+            this.getView().getModel("ui").setProperty("/bBusyFlag", false);
+            this.byId("cardContent").setBusy(false);
         },
 
         dataLoad: function () {

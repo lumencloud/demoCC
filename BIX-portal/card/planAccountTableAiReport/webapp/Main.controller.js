@@ -138,8 +138,8 @@ sap.ui.define([
 
         _bindTable: async function (sChannelId, sEventId, oData) {
             // DOM이 없는 경우 Return
-            let oDom = this.getView().getDomRef();
-            if (!oDom) return;
+            // let oDom = this.getView().getDomRef();
+            // if (!oDom) return;
 
             // detailSelect 해시에 따른 Select 선택
             let oSelect = this.byId("detailSelect");
@@ -172,6 +172,10 @@ sap.ui.define([
 
             let oAiData = JSON.parse(sessionStorage.getItem("aiModel"))
             let sOrgId = oAiData.orgId;
+
+            if(!oAiData.orgId){
+                return
+            }
 
             const oModel = new ODataModel({
                 serviceUrl: "../odata/v4/pl_api/",

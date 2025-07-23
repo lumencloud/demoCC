@@ -39,10 +39,11 @@ sap.ui.define(
 
             Module.displayStatusForEmpty(this.getOwnerComponent().oCard, aResult.value, this.byId("cardContent"));
             this._modelSetting(aResult.value);
-         
+
           }.bind(this))
           .catch((oErr) => {
             Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
+            this.dataLoad();
           });
         this.byId("cardContent").setBusy(false);
       },
@@ -99,9 +100,7 @@ sap.ui.define(
           oModel["etcAmount"] = aResult[4].total_target_amt;
         }
 
-        if(this._bFlag){
-          this.dataLoad();
-        }
+        this.dataLoad();
 
         this._oEventBus.publish("aiReport", "comData", oModel)
         this.getOwnerComponent().setModel(new JSONModel(oModel), "Model");

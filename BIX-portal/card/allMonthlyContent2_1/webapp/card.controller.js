@@ -1,4 +1,3 @@
-
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
@@ -14,16 +13,26 @@ sap.ui.define([
         _aContainerId: [],
         _oEventBus: EventBus.getInstance(),
         _oMyChart: [],
+        _sOrgTp: undefined,
 
 
         onInit: function () {
             // component별 id 설정
             this._createId();
-
+            this._oEventBus.publish("aireport", "isCardSubscribed");
             // 차트 설정
             // this._setChart();
-
             this._oEventBus.subscribe("aireport", "allContent2_1", this._setChart, this);
+
+            this._oEventBus.subscribe("aireport", "setBusy", this._setBusy, this);
+
+            this._setModel();
+        },
+        _setModel: function () {
+            this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+        },
+        _setBusy: function () {
+            this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
         },
 
         /**
@@ -40,7 +49,7 @@ sap.ui.define([
         },
 
         _updateChart: async function (sChannel, sEventId, oData) {
-            this.getOwnerComponent().oCard.setBusy(true);
+            if (this.getView()._sOrgTp !== oData.org_tp) return;
             let aResults = await this._dataSetting(oData.data);
 
             this._oMyChart[0].data.labels = aResults.aLabel
@@ -56,15 +65,17 @@ sap.ui.define([
 
             this._oMyChart[0].update();
             this.dataLoad();
-            setTimeout(()=>{
-                this.getOwnerComponent().oCard.setBusy(false);
-            }, 300)
         },
 
         _setChart: async function (sChannel, sEventId, oData) {
+            if (!this.getView()._sOrgTp) {
+                this.getView()._sOrgTp = oData.org_tp
+            }
+            if (this.getView()._sOrgTp !== oData.org_tp) return;
+
+            this._oEventBus.subscribe("aireport", "allContent2_1", this._updateChart, this);
             // 카드
             const oCard = this.getOwnerComponent().oCard;
-            oCard.setBusy(true)
             let subLabels = {
                 id: "subLabels",
                 afterDatasetsDraw(chart, args, pluginOptions) {
@@ -147,16 +158,23 @@ sap.ui.define([
             let oParentElement = document.getElementById(sCardId).parentElement;
             let iBoxWidth = Math.floor(oParentElement.clientWidth / window.innerWidth * 90);
             let iBoxHeight = Math.floor(oParentElement.clientHeight / window.innerHeight * 90);
-            
-            this._oEventBus.subscribe("aireport", "allContent2_1", this._updateChart, this);
+
+
 
             for (let i = 0; i < this._aCanvasId.length; i++) {
                 let oHTML = this.byId("html" + i);
                 oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:950px; height:400px; min-height:400px'><canvas id='${this._aCanvasId[i]}' /></div>`);
-                oHTML.attachEvent("afterRendering", async function () {
-                  
+                oHTML.attachEventOnce("afterRendering", async function () {
+
                     // 차트 구성
                     const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[i])).getContext("2d");
+                    // // account 이름 넘버 삭제 후 데이터 요청
+                    // let aResults = .map(oObj => {
+                    //     if (oObj.account_nm) {
+                    //         oObj["account_nm"] = oObj["account_nm"].substring(4);
+                    //     }
+                    //     return oObj;
+                    // });
                     //데이터 요청
                     let aData = await this._dataSetting(oData.data);
                     this._oMyChart[i] = new Chart(ctx, {
@@ -426,11 +444,23 @@ sap.ui.define([
                                         display: false
                                     },
                                     ticks: {
-                                        padding: 20,
-                                        font: {
-                                            size: 8,
-                                            weight: 600
+                                        callback: function (value, index, ticks) {
+                                            const labels = this.getLabels() ? this.getLabels() : [];
+                                            return labels[index] ? labels[index].substring(4) : "";
                                         },
+                                        padding: 20,
+                                        font: function (ctx) {
+                                            const dataLength = ctx.chart.data.labels.length;
+                                            if (dataLength > 10) {
+                                                return { size: 7, weight: 600 }
+                                            } else {
+                                                return { size: 12, weight: 600 }
+                                            }
+                                        },
+                                        // font: {
+                                        //     size: 7,
+                                        //     weight: 600
+                                        // },
                                         maxRotation: 0,
                                         minRotation: 0
 
@@ -490,17 +520,12 @@ sap.ui.define([
                             }
                         },
                         plugins: [ChartDataLabels, subLabels],
-
                     })
-
-                  
-
-
                     //this._ovserveResize(this.byId(this._aContainerId[i]), i)
                 }.bind(this));
             }
             this.dataLoad();
-            oCard.setBusy(false)
+            this.getView().getModel("ui").setProperty("/bBusyFlag", false);
         },
 
         dataLoad: function () {
@@ -512,12 +537,13 @@ sap.ui.define([
 
         _dataSetting: async function (oData) {
             // let aResults = await this._setData();
-            let aResults = oData.map(oObj => {
-                if(oObj.account_nm){
-                    oObj["account_nm"] = oObj["account_nm"].substring(4);
-                }
-                return oObj;
-            });;
+            // let aResults = oData.map(oObj => {
+            //     if (oObj.account_nm) {
+            //         oObj["account_nm"] = oObj["account_nm"].substring(4);
+            //     }
+            //     return oObj;
+            // });;
+            let aResults = oData;
 
             let aData;
             let aSales = [];
@@ -574,7 +600,7 @@ sap.ui.define([
                 this._resizeObserver = new ResizeObserver(() => {
                     this._oMyChart[i].resize()
                 })
-                
+
             }
         },
 

@@ -47,6 +47,7 @@ sap.ui.define([
                     let oSessionData = JSON.parse(sessionStorage.getItem("aiReport"))
                     this._oEventBus.publish("aireportTable", "qualified", oSessionData)
                 }
+                
             },
             // _onCardReady: function (sChannelId, sEventId, oData) {
             //     this._iCardReady++;

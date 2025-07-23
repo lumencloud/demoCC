@@ -17,11 +17,21 @@ sap.ui.define(
         // this._dataSetting();
         this._oEventBus.subscribe("aireport", "qualified", this._modelSetting, this)
         this._oEventBus.subscribe("aireportTable", "qualified", this._dataSetting, this)
+        this._oEventBus.subscribe("aireport", "setBusy", this._setBusy, this);
+        this._oEventBus.publish("aireport", "isCardSubscribed");
+        this._setModel();
+      },
+      _setModel: function () {
+        this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+      },
+      _setBusy: function () {
+        this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
       },
 
-      _dataSetting: async function () {
+      _dataSetting: async function (sChannelId, sEventId, oDataModel) {
         this.byId("cardContent").setBusy(true);
-        let oData = JSON.parse(sessionStorage.getItem("aiReport"));
+        // let oData = JSON.parse(sessionStorage.getItem("aiReport"));
+        let oData = oDataModel;
         let iYear = oData.year;
         let sMonth = oData.month;
         let sOrgId = oData.orgId;
@@ -44,7 +54,6 @@ sap.ui.define(
             Module.displayStatusForEmpty(this.byId("table"), aResult.value, this.byId("cardContent"));
 
             this._modelSetting("channnel", "event", aResult.value);
-          
           }.bind(this))
           .catch((oErr) => {
             Module.displayStatus(this.byId("table"), oErr.error.code, this.byId("cardContent"));
@@ -91,17 +100,16 @@ sap.ui.define(
           topPart['count'] = etcPart.length
           topPart['total'] = ietcAmount.toFixed(0)
         }
-
-        if (this._bFlag) {
+        if (sChannel === 'aireport') {
           this.dataLoad();
         }
-
+        this.getView().getModel("ui").setProperty("/bBusyFlag", false);
         let oTable = this.byId("table")
         Module.setTableMerge(oTable, "model", 3);
         oTable.setVisibleRowCountMode("Fixed")
         oTable.setVisibleRowCount(4)
         this.getView().setModel(new JSONModel(topPart), "model");
-        
+
         oTable.setNoData("입찰 예정 건이 없습니다.")
 
         // let subTitle = `(총 ${iAmount.toFixed(2)}억원 / ${iCount}건)`

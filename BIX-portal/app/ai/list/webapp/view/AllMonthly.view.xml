@@ -18,7 +18,7 @@
                             <VBox width="33%" gap="5px">
                                 <w:Card manifest="../bix/card/deliveryMonthlyTitle1/manifest.json" height="380px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                                 <w:Card manifest="../bix/card/deliveryMonthlyContent1_2/manifest.json" height="500px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
-                                <VBox class="custom-ai-report-test-card-container border-gray" height="360px">
+                                <VBox class="custom-ai-report-test-card-container border-gray" height="350px">
                                     <Title text="전년동기 대비 진척도 Gap 비교" width="100%" textAlign="Center" class="bottom-spacing" busyIndicatorDelay="0" />
                                     <w:Card manifest="../bix/card/deliveryMonthlyContent1_3/manifest.json" height="330px" dataMode="Active" overflow="Default" busyIndicatorDelay="0" />
                                 </VBox>

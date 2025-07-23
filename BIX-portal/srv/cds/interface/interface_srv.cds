@@ -13,17 +13,17 @@ using from '../../../db/cds/pl/if_wideview';
 // @requires: 'any' // 호출 권한 [Temp!!]
 service InterfaceService {
 
-    function execute_batch(ver : String(20), cust_param : String(20))                       returns array of ReturnTable;
-    function execute_pipeline_batch(ver : String(20), cust_param : String(20))              returns array of ReturnTable;
-    action   execute_batch_renew(batch_list : array of batch)                               returns array of ReturnTable;
-    function execute_wbs_prj_batch(ver : String(20), ver_last : String(20), trsf : Boolean) returns array of ReturnTable;
-    function execute_wbs_prj_platform_batch(ver : String(20), ver_last : String(20))        returns array of ReturnTable;
+    function execute_batch(ver : String(20), cust_param : String(20))                          returns array of ReturnTable;
+    function execute_pipeline_batch(auto : Boolean, ver : String(20), cust_param : String(20)) returns array of ReturnTable;
+    action   execute_batch_renew(batch_list : array of batch)                                  returns array of ReturnTable;
+    function execute_wbs_prj_batch(ver : String(20), ver_last : String(20), trsf : Boolean)    returns array of ReturnTable;
+    function execute_wbs_prj_platform_batch(ver : String(20), ver_last : String(20))           returns array of ReturnTable;
 
     /**
      * ERP - BIX 전송체크 API (ER6001)
      */
     @requires: 'authenticated-user'
-    action   BIX_transfer_check(I_CODE : String(100))                                       returns ERP_Return;
+    action   BIX_transfer_check(I_CODE : String(100))                                          returns ERP_Return;
 
     type ERP_Return  : {
         O_RTCD    : String(1);
@@ -49,5 +49,38 @@ service InterfaceService {
         source     : String(30);
         table_name : String(30);
     };
+
+    /**
+     * 배치 잡 목록 조회
+     */
+    function get_job_list()                                                                    returns batch;
+    /**
+     * 배치 잡 스케줄링 조회
+     */
+    function get_job_schedule(jobId : String(20))                                              returns array of schedule;
+
+    /**
+     * 배치 잡 스케줄링 CUD
+     */
+    action   create_job_schedule(schedule : schedule)                                          returns schedule;
+
+    action   update_job_schedule(schedule : schedule)                                          returns batch;
+
+    function delete_job_schedule(jobId : String(20), scheduleId : String(20))                  returns batch;
+
+    type schedule    : {
+        jobId          : String(20);
+        scheduleId     : UUID;
+        data           : String(500);
+        decription     : String(500);
+        active         : Boolean;
+        startTime      : String(50);
+        endTime        : String(50);
+        cron           : String(50);
+        time           : String(50);
+        repeatInterval : String(50);
+        repeatAt       : String(50);
+        nextRunAt      : String(50);
+    }
 
 }

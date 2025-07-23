@@ -10,7 +10,7 @@ module.exports = (srv) => {
 
         //엔티티 호출
         const pl_contract_amt = db.entities('pl').contract_amt;
-        const common_account = db.entities('common').account;
+        const common_account = db.entities('common').account_view;
 
         //account 전체 자료
         let account_list= await SELECT.from(common_account).columns(['biz_tp_account_cd','biz_tp_account_nm','sort_order']).orderBy('sort_order');

@@ -33,8 +33,7 @@
             id="vBox2"
             items="{model2>/}"
             width="100%"
-            gap="5px"
-            
+            gap="5px"            
         >
            
             <items>
@@ -53,12 +52,12 @@
                         alignItems="Center"
                     >
                         <VBox
-                            width="15%"
+                            width="20%"
                             justifyContent="Start"
                         >
                             <Title text="{model2>org_name}" />
                         </VBox>
-                        <VBox width="30%">
+                        <VBox width="40%">
                             <VBox
                                 width="100%"
                                 height="80%"
@@ -70,7 +69,7 @@
                                 <VBox class="dotted-cross2" />
                                 <VBox class="cross" />
                                 
-                                <HBox width="100%">
+                                <HBox width="90%">
                                     <HBox
                                         width="20%"
                                         alignItems="Center"
@@ -239,12 +238,12 @@
                         alignItems="Center"
                     >
                         <VBox
-                            width="15%"
+                            width="20%"
                             justifyContent="Start"
                         >
                             <Title text="{model>org_name}" />
                         </VBox>
-                        <VBox width="30%">
+                        <VBox width="40%">
                             <VBox
                                 width="100%"
                                 height="80%"
@@ -254,30 +253,30 @@
                                 <VBox class="dotted-cross2" />
                                 <VBox class="cross" />
 
-                                <HBox class="marginRate-talking-bar">
-                                        <VBox width="{model>talkingRate}" />
+                                <HBox  visible="{=${model>marginRate_type}===true}" class="marginRate-circle-bar">
+                                    <VBox width="{model>circleRate}" />
+                                    <VBox justifyContent="SpaceBetween" alignItems="Center">
                                         <VBox class="marginRate-talking blue"  alignItems="Center" justifyContent="Center"  visible="{=${model>marginRate_type}===true}">
                                             <Text text="{model>marginRate}" textAlign="Center"/>
                                         </VBox>
+                                        <VBox class="marginRate-circle blue" />
+                                    </VBox>
+                                </HBox>
+
+                                <HBox  visible="{=${model>marginRate_type}===false}" class="marginRate-circle-bar">
+                                    <VBox width="{model>circleRate}" />
+                                    <VBox justifyContent="SpaceBetween" alignItems="Center">
                                         <VBox class="marginRate-talking red"  alignItems="Center" justifyContent="Center"  visible="{=${model>marginRate_type}===false}">
                                             <HBox visible="{=${model>marginRate_type}===false}" justifyContent="Center" alignItems="Center">
                                                 <core:Icon src="sap-icon://up"/>
                                                 <Text text="{model>marginRate}"/>
                                             </HBox>
                                         </VBox>
+                                        <VBox class="marginRate-circle red" />
+                                    </VBox>
                                 </HBox>
 
-                                <HBox  visible="{=${model>marginRate_type}===true}" class="marginRate-circle-bar">
-                                    <VBox width="{model>circleRate}" />
-                                    <VBox class="marginRate-circle blue" />
-                                </HBox>
-
-                                <HBox  visible="{=${model>marginRate_type}===false}" class="marginRate-circle-bar">
-                                    <VBox width="{model>circleRate}" />
-                                    <VBox class="marginRate-circle red" />
-                                </HBox>
-
-                                <HBox width="100%">
+                                <HBox width="90%" justifyContent="Start">
                                     <HBox
                                         width="20%"
                                         alignItems="Center"
@@ -355,7 +354,7 @@
                                     <HBox width="80%" />
                                 </HBox>
 
-                                <HBox width="100%">
+                                <HBox width="90%" justifyContent="Start">
                                     <HBox
                                         width="20%"
                                         alignItems="Center"
@@ -546,12 +545,12 @@
                         alignItems="Center"
                     >
                         <VBox
-                            width="15%"
+                            width="20%"
                             justifyContent="Start"
                         >
                             <Title text="{model3>org_name}" />
                         </VBox>
-                        <VBox width="30%">
+                        <VBox width="40%">
                             <VBox
                                 width="100%"
                                 height="80%"
@@ -561,30 +560,30 @@
                                 <VBox class="dotted-cross2" />
                                 <VBox class="cross" />
 
-                                <HBox class="marginRate-talking-bar">
-                                        <VBox width="{model3>talkingRate}" />
+                                <HBox  visible="{=${model3>marginRate_type}===true}" class="marginRate-circle-bar">
+                                    <VBox width="{model3>circleRate}" />
+                                    <VBox justifyContent="SpaceBetween" alignItems="Center">
                                         <VBox class="marginRate-talking blue"  alignItems="Center" justifyContent="Center"  visible="{=${model3>marginRate_type}===true}">
                                             <Text text="{model3>marginRate}" textAlign="Center"/>
                                         </VBox>
+                                        <VBox class="marginRate-circle blue" />
+                                    </VBox>
+                                </HBox>
+
+                                <HBox  visible="{=${model3>marginRate_type}===false}" class="marginRate-circle-bar">
+                                    <VBox width="{model3>circleRate}" />
+                                    <VBox justifyContent="SpaceBetween" alignItems="Center">
                                         <VBox class="marginRate-talking red"  alignItems="Center" justifyContent="Center"  visible="{=${model3>marginRate_type}===false}">
                                             <HBox visible="{=${model3>marginRate_type}===false}" justifyContent="Center" alignItems="Center">
                                                 <core:Icon src="sap-icon://up"/>
                                                 <Text text="{model3>marginRate}"/>
                                             </HBox>
                                         </VBox>
+                                        <VBox class="marginRate-circle red" />
+                                    </VBox>
                                 </HBox>
 
-                                <HBox  visible="{=${model3>marginRate_type}===true}" class="marginRate-circle-bar">
-                                    <VBox width="{model3>circleRate}" />
-                                    <VBox class="marginRate-circle blue" />
-                                </HBox>
-
-                                <HBox  visible="{=${model3>marginRate_type}===false}" class="marginRate-circle-bar">
-                                    <VBox width="{model3>circleRate}" />
-                                    <VBox class="marginRate-circle red" />
-                                </HBox>
-
-                                <HBox width="100%">
+                                <HBox width="90%" justifyContent="Start">
                                     <HBox
                                         width="20%"
                                         alignItems="Center"
@@ -662,7 +661,7 @@
                                     <HBox width="80%" />
                                 </HBox>
 
-                                <HBox width="100%">
+                                <HBox width="90%" justifyContent="Start">
                                     <HBox
                                         width="20%"
                                         alignItems="Center"
@@ -853,12 +852,12 @@
                         alignItems="Center"
                     >
                         <VBox
-                            width="15%"
+                            width="20%"
                             justifyContent="Start"
                         >
                             <Title text="{model4>org_name}" />
                         </VBox>
-                        <VBox width="30%">
+                        <VBox width="40%">
                             <VBox
                                 width="100%"
                                 height="80%"
@@ -868,30 +867,30 @@
                                 <VBox class="dotted-cross2" />
                                 <VBox class="cross" />
 
-                                <HBox class="marginRate-talking-bar">
-                                        <VBox width="{model4>talkingRate}" />
+                               <HBox  visible="{=${model4>marginRate_type}===true}" class="marginRate-circle-bar">
+                                    <VBox width="{model4>circleRate}" />
+                                    <VBox justifyContent="SpaceBetween" alignItems="Center">
                                         <VBox class="marginRate-talking blue"  alignItems="Center" justifyContent="Center"  visible="{=${model4>marginRate_type}===true}">
                                             <Text text="{model4>marginRate}" textAlign="Center"/>
                                         </VBox>
+                                        <VBox class="marginRate-circle blue" />
+                                    </VBox>
+                                </HBox>
+
+                                <HBox  visible="{=${model4>marginRate_type}===false}" class="marginRate-circle-bar">
+                                    <VBox width="{model4>circleRate}" />
+                                    <VBox justifyContent="SpaceBetween" alignItems="Center">
                                         <VBox class="marginRate-talking red"  alignItems="Center" justifyContent="Center"  visible="{=${model4>marginRate_type}===false}">
                                             <HBox visible="{=${model4>marginRate_type}===false}" justifyContent="Center" alignItems="Center">
                                                 <core:Icon src="sap-icon://up"/>
                                                 <Text text="{model4>marginRate}"/>
                                             </HBox>
                                         </VBox>
+                                        <VBox class="marginRate-circle red" />
+                                    </VBox>
                                 </HBox>
 
-                                <HBox  visible="{=${model4>marginRate_type}===true}" class="marginRate-circle-bar">
-                                    <VBox width="{model4>circleRate}" />
-                                    <VBox class="marginRate-circle blue" />
-                                </HBox>
-
-                                <HBox  visible="{=${model4>marginRate_type}===false}" class="marginRate-circle-bar">
-                                    <VBox width="{model4>circleRate}" />
-                                    <VBox class="marginRate-circle red" />
-                                </HBox>
-
-                                <HBox width="100%">
+                                <HBox width="90%" justifyContent="Start">
                                     <HBox
                                         width="20%"
                                         alignItems="Center"
@@ -969,7 +968,7 @@
                                     <HBox width="80%" />
                                 </HBox>
 
-                                <HBox width="100%">
+                                <HBox width="90%" justifyContent="Start">
                                     <HBox
                                         width="20%"
                                         alignItems="Center"

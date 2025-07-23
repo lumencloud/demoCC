@@ -261,7 +261,8 @@ sap.ui.define([
             this._selectedOrgName = oRowData && oRowData.org_name ? oRowData.org_name : oSessionData.org_name;
             this._selectedType = oRowData.type;
 
-
+            this._excludeClick = !Module.checkAiPopupDisplay(oRowData,["forecast_value","secured_value","not_secured_value"]);
+            
             //합계 클릭 금지 
             if (oRowData.org_name === "합계") {
                 this._excludeClick = true;
@@ -271,7 +272,7 @@ sap.ui.define([
                 this._excludeClick = true;
             }
             
-            this._excludeClick = !Module.checkAiPopupDisplay(oRowData,["forecast_value","secured_value","not_secured_value"]);
+            
         },
 
         /**

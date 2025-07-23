@@ -28,13 +28,18 @@
                 <HBox width="100%" alignContent="Center" alignItems="Center" justifyContent="Center" class="custom-dashboard-datepicker">
                     <Label text="조직" class="sapUiTinyMarginEnd" />
                     <Input value="{searchModel>/orgNm}" name="{searchModel>/orgId}"
-                        showClearIcon="true" 
+                        showClearIcon="true" startSuggestion="0"
                         showValueHelp="true" valueHelpRequest=".onOrgSingleSelectDialogOpen" 
-                        showSuggestion="true" change="onOrgSingleChange" valueStateText="입력한 조직이 존재하지 않습니다."
-                        suggestionItems="{ path: 'cm>/latest_org', length: 2000 }" 
+                        showSuggestion="true" change=".onOrgSingleChange" valueStateText="입력한 조직이 존재하지 않습니다."
+                        suggestionItems="{ 
+                            path: 'cm>/get_available_org_list', 
+                            sorter: { path: 'org_name' }, 
+                            parameters: { $select: 'org_id,org_name' },
+                            length: 2000
+                        }" 
                         class="custom-pl2-org-Btn">
                         <suggestionItems>
-                            <core:Item key="{cm>id}" text="{cm>name}" />
+                            <core:Item key="{cm>org_id}" text="{cm>org_name}" />
                         </suggestionItems>
                     </Input>
                 </HBox>

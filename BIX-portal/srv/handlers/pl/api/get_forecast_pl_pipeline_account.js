@@ -28,7 +28,7 @@ module.exports = (srv) => {
             /**
              * account 정보
              */
-            const common_account = db.entities('common').account;
+            const common_account = db.entities('common').account_view;
 
             // function 입력 파라미터 - type 값 month(월기준), deal(deal stage 기준), rodr(수주 금액 기준) 
             const { year, month, org_id, type } = req.data;

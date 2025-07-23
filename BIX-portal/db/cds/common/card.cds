@@ -2,8 +2,8 @@ using {
         cuid,
         managed
 } from '@sap/cds/common';
-using common.card_target as card_target from './card_target';
-using common.card_image as card_image from './card_image';
+// using common.card_target as card_target from './card_target';
+// using common.card_image as card_image from './card_image';
 
 namespace common;
 
@@ -19,8 +19,8 @@ entity card : cuid, managed {
         richText      : LargeString;
         bannerType    : Integer default 0; // 0: normal 1: slide
         bannerTime    : Integer;
-        target        : Composition of many card_target
-                                on target.card = $self;
-        image         : Composition of many card_image //dms file id 저장
-                                on image.card = $self;
+        // target        : Composition of many card_target
+        //                         on target.card = $self;
+        // image         : Composition of many card_image //dms file id 저장
+        //                         on image.card = $self;
 }

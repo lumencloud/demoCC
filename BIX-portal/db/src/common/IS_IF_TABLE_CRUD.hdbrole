@@ -143,16 +143,6 @@
         ]
       },
       {
-        "name": "COMMON_IF_CUSTOMER_SFDC",
-        "type": "TABLE",
-        "privileges": [
-          "DELETE",
-          "INSERT",
-          "SELECT",
-          "UPDATE"
-        ]
-      },
-      {
         "name": "COMMON_IF_CUSTOMER",
         "type": "TABLE",
         "privileges": [

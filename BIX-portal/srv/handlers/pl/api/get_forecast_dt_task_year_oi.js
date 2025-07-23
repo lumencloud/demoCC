@@ -33,7 +33,7 @@ module.exports = (srv) => {
              * 조직구조 테이블
              */
             const org_full_level = db.entities('common').org_full_level_view;
-            const dt_task = db.entities('common').dt_task;
+            const dt_task = db.entities('common').dt_task_view;
             // =================================================================================
 
             // function 입력 파라미터

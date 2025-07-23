@@ -3,14 +3,6 @@
       "name": "IS_IF_PROCEDURE_EXECUTE",
       "object_privileges": [
         {
-          "name": "MIF_RCV_CM_EMPLOYEE",
-          "type": "TABLE",
-          "privileges": [
-            "SELECT",
-            "INSERT"
-          ]
-        },
-        {
           "name": "P_IF_COMMON_PROJECT_PROMIS_RCV",
           "type": "PROCEDURE",
           "privileges": [

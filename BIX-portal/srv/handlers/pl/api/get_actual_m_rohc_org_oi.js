@@ -146,7 +146,7 @@ module.exports = (srv) => {
                     };
 
                     if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id'){
-                        if(!account_list.includes(oTemp.id) && !ackerton_list.includes(oTemp.id)){
+                        if(!account_list.includes(oTemp.id) && !ackerton_list.includes(oTemp.id) && data.org_tp === 'delivery'){
                             org_list.push(oTemp);
                         }
                     }else{

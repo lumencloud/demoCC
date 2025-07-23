@@ -12,7 +12,7 @@ sap.ui.define(
     return BaseController.extend("bix.card.negotiationStage.card", {
       _oEventBus: EventBus.getInstance(),
       _bFlag: true,
-      
+
       onInit: function () {
         this._dataSetting();
         this._oEventBus.subscribe("aiReport", "dateData", this._dataSetting, this)
@@ -37,7 +37,7 @@ sap.ui.define(
           function (aResult) {
             Module.displayStatusForEmpty(this.getOwnerComponent().oCard, aResult.value, this.byId("cardContent"));
             this._modelSetting(aResult.value);
-            
+
           }.bind(this))
           .catch((oErr) => {
             Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
@@ -72,7 +72,7 @@ sap.ui.define(
             return 0;
           })
         }
-      
+
         // Account 코드 삭제
         aResult.forEach(a => {
           if (a.biz_tp_account_nm) {
@@ -99,9 +99,7 @@ sap.ui.define(
           oModel["etcReason"] = aResult[4].deselected_reason
         }
 
-        if(this._bFlag){
-          this.dataLoad();
-        }
+        this.dataLoad();
 
         this._oEventBus.publish("aiReport", "negoData", oModel)
         this.getOwnerComponent().setModel(new JSONModel(oModel), "Model");

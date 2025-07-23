@@ -51,12 +51,9 @@ sap.ui.define([
                 this._setModel();
                 this._oEventBus.subscribe("aireport", "infoSet", this._uiChange);
             },
-
             _setModel: function () {
                 this.getView().setModel(new JSONModel({ bFlag: false }), "ui");
             },
-
-
             _uiChange: function () {
                 let oSessionData = JSON.parse(sessionStorage.getItem("aiReport"))
                 

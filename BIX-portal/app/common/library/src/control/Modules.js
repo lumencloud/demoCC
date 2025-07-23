@@ -894,15 +894,12 @@ sap.ui.define([
         // iValue2가 있을 때 iValue2 - iValue1
         let iNewValue = (iValue2 && !isNaN(iValue2)) ? (iValue1 - iValue2) : iValue1;
         let sAddText = "";
-        console.log(tooltipType);
         if (tooltipType === "infoLabel") {
-            console.log("밸류 두개",iValue1,iValue2);
             // 양수일 시 텍스트에 + 추가
             if (iNewValue > 0) {
                 sAddText = "+ ";
             }
             // 기호 표시하기 위해 절대값 처리
-            console.log("계산값",iNewValue);
             iNewValue = Math.abs(iNewValue);
         }
         if (sType === "마진율" || sType === "영업이익률" || sType === "BR" || sType === "percent") {

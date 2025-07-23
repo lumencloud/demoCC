@@ -28,9 +28,10 @@
                         selectionBehavior="RowOnly" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         rowSelectionChange="onRowSelectionChange"
-                        fixedColumnCount="2"
+                        fixedColumnCount="1"
                         busyIndicatorDelay="0"
                         visibleRowCountMode="Auto"
+                        noData=" "
                         fieldGroupIds="content,org"
                     >
                         <table:extension>
@@ -283,8 +284,9 @@
                         selectionBehavior="RowOnly" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         rowSelectionChange="onRowSelectionChange"
-                        fixedColumnCount="2"
+                        fixedColumnCount="1"
                         busyIndicatorDelay="0"
+                        noData=" "
                         visibleRowCountMode="Auto"
                         fieldGroupIds="content,org_delivery"
                     >
@@ -538,8 +540,9 @@
                         selectionBehavior="RowOnly" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         rowSelectionChange="onRowSelectionChange"
-                        fixedColumnCount="2"
+                        fixedColumnCount="1"
                         busyIndicatorDelay="0"
+                        noData=" "
                         visibleRowCountMode="Auto"
                         fieldGroupIds="content,org_account"
                     >
@@ -793,9 +796,10 @@
                         selectionBehavior="RowOnly" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         rowSelectionChange="onRowSelectionChange"
-                        fixedColumnCount="2"
+                        fixedColumnCount="1"
                         busyIndicatorDelay="0"
                         visibleRowCountMode="Auto"
+                        noData=" "
                         fieldGroupIds="content,account"
                     >
                         <table:extension>
@@ -1022,6 +1026,7 @@
                         visibleRowCountMode="Auto"
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         rowSelectionChange=".onRowSelectionChange"
+                        noData=" "
                         fieldGroupIds="content,task"
                     >
                         <table:extension>
@@ -1276,6 +1281,7 @@
                         visibleRowCountMode="Auto"
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         rowSelectionChange=".onRowSelectionChange"
+                        noData=" "
                         fieldGroupIds="content,member_year"
                     >
                         <table:extension>
@@ -1306,6 +1312,7 @@
                         visibleRowCountMode="Auto"
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         rowSelectionChange=".onRowSelectionChange"
+                        noData=" "
                         fieldGroupIds="content,task_year"
                     >   
                         <table:extension>

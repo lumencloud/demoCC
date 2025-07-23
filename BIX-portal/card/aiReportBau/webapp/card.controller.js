@@ -82,7 +82,6 @@ sap.ui.define([
                 this.byId("cardContent").setBusy(false);
                 Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
                 this._setFallbackData();
-                this.dataLoad();
             }
         },
 
@@ -212,7 +211,6 @@ sap.ui.define([
                     console.error("보고서 컨텐츠 생성 오류:", error);
                     this._setFallbackData();
                     MessageToast.show("보고서 컨텐츠 생성 중 오류가 발생했습니다.");
-                    this.dataLoad();
                 }.bind(this))
                 .finally(function () {
                     oModel.setProperty("/isLoading", false);
@@ -251,9 +249,7 @@ sap.ui.define([
                 this._oEventBus.publish("aiReport", "aiInsight", { key: "bauSight", insight: oReportData.insight });
                 console.log("보고서 컨텐츠 데이터 로드 완료:", oReportData);
 
-                if (this._bFlag) {
-                    this.dataLoad();
-                }
+                this.dataLoad();
             } catch (error) {
                 console.error("보고서 컨텐츠 결과 처리 오류:", error);
                 this._setFallbackData();
@@ -293,7 +289,6 @@ sap.ui.define([
             } catch (error) {
                 console.error("보고서 컨텐츠 내용 파싱 오류:", error);
                 console.log("파싱 실패한 원본 내용:", content);
-                this.dataLoad();
                 this._setFallbackData();
             }
         },

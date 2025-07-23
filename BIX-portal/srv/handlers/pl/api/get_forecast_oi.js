@@ -79,7 +79,7 @@ module.exports = (srv) => {
                 `sum(case when src_type = 'D' then 0 else sale_year_amt end) as secured_sale`,
                 `sum(case when src_type = 'D' then sale_year_amt else 0 end) as not_secured_sale`
             ];
-            const non_mm_where_conditions = { 'year': { in: [year, last_year] }, 'is_delivery': true, 'src_type': { '!=': 'WO' } };
+            const non_mm_where_conditions = { 'year': { in: [year, last_year] }, 'is_delivery': true, 'src_type': { '!=': 'WA' } };
             const non_mm_groupBy_cols = ['year'];
 
             /**

@@ -33,6 +33,21 @@ module.exports = class InterfaceService extends cds.ApplicationService {
     const execute_batch = require('./execute_batch');
     execute_batch(this);
 
+    const get_job_list = require('./get_job_list');
+    get_job_list(this);
+
+    const get_job_schedule = require('./get_job_schedule');
+    get_job_schedule(this);
+
+    const create_job_schedule = require('./create_job_schedule');
+    create_job_schedule(this);
+
+    const update_job_schedule = require('./update_job_schedule');
+    update_job_schedule(this);
+
+    const delete_job_schedule = require('./delete_job_schedule');
+    delete_job_schedule(this);
+
     return super.init()
   }
 }

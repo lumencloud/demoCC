@@ -13,7 +13,7 @@ module.exports = (srv) => {
         // function 입력 파라미터
         const { year, month } = req.data;
 
-        const common_account = db.entities('common').account;
+        const common_account = db.entities('common').account_view;
         // DB 쿼리 실행 (병렬)
         const [aAccount] = await Promise.all([
             SELECT.from(common_account).columns("code", "name").orderBy("sort_order"),

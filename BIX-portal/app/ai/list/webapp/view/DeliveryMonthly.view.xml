@@ -84,9 +84,6 @@
                         <VBox width="100%" class="custom-ai-report-test-card-container">
                             <w:Card manifest="../bix/card/aiReportMonthlyAiInsight/manifest.json" width="100%" overflow="Default" dataMode="Active" busyIndicatorDelay="0"/>
                         </VBox>
-                        <VBox width="100%" class="custom-ai-report-test-card-container">
-                            <w:Card manifest="../bix/card/aiReportMonthlyAiInsightSmry/manifest.json" width="100%" overflow="Default" dataMode="Active" busyIndicatorDelay="0"/>
-                        </VBox>
                         <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
                             <Text text="4"/>
                             <Image src="./resource/image/sk.svg"/>

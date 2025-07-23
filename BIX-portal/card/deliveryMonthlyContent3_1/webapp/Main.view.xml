@@ -6,6 +6,8 @@
     width="100%"
     displayBlock="true"
     controllerName="bix.card.deliveryMonthlyContent3_1.Main"
+    busyIndicatorDelay="0"
+    busy="{ui>/bBusyFlag}"
 >
     <VBox  class="custom-ai-report-test-delivery-content3_1-container">
         <HBox class="title">

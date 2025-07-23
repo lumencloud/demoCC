@@ -23,14 +23,14 @@
                 </OverflowToolbar>
             </form:SimpleForm>
             <VBox alignItems="Center" height="100%" width="100%">
-                <Carousel width="1000px" height="1414px" id="carousel" pageChanged="onPageChanged">
+                <Carousel width="1000px" height="1457px" id="carousel" pageChanged="onPageChanged">
                     <VBox alignItems="Center" id="vbox1" class="page1" renderType="Bare">
                         <HBox width="95%" justifyContent="Center" class="custom-ai-report-test-title-box">
                             <Label text="{= (${uiModel>/weekName} || '') + ' Pipeline 주간 리포트'}" />
                             <!-- <Label text="6월 4주차 Pipeline 주간 리포트" /> -->
                         </HBox>
                         <VBox width="95%" class="sapUiNoContentPadding " height="270px">
-                            <w:Card manifest="../bix/card/aiReport/manifest.json" dataMode="Active" busyIndicatorDelay="0" overflow="Default" />
+                            <w:Card manifest="../bix/card/aiReport/manifest.json" dataMode="Active" busyIndicatorDelay="0" overflow="Default"/>
                         </VBox>
                         <VBox width="95%" height="30px" backgroundDesign="Transparent" alignItems="Center" justifyContent="Center" class="custom-ai-report-test-box">
                             <Text class="custom-ai-report-test-text" text="금주 DT Pipeline 변동 현황" />
@@ -72,12 +72,12 @@
                             </VBox>
                         </HBox>
                         <VBox width="95%" height="30px" backgroundDesign="Transparent" alignItems="Center" justifyContent="Center" class="custom-ai-report-test-box">
-                            <Text class="custom-ai-report-test-text" text="상반기 입찰 예정 사업" />
+                            <!-- <Text class="custom-ai-report-test-text" text="상반기 입찰 예정 사업" /> -->
                             <!-- '입찰 예정 사업' 제목 원본 -->
-                            <!--Text class="custom-ai-report-test-text" text="{= ${uiModel>/halfYear} + ' 입찰 예정 사업'}" /-->
+                            <Text class="custom-ai-report-test-text" text="{= ${uiModel>/halfYear} + ' 입찰 예정 사업'}" />
                         </VBox>
                         <VBox width="95%">
-                            <w:Card id="scheduledBiddingProjects" class="custom-ai-report-test-card-content" manifest="../bix/card/scheduledBiddingProjects/manifest.json" dataMode="Active" busyIndicatorDelay="0" width="100%" height="240px" overflow="Default" />
+                            <w:Card id="scheduledBiddingProjects" class="custom-ai-report-test-card-content" manifest="../bix/card/scheduledBiddingProjects/manifest.json" dataMode="Active" busyIndicatorDelay="0" width="100%" height="230px" overflow="Default" />
                         </VBox>
                         <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
                             <Text text="1"/>
@@ -133,7 +133,7 @@
                         <VBox width="95%">
                             <w:Card id="scheduledBiddingProjectsbau" class="custom-ai-report-test-card-content" manifest="../bix/card/scheduledBiddingProjectsBau/manifest.json" dataMode="Active" busyIndicatorDelay="0" height="190px" overflow="Default" />
                         </VBox>
-                        <VBox width="95%" height="100%">
+                        <VBox width="95%">
                             <w:Card id="aiInsightBau" manifest="../bix/card/aiInsightBau/manifest.json" height="160px" dataMode="Active" busyIndicatorDelay="0" overflow="Default" />
                         </VBox>
                         <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">

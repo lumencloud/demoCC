@@ -19,7 +19,6 @@ using common as orgFull from '../../../db/cds/common/view/org_full_level_view';
 using common as prjBD from '../../../db/cds/common/view/project_biz_domain_view';
 using common.pl_content_view as common_pl_content_view from '../../../db/cds/common/view/pl_content_view';
 // using common.pl_content_view_test as common_pl_content_view_test from '../../../db/cds/common/view/pl_content_view';
-using common.get_card_name_view as cardNameView from '../../../db/cds/common/view/get_card_name_view';
 using common as common_account from '../../../db/cds/common/account';
 using common as common_customer from '../../../db/cds/common/customer';
 using common as common_version from '../../../db/cds/common/version';
@@ -29,12 +28,39 @@ using common.interface_master as common_interface_master from '../../../db/cds/c
 using common.interface_check as common_interface_check from '../../../db/cds/common/interface_check';
 using common as common_target_view from '../../../db/cds/common/view/target_view';
 using common as common_org_target_view from '../../../db/cds/common/view/org_target_view';
+using common.project_account_map_view as common_project_account_map_view from '../../../db/cds/common/view/project_account_map_view';
+using common.account_customer_map_view as common_account_customer_map_view from '../../../db/cds/common/view/account_customer_map_view';
+using common.account_customer_map as common_account_customer_map from '../../../db/cds/common/account_customer_map';
 
 @impl                        : 'srv/handlers/common/common_srv.js'
 @path                        : '/odata/v4/cm'
 @requires                    : 'authenticated-user'
 @cds.server.body_parser.limit: '1000mb' // 파일 첨부 시 body 요청 사이즈 제한 증가
 service ComService {
+
+    view project_account_map_view as select from common_project_account_map_view;
+    view account_customer_map_view as select from common_account_customer_map_view;
+
+    @restrict: [
+        {
+            grant: [
+                'CREATE',
+                'UPDATE',
+                'DELETE'
+            ],
+            to   : 'bix-portal-system-admin'
+        },
+        {
+            grant: [
+                'CREATE',
+                'UPDATE',
+                'DELETE'
+            ],
+            to   : 'bix-portal-manage'
+        },
+        {grant: 'READ'}
+    ]
+    entity account_customer_map                   as projection on common_account_customer_map;
 
     @restrict: [
         {
@@ -161,7 +187,7 @@ service ComService {
     entity Favorite                               as projection on dashboard_favorite.dashboard_favorite;
 
     @readonly
-    entity version_sfdc                              as projection on common_version_sfdc.version_sfdc;
+    entity version_sfdc                           as projection on common_version_sfdc.version_sfdc;
 
     @restrict: [
         {
@@ -230,7 +256,7 @@ service ComService {
 
     function get_user_org_info()                                                             returns oUserInfo;
     type oUserInfo {};
-    function get_type_target(type : String(20))                                               returns array of oTarget;
+    function get_type_target(type : String(20))                                              returns array of oTarget;
     type oTarget {};
     //dashboard chart
     function get_dashboard_chart(year : String(4), month : String(2), org_id : String(10))   returns array of oDashChart;
@@ -259,7 +285,11 @@ service ComService {
             category: :category
         );
 
-    view org_full_level as select from orgFull.org_full_level_view order by org_sort_order;
+    view org_full_level as
+        select from orgFull.org_full_level_view
+        order by
+            org_sort_order;
+
     view latest_org as select from orgFull.latest_org_view;
     view project_biz_domain_view as select from prjBD.project_biz_domain_view;
 
@@ -311,13 +341,6 @@ service ComService {
             detail_info      desc,
             card_sort_order  asc;
 
-    view get_card_name_view(content_menu_code : String(50)) as
-        select from cardNameView (
-            content_menu_code: :content_menu_code
-        )
-        order by
-            sort_order;
-
     function get_code_data(category : String(20))                                            returns array of oRes;
 
     type oRes {
@@ -336,7 +359,41 @@ service ComService {
     function get_available_org_list(isTree : Boolean)                                        returns array of oAvailableOrg;
 
     type oAvailableOrg {
-
+        org_id          : String(20);
+        org_ccorg_cd    : String(8);
+        org_order       : String(100);
+        org_sort_order  : String(100);
+        org_parent      : String(10);
+        org_name        : String(50);
+        org_level       : String(10);
+        org_type        : String(10);
+        is_delivery     : Boolean;
+        is_total_cc     : Boolean;
+        org_tp          : String(20);
+        lv1_id          : String(20);
+        lv1_name        : String(50);
+        lv1_ccorg_cd    : String(8);
+        lv1_sort_order  : String(100);
+        lv2_id          : String(20);
+        lv2_name        : String(50);
+        lv2_ccorg_cd    : String(8);
+        lv2_sort_order  : String(100);
+        lv3_id          : String(20);
+        lv3_name        : String(50);
+        lv3_ccorg_cd    : String(8);
+        lv3_sort_order  : String(100);
+        div_id          : String(20);
+        div_name        : String(50);
+        div_ccorg_cd    : String(8);
+        div_sort_order  : String(100);
+        hdqt_id         : String(20);
+        hdqt_name       : String(50);
+        hdqt_ccorg_cd   : String(8);
+        hdqt_sort_order : String(100);
+        team_id         : String(20);
+        team_name       : String(50);
+        team_ccorg_cd   : String(8);
+        team_sort_order : String(100);
     }
 
 

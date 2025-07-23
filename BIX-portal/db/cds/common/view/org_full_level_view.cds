@@ -18,7 +18,7 @@ view org_full_level_view as
             end            as org_ccorg_cd : String(8)  @title: '조직 CC코드 (인터페이스 외 추가조직 포함)',
             lv1.org_order,
             lv1.org_sort_order,
-            lv1.org_parent,
+            case when length(lv1.org_parent) = 0 then null else lv1.org_parent end as org_parent,
             case
                 when
                     lv1.org_name     is null
@@ -214,7 +214,7 @@ view org_full_level_view as
         key org_ccorg_cd,
             org_order,
             org_sort_order,
-            org_parent,
+            org_parent : String(10),
             org_name,
             org_level: String(10),
             org_type,

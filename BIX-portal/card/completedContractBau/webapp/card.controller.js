@@ -47,6 +47,7 @@ sap.ui.define(
           }.bind(this))
           .catch((oErr) => {
             Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
+            
           });
         this.byId("cardContent").setBusy(false);
       },
@@ -115,9 +116,7 @@ sap.ui.define(
         this._oEventBus.publish("aiReport", "comBauData", oModel)
         this.getOwnerComponent().setModel(new JSONModel(oModel), "Model");
 
-        if (this._bFlag) {
-          this.dataLoad();
-        }
+        this.dataLoad();
 
         let subTitle = `(총 ${iAmount.toFixed(2)}억원 / ${iCount}건)`
         if (this.getOwnerComponent().oCard.getAggregation("_header")) {

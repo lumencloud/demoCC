@@ -104,22 +104,29 @@ sap.ui.define([
                         fieldGroupIds:'Input',
                         value:{
                             path:`addTargetModel>new_${oProperty['value']}_data`,
-                            type:'sap.ui.model.type.Integer',
+                            type:'sap.ui.model.type.Float',
                             formatOptions:{
                                 groupSeparator: ',',
                                 groupingEnabled: true,
-                                maxIntegerDigits: 99
+                                maxIntegerDigits: 99,
+                                minFractionDigits:0,
+                                maxFractionDigits: 2
                             }
                         },
                         visible:'{uiModel>/edit}',
                         description:{
                             path:`addTargetModel>total_t_${oProperty['value']}_data`,
-                            type:'sap.ui.model.type.Integer',
-                            formatOptions:{
-                                groupSeparator: ',',
-                                groupingEnabled: true,
-                                maxIntegerDigits: 99
-                            },
+                            formatter: function (iValue1) {
+                                var oNumberFormat = NumberFormat.getFloatInstance({
+                                    groupingEnabled: true,
+                                    groupingSeparator: ',',
+                                    groupingSize: 3,
+                                    minFractionDigits:0,
+                                    maxFractionDigits:2
+                                });
+                                let sNumber = oNumberFormat.format(iValue1)
+                                return sNumber;                        
+                            }
                         },
                         fieldWidth:"60%",
                         liveChange: ($event) => { this.onInputLiveChange($event,'Number')},
@@ -134,7 +141,10 @@ sap.ui.define([
                             formatter: function (iValue1, iValue2, sId) {
                                 var oNumberFormat = NumberFormat.getFloatInstance({
                                     groupingEnabled: true,
-                                    groupingSeparator: ','
+                                    groupingSeparator: ',',
+                                    groupingSize: 3,
+                                    minFractionDigits:0,
+                                    maxFractionDigits:2
                                 });
                                 let sNumber = !sId ? oNumberFormat.format(iValue1) + " ("+oNumberFormat.format(iValue2)+")" : oNumberFormat.format(iValue1)
                                 return sNumber;                        
@@ -148,7 +158,10 @@ sap.ui.define([
                             formatter: function (iValue1, sId) {
                                 var oNumberFormat = NumberFormat.getFloatInstance({
                                     groupingEnabled: true,
-                                    groupingSeparator: ','
+                                    groupingSeparator: ',',
+                                    groupingSize: 3,
+                                    minFractionDigits:0,
+                                    maxFractionDigits:2
                                 });
                                 let sNumber = oNumberFormat.format(iValue1)
                                 return !sId ? sNumber : '';
@@ -162,25 +175,6 @@ sap.ui.define([
                     
                     })
                     if (oProperty.value === 'A02') {
-                        oInput = new Input({
-                            width:'100%',
-                            textAlign:'End',
-                            fieldGroupIds:'Input',
-                            value:{
-                                path:`addTargetModel>new_${oProperty['value']}_data`,
-                                type:'sap.ui.model.type.Float',
-                                formatOptions:{
-                                    groupSeparator: ',',
-                                    groupingEnabled: true,
-                                    maxIntegerDigits: 99,
-                                    maxFractionDigits: 2
-                                }
-                            },
-                            description:"%",
-                            fieldWidth:"70%",
-                            visible:'{uiModel>/edit}',
-                            liveChange: ($event) => { this.onInputLiveChange($event,'Number')},
-                        })
                         oText = new Text({
                             text:{
                                 parts: [
@@ -233,7 +227,10 @@ sap.ui.define([
                                 formatter: function (iValue1) {
                                     var oNumberFormat = NumberFormat.getFloatInstance({
                                         groupingEnabled: true,
-                                        groupingSeparator: ','
+                                        groupingSeparator: ',',
+                                        groupingSize: 3,
+                                        minFractionDigits:0,
+                                        maxFractionDigits:2
                                     });
                                     let sNumber = oNumberFormat.format(iValue1)
                                     return sNumber;                        
@@ -311,11 +308,13 @@ sap.ui.define([
                         placeholder:'금액 입력',
                         value:{
                             path:`excelUploadModel>${oProperty['value']}`,
-                            type:'sap.ui.model.type.Integer',
+                            type:'sap.ui.model.type.Float',
                             formatOptions:{
                                 groupSeparator: ',',
                                 groupingEnabled: true,
-                                maxIntegerDigits: 99
+                                maxIntegerDigits: 99,
+                                minFractionDigits:0,
+                                maxFractionDigits: 2
                             }
                         },
                         liveChange: ($event) => { this.onExcelUploadLiveChange($event,'Number')},
@@ -381,6 +380,7 @@ sap.ui.define([
                                     groupSeparator: ',',
                                     groupingEnabled: true,
                                     maxIntegerDigits: 99,
+                                    minFractionDigits:0,
                                     maxFractionDigits: 2
                                 }
                             },
@@ -528,7 +528,6 @@ sap.ui.define([
                 
                 const oBinding = oModel.bindContext(sPlUrl);
                 let oRequest= await oBinding.requestObject();
-                console.log(oRequest.value)
                 let oSetResult = this._dataSetting(oRequest.value, true);
                 let oJSONModel = new JSONModel(oSetResult.data);
                 // 바인딩에 사용되는 최대 항목 수를 설정
@@ -572,18 +571,18 @@ sap.ui.define([
         fnUpdateSums : function (oData, sProperty) {
             oData.highlight = 'None';
             if(oData[`new_${sProperty}_total_yn`]){
-                oData[`total_t_${sProperty}_data`] = Math.floor(oData[`new_${sProperty}_data`]);
+                oData[`total_t_${sProperty}_data`] = Math.floor(oData[`new_${sProperty}_data`]*100)/100;
                 if(oData.children?.length){
                     oData.children.forEach(child => {
                         this.fnUpdateSums(child, sProperty);
                     })
                 }
-                return Math.floor(oData[`new_${sProperty}_data`]);
+                return Math.floor(oData[`new_${sProperty}_data`]*100)/100;
             }else if(!oData[`new_${sProperty}_total_yn`] && !!oData.children?.length){
                 oData[`total_t_${sProperty}_data`] = oData.children.reduce((sum, child) => {
-                    return sum + this.fnUpdateSums(child, sProperty);
+                    return (Math.floor(sum*100) + Math.floor(this.fnUpdateSums(child, sProperty)*100))/100;
                 }, 0);
-                return Math.floor(oData[`total_t_${sProperty}_data`]);
+                return oData[`total_t_${sProperty}_data`];
             }else{
                 return 0
             }
@@ -596,17 +595,9 @@ sap.ui.define([
          * @returns 
          */
         fnCalcSums : function (oData, sProperty){
-            if(!oData.hdqt_id){
-                if (!!oData.children?.length) {
-                    oData[`total_f_${sProperty}_data`] = oData.children.reduce((sum, child) => {
-                        return sum + this.fnCalcSums(child, sProperty);
-                    }, 0);
-                }
-            }
-            
             if(oData[`new_${sProperty}_total_yn`]){
                 oData[`total_t_${sProperty}_data`] = oData[`new_${sProperty}_data`]
-            }else if(!!oData.children.length && !!oData.div_id && !oData.hdqt_id){
+            }else if(!!oData.children?.length && !!oData.div_id && !oData.hdqt_id){
                 if(!oData[`new_${sProperty}_data`]){
                     let i_t_sum = 0,
                         i_f_sum = 0;
@@ -624,7 +615,15 @@ sap.ui.define([
                 oData[`total_t_${sProperty}_data`] = oData[`new_${sProperty}_data`]
             }
 
-            return Math.floor(oData[`total_f_${sProperty}_data`]);
+            if(!oData.hdqt_id){
+                if (!!oData.children?.length) {
+                    oData[`total_f_${sProperty}_data`] = oData.children.reduce((sum, child) => {
+                        return sum + this.fnCalcSums(child, sProperty);
+                    }, 0);
+                }
+            }
+
+            return Math.floor(oData[`total_f_${sProperty}_data`]*100)/100;
         },
 
         /**
@@ -781,7 +780,7 @@ sap.ui.define([
                     oSource.setValueStateText("팀를 입력해주세요.");
                 }
             } else if (sFlag === "Number") { // 숫자
-                if(Number(sValue) === 0 && !sValuePath.includes("A02") && sValue.includes(".")) {                   // 0일때 0넣기
+                if(Number(sValue) === 0 && !sValue.includes(".")) {                   // 0일때 0넣기
                     oValueModel.setProperty(sValuePath, 0);
                     oSource.setValue(0);
                     oSource.setValueState(coreLib.ValueState.None);
@@ -789,7 +788,16 @@ sap.ui.define([
                 else {   // 값이 있을 때 유효성 검사
                     let sNewValue = this._validateField(sValue, sFlag);
                     if (sNewValue !== null) { // 값이 유효할 때
-                        if(!sValuePath.includes("A02") || (sValuePath.includes("A02") && sNewValue.split(".")[1] !== '')){
+                        if(sNewValue.includes('.')){
+                            let aPart = sNewValue.split('.');
+                            if(aPart[1].length>2){
+                                sNewValue = aPart[0] + '.' + aPart[1].substr(0,2);
+                            }
+                            if(aPart[1] !== '' && aPart[1] !== '0'){
+                                oSource.setValue(Number(sNewValue))
+                                oValueModel.setProperty(sValuePath, Number(sNewValue));
+                            }
+                        }else{
                             oValueModel.setProperty(sValuePath, Number(sNewValue));
                         }
 
@@ -816,7 +824,7 @@ sap.ui.define([
                 let isChanged = this._getFlatDataList(aTreeData).find(oData => {
                     return this._aPropertyList.some(sProperty => {
                         if(sProperty["value"] !== "D01"){
-                            return oData[sProperty["value"]+"_data"] !== oData["new_"+sProperty["value"]+"_data"]
+                            return oData[sProperty["value"]+"_data"] !== oData["new_"+sProperty["value"]+"_data"] || oData[sProperty["value"]+"_total_yn"] !== oData["new_"+sProperty["value"]+"_total_yn"]
                         }
                     });
                 })
@@ -869,7 +877,7 @@ sap.ui.define([
             let isChanged = this._getFlatDataList(aTreeData).find(oData => {
                 return this._aPropertyList.some(sProperty => {
                     if(sProperty["value"] !== "D01"){
-                        return oData[sProperty["value"]+"_total_yn"] !== oData["new_"+sProperty["value"]+"_total_yn"]
+                        return oData[sProperty["value"]+"_data"] !== oData["new_"+sProperty["value"]+"_data"] || oData[sProperty["value"]+"_total_yn"] !== oData["new_"+sProperty["value"]+"_total_yn"]
                     }
                 });
             })
@@ -939,13 +947,17 @@ sap.ui.define([
                 if (sValue) {   // 값이 있을 때 유효성 검사
                     let sNewValue = this._validateField(sValue, sFlag);
                     if (!!sNewValue) { // 값이 유효할 때
-                        const oNumberFormat = NumberFormat.getIntegerInstance({
-                            groupingEnabled: true,
-                            groupingSeparator: ',',
-                        });
-                        let sFormatValue = Number(sNewValue);
-
-                        oSource.setValue(sFormatValue);
+                        if(sNewValue.includes('.')){
+                            let aPart = sNewValue.split('.');
+                            if(aPart[1].length>2){
+                                sNewValue = aPart[0] + '.' + aPart[1].substr(0,2);
+                            }
+                            if(aPart[1] !== '' && aPart[1] !== '0'){
+                                oSource.setValue(Number(sNewValue))
+                            }
+                        }else{
+                            oSource.setValue(Number(sNewValue))
+                        }
                         oSource.setValueState(coreLib.ValueState.None);
                     } else {    // 유효하지 않을 때
                         oSource.setValue(sLastValue);

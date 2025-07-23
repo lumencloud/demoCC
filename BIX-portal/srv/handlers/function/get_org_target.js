@@ -81,21 +81,21 @@ module.exports = async function (year, a_target_list) {
             a_tree.push(o_look_up[org.org_id]);
         }
     })
-
+    
     function sum_target(a_data, s_target) {
         if(a_data[`${s_target}_total_yn`]){
-            a_data[`new_${s_target}`] = Math.floor(a_data[`new_${s_target}`]);
+            a_data[`new_${s_target}`] = Math.floor(a_data[`new_${s_target}`]*100)/100;
             if(a_data.children.length){
                 a_data.children.forEach(child => {
                     sum_target(child, s_target);
                 })
             }
-            return Math.floor(a_data[`new_${s_target}`]);
+            return Math.floor(a_data[`new_${s_target}`]*100)/100;
         }else if(!a_data[`${s_target}_total_yn`] && !!a_data.children.length){
             a_data[`new_${s_target}`] = a_data.children.reduce((sum, child) => {
-                return sum + sum_target(child, s_target);
+                return (Math.floor(sum*100) + Math.floor(sum_target(child, s_target)*100))/100;
             }, 0);
-            return Math.floor(a_data[`new_${s_target}`]);
+            return a_data[`new_${s_target}`];
         }else{
             return 0
         }
@@ -110,7 +110,7 @@ module.exports = async function (year, a_target_list) {
     function set_flat_data(a_data, a_flat) {
         let o_temp = {}
         a_target_item.forEach(item => {
-            if(a_data.div_id && !a_data[`new_${item.target}`]){
+            if((a_data.div_id || a_data.hdqt_id) && !a_data[`new_${item.target}`]){
                 a_data[`new_${item.target}`] = a_data[`${item.target}`]
             }
             if((item.value === 'A01' && !a_target_list.includes('A01')) || (item.value === 'A03' && !a_target_list.includes('A03'))) return

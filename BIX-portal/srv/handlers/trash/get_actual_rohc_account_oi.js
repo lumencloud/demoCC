@@ -45,7 +45,7 @@ module.exports = (srv) => {
          */
         const org_full_level = db.entities('common').org_full_level_view;
 
-        const account_view = db.entities('common').account
+        const account_view = db.entities('common').account_view
         // =================================================================================
 
         // function 입력 파라미터

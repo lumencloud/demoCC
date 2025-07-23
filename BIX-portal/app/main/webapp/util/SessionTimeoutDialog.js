@@ -38,7 +38,8 @@ sap.ui.define(
             this.setModel(
                 new JSONModel({
                     expired: this.getExpired(),
-                    timeLeft: this.getTimeoutNoticeDuration()
+                    timeLeft: this.getTimeoutNoticeDuration(),
+                    sessionTime : Number(localStorage.getItem("sessionTimeout")),
                 }),
                 SessionTimeoutDialog.INTERNAL_MODEL
             );
@@ -138,10 +139,21 @@ sap.ui.define(
             const iSecondsLeft = Math.ceil(Math.max(0, timeLeft) / 1000);
 
             if (iSecondsLeft > 0) {
-                return "세션 만료 예정 : " + iSecondsLeft + " 초 후"
+                return `<p>${iSecondsLeft}초 후 자동 <span class="logout-highlight">로그아웃</span>됩니다</p>`
             }
 
-            return "다시 로그인 해주세요";
+            return `<p>로그인 시간이 만료되어<br>자동으로 <span class="logout-highlight">로그아웃</span>되었습니다</p>`;
+        };
+        SessionTimeoutDialog.prototype._formatSubDescription = function (timeLeft,sessionTime) {
+            const iSecondsLeft = Math.ceil(Math.max(0, timeLeft) / 1000);
+
+            if (iSecondsLeft > 0) {
+                return `<p>로그인 후 ${sessionTime}분동안 사용하지 않을 경우, 자동 로그아웃 됩니다.</p>
+                    <p>로그인 시간을 연장하시려면 로그인 연장 버튼을 클릭하시길 바랍니다.</p>`
+            }
+
+            return `<p>서비스를 이용해주셔서 감사합니다.</p>
+                <p>로그인이 필요한 경우 다시 로그인하기 버튼을 클릭하시길 바랍니다.</p>`;
         };
 
         SessionTimeoutDialog.prototype._onContinueWorking = function () {

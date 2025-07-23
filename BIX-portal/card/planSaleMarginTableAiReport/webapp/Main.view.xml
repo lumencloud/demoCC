@@ -28,7 +28,7 @@
                         selectionBehavior="RowOnly" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         rowSelectionChange=".onRowSelectionChange"
-                        fixedColumnCount="2"
+                        fixedColumnCount="1"
                         busyIndicatorDelay="0"
                         visibleRowCountMode="Auto"
                         noData=" "
@@ -364,7 +364,7 @@
                         selectionBehavior="RowOnly" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         rowSelectionChange=".onRowSelectionChange"
-                        fixedColumnCount="2"
+                        fixedColumnCount="1"
                         busyIndicatorDelay="0"
                         visibleRowCountMode="Auto"
                         noData=" "
@@ -701,7 +701,7 @@
                         selectionBehavior="RowOnly" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         rowSelectionChange=".onRowSelectionChange"
-                        fixedColumnCount="2"
+                        fixedColumnCount="1"
                         busyIndicatorDelay="0"
                         visibleRowCountMode="Auto"
                         noData=" "
@@ -1028,7 +1028,7 @@
                         selectionBehavior="RowOnly" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         rowSelectionChange=".onRowSelectionChange"
-                        fixedColumnCount="2"
+                        fixedColumnCount="1"
                         busyIndicatorDelay="0"
                         visibleRowCountMode="Auto"
                         noData=" "
@@ -1376,14 +1376,14 @@
                                 <Text emptyIndicatorMode="On"
                                     text="{
                                         parts:[
-                                            {path:'forecast_value', targetType: 'any'},
+                                            {path:'secured_value', targetType: 'any'},
                                             {path:'type', targetType: 'any'}
                                         ],
                                         formatter: '.onFormatPerformance'
                                     }"
                                     tooltip="{
                                         parts:[
-                                            {path:'forecast_value', targetType: 'any'},
+                                            {path:'secured_value', targetType: 'any'},
                                             {path:'type', targetType: 'any'},
                                             {value:'tooltip'}
                                         ],

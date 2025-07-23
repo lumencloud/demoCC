@@ -176,7 +176,7 @@ sap.ui.define([
             for (let i = 0; i < this._aCanvasId.length; i++) {
                 let oHTML = this.byId("html" + i);
                 oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:${iBoxWidth}vw; height:${iBoxHeight}vh; min-height:${this._iMinHeight}px'><canvas id='${this._aCanvasId[i]}' /></div>`);
-                oHTML.attachEvent("afterRendering", async function () {                                       
+                oHTML.attachEventOnce("afterRendering", async function () {                                       
                     // 차트 구성
                     const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[i])).getContext("2d");
                     //데이터 요청
@@ -206,6 +206,7 @@ sap.ui.define([
                                     borderRadius: 3,
                                     backgroundColor: Blue,
                                     borderColor : Blue,
+                                    borderSkipped : false,
                                     yAxisID: "y",
                                     stack: 'stack2', //동일한 스택 이름으로 묶음
                                     order:1,
@@ -222,6 +223,7 @@ sap.ui.define([
                                     borderRadius: 3,
                                     backgroundColor: "white",
                                     borderColor: Blue,
+                                    borderSkipped : false,
                                     borderWidth: 1,
                                     yAxisID: "y",                                    
                                     stack: 'stack2', //동일한 스택 이름으로 묶음
@@ -230,15 +232,13 @@ sap.ui.define([
                                         color: Blue
                                         
                                     },
-
-
-
                                 },
                                 {
                                     label: "마진",
                                     data: aData.margin,
                                     borderRadius: 3,
                                     backgroundColor: Green,
+                                    borderSkipped : false,
                                     yAxisID : "y",
                                     stack: 'stack1', //동일한 스택 이름으로 묶음
                                     order:2,
@@ -255,6 +255,7 @@ sap.ui.define([
                                     backgroundColor: 'White',
                                     borderColor : Green,
                                     borderWidth: 1,
+                                    borderSkipped : false,
                                     yAxisID : "y",                                    
                                     stack: 'stack1', //동일한 스택 이름으로 묶음
                                     order:2,
@@ -396,26 +397,49 @@ sap.ui.define([
                                         size: 12
                                     },
                                     offset: -3,
-                                    formatter: function(value){
-                                            if (value > 100 || value < -100) {
+                                    formatter: function(value, context){
+                                        let type = context.dataset.label;
+
+                                        if(type){
+                                            if (type === "매출" || type === "매출 추정" || type === "마진"|| type === "마진 추정") {
                                                 var oNumberFormat = NumberFormat.getFloatInstance({
                                                     groupingEnabled: true,
                                                     groupingSeparator: ',',
                                                     groupingSize: 3,
                                                     decimals: 0
                                                 });
-                                                return oNumberFormat.format(value / 100000000);                                                
-                                            } else if(value === null){return null} else if (value < 100 && value > -100){
+
+                                                if(value === null || value === 0){
+                                                    return null;
+                                                } else  if(value < 100000000 && value > -100000000) {
+                                                    var oNumberFormat = NumberFormat.getFloatInstance({
+                                                        groupingEnabled: true,
+                                                        groupingSeparator: ',',
+                                                        groupingSize: 3,
+                                                        decimals: 2
+                                                    });
+
+                                                    return `${oNumberFormat.format(value / 100000000)}`;
+                                                }
+                                                else {
+                                                    return `${oNumberFormat.format(value / 100000000)}`;
+                                                }
+                                                
+                                            } else if (type === "마진율(%)" || type === "마진율 추이(%)"){
                                                 var oNumberFormat = NumberFormat.getFloatInstance({
                                                     groupingEnabled: true,
                                                     groupingSeparator: ',',
                                                     groupingSize: 3,
                                                     decimals: 1
                                                 });
-                                                return oNumberFormat.format(value)+"%";
+                                                if(value === 0){
+                                                    return null;
+                                                } else {
+                                                return `${oNumberFormat.format(value)}%`;
+                                                }
                                                 
-                                            }
-                                        
+                                            } 
+                                        }
                                     }
                                 }
                             },                                            
@@ -485,7 +509,6 @@ sap.ui.define([
                     })
                     
                     this.dataLoad();
-                    //this._ovserveResize(this.byId(this._aContainerId[i]), i)
                 }.bind(this));
                 
            }
@@ -500,17 +523,7 @@ sap.ui.define([
 			})
 		},
 
-        _ovserveResize: function(oElement, i){
-
-            if(!this._resizeObserver){
-                this._resizeObserver = new ResizeObserver(()=> {
-                    this._oMyChart[i].resize()
-                })
-                   
-            }
-        },
-
-
+       
         _dataSetting: async function () {
             let oResults = await this._setData();
             let aData;

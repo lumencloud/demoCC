@@ -88,7 +88,7 @@ sap.ui.define([
 
             let oHTML = this.byId("html");
             oHTML.setContent(`<div id='${this._sContainerId}' class='custom-chart-container' style='width:${iBoxWidth}vw; height:${iBoxHeight}vh; min-height:${this._iMinHeight}rem'><canvas id='${this._sCanvasId}' style='padding: 0 0.5rem'/></div>`);
-            oHTML.attachEvent("afterRendering", async function () {
+            oHTML.attachEventOnce("afterRendering", async function () {
 
                 const canvas = document.getElementById(this._sCanvasId);
                 const ctx = canvas.getContext("2d");
@@ -251,7 +251,7 @@ sap.ui.define([
         //     });
         //     oBox.addItem(oHTML);
 
-        //     oHTML.attachEvent("afterRendering", function () {
+        //     oHTML.attachEventOnce("afterRendering", function () {
         //         const ctx = document.getElementById('chart05');
 
         //         // 데이터 설정

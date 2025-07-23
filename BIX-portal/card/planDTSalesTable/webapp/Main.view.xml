@@ -21,7 +21,7 @@
             <VBox height="100%" width="100%">
                 <OverflowToolbar
                         width="100%"
-                        height="3rem"
+                        height="4rem"
                         class="custom-overflow-toolbar"                    
                     >
                         <ToolbarSpacer />
@@ -1088,7 +1088,7 @@
                         resizable="false"
                     >
                             <Label
-                                text="과제명"
+                                text="과제"
                                 wrapping="false"
                             />
                         <table:template>

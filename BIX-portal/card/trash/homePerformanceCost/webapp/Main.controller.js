@@ -70,7 +70,7 @@ sap.ui.define([
 				oBox.addItem(oHTML);
 
 				// 차트 바인딩
-				oHTML.attachEvent("afterRendering", function () {
+				oHTML.attachEventOnce("afterRendering", function () {
 					const oCanvas = document.getElementById("chart1");
 					const ctx = oCanvas.getContext("2d");
 

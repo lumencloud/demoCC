@@ -16,46 +16,7 @@ modules:
             - bixcarddivplugin.zip
           name: bixcarddivplugin
           target-path: resources/
-        - artifacts:
-            - bixcardsalesprogress.zip
-          name: bixcardsalesprogress
-          target-path: resources/
-        - artifacts:
-            - bixcardmarginprogress.zip
-          name: bixcardmarginprogress
-          target-path: resources/
-        - artifacts:
-            - bixcardsgaprogress.zip
-          name: bixcardsgaprogress
-          target-path: resources/
-        - artifacts:
-            - bixcardyoysalesgap.zip
-          name: bixcardyoysalesgap
-          target-path: resources/
-        - artifacts:
-            - bixcardplGrid1.zip
-          name: bixcardplGrid1
-          target-path: resources/
-        - artifacts:
-            - bixcardplGrid2.zip
-          name: bixcardplGrid2
-          target-path: resources/
-        - artifacts:
-            - bixcardplGrid3.zip
-          name: bixcardplGrid3
-          target-path: resources/
-        - artifacts:
-            - bixcardplGrid4.zip
-          name: bixcardplGrid4
-          target-path: resources/
-        - artifacts:
-            - bixcardplGrid5.zip
-          name: bixcardplGrid5
-          target-path: resources/
-        - artifacts:
-            - bixcardplGrid6.zip
-          name: bixcardplGrid6
-          target-path: resources/
+        
         - artifacts:
             - bixcardplUiTable.zip
           name: bixcardplUiTable
@@ -64,49 +25,11 @@ modules:
             - bixcardoiUiTable.zip
           name: bixcardoiUiTable
           target-path: resources/
-        - artifacts:
-            - bixcardorgRateTable.zip
-          name: bixcardorgRateTable
-          target-path: resources/
+        
         - artifacts:
             - bixcardsgaDetailTable.zip
           name: bixcardsgaDetailTable
           target-path: resources/
-        - artifacts:
-            - bixcardsgaDetailTableAiReport.zip
-          name: bixcardsgaDetailTableAiReport
-          target-path: resources/
-        - artifacts:
-            - bixcardplPlanSaleMarginTable.zip
-          name: bixcardplPlanSaleMarginTable
-          target-path: resources/
-        - artifacts:
-            - bixcardplPlanSgaTable.zip
-          name: bixcardplPlanSgaTable
-          target-path: resources/
-        
-        - artifacts:
-            - bixcardplPlanOffshoringTable.zip
-          name: bixcardplPlanOffshoringTable
-          target-path: resources/
-        - artifacts:
-            - bixcardplPlanNonMMTable.zip
-          name: bixcardplPlanNonMMTable
-          target-path: resources/
-        
-        - artifacts:
-            - bixcardplPipeLineDetailTable.zip
-          name: bixcardplPipeLineDetailTable
-          target-path: resources/
-        
-        - artifacts:
-            - bixcardplDtRodrTable.zip
-          name: bixcardplDtRodrTable
-          target-path: resources/
-        - artifacts:
-            - bixcardplAccountRodrTable.zip
-          name: bixcardplAccountRodrTable
-          target-path: resources/  
         - artifacts:
             - bixcardforecastPlUiTable.zip
           name: bixcardforecastPlUiTable
@@ -115,24 +38,10 @@ modules:
             - bixcardforecastOiUiTable.zip
           name: bixcardforecastOiUiTable
           target-path: resources/       
-        - artifacts:
-            - bixcarddtUiTable.zip
-          name: bixcarddtUiTable
-          target-path: resources/
-                            
+       
         - artifacts:
             - bixcardplanPipelineDetailTable.zip
           name: bixcardplanPipelineDetailTable
-          target-path: resources/
-                            
-        - artifacts:
-            - bixcardplanPipelineDetailTableAiReport.zip
-          name: bixcardplanPipelineDetailTableAiReport
-          target-path: resources/
-
-        - artifacts:
-            - bixcardactualPipeLineDetailTable.zip
-          name: bixcardactualPipeLineDetailTable
           target-path: resources/
 
         - artifacts:
@@ -141,33 +50,8 @@ modules:
           target-path: resources/
 
         - artifacts:
-            - bixcardactualSaleMarginDetailTableAiReport.zip
-          name: bixcardactualSaleMarginDetailTableAiReport
-          target-path: resources/
-
-        - artifacts:
-            - bixcardaccountDetailTableAiReport.zip
-          name: bixcardaccountDetailTableAiReport
-          target-path: resources/
-
-        - artifacts:
             - bixcardplanSaleMarginTable.zip
           name: bixcardplanSaleMarginTable
-          target-path: resources/
-
-        - artifacts:
-            - bixcardplanSaleMarginTableAiReport.zip
-          name: bixcardplanSaleMarginTableAiReport
-          target-path: resources/
-
-        - artifacts:
-            - bixcardactualSGATable.zip
-          name: bixcardactualSGATable
-          target-path: resources/
-
-        - artifacts:
-            - bixcardplanSGATable.zip
-          name: bixcardplanSGATable
           target-path: resources/
 
         - artifacts:
@@ -176,18 +60,8 @@ modules:
           target-path: resources/
 
         - artifacts:
-            - bixcardactualDTSalesTableAiReport.zip
-          name: bixcardactualDTSalesTableAiReport
-          target-path: resources/
-
-        - artifacts:
             - bixcardplanDTSalesTable.zip
           name: bixcardplanDTSalesTable
-          target-path: resources/
-
-        - artifacts:
-            - bixcardplanDTSalesTableAiReport.zip
-          name: bixcardplanDTSalesTableAiReport
           target-path: resources/
 
         - artifacts:
@@ -206,23 +80,8 @@ modules:
           target-path: resources/
 
         - artifacts:
-            - bixcardactualBrTableAiReport.zip
-          name: bixcardactualBrTableAiReport
-          target-path: resources/
-
-        - artifacts:
             - bixcardplanBrTable.zip
           name: bixcardplanBrTable
-          target-path: resources/
-
-        - artifacts:
-            - bixcardplanBrTableAiReport.zip
-          name: bixcardplanBrTableAiReport
-          target-path: resources/
-
-        - artifacts:
-            - bixcardactualAccountTable.zip
-          name: bixcardactualAccountTable
           target-path: resources/
 
         - artifacts:
@@ -231,59 +90,14 @@ modules:
           target-path: resources/
 
         - artifacts:
-            - bixcardplanAccountTableAiReport.zip
-          name: bixcardplanAccountTableAiReport
-          target-path: resources/
-
-        - artifacts:
-            - bixcardplanSectorPipelineTable.zip
-          name: bixcardplanSectorPipelineTable
-          target-path: resources/
-
-        - artifacts:
             - bixcardactualRoHCTable.zip
           name: bixcardactualRoHCTable
           target-path: resources/
 
         - artifacts:
-            - bixcardactualRoHCTableAiReport.zip
-          name: bixcardactualRoHCTableAiReport
-          target-path: resources/
-          
-        - artifacts:
             - bixcardactualSaleMarginChart.zip
           name: bixcardactualSaleMarginChart
-          target-path: resources/
-
-        - artifacts:
-            - bixcardmarginAmt.zip
-          name: bixcardmarginAmt
-          target-path: resources/        
-        
-        - artifacts:
-            - bixcardsalesAmt.zip
-          name: bixcardsalesAmt
-          target-path: resources/       
-
-        - artifacts:
-            - bixcardmarginRate.zip
-          name: bixcardmarginRate
-          target-path: resources/       
-
-        - artifacts:
-            - bixcardorderAmt.zip
-          name: bixcardorderAmt
-          target-path: resources/       
-
-        - artifacts:
-            - bixcarddealStageChart.zip
-          name: bixcarddealStageChart
-          target-path: resources/       
-
-        - artifacts:
-            - bixcardactualSaleOrgChart.zip
-          name: bixcardactualSaleOrgChart
-          target-path: resources/       
+          target-path: resources/  
 
         - artifacts:
             - bixcardnewRegist.zip
@@ -346,11 +160,6 @@ modules:
           target-path: resources/ 
 
         - artifacts:
-            - bixcardactualSMOrgChart.zip
-          name: bixcardactualSMOrgChart
-          target-path: resources/
-
-        - artifacts:
             - bixcardaiInsightBau.zip
           name: bixcardaiInsightBau
           target-path: resources/        
@@ -360,50 +169,6 @@ modules:
           name: bixcardamountCard
           target-path: resources/
 
-        - artifacts:
-            - bixcardmonthlyPlan.zip
-          name: bixcardmonthlyPlan
-          target-path: resources/
-
-        - artifacts:
-            - bixcardorgAnalyze.zip
-          name: bixcardorgAnalyze
-          target-path: resources/
-
-        - artifacts:
-            - bixcardsaleCrov.zip
-          name: bixcardsaleCrov
-          target-path: resources/
-
-        - artifacts:
-            - bixcardsaleNewCarryOver.zip
-          name: bixcardsaleNewCarryOver
-          target-path: resources/
-
-        - artifacts:
-            - bixcardsalePurposeState.zip
-          name: bixcardsalePurposeState
-          target-path: resources/
-
-        - artifacts:
-            - bixcardsaleRelsco.zip
-          name: bixcardsaleRelsco
-          target-path: resources/
-
-        - artifacts:
-            - bixcardsaleRelsco2.zip
-          name: bixcardsaleRelsco2
-          target-path: resources/
-        
-        - artifacts:
-            - bixcardactualSMTypeChartContainer.zip
-          name: bixcardactualSMTypeChartContainer
-          target-path: resources/
-
-        - artifacts:
-            - bixcardactualSMAccountChartContainer.zip
-          name: bixcardactualSMAccountChartContainer
-          target-path: resources/
 
         - artifacts:
             - bixcardplanSMTypeChartContainer.zip
@@ -416,17 +181,6 @@ modules:
           target-path: resources/
 
         - artifacts:
-            - bixcardplanPipelineOrgDetailTableAiReport.zip
-          name: bixcardplanPipelineOrgDetailTableAiReport
-          target-path: resources/
-
-        - artifacts:
-            - bixcardplanSectorPipelineChart.zip
-          name: bixcardplanSectorPipelineChart
-          target-path: resources/
-
-                
-        - artifacts:
             - bixcarddeliverymonthlytitle1.zip
           name: bixcarddeliverymonthlytitle1
           target-path: resources/
@@ -435,7 +189,7 @@ modules:
             - bixcarddeliverymonthlytitle2.zip
           name: bixcarddeliverymonthlytitle2
           target-path: resources/
-
+ 
         - artifacts:
             - bixcarddeliverymonthlycontent1_1.zip
           name: bixcarddeliverymonthlycontent1_1
@@ -497,20 +251,20 @@ modules:
           target-path: resources/
 
         - artifacts:
+            - bixcarddeliverymonthlycontent3_3.zip
+          name: bixcarddeliverymonthlycontent3_3
+          target-path: resources/
+     
+        - artifacts:
             - bixcardallmonthlycontent3_4.zip
           name: bixcardallmonthlycontent3_4
           target-path: resources/
-
+      
         - artifacts:
             - bixcardallmonthlycontent3_5.zip
           name: bixcardallmonthlycontent3_5
           target-path: resources/
 
-        - artifacts:
-            - bixcarddeliverymonthlycontent3_3.zip
-          name: bixcarddeliverymonthlycontent3_3
-          target-path: resources/
-     
         - artifacts:
             - bixcardmonthlycompletedcontract.zip
           name: bixcardmonthlycompletedcontract
@@ -545,9 +299,7 @@ modules:
             - bixcardaireportmonthlyaiinsightsmry.zip
           name: bixcardaireportmonthlyaiinsightsmry
           target-path: resources/
-
           
-
         - artifacts:
             - bixcardacountMonthlyContent2_2.zip
           name: bixcardacountMonthlyContent2_2
@@ -567,6 +319,66 @@ modules:
             - bixcardplanPipelineDetailChart.zip
           name: bixcardplanPipelineDetailChart
           target-path: resources/
+
+        - artifacts:
+            - bixcardaccountDetailTableAiReport.zip
+          name: bixcardaccountDetailTableAiReport
+          target-path: resources/
+
+        - artifacts:
+            - bixcardactualBrTableAiReport.zip
+          name: bixcardactualBrTableAiReport
+          target-path: resources/
+
+        - artifacts:
+            - bixcardactualDTSalesTableAiReport.zip
+          name: bixcardactualDTSalesTableAiReport
+          target-path: resources/
+
+        - artifacts:
+            - bixcardactualRoHCTableAiReport.zip
+          name: bixcardactualRoHCTableAiReport
+          target-path: resources/
+
+        - artifacts:
+            - bixcardactualSaleMarginDetailTableAiReport.zip
+          name: bixcardactualSaleMarginDetailTableAiReport
+          target-path: resources/
+
+        - artifacts:
+            - bixcardplanAccountTableAiReport.zip
+          name: bixcardplanAccountTableAiReport
+          target-path: resources/
+
+        - artifacts:
+            - bixcardplanBrTableAiReport.zip
+          name: bixcardplanBrTableAiReport
+          target-path: resources/
+
+        - artifacts:
+            - bixcardplanDTSalesTableAiReport.zip
+          name: bixcardplanDTSalesTableAiReport
+          target-path: resources/
+
+        - artifacts:
+            - bixcardplanPipelineDetailTableAiReport.zip
+          name: bixcardplanPipelineDetailTableAiReport
+          target-path: resources/
+
+        - artifacts:
+            - bixcardplanPipelineOrgDetailTableAiReport.zip
+          name: bixcardplanPipelineOrgDetailTableAiReport
+          target-path: resources/
+
+        - artifacts:
+            - bixcardplanSaleMarginTableAiReport.zip
+          name: bixcardplanSaleMarginTableAiReport
+          target-path: resources/
+
+        - artifacts:
+            - bixcardsgaDetailTableAiReport.zip
+          name: bixcardsgaDetailTableAiReport
+          target-path: resources/
          
 
           
@@ -580,97 +392,7 @@ modules:
         - npm run build:cf
       supported-platforms: []
   
-  - name: bixcardsalesprogress
-    type: html5
-    path: ./salesProgress
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardmarginprogress
-    type: html5
-    path: ./marginProgress
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardsgaprogress
-    type: html5
-    path: ./sgaProgress
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardyoysalesgap
-    type: html5
-    path: ./yoySalesGap
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: [] 
   
-  - name: bixcardplGrid1
-    type: html5
-    path: ./plGrid1
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardplGrid2
-    type: html5
-    path: ./plGrid2
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardplGrid3
-    type: html5
-    path: ./plGrid3
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardplGrid4
-    type: html5
-    path: ./plGrid4
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardplGrid5
-    type: html5
-    path: ./plGrid5
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardplGrid6
-    type: html5
-    path: ./plGrid6
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
   - name: bixcardplUiTable
     type: html5
     path: ./plUiTable
@@ -698,90 +420,7 @@ modules:
       commands:
         - npm run build:cf
       supported-platforms: []
-  - name: bixcardorgRateTable
-    type: html5
-    path: ./orgRateTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardsgaDetailTableAiReport
-    type: html5
-    path: ./sgaDetailTableAiReport
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardplPlanSaleMarginTable
-    type: html5
-    path: ./plPlanSaleMarginTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardplPlanSgaTable
-    type: html5
-    path: ./plPlanSgaTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  
-  - name: bixcardplPlanOffshoringTable
-    type: html5
-    path: ./plPlanOffshoringTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardplPlanNonMMTable
-    type: html5
-    path: ./plPlanNonMMTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-   
-  - name: bixcardplPipeLineDetailTable
-    type: html5
-    path: ./plPipeLineDetailTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  
-  - name: bixcardplDtRodrTable
-    type: html5
-    path: ./plDtRodrTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  - name: bixcardplAccountRodrTable
-    type: html5
-    path: ./plAccountRodrTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
+
   - name: bixcardforecastPlUiTable
     type: html5
     path: ./forecastPlUiTable
@@ -800,15 +439,6 @@ modules:
       commands:
         - npm run build:cf
       supported-platforms: []
-  - name: bixcarddtUiTable
-    type: html5
-    path: ./dtUiTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []     
 
   - name: bixcardplanPipelineDetailTable
     type: html5
@@ -820,26 +450,6 @@ modules:
         - npm run build:cf
       supported-platforms: []      
 
-  - name: bixcardplanPipelineDetailTableAiReport
-    type: html5
-    path: ./planPipelineDetailTableAiReport
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: [] 
-  
-  - name: bixcardactualPipeLineDetailTable
-    type: html5
-    path: ./actualPipelineDetailTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: [] 
-  
   - name: bixcardactualSaleMarginDetailTable
     type: html5
     path: ./actualSaleMarginDetailTable
@@ -849,60 +459,10 @@ modules:
       commands:
         - npm run build:cf
       supported-platforms: [] 
-  
-  - name: bixcardactualSaleMarginDetailTableAiReport
-    type: html5
-    path: ./actualSaleMarginDetailTableAiReport
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: [] 
-  
-  - name: bixcardaccountDetailTableAiReport
-    type: html5
-    path: ./accountDetailTableAiReport
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
 
   - name: bixcardplanSaleMarginTable
     type: html5
     path: ./planSaleMarginTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: [] 
-
-  - name: bixcardplanSaleMarginTableAiReport
-    type: html5
-    path: ./planSaleMarginTableAiReport
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: [] 
-    
-  - name: bixcardactualSGATable
-    type: html5
-    path: ./actualSGATable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: [] 
-
-  - name: bixcardplanSGATable
-    type: html5
-    path: ./planSGATable
     build-parameters:
       build-result: dist
       builder: custom
@@ -920,29 +480,9 @@ modules:
         - npm run build:cf
       supported-platforms: [] 
 
-  - name: bixcardplanDTSalesTableAiReport
-    type: html5
-    path: ./planDTSalesTableAiReport
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: [] 
-
   - name: bixcardactualDTSalesTable
     type: html5
     path: ./actualDTSalesTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: [] 
-
-  - name: bixcardactualDTSalesTableAiReport
-    type: html5
-    path: ./actualDTSalesTableAiReport
     build-parameters:
       build-result: dist
       builder: custom
@@ -980,16 +520,6 @@ modules:
         - npm run build:cf
       supported-platforms: [] 
 
-  - name: bixcardplanBrTableAiReport
-    type: html5
-    path: ./planBrTableAiReport
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: [] 
-
   - name: bixcardactualBrTable
     type: html5
     path: ./actualBrTable
@@ -1000,49 +530,10 @@ modules:
         - npm run build:cf
       supported-platforms: []
 
-  - name: bixcardactualBrTableAiReport
-    type: html5
-    path: ./actualBrTableAiReport
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
 
   - name: bixcardplanAccountTable
     type: html5
     path: ./planAccountTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: [] 
-
-  - name: bixcardplanAccountTableAiReport
-    type: html5
-    path: ./planAccountTableAiReport
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: [] 
-
-  - name: bixcardactualAccountTable
-    type: html5
-    path: ./actualAccountTable
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardplanSectorPipelineTable
-    type: html5
-    path: ./planSectorPipelineTable
     build-parameters:
       build-result: dist
       builder: custom
@@ -1060,89 +551,9 @@ modules:
         - npm run build:cf
       supported-platforms: []
 
-  - name: bixcardactualRoHCTableAiReport
-    type: html5
-    path: ./actualRoHCTableAiReport
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-  
   - name: bixcardactualSaleMarginChart
     type: html5
     path: ./actualSaleMarginChart
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardplanSectorPipelineChart
-    type: html5
-    path: ./planSectorPipelineChart
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardmarginAmt
-    type: html5
-    path: ./marginAmt
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardsalesAmt
-    type: html5
-    path: ./salesAmt
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardmarginRate
-    type: html5
-    path: ./marginRate
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardorderAmt
-    type: html5
-    path: ./orderAmt
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-    
-  - name: bixcarddealStageChart
-    type: html5
-    path: ./dealStageChart
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardactualSaleOrgChart
-    type: html5
-    path: ./actualSaleOrgChart
     build-parameters:
       build-result: dist
       builder: custom
@@ -1279,20 +690,7 @@ modules:
       commands:
         - npm run build:cf
       supported-platforms: []
-
-      
-  - name: bixcardactualSMOrgChart
-    type: html5
-    path: ./actualSMOrgChart
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-      
   
-
   - name: bixcardamountCard
     type: html5
     path: ./amountCard
@@ -1303,95 +701,6 @@ modules:
         - npm run build:cf
       supported-platforms: []
 
-  - name: bixcardmonthlyPlan
-    type: html5
-    path: ./monthlyPlan
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardorgAnalyze
-    type: html5
-    path: ./orgAnalyze
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardsaleCrov
-    type: html5
-    path: ./saleCrov
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardsaleNewCarryOver
-    type: html5
-    path: ./saleNewCarryOver
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardsalePurposeState
-    type: html5
-    path: ./salePurposeState
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardsaleRelsco
-    type: html5
-    path: ./saleRelsco
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardsaleRelsco2
-    type: html5
-    path: ./saleRelsco2
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardactualSMTypeChartContainer
-    type: html5
-    path: ./actualSMTypeChartContainer
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
-
-  - name: bixcardactualSMAccountChartContainer
-    type: html5
-    path: ./actualSMAccountChartContainer
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []
 
   - name: bixcardplanSMTypeChartContainer
     type: html5
@@ -1412,16 +721,6 @@ modules:
       commands:
         - npm run build:cf
       supported-platforms: []
-
-  - name: bixcardplanPipelineOrgDetailTableAiReport
-    type: html5
-    path: ./planPipelineOrgDetailTableAiReport
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm run build:cf
-      supported-platforms: []     
 
   - name: bixcarddeliverymonthlytitle1
     type: html5
@@ -1481,7 +780,7 @@ modules:
       builder: custom
       commands:
         - npm run build:cf
-      supported-platforms: []        
+      supported-platforms: []           
 
   - name: bixcarddeliverymonthlycontent2_2
     type: html5
@@ -1531,7 +830,7 @@ modules:
       builder: custom
       commands:
         - npm run build:cf
-      supported-platforms: []              
+      supported-platforms: []  
 
   - name: bixcarddeliverymonthlycontent3_3
     type: html5
@@ -1631,7 +930,7 @@ modules:
       builder: custom
       commands:
         - npm run build:cf
-      supported-platforms: []     
+      supported-platforms: []   
 
   - name: bixcardaireportmonthlyaiinsight
     type: html5
@@ -1652,8 +951,6 @@ modules:
       commands:
         - npm run build:cf
       supported-platforms: []     
-
-      
 
   - name: bixcardacountMonthlyContent2_2
     type: html5
@@ -1688,6 +985,126 @@ modules:
   - name: bixcardplanPipelineDetailChart
     type: html5
     path: ./planPipelineDetailChart
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardaccountDetailTableAiReport
+    type: html5
+    path: ./accountDetailTableAiReport
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardactualBrTableAiReport
+    type: html5
+    path: ./actualBrTableAiReport
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardactualDTSalesTableAiReport
+    type: html5
+    path: ./actualDTSalesTableAiReport
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardactualRoHCTableAiReport
+    type: html5
+    path: ./actualRoHCTableAiReport
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardactualSaleMarginDetailTableAiReport
+    type: html5
+    path: ./actualSaleMarginDetailTableAiReport
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardplanAccountTableAiReport
+    type: html5
+    path: ./planAccountTableAiReport
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardplanBrTableAiReport
+    type: html5
+    path: ./planBrTableAiReport
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardplanDTSalesTableAiReport
+    type: html5
+    path: ./planDTSalesTableAiReport
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardplanPipelineDetailTableAiReport
+    type: html5
+    path: ./planPipelineDetailTableAiReport
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardplanPipelineOrgDetailTableAiReport
+    type: html5
+    path: ./planPipelineOrgDetailTableAiReport
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardplanSaleMarginTableAiReport
+    type: html5
+    path: ./planSaleMarginTableAiReport
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []   
+      
+  - name: bixcardsgaDetailTableAiReport
+    type: html5
+    path: ./sgaDetailTableAiReport
     build-parameters:
       build-result: dist
       builder: custom

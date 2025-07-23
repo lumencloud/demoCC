@@ -11,11 +11,20 @@ sap.ui.define([
 	return Controller.extend("bix.card.deliveryMonthlyContent1_2.Main", {
 		_oEventBus: EventBus.getInstance(),
 		onInit: function () {
-			// this._dataSetting();
-			// this.byId("cardContent").setBusy(true)
-			this.getOwnerComponent().oCard.setBusy(true)
+			this._oEventBus.publish("aireport", "isCardSubscribed");
+
 			this._oEventBus.subscribe("aireport", "deliContent1_2", this._modelSetting, this);
-			this.getOwnerComponent().oCard.setBusy(false)
+
+			this._oEventBus.subscribe("aireport", "setBusy", this._setBusy, this);
+
+			this._setModel();
+
+		},
+		_setModel: function () {
+			this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+		},
+		_setBusy: function () {
+			this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
 		},
 
 		_dataSetting: async function () {
@@ -44,13 +53,13 @@ sap.ui.define([
 			await oModel.bindContext(sPath).requestObject().then(
 				function (aResult) {
 					Module.displayStatusForEmpty(this.getOwnerComponent().oCard, aResult.value, this.byId("cardContent"));
-					
+
 					this._modelSetting(aResult.value);
 				}.bind(this)
 			).catch((oErr) => {
 				Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
 			})
-			this.getOwnerComponent().oCard.setBusy(false)
+
 		},
 
 		dataLoad: function () {
@@ -61,8 +70,7 @@ sap.ui.define([
 		},
 
 		_modelSetting: function (sChannel, sEventId, oData) {
-			this.getOwnerComponent().oCard.setBusy(true)
-
+			this.byId("cardContent").setBusy(true)
 			let oSessionData = JSON.parse(sessionStorage.getItem("aiReport"));
 
 			const oResult = oData.data
@@ -72,20 +80,19 @@ sap.ui.define([
 			let oModelData = oResult.length > 0 ? oResult[0] : {};
 			this.getView().setModel(new JSONModel(oModelData), "Model");
 			this.dataLoad();
-			setTimeout(() => {
-                this.getOwnerComponent().oCard.setBusy(false);
-            }, 300)
+			this.getView().getModel("ui").setProperty("/bBusyFlag", false);
+			this.byId("cardContent").setBusy(false)
 		},
 
 		onFormatPerformance: function (iValue) {
 
-            var oNumberFormat = NumberFormat.getFloatInstance({
-					groupingEnabled: true,
-					groupingSeparator: ',',
-					groupingSize: 3,
-                });
-                return oNumberFormat.format(iValue);
-            
-        },
+			var oNumberFormat = NumberFormat.getFloatInstance({
+				groupingEnabled: true,
+				groupingSeparator: ',',
+				groupingSize: 3,
+			});
+			return oNumberFormat.format(iValue);
+
+		},
 	});
 });

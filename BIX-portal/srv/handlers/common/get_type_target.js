@@ -16,8 +16,8 @@ module.exports = (srv) => {
             const target = db.entities('common').annual_target;
             const code_header = db.entities('common').code_header;
             const code_item = db.entities('common').code_item;
-            const dt_task = db.entities('common').dt_task
-            const account = db.entities('common').account
+            const dt_task = db.entities('common').dt_task_view
+            const account = db.entities('common').account_view
             const header_data = await SELECT.one.from(code_header).where({'category':'target_code'})
 
             const target_columns = ['target_cd','target_type_cd','target_val','is_total_calc'];

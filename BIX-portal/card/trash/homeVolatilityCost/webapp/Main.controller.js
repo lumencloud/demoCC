@@ -53,7 +53,7 @@ sap.ui.define([
             });
             oBox.addItem(oHTML);
 
-            oHTML.attachEvent("afterRendering", function () {
+            oHTML.attachEventOnce("afterRendering", function () {
                 const ctx = document.getElementById('chart01');
 
                 // 데이터 설정

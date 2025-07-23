@@ -14,8 +14,8 @@ module.exports = class PL_Service extends cds.ApplicationService {
         /**
          * [실적PL] PL 디테일 테이블 데이터 호출 API
          */
-        const get_actual_pl_org_detail = require('./api/get_actual_pl_org_detail');
-        get_actual_pl_org_detail(this);
+        // const get_actual_pl_org_detail = require('./api/get_actual_pl_org_detail');
+        // get_actual_pl_org_detail(this);
 
         /**
          * [실적PL] PL 디테일 테이블 엑셀 pl 데이터 호출 API
@@ -37,16 +37,16 @@ module.exports = class PL_Service extends cds.ApplicationService {
         /**
          * [월별 추정 Trend] 월별 추정 Trend 테이블 데이터 호출 api
          */
-        const get_forecast_trend = require('./api/get_forecast_trend');
-        get_forecast_trend(this);
+        // const get_forecast_trend = require('./api/get_forecast_trend');
+        // get_forecast_trend(this);
         /**
          * [월별 추정 미확보PL] 월별 추정 미확보PL 테이블 데이터 호출 api
          */
         const get_forecast_m_pl = require('./api/get_forecast_m_pl');
         get_forecast_m_pl(this);
 
-        const get_forecast_m_pl_excel = require('./api/get_forecast_m_pl_excel');
-        get_forecast_m_pl_excel(this);
+        // const get_forecast_m_pl_excel = require('./api/get_forecast_m_pl_excel');
+        // get_forecast_m_pl_excel(this);
         /**
          * [추정 미확보PL] 추정 미확보PL pipeline 테이블 데이터 호출 api
          */
@@ -60,6 +60,9 @@ module.exports = class PL_Service extends cds.ApplicationService {
         
         const get_forecast_pl_pipeline_org_detail = require('./api/get_forecast_pl_pipeline_org_detail');
         get_forecast_pl_pipeline_org_detail(this);
+
+        const get_forecast_pl_pipeline_org_chart = require('./api/get_forecast_pl_pipeline_org_chart');
+        get_forecast_pl_pipeline_org_chart(this);
         /**
          * [추정 미확보PL] 추정 미확보PL pipeline account 테이블 데이터 호출 api
          */
@@ -69,11 +72,11 @@ module.exports = class PL_Service extends cds.ApplicationService {
         /**
          * [실적PL] DT과제별 연간 총 수주금액 테이블 데이터 호출 API
          */
-        const get_rodr_dt_y = require('./api/get_rodr_dt_y');
-        get_rodr_dt_y(this);
+        // const get_rodr_dt_y = require('./api/get_rodr_dt_y');
+        // get_rodr_dt_y(this);
 
-        const get_rodr_dt_y_excel = require('./api/get_rodr_dt_y_excel');
-        get_rodr_dt_y_excel(this);
+        // const get_rodr_dt_y_excel = require('./api/get_rodr_dt_y_excel');
+        // get_rodr_dt_y_excel(this);
 
         /**
          * [실적PL] 조직별 BR 테이블 데이터 호출 API
@@ -90,8 +93,8 @@ module.exports = class PL_Service extends cds.ApplicationService {
         /**
          * [실적PL] ACCOUNT별 연간 총 수주금액 테이블 데이터 호출 API
          */
-        const get_rodr_account_y = require('./api/get_rodr_account_y');
-        get_rodr_account_y(this);
+        // const get_rodr_account_y = require('./api/get_rodr_account_y');
+        // get_rodr_account_y(this);
 
         /**
          * [AI] 사업기회, 선택한 조직을 기준으로 고객사 매출 Top5를 반환
@@ -125,8 +128,8 @@ module.exports = class PL_Service extends cds.ApplicationService {
         /**
          * [실적PL] PL 테이블 전체보기 Raw Data 반환 API
          */
-        const get_actual_pl_excel = require('./api/get_actual_pl_excel');
-        get_actual_pl_excel(this);
+        // const get_actual_pl_excel = require('./api/get_actual_pl_excel');
+        // get_actual_pl_excel(this);
         
         const get_forecast_oi = require('./api/get_forecast_oi');
         get_forecast_oi(this);
@@ -161,11 +164,11 @@ module.exports = class PL_Service extends cds.ApplicationService {
         const get_pl_excel = require('./api/get_pl_excel');
         get_pl_excel(this);
 
-        const get_plan_dt_sale = require('./api/get_plan_dt_sale');
-        get_plan_dt_sale(this);
+        // const get_plan_dt_sale = require('./api/get_plan_dt_sale');
+        // get_plan_dt_sale(this);
 
-        const get_plan_dt_sale_excel = require('./api/get_plan_dt_sale_excel');
-        get_plan_dt_sale_excel(this);
+        // const get_plan_dt_sale_excel = require('./api/get_plan_dt_sale_excel');
+        // get_plan_dt_sale_excel(this);
 
         const get_actual_dt_org_oi = require('./api/get_actual_dt_org_oi');
         get_actual_dt_org_oi(this);
@@ -188,11 +191,11 @@ module.exports = class PL_Service extends cds.ApplicationService {
         const get_actual_sale_org_pl = require('./api/get_actual_sale_org_pl');
         get_actual_sale_org_pl(this);
 
-        const get_actual_sale_org_pl_total = require('./api/get_actual_sale_org_pl_total');
-        get_actual_sale_org_pl_total(this);
+        // const get_actual_sale_org_pl_total = require('./api/get_actual_sale_org_pl_total');
+        // get_actual_sale_org_pl_total(this);
 
-        const get_actual_sale_chart_pl = require('./api/get_actual_sale_chart_pl');
-        get_actual_sale_chart_pl(this);
+        // const get_actual_sale_chart_pl = require('./api/get_actual_sale_chart_pl');
+        // get_actual_sale_chart_pl(this);
 
         const get_actual_sale_sub_company_pl = require('./api/get_actual_sale_sub_company_pl');
         get_actual_sale_sub_company_pl(this);
@@ -203,14 +206,14 @@ module.exports = class PL_Service extends cds.ApplicationService {
         const get_actual_sale_relsco_pl = require('./api/get_actual_sale_relsco_pl');
         get_actual_sale_relsco_pl(this);
 
-        const get_actual_sale_relsco_pl_total = require('./api/get_actual_sale_relsco_pl_total');
-        get_actual_sale_relsco_pl_total(this);
+        // const get_actual_sale_relsco_pl_total = require('./api/get_actual_sale_relsco_pl_total');
+        // get_actual_sale_relsco_pl_total(this);
         
         const get_actual_sale_crov_pl = require('./api/get_actual_sale_crov_pl');
         get_actual_sale_crov_pl(this);
 
-        const get_actual_sale_crov_pl_total = require('./api/get_actual_sale_crov_pl_total');
-        get_actual_sale_crov_pl_total(this);
+        // const get_actual_sale_crov_pl_total = require('./api/get_actual_sale_crov_pl_total');
+        // get_actual_sale_crov_pl_total(this);
 
         const get_actual_dt_account_oi = require('./api/get_actual_dt_account_oi');
         get_actual_dt_account_oi(this);
@@ -331,8 +334,8 @@ module.exports = class PL_Service extends cds.ApplicationService {
         /**
          * [월별 실적PL] PL 테이블 데이터 호출 api
          */
-        const get_actual_m_pl = require('./api/get_actual_m_pl');
-        get_actual_m_pl(this);
+        // const get_actual_m_pl = require('./api/get_actual_m_pl');
+        // get_actual_m_pl(this);
         const get_ai_forecast_m_pl = require('./api/get_ai_forecast_m_pl');
         get_ai_forecast_m_pl(this);
         const get_ai_forecast_pl = require('./api/get_ai_forecast_pl');
@@ -349,8 +352,8 @@ module.exports = class PL_Service extends cds.ApplicationService {
         /**
          * [월별 실적PL] 전사 조회용 PL 테이블 데이터 호출 api
          */
-        const get_actual_m_pl_total = require('./api/get_actual_m_pl_total');
-        get_actual_m_pl_total(this);
+        // const get_actual_m_pl_total = require('./api/get_actual_m_pl_total');
+        // get_actual_m_pl_total(this);
         const get_actual_m_pl_total_org = require('./api/get_actual_m_pl_total_org');
         get_actual_m_pl_total_org(this);
 
@@ -363,12 +366,12 @@ module.exports = class PL_Service extends cds.ApplicationService {
         get_actual_m_pl_oi(this);
 
          // ai account 6p 당월 누계 실적
-         const get_actual_m_account_pl_oi = require('./api/get_actual_m_account_pl_oi');
-         get_actual_m_account_pl_oi(this);
+        //  const get_actual_m_account_pl_oi = require('./api/get_actual_m_account_pl_oi');
+        //  get_actual_m_account_pl_oi(this);
 
         // ai 7p 당월 누계 목표 대비 실적
-        const get_actual_m_target_pl_oi = require('./api/get_actual_m_target_pl_oi');
-        get_actual_m_target_pl_oi(this);
+        // const get_actual_m_target_pl_oi = require('./api/get_actual_m_target_pl_oi');
+        // get_actual_m_target_pl_oi(this);
 
         // ai 8p 당월 BR 현황
         const get_actual_m_br_org_detail = require('./api/get_actual_m_br_org_detail');
@@ -391,8 +394,8 @@ module.exports = class PL_Service extends cds.ApplicationService {
         get_actual_m_rate_gap_pl_oi(this);
 
         // 추가- ai account 6p 전년동기 대비 진척도 gap
-        const get_actual_m_account_rate_gap_pl_oi = require('./api/get_actual_m_account_rate_gap_pl_oi');
-        get_actual_m_account_rate_gap_pl_oi(this);
+        // const get_actual_m_account_rate_gap_pl_oi = require('./api/get_actual_m_account_rate_gap_pl_oi');
+        // get_actual_m_account_rate_gap_pl_oi(this);
 
         // ai 8p account별 매출,마진,마진율 현황
         const get_actual_m_account_sale_pl = require('./api/get_actual_m_account_sale_pl');

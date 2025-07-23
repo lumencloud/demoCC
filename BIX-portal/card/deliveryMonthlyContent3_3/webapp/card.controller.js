@@ -13,12 +13,12 @@ sap.ui.define([
         _aContainerId: [],
         _oEventBus: EventBus.getInstance(),
         _oMyChart: [],
-
+        _sOrgTp: undefined,
 
         onInit: function () {
             // component별 id 설정
             this._createId();
-
+            this._oEventBus.publish("aireport", "isCardSubscribed");
             // 차트 설정
             // this._setChart();
             this._oEventBus.subscribe("aireport", "deliContent3_3", this._setChart, this);
@@ -26,6 +26,10 @@ sap.ui.define([
 
             this._setModel();
         },
+        onExit: function () {
+            this._oEventBus.unsubscribe("aireport", "deliContent3_3", this._setChart, this);
+        },
+
         _setModel: function () {
             this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
         },
@@ -46,20 +50,33 @@ sap.ui.define([
         },
 
         _updateChart: async function (sChannel, sEventId, oDataResult) {
-
+            if (!this.getView()._sOrgTp) {
+                this.getView()._sOrgTp = oDataResult.org_tp
+            }
+            if (this.getView()._sOrgTp !== oDataResult.org_tp) return;
             let aResults = await this._dataSetting(oDataResult.data);
 
-            let maxTotal, iYAxisMax;
+            //total (target) 값이 없을경우 실적 + 추정치에 합산보다 높은 금액을 최대치로 y 값 맥스 설정
+            let maxTotal = 0, iYAxisMax;
+
             if (aResults.aTotal && aResults.aTotal.some(val => val && val > 0)) {
                 maxTotal = Math.max(...aResults.aTotal)
-            } else if (aResults.aActual && aResults.aActual.length > 0) {
-                const maxActual = Math.max(...aResults.aActual);
-                maxTotal = maxActual;
+            } else if (aResults.aActual && aResults.aActual.length > 0 &&
+                aResults.aPlan && aResults.aPlan.length > 0
+            ) {
+                const actualSum = aResults.aActual.reduce((sum, val) => {
+                    return sum + (typeof val === 'number' && !isNaN(val) ? Math.round(val) : 0)
+                }, 0)
+                const planSum = aResults.aPlan.reduce((sum, val) => {
+                    return sum + (typeof val === 'number' && !isNaN(val) ? Math.round(val) : 0)
+                }, 0)
+                maxTotal = actualSum + planSum;
             } else {
-                maxTotal = 10000 //최소값 적용
+                maxTotal = 10000;
             }
-            if (maxTotal < 100) {
-                iYAxisMax = Math.ceil(maxTotal / 200) * 200;
+
+            if (maxTotal < 1000) {
+                iYAxisMax = Math.max(100, Math.ceil(maxTotal / 200) * 200);
             } else {
                 // y축 total 값의 따라 동적 변경을 위한 변수
                 iYAxisMax = Math.ceil(maxTotal / 10000) * 10000;
@@ -120,16 +137,28 @@ sap.ui.define([
                     ]
                 }
             this.dataLoad();
+
+
             this._oMyChart[0].update();
+            this.getView().getModel("ui").setProperty("/bBusyFlag", false);
         },
 
         _setChart: async function (sChannel, sEventId, oDataResult) {
-            this.byId("cardContent").setBusy(true)
-            // 카드
+            if (!this.getView()._sOrgTp) {
+                this.getView()._sOrgTp = oDataResult.org_tp
+            }
+            if (this.getView()._sOrgTp !== oDataResult.org_tp) return;
             const oCard = this.getOwnerComponent().oCard;
-
-
-
+       
+            if(oDataResult.bUpdateFlag){
+                this._updateChart(sChannel, sEventId, oDataResult);
+                return;
+            }
+           
+            // if (oDataResult.bUpdateFlag === true && oDataResult.bInstanceFlag === false) {
+            //     this._updateChart(sChannel, sEventId, oDataResult);
+            //     return
+            // }
 
             // Card 높이를 컨테이너 높이와 동일하게 구성
             let sCardId = oCard.getId();
@@ -211,17 +240,31 @@ sap.ui.define([
                     //데이터 요청
                     let aData = await this._dataSetting(oDataResult.data);
 
-                    let maxTotal;
-                    if (aData.aTotal && aData.aActual.length > 0) {
+                    //total (target) 값이 없을경우 실적 + 추정치에 합산보다 높은 금액을 최대치로 y 값 맥스 설정
+                    let maxTotal = 0, iYAxisMax;
+
+                    if (aData.aTotal && aData.aTotal.some(val => val && val > 0)) {
                         maxTotal = Math.max(...aData.aTotal)
-                    } else if (aData.aActual && aData.aActual.length > 0) {
-                        const maxActual = Math.max(...aData.aActual);
-                        maxTotal = maxActual + 5000;
+                    } else if (aData.aActual && aData.aActual.length > 0 &&
+                        aData.aPlan && aData.aPlan.length > 0
+                    ) {
+                        const actualSum = aData.aActual.reduce((sum, val) => {
+                            return sum + (typeof val === 'number' && !isNaN(val) ? Math.round(val) : 0)
+                        }, 0)
+                        const planSum = aData.aPlan.reduce((sum, val) => {
+                            return sum + (typeof val === 'number' && !isNaN(val) ? Math.round(val) : 0)
+                        }, 0)
+                        maxTotal = actualSum + planSum;
                     } else {
-                        maxTotal = 10000 //최소값 적용
+                        maxTotal = 10000;
                     }
-                    // y축 total 값의 따라 동적 변경을 위한 변수
-                    let iYAxisMax = Math.ceil(maxTotal / 10000) * 10000;
+
+                    if (maxTotal < 1000) {
+                        iYAxisMax = Math.max(100, Math.ceil(maxTotal / 200) * 200);
+                    } else {
+                        // y축 total 값의 따라 동적 변경을 위한 변수
+                        iYAxisMax = Math.ceil(maxTotal / 10000) * 10000;
+                    }
 
                     this._oMyChart[i] = new Chart(ctx, {
                         type: "bar",
@@ -369,6 +412,7 @@ sap.ui.define([
                                     display: true,
                                     position: 'left',
                                     stacked: true,
+                                    stepSize: 50,
                                     ticks: {
                                         callback: function (value) {
                                             var oNumberFormat = NumberFormat.getFloatInstance({

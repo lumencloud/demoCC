@@ -1,0 +1,176 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:mdc="sap.ui.mdc"
+    xmlns:table="sap.ui.table"
+	busyIndicatorDelay="0"
+>
+    <Dialog id="excelUploadDialog" class="sapUiContentPadding" contentWidth="80%" >
+		<customHeader>
+			<OverflowToolbar>
+				<content>
+					<Title text="엑셀 업로드" />
+					<ToolbarSpacer/>
+				</content>
+			</OverflowToolbar>
+		</customHeader>
+        <content>
+			<VBox>
+				<table:Table
+					id="Table"
+					selectionMode="None"
+					class="custom-selection-uiTable  highlight-custom"
+                    threshold="10"
+					rowsUpdated="onRowsUpdated"
+					rows="{excelUploadModel>/}"
+					
+					>
+					<table:extension>
+						<OverflowToolbar style="Standard" height="1px" />
+					</table:extension>
+
+                    <table:rowSettingsTemplate>
+                        <table:RowSettings highlight="{excelUploadModel>state}"></table:RowSettings>
+                    </table:rowSettingsTemplate>
+
+					<table:columns>
+                        <table:Column  width="8rem" resizable="false">
+                            <Label text="Seq" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>								
+                                <Text text="{excelUploadModel>seq}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+						<table:Column  width="8rem" resizable="false">
+                            <Label text="회계연도" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>								
+                                <Text text="{excelUploadModel>year}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="6rem" resizable="false">
+                            <Label text="마감월" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>month}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="ERP Cost Center" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>ccorg_cd}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="8rem" resizable="false">
+                            <Label text="계정코드" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>gl_account}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="6rem" resizable="false">
+                            <Label text="중계정" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>commitment_item}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="1월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>co_m1_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="2월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>co_m2_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="3월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>co_m3_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+                        
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="4월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>co_m4_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="5월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>co_m5_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="6월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>co_m6_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="7월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>co_m7_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="8월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>co_m8_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="9월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>co_m9_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="10월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>co_m10_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="11월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>co_m11_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="12월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{excelUploadModel>co_m12_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>                        
+                    </table:columns>
+                </table:Table>
+			</VBox>
+        </content>
+
+		<footer>
+            <OverflowToolbar>
+                <ToolbarSpacer/>
+                <Button type="Emphasized" text="등록" press=".onExcelUploadDialogButton($event,'Save')"/>
+                <Button type="Ghost" text="취소" press=".onExcelUploadDialogButton($event,'Close')"/>
+            </OverflowToolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>

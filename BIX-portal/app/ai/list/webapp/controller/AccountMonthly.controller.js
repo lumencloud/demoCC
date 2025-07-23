@@ -37,19 +37,49 @@ sap.ui.define([
                 this._oEventBus.subscribe("aireport", "uiModel", this._setUiChange, this);
                 this._oEventBus.subscribe("aireport", "uiSelectModel", this._setUiChange, this);
             },
+
+            onMyRoutePatternMatched: async function () {
+                await this._setTopOrgModel();
+                this._setUiChange();
+            },
+
             _setUiChange: function (sChanner, sEventId, oData) {
-                if (
-                    oData.org_id !== '5' || oData !== 'all'
-                ) {
+                const oTopOrgData = this.getView().getModel("topOrgModel").getData();
+                if (oData.org_id !== oTopOrgData.org_id) {
                     this.getView().getModel("ui").setProperty("/bFlag", true)
                 } else {
                     this.getView().getModel("ui").setProperty("/bFlag", false)
                 }
             },
 
-            onMyRoutePatternMatched: async function () {
-                this._setUiChange();
-            }
+            /**
+             * 최상위 조직 값 모델 설정
+             */
+            _setTopOrgModel: async function () {
+                const andFilter = new Filter([
+                    new Filter("org_id", FilterOperator.NE, null),
+                    new Filter([
+                        new Filter("org_parent", FilterOperator.EQ, null),
+                        new Filter("org_parent", FilterOperator.EQ, ''),
+                    ], false)
+                ], true)
+
+                // 전사조직 모델 세팅
+                const oModel = this.getOwnerComponent().getModel();
+                const oBinding = oModel.bindList("/org_full_level", undefined, undefined, andFilter)
+                await oBinding.requestContexts().then((aContext) => {
+                    const aData = aContext.map(ctx => ctx.getObject());
+                    this.getView().setModel(new JSONModel(aData[0]), "topOrgModel");
+                })
+            },
+            onPageChanged: function (oEvent) {
+                // 초기 페이지 라우팅시 다른페이지 테이블은 병합이 되지않아 // 테이블 페이지 이동 시 재호출
+                const checkPageId = String(oEvent.getParameter("activePages"))
+                if (checkPageId === "3") {  // 테이블이 있는 페이지 index  
+                    let oSessionData = JSON.parse(sessionStorage.getItem("aiReport"))
+                    this._oEventBus.publish("aireportTable", "qualified", oSessionData)
+                }
+            },
             // onMyRoutePatternMatched: async function (oEvent) {
             //     const oCarousel = this.byId("carousel");
             //     if (oCarousel) {
@@ -210,14 +240,7 @@ sap.ui.define([
             //     this.getOwnerComponent().getRouter().navTo("RouteMain")
 
             // },
-            ,
-            onPageChanged: function (oEvent) {
-                // 초기 페이지 라우팅시 다른페이지 테이블은 병합이 되지않아 // 테이블 페이지 이동 시 재호출
-                const checkPageId = String(oEvent.getParameter("activePages"))
-                if (checkPageId === "3") {  // 테이블이 있는 페이지 index  
-                    this._oEventBus.publish("aireport", "infoSet")
-                }
-            }
+
 
         });
     });

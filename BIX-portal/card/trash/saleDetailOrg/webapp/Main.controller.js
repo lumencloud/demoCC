@@ -104,7 +104,7 @@ sap.ui.define([
 
             let oHTML = this.byId("html");
             oHTML.setContent(`<div id='${this._sContainerId}' class='custom-chart-container' style='width:${iBoxWidth}vw; height:${iBoxHeight}vh; min-height:${this._iMinHeight}px'><canvas id='${this._sCanvasId}' style='padding: 0 2.5rem'/></div>`);
-            oHTML.attachEvent("afterRendering", async function () {
+            oHTML.attachEventOnce("afterRendering", async function () {
 
                 const ctx = document.getElementById(this._sCanvasId).getContext("2d");
 

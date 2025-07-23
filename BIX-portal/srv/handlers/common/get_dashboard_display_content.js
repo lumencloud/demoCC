@@ -5,7 +5,7 @@ module.exports = (srv) => {
             // cds 모듈을 통한 DB 커넥트
             const db = await cds.connect.to('db');
 
-            const dashboard_set = db.entities('dashboard').dashboard_set;
+            const dashboard_set = db.entities('common').dashboard_set;
             let aDashBoardSet = await SELECT.from(dashboard_set).where(expr("use_flag = true"));
 
             // function 입력 파라미터

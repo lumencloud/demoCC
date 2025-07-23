@@ -7,7 +7,9 @@
     height="100%"
     width="100%"
     displayBlock="true"
->   
+    busyIndicatorDelay="0"
+    busy="{ui>/bBusyFlag}"
+    >   
     <form:SimpleForm id="cardContent" class="custom-back-white">
         <form:content>
             <VBox>            

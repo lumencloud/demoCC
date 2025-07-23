@@ -17,14 +17,6 @@ view wideview_org_view as
                 // src_type,
                 div_ccorg_cd  as sale_div_ccorg_cd,
                 hdqt_ccorg_cd as sale_hdqt_ccorg_cd,
-                // max(case
-                //         when
-                //             src_type <> 'D'
-                //         then
-                //             0
-                //         else
-                //             rodr_year_amt
-                //     end)      as sfdc_rodr_year_amt     : Decimal(18, 2) @title: '미확보 연간 수주금액',
                 sum(case
                         when
                             src_type <> 'D'
@@ -41,14 +33,14 @@ view wideview_org_view as
                         else
                             sfdc_margin_year_amt
                     end)      as sfdc_margin_year_amt   : Decimal(18, 2) @title: '미확보 연간 마진금액',
-                // sum(case
-                //         when
-                //             src_type <> 'D'
-                //         then
-                //             0
-                //         else
-                //             prj_prfm_year_amt
-                //     end)      as sfdc_prj_prfm_year_amt : Decimal(18, 2) @title: '미확보 연간 수행금액',
+                sum(case
+                        when
+                            src_type <> 'D'
+                        then
+                            0
+                        else
+                            prj_prfm_year_amt
+                    end)      as sfdc_prj_prfm_year_amt : Decimal(18, 2) @title: '미확보 연간 수행금액',
                 max(case
                         when
                             src_type = 'D'

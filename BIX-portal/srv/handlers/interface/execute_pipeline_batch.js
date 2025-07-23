@@ -3,7 +3,7 @@ const { executeHttpRequest } = require('@sap-cloud-sdk/http-client');
 
 module.exports = (srv) => {
     srv.on('execute_pipeline_batch', async (req) => {
-        const { ver, cust_param } = req.data;
+        const { auto, ver, cust_param } = req.data;
 
         const tx_main = cds.tx(req);
         const tx_ver = cds.tx();
@@ -54,7 +54,7 @@ module.exports = (srv) => {
                 }
                 // [step-2 신규 버전코드 등록]
                 await tx_ver.run(INSERT([{
-                    if_id: func('SYSUUID')[0], ver_sfdc: ver_no, year: sfdc_year, month: sfdc_month, week: sfdc_week, day: sfdc_date, tag: 'P'
+                    if_id: func('SYSUUID')[0], ver_sfdc: ver_no, year: sfdc_year, month: sfdc_month, week: sfdc_week, day: sfdc_date, tag: 'P', auto_yn : auto ? true : false
                 }]).into(common_version_sfdc));
 
                 await tx_ver.commit();

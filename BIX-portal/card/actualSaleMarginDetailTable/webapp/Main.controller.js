@@ -319,7 +319,7 @@ sap.ui.define([
             this._setBusy(false);
         },
 
-        _setBusy: async function (bType) {
+        _setBusy: function (bType) {
             // 모든 박스 setBusy 설정
             this._aTableLists.forEach(sTableId => {
                 let oBox = this.byId(sTableId).getParent();
@@ -411,10 +411,10 @@ sap.ui.define([
 
      
             this._excludeClick = !Module.checkAiPopupDisplay(oRowData,["actual_curr_ym_value","actual_last_ym_value"]);
-   
+            
    
             // 합계 클릭 금지 
-            if (oRowData.org_name === "합계" || oRowData.account_nm === "합계") {
+            if (oRowData.org_name === "합계" || oRowData.account_nm === "합계" || oRowData.org_name?.includes("소계") || oRowData.account_nm?.includes("15. 공통")) {
                 this._excludeClick = true;
             }
 

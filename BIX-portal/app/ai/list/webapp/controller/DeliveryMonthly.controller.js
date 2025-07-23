@@ -31,25 +31,46 @@ sap.ui.define([
             onInit: function () {
                 const myRoute = this.getOwnerComponent().getRouter().getRoute("DeliveryMonthly");
                 myRoute.attachPatternMatched(this.onMyRoutePatternMatched, this);
-               
+
                 this.getView().setModel(new JSONModel({ bFlag: false }), "ui");
                 this._oEventBus.subscribe("aireport", "uiModel", this._setUiChange, this);
                 this._oEventBus.subscribe("aireport", "uiSelectModel", this._setUiChange, this);
             },
 
+            onMyRoutePatternMatched: async function () {
+                await this._setTopOrgModel();
+                this._setUiChange();
+            },
+
             _setUiChange: function (sChanner, sEventId, oData) {
-                if (
-                    oData.org_id !== '5' || oData !== 'all'
-                ) {
+                const oTopOrgData = this.getView().getModel("topOrgModel").getData();
+                if (oData.org_id !== oTopOrgData.org_id) {
                     this.getView().getModel("ui").setProperty("/bFlag", true)
                 } else {
                     this.getView().getModel("ui").setProperty("/bFlag", false)
                 }
+             
             },
+            /**
+             * 최상위 조직 값 모델 설정
+             */
+            _setTopOrgModel: async function () {
+                const andFilter = new Filter([
+                    new Filter("org_id", FilterOperator.NE, null),
+                    new Filter([
+                        new Filter("org_parent", FilterOperator.EQ, null),
+                        new Filter("org_parent", FilterOperator.EQ, ''),
+                    ], false)
+                ], true)
 
-            onMyRoutePatternMatched: async function () {
-                this._setUiChange();
-            }
+                // 전사조직 모델 세팅
+                const oModel = this.getOwnerComponent().getModel();
+                const oBinding = oModel.bindList("/org_full_level", undefined, undefined, andFilter)
+                await oBinding.requestContexts().then((aContext) => {
+                    const aData = aContext.map(ctx => ctx.getObject());
+                    this.getView().setModel(new JSONModel(aData[0]), "topOrgModel");
+                })
+            },
 
             // onMyRoutePatternMatched: async function (oEvent) {
             //     const oCarousel = this.byId("carousel");

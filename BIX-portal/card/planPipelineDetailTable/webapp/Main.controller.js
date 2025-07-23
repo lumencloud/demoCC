@@ -317,6 +317,9 @@ sap.ui.define([
             this._selectedOrgName = oRowData && oRowData.div_name ? oRowData.div_name : oSessionData.div_name;
             this._selectedType = oRowData.type;
 
+
+            this._excludeClick = !Module.checkAiPopupDisplay(oRowData,["div_id","div_name","display_order","item_order","type"],true);
+        
             //합계 클릭 금지 
             if (oRowData.div_name === "합계") {
                 this._excludeClick = true;
@@ -326,8 +329,7 @@ sap.ui.define([
                 this._excludeClick = true;
             }
 
-            this._excludeClick = !Module.checkAiPopupDisplay(oRowData,["div_id","div_name","display_order","item_order","type"],true);
-        
+            
         },
 
         /**

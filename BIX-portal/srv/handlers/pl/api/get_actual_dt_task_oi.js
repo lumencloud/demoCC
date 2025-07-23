@@ -42,7 +42,7 @@ module.exports = (srv) => {
              * common.dt_task [과제정보]
              * 조직구조 테이블
              */
-            const dt_task = db.entities('common').dt_task
+            const dt_task = db.entities('common').dt_task_view
             // =================================================================================
 
             // function 입력 파라미터
@@ -155,6 +155,10 @@ module.exports = (srv) => {
             o_total['target_curr_y_value'] = a_curr_target.reduce((iSum, oData) => iSum += oData.sale_target, 0).toFixed(2) || 0;
             o_total['actual_curr_ym_rate'] = (o_total?.['target_curr_y_value'] ?? 0) === 0 ? 0 : (o_total?.['actual_curr_ym_value'] ?? 0) / ((o_total?.['target_curr_y_value'] ?? 0) * 100000000);
             oResult.unshift(o_total);
+
+            //값이 모두0이면 빈배열 리턴
+            const chk_zero = oResult.every(data=>!data.target_curr_y_value && !data.actual_curr_ym_value );
+            if(chk_zero){ return []; };
 
             return oResult;
         } catch(error) { 

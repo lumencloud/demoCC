@@ -72,6 +72,19 @@
         "vcap": {
           "name": "connectivity"
         }
+      },
+      "custom-service:bix-portal-job-scheduler": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.ap12.hana.ondemand.com",
+          "org": "SKCC_dev-skerp1",
+          "space": "BIX",
+          "instance": "bix-portal-job-scheduler",
+          "key": "bix-portal-job-scheduler-key"
+        },
+        "vcap": {
+          "name": "custom-service:bix-portal-job-scheduler"
+        }
       }
     }
   }

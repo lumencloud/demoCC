@@ -3,13 +3,13 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/m/MessageToast",
 	"bix/common/ai/service/AgentService",
-    "sap/ui/core/EventBus",
+	"sap/ui/core/EventBus",
 ], function (Controller, JSONModel, MessageToast, AgentService, EventBus) {
 	"use strict";
 
 	return Controller.extend("bix.card.aiReportMonthlyAiInsight.Main", {
 		_oEventBus: EventBus.getInstance(),
-
+		_bFlag: true, // 카드 로드 예외 처리
 		onInit: function () {
 			// 초기 로딩 상태 설정
 			this.getView().setModel(new JSONModel({
@@ -17,7 +17,7 @@ sap.ui.define([
 				"insight": "",
 				"summary": []
 			}), "LLMModel");
-
+			this._oEventBus.publish("aireport", "isCardSubscribed");
 			this._dataSetting();
 		},
 
@@ -320,38 +320,38 @@ sap.ui.define([
 			
 			// 보고서 컨텐츠 에이전트 호출을 위한 데이터 구성
 			var interactionData = {
-                interaction: {
-                    type: "context_fill",
-                    timestamp: new Date().toISOString()
-                },
-                context: {
-                    id: sViewid,
-                    functions: [
-                        {
-                            name: "get_actual_m_pl_oi",
-                            params: {}
-                        },
-                    ],
-                    global_params: {
-                        year: params.year,
-                        month: params.month,
-                        org_id: params.orgId,
-                        org_tp: params.type
-                    }
-                }
-            };
+				interaction: {
+					type: "context_fill",
+					timestamp: new Date().toISOString()
+				},
+				context: {
+					id: sViewid,
+					functions: [
+						{
+							name: "get_actual_m_pl_oi",
+							params: {}
+						},
+					],
+					global_params: {
+						year: params.year,
+						month: params.month,
+						org_id: params.orgId,
+						org_tp: params.type
+					}
+				}
+			};
 			*/
 
 			// 전사 기준 (일시적)
 			var interactionData = {
-                interaction: {
-                    type: "context_fill",
-                    timestamp: new Date().toISOString()
-                },
-                context: {
-                    id: sViewid,
-                    functions: [
-                        {
+				interaction: {
+					type: "context_fill",
+					timestamp: new Date().toISOString()
+				},
+				context: {
+					id: sViewid,
+					functions: [
+						{
 							name: "get_actual_m_pl_oi",
 							params: {
 								year: params.year,
@@ -388,8 +388,8 @@ sap.ui.define([
 							}
 						}
 					]
-                }
-            };
+				}
+			};
 
 			var options = {
 				showBusyDialog: false,
@@ -414,7 +414,6 @@ sap.ui.define([
 					console.error("보고서 컨텐츠 생성 오류:", error);
 					this._setFallbackData();
 					MessageToast.show("보고서 컨텐츠 생성 중 오류가 발생했습니다.");
-					this.dataLoad();
 				}.bind(this))
 				.finally(function () {
 					oModel.setProperty("/isLoading", false);
@@ -438,7 +437,7 @@ sap.ui.define([
 				if (!sReportContent) {
 					// 보고서 컨텐츠 내용이 없으면 null을 전달
 					this._oEventBus.publish("pl", "aiReportMonthlyAiInsightSmry", { summary: null });
-					
+
 					console.warn("보고서 컨텐츠 내용이 없습니다. 전체 결과:", result);
 					throw new Error("보고서 컨텐츠 내용이 없습니다.");
 				}
@@ -452,14 +451,14 @@ sap.ui.define([
 				oModel.setProperty("/isLoading", false);
 
 				// aiReportMonthlyAiInsightSmry에 insight 전달
-                this._oEventBus.publish("pl", "aiReportMonthlyAiInsightSmry", { summary: oReportData.summary });
+				this._oEventBus.publish("pl", "aiReportMonthlyAiInsightSmry", { summary: oReportData.summary });
 
 				console.log("보고서 컨텐츠 데이터 로드 완료:", oReportData);
-				this.dataLoad();
+					this.dataLoad();
 			} catch (error) {
 				console.error("보고서 컨텐츠 결과 처리 오류:", error);
 				this._setFallbackData();
-				this.dataLoad();
+					this.dataLoad();
 			}
 		},
 
@@ -493,7 +492,6 @@ sap.ui.define([
 			} catch (error) {
 				console.error("보고서 컨텐츠 내용 파싱 오류:", error);
 				console.log("파싱 실패한 원본 내용:", content);
-				this.dataLoad();
 				this._setFallbackData();
 			}
 		},
@@ -541,13 +539,13 @@ sap.ui.define([
 				}
 				else if (currentSection === "summary") {
 					// 불릿 포인트나 번호 제거
-                    var cleanLine = line.replace(/^[\-\*\•\d\.]\s*/, '').trim();
-                    if (cleanLine) {
-                        reportData.summary.push(cleanLine);
-                    }
+					var cleanLine = line.replace(/^[\-\*\•\d\.]\s*/, '').trim();
+					if (cleanLine) {
+						reportData.summary.push(cleanLine);
+					}
 				}
 			}
-			
+
 			return reportData;
 		},
 
@@ -578,9 +576,9 @@ AI는 이상 징후로 Non-MM 비중의 증가(전년 대비 +29%)와 ROHC의 �
 			});
 		},
 		dataLoad: function () {
-            this._oEventBus.publish("CardChannel", "CardFullLoad", {
-                cardId: this.getView().getId()
-            });
-        }
+			this._oEventBus.publish("CardChannel", "CardFullLoad", {
+				cardId: this.getView().getId()
+			})
+		},
 	});
 });

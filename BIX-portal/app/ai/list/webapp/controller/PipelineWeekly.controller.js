@@ -23,8 +23,19 @@ sap.ui.define([
          * @typedef {sap.ui.base.Event} Event
          */
         return Controller.extend("bix.ai.list.controller.PipelineWeekly", {
+            /**
+             *  eventBus 전역 객체 
+             */
             _oEventBus: EventBus.getInstance(),
+            /**
+             *  pdf 다운로드 버튼 제어를 위한 카드 로딩 카운트 변수
+             */
             _iCardReady: 0,
+            /**
+             *  select 선택시 pdf (busy,enable) ui 제어 flag 변수
+             */
+            _bPdfLoaded: true,
+            _isCardLoaded: true,
 
             onInit: function () {
                 const myRoute = this.getOwnerComponent().getRouter().getRoute("PipelineWeekly");
@@ -35,10 +46,12 @@ sap.ui.define([
                 let oArguments = oEvent.getParameters()["arguments"];
                 // 첫 페이지 고정
                 const oCarousel = this.byId("carousel");
-                if (oCarousel) { oCarousel.setActivePage(oCarousel.getPages()[0]); oCarousel.scrollTo(0); }
+                if (oCarousel) {
+                    oCarousel.setActivePage(oCarousel.getPages()[0]);
+                }
                 // 스크롤 상단 고정
-                // let oPage = this.byId("carouselPage")
-                // if (oPage) { oPage.scrollTo(0); }
+                let oPage = this.byId("carouselPage")
+                if (oPage) { oPage.scrollTo(0); }
 
                 this._oEventBus.subscribe("aiReport", "newData", this._setModel, this);
                 this._oEventBus.subscribe("aiReport", "newBauData", this._setModel, this);
@@ -53,10 +66,10 @@ sap.ui.define([
                     this._oEventBus.subscribe("CardWeekChannel", "CardWeekFullLoad", this._onCardReady, this);
                     this._isSubscribed = true;
                 }
+                await this._setTopOrgModel();
 
                 this.setSelectModel();
                 this._setSessionItem();
-                await this._setTopOrgModel();
                 // URL 해시 설정
                 this._setHash(oArguments);
             },
@@ -65,11 +78,15 @@ sap.ui.define([
                 this._countViewContainCard();
             },
 
-            _onCardReady: function (sChannelId, sEventId, oData) {
+            _onCardReady: function () {
                 this._iCardReady++;
                 if (this._iCardReady === this.iCardCount) {
-                    this.getView().getModel("uiModel").setProperty("/bPdfFlag", true)
-                    this.getView().getModel("uiModel").setProperty("/busyFlag", false)
+                    this.getView().getModel("uiModel").setProperty("/bPdfFlag", true);
+                    this.getView().getModel("uiModel").setProperty("/busyFlag", false);
+                    this._oEventBus.unsubscribe("CardWeekChannel", "CardWeekFullLoad", this._onCardReady, this);
+                    this._iCardReady = 0;
+                    this._bPdfLoaded = false;
+                    this._isCardLoaded = false;
                 }
             },
             _countViewContainCard: function () {
@@ -87,7 +104,6 @@ sap.ui.define([
              * 연, 월, 주차 해시 설정
              */
             _setHash: function (oArguments) {
-
                 // 컴포넌트 경로가 다른 경우 Return
                 let sCurrHash = HashChanger.getInstance().getHash();
 
@@ -128,21 +144,44 @@ sap.ui.define([
                 })
                 oSelect.fireChange({ selectedItem: oSelectedItem })
             },
+            /**
+             * 주차 Select 선택 이벤트
+             * @param {Event} oEvent 
+             */
+            onChange: function (oEvent) {
+                // 조직 재 선택했을 시 pdf 버튼 ui 제어
+                if (!this._bPdfLoaded) {
+                    this.getView().getModel("uiModel").setProperty("/bPdfFlag", false)
+                    this.getView().getModel("uiModel").setProperty("/busyFlag", true)
+                }
+                // 조직 재 선택했을 시 해당 view 카드 카운트
+                if (!this._isCardLoaded) {
+                    this._countViewContainCard();
+                    this._oEventBus.subscribe("CardWeekChannel", "CardWeekFullLoad", this._onCardReady, this);
+                }
 
-            /**하드 코딩 되어있음
+                const aDateData = this.getView().getModel("dateModel").getProperty("/")
+                const sSelectedKey = oEvent?.getParameter("selectedItem").getKey();
+                const oSelectedItem = aDateData.find(oData => oData.id == sSelectedKey);
+
+                // UI 상반기/하반기 및 주차 설정
+                let bFlag = oSelectedItem.month <= 6 ? "상반기" : "하반기"
+                this.getView().getModel("uiModel").setProperty("/halfYear", bFlag);
+                this.getView().getModel("uiModel").setProperty("/weekName", oSelectedItem.weekName);
+
+                const oData = this.getView().getModel("topOrgModel").getData();
+                this._setSessionItem(oData, oSelectedItem.start_date, oSelectedItem.end_date);
+
+                this._oEventBus.publish("aiReport", "dateData", { start_date: oSelectedItem.start_date, end_date: oSelectedItem.end_date, org_id: oData.org_id })
+                this._oEventBus.publish("aiReport", "dateDataTable", { start_date: oSelectedItem.start_date, end_date: oSelectedItem.end_date, org_id: oData.org_id })
+            },
+
+            /**
              * 각 카드에 사용할 세션값 저장
              * @param {*} oData  조직 데이터
              * @param {*} startDate 
              * @param {*} endDate 
              */
-            // _setSessionItem: function (oData, year, month) {
-            //     sessionStorage.setItem("aiWeekReport", JSON.stringify({
-            //         org_id: '5',
-            //         start_date: '2025-06-23',
-            //         end_date: '2025-06-29',
-            //     }));
-            //     this._oEventBus.publish("aireport", "dateData");
-            // },
             _setSessionItem: function (oData, year, month) {
                 const oDataModel = this.getView().getModel("topOrgModel").getData();
                 sessionStorage.setItem("aiWeekReport", JSON.stringify({
@@ -152,13 +191,17 @@ sap.ui.define([
                 }));
                 this._oEventBus.publish("aireport", "dateData");
             },
+
             /**
             * 최상위 조직 값 모델 설정
             */
             _setTopOrgModel: async function () {
                 const andFilter = new Filter([
                     new Filter("org_id", FilterOperator.NE, null),
-                    new Filter("org_parent", FilterOperator.EQ, null),
+                    new Filter([
+                        new Filter("org_parent", FilterOperator.EQ, null),
+                        new Filter("org_parent", FilterOperator.EQ, ''),
+                    ], false)
                 ], true)
 
                 // 전사조직 모델 세팅
@@ -167,11 +210,8 @@ sap.ui.define([
                 await oBinding.requestContexts().then((aContext) => {
                     const aData = aContext.map(ctx => ctx.getObject());
                     this.getView().setModel(new JSONModel(aData[0]), "topOrgModel");
-
                 })
             },
-
-
 
             // 월요일을 기준으로 다음달 주차수 계산
             // ex) 31일이 월요일이면 그 달 마지막 주차
@@ -218,8 +258,7 @@ sap.ui.define([
                 });
 
                 this.getView().setModel(new JSONModel(weekList), "dateModel");
-                // this.getView().getModel("dateModel").setProperty("/selectedKey", weekList[0].end_date)
-                // this.getView().getModel("dateModel").setProperty("/halfYear", sFlag);
+
             },
 
             _setDate: function () {
@@ -257,6 +296,7 @@ sap.ui.define([
                         break;
                 }
             },
+
             onPDF: async function () {
                 this.byId("carousel").setBusy(true);
                 try {
@@ -286,45 +326,15 @@ sap.ui.define([
                         pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
                     }
 
-
                     const sWeekName = this.getView().getModel("uiModel").getProperty("/weekName")
                     const sFileName = sWeekName + "\n" + "주간리포트.pdf";
-                    // const sFileName = "6월 4주차" + "\n" + "주간리포트.pdf";
-                    /**
-                     * 하드코딩 되어있음  ↑↑↑↑
-                     */
+
                     pdf.save(sFileName);
                     oCarousel.setActivePage(pageId[activeIdx])
                 } catch (e) {
                     console.error("PDF 생성 오류", e)
                 }
                 this.byId("carousel").setBusy(false);
-            },
-
-            /**
-             * 주차 Select 선택 이벤트
-             * @param {Event} oEvent 
-             */
-            onChange: function (oEvent) {
-                const aDateData = this.getView().getModel("dateModel").getProperty("/")
-                const sSelectedKey = oEvent?.getParameter("selectedItem").getKey();
-                const oSelectedItem = aDateData.find(oData => oData.id == sSelectedKey);
-
-                // UI 상반기/하반기 및 주차 설정
-                let bFlag = oSelectedItem.month <= 6 ? "상반기" : "하반기"
-                this.getView().getModel("uiModel").setProperty("/halfYear", bFlag);
-                this.getView().getModel("uiModel").setProperty("/weekName", oSelectedItem.weekName);
-
-                const oData = this.getView().getModel("topOrgModel").getData();
-                this._setSessionItem(oData, oSelectedItem.start_date, oSelectedItem.end_date);
-
-                this._oEventBus.publish("aiReport", "dateData", { start_date: oSelectedItem.start_date, end_date: oSelectedItem.end_date, org_id: '5' })
-                this._oEventBus.publish("aiReport", "dateDataTable", { start_date: oSelectedItem.start_date, end_date: oSelectedItem.end_date, org_id: '5' })
-                // this._oEventBus.publish("aiReport", "dateData", { start_date: '2025-06-23', end_date: '2025-06-29', org_id: '5' })
-                // this._oEventBus.publish("aiReport", "dateDataTable", { start_date: '2024-06-23', end_date: '2025-06-29', org_id: '5' })
-                /**
-                 * 하드코딩 되어있음  ↑↑↑↑
-                 */
             },
 
             onCancel: function () {
@@ -347,11 +357,7 @@ sap.ui.define([
                 let oSelect = this.byId("selectWeek");
                 const oData = this.getView().getModel("topOrgModel").getData()
                 let oBindingObject = oSelect.getSelectedItem().getBindingContext("dateModel").getObject();
-                this._oEventBus.publish("aiReport", "dateDataTable", { start_date: oBindingObject.start_date, end_date: oBindingObject.end_date, org_id: oData.org_id })
-                // this._oEventBus.publish("aiReport", "dateDataTable", { start_date: '2024-06-23', end_date: '2025-06-29', org_id: '5' })
-                /**
-                * 하드코딩 되어있음  ↑↑↑↑
-                */
+                this._oEventBus.publish("aiReport", "dateLoadTable", { start_date: oBindingObject.start_date, end_date: oBindingObject.end_date, org_id: oData.org_id })
             },
         });
     });

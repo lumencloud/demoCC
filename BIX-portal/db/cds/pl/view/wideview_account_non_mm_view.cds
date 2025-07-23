@@ -115,6 +115,7 @@ view wideview_account_non_mm_view as
         key year,
         key month,
         key src_type,
+            prj_no,
             prj_nm,
             cstco_cd,
             rodr_ccorg_cd,

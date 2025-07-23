@@ -14,7 +14,7 @@ namespace rsp;
  *
  * [조직별 총 인건비] RSP_ORG_TOTAL_LABOR_VIEW [ERP] <br/>
  * [조직별 프로젝트 투입 인건비] RSP_ORG_LABOR_VIEW (RSP_PJR_LABOR 프로젝트 투입 인건비의 조직별 집계) [PROMIS] <br/>
- * [위임 경비 중 종업원급여/IB배부금] SGA_EXPENSE_CO - gl_account = '702202' [ERP] <br/>
+ * [위임 경비 중 종업원급여/IB배부금] SGA_EXPENSE_CO - gl_account = '702202' '702201'(실적월 only) [수기] <br/>
  * [조직별 계획 인건비] RSP_ORG_MM_VIEW [PROMIS] <br/>
  * [사업기회, 조직별 미확보 인건비] RSP_OPP_LABOR_VIEW [SFDC] <br/>
  */
@@ -163,6 +163,19 @@ view wideview_view as
                     b_mm_m11_amt,
                     b_mm_m12_amt,
                     b_mm_amt_sum,
+                    bn_mm_m1_amt,
+                    bn_mm_m2_amt,
+                    bn_mm_m3_amt,
+                    bn_mm_m4_amt,
+                    bn_mm_m5_amt,
+                    bn_mm_m6_amt,
+                    bn_mm_m7_amt,
+                    bn_mm_m8_amt,
+                    bn_mm_m9_amt,
+                    bn_mm_m10_amt,
+                    bn_mm_m11_amt,
+                    bn_mm_m12_amt,
+                    bn_mm_amt_sum,
                     opp_m1_amt,
                     opp_m2_amt,
                     opp_m3_amt,
@@ -693,6 +706,58 @@ view wideview_view as
                          year,
                          month,
                          ccorg_cd,
+                         sum(mm_m1_amt)  as bn_mm_m1_amt,
+                         sum(mm_m2_amt)  as bn_mm_m2_amt,
+                         sum(mm_m3_amt)  as bn_mm_m3_amt,
+                         sum(mm_m4_amt)  as bn_mm_m4_amt,
+                         sum(mm_m5_amt)  as bn_mm_m5_amt,
+                         sum(mm_m6_amt)  as bn_mm_m6_amt,
+                         sum(mm_m7_amt)  as bn_mm_m7_amt,
+                         sum(mm_m8_amt)  as bn_mm_m8_amt,
+                         sum(mm_m9_amt)  as bn_mm_m9_amt,
+                         sum(mm_m10_amt) as bn_mm_m10_amt,
+                         sum(mm_m11_amt) as bn_mm_m11_amt,
+                         sum(mm_m12_amt) as bn_mm_m12_amt,
+                         sum(mm_amt_sum) as bn_mm_amt_sum
+                    from rsp_org_mm_view
+                    where
+                         bun_tp in (
+                              'B', 'N'
+                         )
+                    group by
+                         ver,
+                         year,
+                         month,
+                         ccorg_cd
+               ) as org_mm_bn
+                    on (
+                             sga_labor.ver             = org_mm_bn.ver
+                         and sga_labor.year            = org_mm_bn.year
+                         and case
+                                  when sga_labor.month = '13'
+                                       then '12'
+                                  else sga_labor.month
+                             end = org_mm_bn.month
+                         and sga_labor.ccorg_cd        = org_mm_bn.ccorg_cd
+                    )
+                    or (
+                             org_mm.ver                = org_mm_bn.ver
+                         and org_mm.year               = org_mm_bn.year
+                         and org_mm.month              = org_mm_bn.month
+                         and org_mm.ccorg_cd           = org_mm_bn.ccorg_cd
+                    )
+                    or (
+                             org_mm_b.ver              = org_mm_bn.ver
+                         and org_mm_b.year             = org_mm_bn.year
+                         and org_mm_b.month            = org_mm_bn.month
+                         and org_mm_b.ccorg_cd         = org_mm_bn.ccorg_cd
+                    )
+               full outer join (
+                    select
+                         ver,
+                         year,
+                         month,
+                         ccorg_cd,
                          sum(opp_m1_amt)  as opp_m1_amt,
                          sum(opp_m2_amt)  as opp_m2_amt,
                          sum(opp_m3_amt)  as opp_m3_amt,
@@ -790,6 +855,12 @@ view wideview_view as
                          and org_mm.year               = opp.year
                          and org_mm.month              = opp.month
                          and org_mm.ccorg_cd           = opp.ccorg_cd
+                    )
+                    or (
+                             org_mm_bn.ver             = opp.ver
+                         and org_mm_bn.year            = opp.year
+                         and org_mm_bn.month           = opp.month
+                         and org_mm_bn.ccorg_cd        = opp.ccorg_cd
                     )
                left join common_org_full_level_view as org
                     on sga_labor.ccorg_cd = org.org_ccorg_cd
@@ -896,6 +967,19 @@ view wideview_view as
                    b_mm_m11_amt,
                    b_mm_m12_amt,
                    b_mm_amt_sum,
+                   bn_mm_m1_amt,
+                   bn_mm_m2_amt,
+                   bn_mm_m3_amt,
+                   bn_mm_m4_amt,
+                   bn_mm_m5_amt,
+                   bn_mm_m6_amt,
+                   bn_mm_m7_amt,
+                   bn_mm_m8_amt,
+                   bn_mm_m9_amt,
+                   bn_mm_m10_amt,
+                   bn_mm_m11_amt,
+                   bn_mm_m12_amt,
+                   bn_mm_amt_sum,
                    opp_m1_amt,
                    opp_m2_amt,
                    opp_m3_amt,

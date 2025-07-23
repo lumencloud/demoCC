@@ -5,7 +5,8 @@
     xmlns:f="sap.f"
     xmlns:form="sap.ui.layout.form"
     xmlns:table="sap.ui.table"
-    xmlns:rowmodes="sap.ui.table.rowmodes" height="100%" width="100%" displayBlock="true">
+    xmlns:rowmodes="sap.ui.table.rowmodes" height="100%" width="100%" displayBlock="true" busyIndicatorDelay="0"
+    busy="{ui>/bBusyFlag}">
     <form:SimpleForm id="cardContent" class="custom-back-white sapUiNoContentPadding">
         <form:content>
             <VBox width="100%" height="100%">

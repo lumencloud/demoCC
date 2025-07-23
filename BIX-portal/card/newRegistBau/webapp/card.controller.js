@@ -37,7 +37,7 @@ sap.ui.define(
           function (aResult) {
             Module.displayStatusForEmpty(this.getOwnerComponent().oCard, aResult.value, this.byId("cardContent"));
             this._modelSetting(aResult.value);
-           
+
           }.bind(this))
           .catch((oErr) => {
             Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
@@ -100,9 +100,7 @@ sap.ui.define(
           oModel["account2ndCount"] = aGroupedArray[1].length
         }
 
-        if(this._bFlag){
-          this.dataLoad();
-        }
+        this.dataLoad();
 
         this._oEventBus.publish("aiReport", "newBauData", oModel)
         this.getOwnerComponent().setModel(new JSONModel(oModel), "Model");

@@ -409,7 +409,7 @@ sap.ui.define([
         },
 
 
-        _setBusy: async function (bType) {
+        _setBusy: function (bType) {
             const oTable = this.byId(this._sTableId);
             const oBox = oTable.getParent();
             oBox.setBusy(bType);
@@ -440,7 +440,7 @@ sap.ui.define([
             let oAiData = JSON.parse(sessionStorage.getItem("aiModel"))
             let sOrgId = oAiData.orgId;
 
-            if(!sOrgId){
+            if(!oAiData.orgId){
                 return
             }
 

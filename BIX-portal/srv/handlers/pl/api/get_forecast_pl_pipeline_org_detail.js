@@ -28,7 +28,7 @@ module.exports = (srv) => {
 
             const code = db.entities('common').code_header;
 
-            const { year, month, org_id, type, ai_flag } = req.data;
+            const { year, month, org_id, ai_flag } = req.data;
             let i_month = Number(month);
 
             /**

@@ -42,6 +42,7 @@ sap.ui.define(
           }.bind(this))
           .catch((oErr) => {
             Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
+            this.dataLoad();
           });
         this.byId("cardContent").setBusy(false);
       },
@@ -108,9 +109,7 @@ sap.ui.define(
           oModel["etcReason"] = aResult[4].deselected_reason || "없음"
         }
 
-        if (this._bFlag) {
-          this.dataLoad();
-        }
+        this.dataLoad();
 
         this._oEventBus.publish("aiReport", "deselBauData", oModel)
         this.getOwnerComponent().setModel(new JSONModel(oModel), "Model");

@@ -6,7 +6,9 @@ sap.ui.define([
     "sap/ui/model/odata/v4/ODataModel",
     "sap/ui/core/format/NumberFormat",
     "sap/ui/core/EventBus",
-], function (Controller, JSONModel, Module, ODataModel, NumberFormat, EventBus) {
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
+], function (Controller, JSONModel, Module, ODataModel, NumberFormat, EventBus, Filter, FilterOperator) {
     "use strict";
 
     return Controller.extend("bix.card.deliveryMonthlyContent1_3.card", {
@@ -14,15 +16,28 @@ sap.ui.define([
         _aContainerId: [],
         _oEventBus: EventBus.getInstance(),
         _oMyChart: [],
-
+        _sOrgTp: undefined,
 
         onInit: function () {
             // component별 id 설정
             this._createId();
+            this._setTopOrgModel();
 
             // 차트 설정
             // this._setChart();
+            this._oEventBus.publish("aireport", "isCardSubscribed");
+
             this._oEventBus.subscribe("aireport", "deliContent1_3", this._setChart, this);
+
+            this._oEventBus.subscribe("aireport", "setBusy", this._setBusy, this);
+
+            this._setModel();
+        },
+        _setModel: function () {
+            this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+        },
+        _setBusy: function () {
+            this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
         },
 
         /**
@@ -39,19 +54,19 @@ sap.ui.define([
         },
 
         _updateChart: async function (sChannel, sEventId, oData) {
-            this.getOwnerComponent().oCard.setBusy(true);
+            if (this.getView()._sOrgTp !== oData.org_tp) return;
             let aResults = await this._dataSetting(oData.data);
             this._oMyChart.data.labels = aResults.aLabel
             this._oMyChart.data.datasets[0].data = aResults.aData
             this._oMyChart.update();
             this.dataLoad();
-            setTimeout(() => {
-                this.getOwnerComponent().oCard.setBusy(false);
-            }, 300)
         },
 
         _setChart: async function (sChannel, sEventId, oData) {
-            this.byId("cardContent").setBusy(true);
+            if (!this.getView()._sOrgTp) {
+                this.getView()._sOrgTp = oData.org_tp
+            }
+            if (this.getView()._sOrgTp !== oData.org_tp) return;
             // 카드
             const oCard = this.getOwnerComponent().oCard;
 
@@ -66,7 +81,7 @@ sap.ui.define([
 
             let oHTML = this.byId("html0");
             oHTML.setContent(`<div id='${this._aContainerId}' class='custom-chart-container' style='width:300px; height:250px; min-height:250px'><canvas id='${this._aCanvasId}' /></div>`);
-            oHTML.attachEvent("afterRendering", async function () {
+            oHTML.attachEventOnce("afterRendering", async function () {
 
                 // 차트 구성
                 const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[0])).getContext("2d");
@@ -191,13 +206,11 @@ sap.ui.define([
 
                 })
 
-
-                
-                
                 this._ovserveResize(this.byId(this._aContainerId))
-                
+
             }.bind(this));
             this.dataLoad();
+            this.getView().getModel("ui").setProperty("/bBusyFlag", false);
             this.byId("cardContent").setBusy(false);
         },
 
@@ -214,26 +227,26 @@ sap.ui.define([
 
         _dataSetting: async function (oDataResult) {
             // let aResults = await this._setData();
-            let oSessionData = JSON.parse(sessionStorage.getItem("aiReport"))
+            await this._setTopOrgModel();
+            await this._setCloudOrgModel();
+            const topOrgModel = this.getView().getModel("topOrgModel").getData();
+            const cloudgModel = this.getView().getModel("cloudOrgModel").getData();
 
+            let oSessionData = JSON.parse(sessionStorage.getItem("aiReport"))
             let oValue = oDataResult[0];
             let sOrgType = oSessionData['type'];
             let sOrgId = oSessionData['orgId'];
             let aLabel, aData;
-            if (sOrgId === '5') {
-                switch (sOrgType) {
-                    case '': aLabel = ["매출", "마진", "마진율", "DT 매출"]
-                        aData = [oValue.sale_gap, oValue.margin_gap, oValue.margin_rate_gap, oValue.dt_gap]
-                        break;
-                    case 'account': aLabel = ["매출", "DT 매출", "RoHC", "공헌이익"]
-                        aData = [oValue.sale_gap, oValue.dt_gap, oValue.rohc_gap, oValue.contribution_gap]
-                        break;
-                    case 'delivery': aLabel = ["마진율", "DT 매출", "BR(Cost)", "RoHC"]
-                        aData = [oValue.margin_rate_gap, oValue.dt_gap, oValue.br_cost_gap, oValue.rohc_gap]
-                        break;
-                }
-            } else {
-                // Cloud
+            if (sOrgId === topOrgModel.org_id) {
+                aLabel = ["매출", "마진", "마진율", "DT 매출"]
+                aData = [oValue.sale_gap, oValue.margin_gap, oValue.margin_rate_gap, oValue.dt_gap]
+            } else if (sOrgId != topOrgModel.org_id && sOrgType === 'account') {
+                aLabel = ["매출", "DT 매출", "RoHC", "공헌이익"]
+                aData = [oValue.sale_gap, oValue.dt_gap, oValue.rohc_gap, oValue.contribution_gap]
+            } else if (sOrgId != topOrgModel.org_id && sOrgType === 'delivery' && sOrgId != cloudgModel.org_id) {
+                aLabel = ["마진율", "DT 매출", "BR(Cost)", "RoHC"]
+                aData = [oValue.margin_rate_gap, oValue.dt_gap, oValue.br_cost_gap, oValue.rohc_gap]
+            } else if (sOrgId === cloudgModel.org_id && sOrgType === 'delivery') {
                 aLabel = ["매출", "마진율", "DT 매출", "BR(Cost)", "RoHC", "공헌이익", "Non-MM"]
                 aData = [oValue.sale_gap, oValue.margin_rate_gap,
                 oValue.dt_gap, oValue.br_cost_gap, oValue.rohc_gap, oValue.contribution_gap, oValue.nonmm_gap]
@@ -243,9 +256,68 @@ sap.ui.define([
                 aData
             }
             return oData;
+            // if (sOrgId === topOrgModel.org_id) {
+            //     switch (sOrgType) {
+            //         case '': aLabel = ["매출", "마진", "마진율", "DT 매출"]
+            //             aData = [oValue.sale_gap, oValue.margin_gap, oValue.margin_rate_gap, oValue.dt_gap]
+            //             break;
+            //         case 'account': aLabel = ["매출", "DT 매출", "RoHC", "공헌이익"]
+            //             aData = [oValue.sale_gap, oValue.dt_gap, oValue.rohc_gap, oValue.contribution_gap]
+            //             break;
+            //         case 'delivery': aLabel = ["마진율", "DT 매출", "BR(Cost)", "RoHC"]
+            //             aData = [oValue.margin_rate_gap, oValue.dt_gap, oValue.br_cost_gap, oValue.rohc_gap]
+            //             break;
+            //     }
+            // } else {
+            //     // Cloud
+            //     aLabel = ["매출", "마진율", "DT 매출", "BR(Cost)", "RoHC", "공헌이익", "Non-MM"]
+            //     aData = [oValue.sale_gap, oValue.margin_rate_gap,
+            //     oValue.dt_gap, oValue.br_cost_gap, oValue.rohc_gap, oValue.contribution_gap, oValue.nonmm_gap]
+            // }
         },
 
+        /**
+         * 최상위 조직 값 모델 설정
+         */
+        _setTopOrgModel: async function () {
+            const oModel = new ODataModel({
+                serviceUrl: "../odata/v4/cm/",
+                synchronizationMode: "None",
+                operationMode: "Server"
+            });
 
+            const andFilter = new Filter([
+                new Filter("org_id", FilterOperator.NE, null),
+                new Filter([
+                    new Filter("org_parent", FilterOperator.EQ, null),
+                    new Filter("org_parent", FilterOperator.EQ, ''),
+                ], false)
+            ], true)
+
+            // 전사조직 모델 세팅
+            const oBinding = oModel.bindList("/org_full_level", undefined, undefined, andFilter)
+            await oBinding.requestContexts().then((aContext) => {
+                const aData = aContext.map(ctx => ctx.getObject());
+                this.getView().setModel(new JSONModel(aData[0]), "topOrgModel");
+
+            })
+        },
+
+        /**
+         *  Cloud 부문 조직 값 모델 설정
+         */
+        _setCloudOrgModel: async function () {
+            const oModel = new ODataModel({
+                serviceUrl: "../odata/v4/cm/",
+                synchronizationMode: "None",
+                operationMode: "Server"
+            });
+            const oBinding = oModel.bindList("/org_full_level", undefined, undefined, new Filter("org_ccorg_cd", FilterOperator.EQ, "195200"))
+            await oBinding.requestContexts().then((aContext) => {
+                const aData = aContext.map(ctx => ctx.getObject());
+                this.getView().setModel(new JSONModel(aData[0]), "cloudOrgModel");
+            })
+        },
         _setData: async function () {
             let oData = JSON.parse(sessionStorage.getItem("aiReport"));
 

@@ -4,6 +4,8 @@ sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
     "bix/common/library/control/Modules",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
@@ -14,6 +16,8 @@ sap.ui.define([
         Controller,
         JSONModel,
         Modules,
+        Filter,
+        FilterOperator,
     ) {
         "use strict";
 
@@ -24,6 +28,7 @@ sap.ui.define([
             },
             onMyRoutePatternMatched: async function (oEvent) {
                 this._setModel()
+                this._setTopOrgModel();
             },
 
             _setModel: function () {
@@ -44,6 +49,11 @@ sap.ui.define([
                 let oContext = oEvent.getParameters()["rowContext"];
                 let sId = oContext.getObject("ID");
                 const sHash = window.location.origin;
+
+                let oToday = new Date();
+                let sYear = String(oToday.getFullYear());
+                let sMonth = String(oToday.getMonth()).padStart(2, "0");
+                const oData = this.getView().getModel("topOrgModel").getData();
 
                 const w = 1200;
                 const h = 820;
@@ -71,7 +81,7 @@ sap.ui.define([
                 switch (sId) {
                     case "ID1":
                         // this.getOwnerComponent().getRouter().navTo("PipelineWeekly");
-                        window.open(sHash + "/main/aiReportWeek.html#/PipelineWeekly", "_blank");
+                        window.open(sHash + "/main/aiReportWeek.html#/PipelineWeekly", "_blank", newTabConfig);
                         break;
                     case "ID2":
                         this.getOwnerComponent().getRouter().navTo("DeliveryMonthly");
@@ -81,6 +91,13 @@ sap.ui.define([
                         break;
                     case "ID4": //MainMonthly
                         window.open(sHash + "/main/aiReportMonth.html#/MainMonthly", "_blank");
+                        sessionStorage.setItem("aiReport", JSON.stringify({
+                            orgId: oData.org_id,
+                            type: oData.org_tp,
+                            title: oData.org_name,
+                            year: sYear,
+                            month: sMonth
+                        }));
                         // this.getOwnerComponent().getRouter().navTo("MainMonthly");
                         break;
                     case "ID5":
@@ -88,6 +105,27 @@ sap.ui.define([
                         break;
                 }
             },
+            /**
+            * 최상위 조직 값 모델 설정
+            */
+            _setTopOrgModel: async function () {
+                const andFilter = new Filter([
+                    new Filter("org_id", FilterOperator.NE, null),
+                    new Filter([
+                        new Filter("org_parent", FilterOperator.EQ, null),
+                        new Filter("org_parent", FilterOperator.EQ, ''),
+                    ], false)
+                ], true)
+
+                // 전사조직 모델 세팅
+                const oModel = this.getOwnerComponent().getModel();
+                const oBinding = oModel.bindList("/org_full_level", undefined, undefined, andFilter)
+                await oBinding.requestContexts().then((aContext) => {
+                    const aData = aContext.map(ctx => ctx.getObject());
+                    this.getView().setModel(new JSONModel(aData[0]), "topOrgModel");
+                })
+            },
+
 
         });
     });

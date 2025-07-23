@@ -23,7 +23,7 @@ sap.ui.define(["sap/ui/base/EventProvider", "sap/base/Log"], function (
         Log.debug("Session timeout init", "bix.main.SessionTimeout");
 
         const sessionTimeout = localStorage.getItem("sessionTimeout");
-        let iServerSessionTimeout = Number(sessionTimeout) || 15 * 60 * 1000;
+        let iServerSessionTimeout = Number(sessionTimeout) * 60 * 1000 || 15 * 60 * 1000;
 
         if (!isNaN(iServerSessionTimeout) && iServerSessionTimeout > 0) {
             const iSessionTimeoutNotice = iServerSessionTimeout - SessionTimeout.SESSION_TIMEOUT_NOTICE_DURATION;

@@ -7,31 +7,34 @@ using sga.wideview_view as sga_wideview_view from '../../../db/cds/sga/view/wide
 using sga.expense_view as sga_expense_view from '../../../db/cds/sga/view/expense_view';
 using sga.investment_view as sga_investment_view from '../../../db/cds/sga/view/investment_view';
 using sga.excel_export_view as sga_excel_export_view from '../../../db/cds/sga/view/execl_export_view';
+using sga.expense_co as sga_expense_co from '../../../db/cds/sga/expense_co';
+using sga.if_expense_co as sag_if_expense_co from '../../../db/cds/sga/if_expense_co';
 
 @impl    : 'srv/handlers/sga/sga_handler.js' // api 구현 코드위치
 @path    : '/odata/v4/sga-api'
 @requires: 'authenticated-user'
 service SgaService {
 
-
-    // /**
-    //  * SG&A 장판지 조회 API
-    //  */
-    // @readonly
-    // entity sga_wideview   as projection on sga_wideview_view;
-
-    // /**
-    //  * SG&A 경비 상세 조회 API
-    //  */
-    // @readonly
-    // entity sga_expense    as projection on sga_expense_view;
-
-    // /**
-    //  * SG&A 투자비 상세 조회 API
-    //  */
-    // @readonly
-    // entity sga_investment as projection on sga_investment_view;
-
+    @restrict: [
+        {
+            grant: [
+                'CREATE',
+                'UPDATE',
+                'DELETE'
+            ],
+            to   : 'bix-portal-system-admin'
+        },
+        {
+            grant: [
+                'CREATE',
+                'UPDATE',
+                'DELETE'
+            ],
+            to   : 'bix-portal-manage'
+        },
+        {grant: 'READ'}
+    ]
+    entity expense_co as projection on sga_expense_co;
 
     // sga 실적화면 테이블 데이터 호출 API
     function get_actual_sga(year : String(4), month : String(2), org_id : String(10))                                 returns array of oRes_;
@@ -105,4 +108,6 @@ service SgaService {
     function get_actual_sga_chart(year : String(4), month : String(2), org_id : String(10))                           returns array of oForecastSgaDetailChartResult;
     type oForecastSgaDetailChartResult {}
 
+    @readonly
+    entity if_expense_co                              as projection on sag_if_expense_co;
 }

@@ -6,7 +6,7 @@ using common.code_header as common_code_header from '../../common/code';
 using common.project_biz_domain as common_project_biz_domain from '../../common/project_biz_domain';
 using common.customer as common_customer from '../../common/customer';
 using common.org_type as common_org_type from '../../common/org_type';
-using common.account_customer_map as common_account_customer_map from '../../common/account';
+using common.account_customer_map as common_account_customer_map from '../../common/account_customer_map';
 using pl.sfdc_contract_view as pl_sfdc_contract_view from '../../pl/view/sfdc_contract_view';
 using pl.wideview as pl_wideview from '../../pl/wideview';
 using common.project_master_mapping as common_project_master_mapping from '../../common/project_master_mapping';
@@ -72,6 +72,34 @@ view project_view as
                              '600441', '600964', '600665'
                          )
                          then false
+                    when actual_prj.relsco_yn         is     null
+                         and customer.relsco_yn       is     null
+                         then(
+                                 case
+                                     when substring(
+                                              ifnull(
+                                                  (
+                                                      case
+                                                          when sfdc1.biz_tp_account_cd     is not null
+                                                               and sfdc1.biz_tp_account_cd <>     ''
+                                                               then sfdc1.biz_tp_account_cd
+                                                          when sfdc2.biz_tp_account_cd     is not null
+                                                               and sfdc2.biz_tp_account_cd <>     ''
+                                                               then sfdc2.biz_tp_account_cd
+                                                          when sfdc3.biz_tp_account_cd     is not null
+                                                               and sfdc3.biz_tp_account_cd <>     ''
+                                                               then sfdc3.biz_tp_account_cd
+                                                          when customer.biz_tp_account_cd  is not null
+                                                               then customer.biz_tp_account_cd
+                                                          else account_map.biz_tp_account_cd
+                                                      end
+                                                  ), 'EX'
+                                              ), 1, 2
+                                          ) = 'IN'
+                                          then true
+                                     else false
+                                 end
+                             )
                 // ECC 구 고객코드 하드코딩 처리
                 // 600441 / 한국지능정보사회진흥원/ 대외 (관계사 아님)
                 // 600964 / 대한무역투자진흥공사 (KOTRA) / 대외 (관계사아님)

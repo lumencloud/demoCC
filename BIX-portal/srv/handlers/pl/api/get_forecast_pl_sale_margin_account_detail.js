@@ -39,7 +39,7 @@ module.exports = (srv) => {
             /**
              * common.account 정보
              */
-            const common_account = db.entities('common').account;
+            const common_account = db.entities('common').account_view;
             // =================================================================================
 
             // function 입력 파라미터

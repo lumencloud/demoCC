@@ -51,10 +51,10 @@
                         selectionBehavior="RowOnly" 
                         firstVisibleRowChanged="onFirstVisibleRowChanged"
                         rowSelectionChange="onRowSelectionChange"
-                        class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
+                        class=" custom-table-container custom-table-header custom-table-body custom-pl-detail-table custom-uiTable-selection custom-inherit-height"
                         busyIndicatorDelay="0"
                         visibleRowCountMode="Auto"
-                        fixedColumnCount="2"
+                        fixedColumnCount="1"
                         noData=" "
                         fieldGroupIds="content,deal_stage"
                     >
@@ -940,7 +940,7 @@
                                         text="{div_name}"
                                         wrapping="false"
                                         width="100%"
-                                        textAlign="Center"
+                                        textAlign="Begin"
                                     />
                                 </table:template>
                                 

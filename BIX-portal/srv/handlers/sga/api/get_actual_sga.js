@@ -87,7 +87,19 @@ module.exports = (srv) => {
             sga_column = [...sga_col_list, `${search_org_ccorg} as org_ccorg_cd`];
             sga_groupBy = [...sga_groupBy, search_org_ccorg];
 
-            const org_query = await SELECT.from(org_full_level);
+            // DB 쿼리 실행 (병렬)
+            const [query, target_query, org_query] = await Promise.all([
+                SELECT.from(sga_view).columns(sga_column).where(sga_where).groupBy(...sga_groupBy),
+                get_org_target(year,['C05','C07']),
+                SELECT.from(org_full_level)
+            ]);
+
+            if(!query.length){
+                //return req.res.status(204).send();
+                return []
+            }
+
+            //org 정리 및 ackerton 리스트 작성
             let org_query_data = [];
             let ackerton_list = [];
             org_query.forEach(data=>{
@@ -99,18 +111,7 @@ module.exports = (srv) => {
                         ackerton_list.push(data[search_org_ccorg]);
                     };
                 };
-            })
-
-            // DB 쿼리 실행 (병렬)
-            const [query, target_query] = await Promise.all([
-                SELECT.from(sga_view).columns(sga_column).where(sga_where).groupBy(...sga_groupBy),
-                get_org_target(year,['C05','C07'])
-            ]);
-
-            if(!query.length){
-                //return req.res.status(204).send();
-                return []
-            }
+            });
 
             let ackerton_org, ackerton_curr_sga_sum_data, ackerton_last_sga_sum_data;
             if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
@@ -137,10 +138,11 @@ module.exports = (srv) => {
                 };
             };
 
+            //토탈값 구하기 위한 베이스 작성
             let total_target = target_query.find(data=>data.org_ccorg_cd === orgInfo.org_ccorg_cd);
             let sga_labor_amt_sum = {
                 div_id: org_id,
-                org_name: org_col_nm !== 'hdqt_id' && org_col_nm !== 'team_id' ? '합계' : org_col_nm_name,
+                org_name: org_col_nm !== 'hdqt_ccorg_cd' && org_col_nm !== 'team_ccorg_cd' ? '합계' : org_col_nm_name,
                 type: 'LABOR',
                 org_order: '001',
                 curr_target_value: total_target.target_labor,
@@ -156,7 +158,7 @@ module.exports = (srv) => {
             };
             let sga_invest_amt_sum = {
                 div_id: org_id,
-                org_name: org_col_nm !== 'hdqt_id' && org_col_nm !== 'team_id' ? '합계' : org_col_nm_name,
+                org_name: org_col_nm !== 'hdqt_ccorg_cd' && org_col_nm !== 'team_ccorg_cd' ? '합계' : org_col_nm_name,
                 type: 'INVEST',
                 org_order: '002',
                 curr_target_value: total_target.target_expense,
@@ -172,7 +174,7 @@ module.exports = (srv) => {
             };
             let sga_expence_amt_sum = {
                 div_id: org_id,
-                org_name: org_col_nm !== 'hdqt_id' && org_col_nm !== 'team_id' ? '합계' : org_col_nm_name,
+                org_name: org_col_nm !== 'hdqt_ccorg_cd' && org_col_nm !== 'team_ccorg_cd' ? '합계' : org_col_nm_name,
                 type: 'EXPENSE',
                 org_order: '003',
                 curr_target_value: total_target.target_expense,
@@ -187,6 +189,7 @@ module.exports = (srv) => {
                 rate_gap: 0
             };
 
+            //전체 값으로 데이터 작성 및 akerton 값 작성
             let o_query_sum = {};
             query.forEach(data=>{
                 if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
@@ -262,6 +265,7 @@ module.exports = (srv) => {
                 a_query_sum.push(ackerton_last_sga_sum_data);
             };
 
+            //최종 조직 리스트 작성
             let org_list = [];
             org_query_data.forEach(data => {
                 let oTemp = {
@@ -280,6 +284,7 @@ module.exports = (srv) => {
                 }
             });
 
+            //akerton 및 999990 조직 작성
             if(orgInfo.org_level === 'lv1' || orgInfo.org_level === 'lv2'){
                 let oTemp = {
                     id: ackerton_org.org_id,
@@ -297,6 +302,7 @@ module.exports = (srv) => {
                 org_list.push(oTemp2);
             };
 
+            //최종 데이터 작성
             let a_curr_y_sga = [];
             let a_last_y_sga = [];
             a_query_sum.forEach(data => {
@@ -366,10 +372,11 @@ module.exports = (srv) => {
             });
             
             aRes.push(sga_labor_amt_sum, sga_expence_amt_sum, sga_invest_amt_sum);
-            if(org_col_nm !== 'hdqt_id' && org_col_nm !== 'team_id'){
+            if(org_col_nm !== 'hdqt_ccorg_cd' && org_col_nm !== 'team_ccorg_cd'){
                 aRes.push(...a_result);
             }
 
+            //데이터 정렬
             let a_sort_field = [
                 { field: "org_order", order: "asc" }
             ];

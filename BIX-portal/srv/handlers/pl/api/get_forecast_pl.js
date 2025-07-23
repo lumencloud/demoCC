@@ -199,7 +199,7 @@ module.exports = (srv) => {
                 "forecast_value": margin_data['forecast_value'] - sga_data['forecast_value'],
                 "secured_value": margin_data['secured_value'] - sga_data['secured_value'],
                 "not_secured_value": 0,
-                "yoy": margin_data['secured_value'] - sga_data['secured_value'] - ((pl_last_y_data?.['forecast_value'] ?? 0) - i_last_sga_forecast)
+                "yoy": (margin_data['forecast_value'] - sga_data['forecast_value']) - (i_last_margin_forecast - i_last_sga_forecast)
             };
             contribution_data["plan_ratio"] = contribution_data["forecast_value"] - (curr_target?.["target_cont_profit"] * 100000000);
             oResult.push(contribution_data);

@@ -22,7 +22,7 @@
             >
                 <OverflowToolbar
                     style="Clear"
-                    height="2.5rem"
+                    height="4rem"
                 >
                     
                     <!-- <Title id="tempMessage" text="※ Deal Stage 데이터가 없어 Total을 제외한 필드는 값이 맞지 않을 수 있습니다." />                     -->

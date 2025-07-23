@@ -11,7 +11,7 @@ module.exports = (srv) => {
          * dashboard.dashboard_set [대시보드 정보]
          * 대시보드 테이블
          */
-        const dashboard_set = db.entities('dashboard').dashboard_set;
+        const dashboard_set = db.entities('common').dashboard_set;
         if (use_flag) {
             await UPDATE(dashboard_set).set({use_flag : false})
         }

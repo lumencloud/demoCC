@@ -346,11 +346,14 @@ sap.ui.define([
                         }
                     }
 
+                  
+                   
                     let circleRate;
                     if (data.curr_sale === 0) {
-                        circleRate = 50 + 5
+                        circleRate = 45
                     } else {
-                        circleRate = (data.curr_margin / data.curr_sale * 100 / 2) + 50 + 5
+                        circleRate = (data.curr_margin / data.curr_sale * 100 / 2) + 45
+                        if(circleRate < 8){circleRate = 8}
                     }
 
                     let oModel = {

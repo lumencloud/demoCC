@@ -149,7 +149,7 @@ sap.ui.define([
 
             let oHTML = this.byId("html");
             oHTML.setContent(`<div id='${this._sContainerId}' class='custom-chart-container' style='width:${iBoxWidth}vw; height:${iBoxHeight}vh; min-height:${this._iMinHeight}px'><canvas id='${this._sCanvasId}' /></div>`);
-            oHTML.attachEvent("afterRendering", function () {
+            oHTML.attachEventOnce("afterRendering", function () {
 
                 
 

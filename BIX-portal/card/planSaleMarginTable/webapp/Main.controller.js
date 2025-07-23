@@ -151,7 +151,7 @@ sap.ui.define([
             await this._setTableMerge([this._aTableLists[iTableIndex]]);
         },
 
-        _setBusy: async function (bType) {
+        _setBusy: function (bType) {
             // 모든 박스 setBusy 설정
             this._aTableLists.forEach(sTableId => {
                 let oBox = this.byId(sTableId).getParent();
@@ -356,7 +356,11 @@ sap.ui.define([
 
 
             //합계 클릭 금지 
-            if (oRowData.org_name === "합계" || oRowData.account_nm === "합계") {
+            if (oRowData.org_name === "합계" 
+                || oRowData.account_nm === "합계"
+                || oRowData.org_name?.includes("소계") 
+                || oRowData.account_nm?.includes("14.") 
+                || oRowData.account_nm?.includes("15.")) {
                 this._excludeClick = true;
             }
             // 첫번째 열 클릭 금지

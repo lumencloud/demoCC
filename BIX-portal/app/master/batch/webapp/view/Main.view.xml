@@ -146,7 +146,14 @@
                             </table:template>
                         </table:Column>
 
-                        <!-- <table:Column width="auto" hAlign="Center" autoResizable="true" >
+                        <table:Column width="6rem"  hAlign="Center" autoResizable="true">
+                            <Label text="로그"   wrapping="true"/>
+                            <table:template>
+                                <Button text="확인" press="checkLog" visible="{path:'log', formatter :'.isLogVisible', targetType: 'any'}"></Button>
+                            </table:template>
+                        </table:Column>
+
+                        <!-- <table:Column width="auto" hAlign="Center" autoResizable="true" visible="true" >
                             <Label text="내용"   wrapping="true"/>
                             <table:template>
                                 <VBox width="100%" height="100%" >
@@ -165,11 +172,6 @@
                         </table:Column> -->
                     </table:columns>
 
-                    <table:rowActionTemplate>
-                        <table:RowAction>
-                            <table:RowActionItem type="Navigation" press=".onDetail" />
-                        </table:RowAction>
-                    </table:rowActionTemplate>
                 </table:Table>
             </Panel>
         </content>

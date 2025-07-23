@@ -4,7 +4,8 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "bix/common/library/control/Modules",
-], (Controller, JSONModel, Filter, FilterOperator, Modules) => {
+    "sap/ui/core/Fragment",
+], (Controller, JSONModel, Filter, FilterOperator, Modules, Fragment) => {
     "use strict";
 
     /**
@@ -104,6 +105,7 @@ sap.ui.define([
                     filters: aFilters,
                     parameters: {
                         $count: true,
+                        $select: "log"
                     },
                     events: {
                         dataRequested: function () {
@@ -143,6 +145,7 @@ sap.ui.define([
                     },
                     events: {
                         dataRequested: function () {
+                            console.log()
                             oTable.setBusy(true);
                         }.bind(this),
                         dataReceived: function (oEvent) {
@@ -267,34 +270,51 @@ sap.ui.define([
         },
 
         /**
-         * 배치 그룹 테이블 상세 버튼 클릭 이벤트
-         * @param {Event} oEvent 
-         */
-        onDetail: async function (oEvent) {
-            let oContext = oEvent.getParameters()["rowContext"];
-
-            if (oContext) {
-                this.getOwnerComponent().getRouter().navTo("RouteDetail", {
-                    ver: oContext.getObject("ver"),
-                    if_step: oContext.getObject("if_step"),
-                    table_name: oContext.getObject("table_name"),
-                    procedure_name: oContext.getObject("procedure_name"),
-                    success_yn: oContext.getObject("success_yn"),
-                });
-            }
-        },
-
-        /**
          * 테이블 행 선택 이벤트
          * @param {Event} oEvent 
          */
-        onRowSelectionChange: function (oEvent) {
+        onRowSelectionChange:  function (oEvent) {
             let oTable = /** @type {Table} */ (oEvent.getSource());
             let aSelectedIndices = oTable.getSelectedIndices();
+
 
             // 테이블 행 선택이 1개 이상일 때 테이블 툴바 버튼 활성화
             let oSelectModel = this.getView().getModel("searchModel");
             oSelectModel.setProperty("/selectedIndices", (aSelectedIndices.length > 0));
+        },
+        checkLog: async function (oEvent) {
+            //마지막 선택된 인덱스 
+            const oButton = oEvent.getSource()
+            const oContext = oButton.getBindingContext();
+            const oData = oContext.getObject();
+
+
+            //실패한 경우에만 플라그먼트 오픈
+            if (!oData.success_yn) {
+                if (!this._pLogDialog) {
+                    this._pLogDialog = await Fragment.load({
+                        id: this.getView().getId(),
+                        name: "bix.master.batch.view.fragment.log",
+                        controller: this
+                    })
+                    this.getView().addDependent(this._pLogDialog);
+
+                }
+
+                this._pLogDialog.setModel(new JSONModel(oData), "log");
+                this._pLogDialog.open();
+            }
+
+
+        },
+
+
+        isLogVisible : function(log){
+            return log!=null;
+        },
+
+        onLogDialogClose: function () {
+            this._pLogDialog.close();
         },
 
         /**
@@ -335,12 +355,12 @@ sap.ui.define([
         /**
          * 신규 배치 실행 버튼 클릭 이벤트
          */
-        onExecuteReBatch: function (oEvent) {
+        onExecuteReBatch: async function (oEvent) {
             let oTable = this.byId("batchTable");
             let aSelectedIndices = oTable.getSelectedIndices();
             let oIfModel = this.getOwnerComponent().getModel("v4if");
             let oV2Model = this.getOwnerComponent().getModel("v2");
-            
+
             // 요청 모아서 보내기
             let aBatchList = [];
             aSelectedIndices.forEach(async (index) => {
@@ -364,15 +384,44 @@ sap.ui.define([
                 }
             });
 
-            new Promise((resolve, reject) => {
-                let oContext = oIfModel.bindContext(`/execute_batch_renew`, null, {
-                    parameters: {
-                        batch_list: aBatchList
-                    }
-                });
-                // oContext.invoke();
-                oContext.execute();
+
+            return
+
+            // ajax 로 batch_list 를 post 전송
+            $.ajax({
+                url: "/odata/v4/interface/execute_batch_renew",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    batch_list: aBatchList
+                }),
+                success: function (data) {
+                    console.log("success", data)
+                },
+                error: function (xhr, status, error) {
+                    console.log("에러 ", status, xhr)
+                }
             })
+
+
+            // const oBinding =  oIfModel.bindContext(`/execute_batch_renew(...)`);
+            // oBinding.setParameter("batch_list",aBatchList);
+            // await oBinding.execute();
+
+
+
+
+
+
+            // new Promise((resolve, reject) => {
+            //     let oContext = oIfModel.bindContext(`/execute_batch_renew`, null, {
+            //         parameters: {
+            //             batch_list: aBatchList
+            //         }
+            //     });
+            //     // oContext.invoke();
+            //     oContext.execute();
+            // })
         },
     });
 });

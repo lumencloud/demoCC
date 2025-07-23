@@ -26,11 +26,25 @@ sap.ui.define([
              *  eventBus 전역 객체 
              */
             _oEventBus: EventBus.getInstance(),
+            /**
+             *  pdf 다운로드 버튼 제어를 위한 카드 로딩 카운트 변수
+             */
             _iCardReady: 0,
+            /**
+             *  select 선택시 pdf (busy,enable) ui 제어 flag 변수
+             */
+            _bPdfLoaded: true,
+            /**
+             *  eventBus subscribed 된 이후 publish 위한 카드 subscribe 카운트 변수
+             */
+            _iCardSubs: 0,
+            _bUpdateFlag: false,
+            _bInstanceFlag: true,
 
             onInit: function () {
                 const myRoute = this.getOwnerComponent().getRouter().getRoute("MainMonthly");
                 myRoute.attachPatternMatched(this.onMyRoutePatternMatched, this);
+
             },
 
             onMyRoutePatternMatched: async function (oEvent) {
@@ -45,50 +59,18 @@ sap.ui.define([
                 let sYear = String(oToday.getFullYear());
                 let sMonth = String(oToday.getMonth()).padStart(2, "0");
                 const oData = this.getView().getModel("topOrgModel").getData();
-                // this._setSessionItem(oData, sYear, sMonth);
-
-                /**
-                 *  첫 페이지에 있는 카드들의 subscribe하는 시점보다 메인 controller 
-                 *  publish가 빨라서 잠시 카드 로드를 위해 delay후 publish
-                 *  추후 수정 예정
-                 */
-                // setTimeout(() => {
-                //     oSelect.fireChange({
-                //         selectedItem: oSelect.getSelectedItem()
-                //     })
-                // }, 2000);
+                this._setSessionItem(oData, sYear, sMonth);
 
                 this._oEventBus.subscribe("aiReport", "newMonthData", this._setChartHeaderModel, this)
                 this._oEventBus.subscribe("aiReport", "deselMonthData", this._setChartHeaderModel, this)
                 this._oEventBus.subscribe("aiReport", "negoMonthData", this._setChartHeaderModel, this)
                 this._oEventBus.subscribe("aiReport", "comMonthData", this._setChartHeaderModel, this)
 
-
+                this._oEventBus.subscribe("aireport", "isCardSubscribed", this._onCardSubscribed, this)
             },
+
             onBeforeRendering: function () {
                 this._countViewContainCard();
-            },
-
-            _onCardReady: async function (sChannelId, sEventId, oData) {
-               
-
-                this._iCardReady++;
-                if (this._iCardReady === this.iCardCount) {
-                    this.getView().getModel("ui").setProperty("/bPdfFlag", true)
-                    this.getView().getModel("ui").setProperty("/busyFlag", false)
-                    console.warn("카드로딩", this._iCardReady)
-                    this._iCardReady = 0;
-                    return;
-                } else if (this._iCardReady === 2 && !this._isCardLoaded) {
-                    /**
-                     *  안전하게 카드가 로딩된 후 (subscribe) publish 날릴 수 있게 2개(카드 갯수)로 설정 
-                    */
-                    const oSelect = this.byId("selectType");
-                    oSelect.fireChange({
-                        selectedItem: oSelect.getSelectedItem()
-                    })
-                    this._isCardLoaded = true;
-                }
             },
 
             onAfterRendering: function () {
@@ -98,13 +80,37 @@ sap.ui.define([
                 }
             },
 
+            _onCardSubscribed: function () {
+                this._iCardSubs++;
+                if (this._iCardSubs >= 10 && !this._isCardLoaded) {
+                    /**
+                     *  안전하게 카드가 로딩된 후 (subscribed 후) publish 날릴 수 있게 2개(카드 갯수)로 설정 
+                     */
+                    const oSelect = this.byId("selectType");
+                    oSelect.fireChange({
+                        selectedItem: oSelect.getSelectedItem()
+                    })
+                    this._isCardLoaded = true;
+                }
+            },
+
+            _onCardReady: async function () {
+                this._iCardReady++;
+                if (this._iCardReady === this.iCardCount) {
+                    this.getView().getModel("ui").setProperty("/bPdfFlag", true)
+                    this.getView().getModel("ui").setProperty("/busyFlag", false)
+                    this._oEventBus.unsubscribe("CardChannel", "CardFullLoad", this._onCardReady, this);
+                    this._iCardReady = 0;
+                    this._bPdfLoaded = false;
+                }
+            },
+
             /**
              *  select 를 통해서 view를 불러올 때마다 카드 개수 확인하여 카운트
              */
-            _countViewContainCard: function () {
+            _countViewContainCard: function (sPageId) {
                 let iCardCount = 0;
-
-                const viewId = this.byId("selectType").getSelectedKey() || "all";
+                const viewId = sPageId || "all";
                 const oCurrView = this.byId(viewId).byId("carousel");
                 const aCard = oCurrView.findAggregatedObjects(true, function (oControl) {
                     return oControl.isA("sap.ui.integration.widgets.Card");
@@ -113,7 +119,6 @@ sap.ui.define([
                     iCardCount++;
                 })
                 this.iCardCount = iCardCount;
-                console.warn(this.iCardCount);
             },
 
             /**
@@ -123,37 +128,43 @@ sap.ui.define([
              * @param {*} ThirdData 
              */
             _requestData: async function (firstData, secondData, ThirdData) {
-                this._countViewContainCard();
                 const aFirstResult = await this._callApiGroup(firstData);
                 this._eventBusToCard(aFirstResult);
 
                 const aSecondResult = await this._callApiGroup(secondData);
                 this._eventBusToCard(aSecondResult);
 
-                if (ThirdData) {
+                if (ThirdData) {   //각 페이지별 api 요청 분기 처리
                     const aThirdResult = await this._callApiGroup(ThirdData);
                     this._eventBusToCard(aThirdResult);
                 }
-                console.count("callAPi")
             },
+
             /**
              * 그룹으로 넘어온 api Path 값 promise all 로 한번에 return
              * @param {*} aApi 
              * @returns 
              */
             _callApiGroup: async function (aApi) {
+                const oSelect = this.byId("selectType").getSelectedKey();
+                const org_tp = this._extractViewId(oSelect);
+
                 const aPromises = aApi.map((obj) => {
                     const skey = Object.keys(obj)[0];
                     const sPath = obj[skey]
                     return this._callApi(sPath).then((oResult => {
                         return {
                             eventId: skey,
-                            data: oResult
+                            data: oResult,
+                            org_tp: org_tp,
+                            bUpdateFlag: this._bUpdateFlag,
+                            bInstanceFlag: this._bInstanceFlag,
                         }
                     }))
                 })
                 return Promise.all(aPromises);
             },
+
             /**
              * 각 그룹 path 값 데이터 요청
              * @param {*} sPath 
@@ -166,7 +177,6 @@ sap.ui.define([
                     operationMode: "Server"
                 });
                 try {
-
                     const oData = await oModel.bindContext(sPath).requestObject();
                     return oData.value
                 } catch (oError) {
@@ -174,7 +184,8 @@ sap.ui.define([
                     return
                 }
             },
-            /**
+
+            /** 선택된 조직 별 api 요청 path값 가공 함수
              * @param {Object} oData 
              * @param {String} year 
              * @param {String} month 
@@ -219,112 +230,163 @@ sap.ui.define([
                     { contract: mappingPath("/get_ai_forecast_deal_type_pl", "deal_stage_cd='contract'") }
                 ]
                 // Account, 전사 페이지에서만 사용하는 표 형태 카드 분기처리
-                if (oData.org_tp === 'account' || (oData.org_tp === '' && oData.org_id === oTopOrgData.org_id)) {
+                if (oData.org_tp === 'account' || (oData.org_tp === 'delivery' && oData.org_id === oTopOrgData.org_id)) {
                     return { first: aFirstPagePaths, second: aRestPagePaths, third: aTablePagePath }
                 } else {
                     return { first: aFirstPagePaths, second: aRestPagePaths }
                 }
             },
 
-
             /**
-             * 첫번째 셀렉트 이벤트 (전사, Cloud, Account, Delivery)
              * @param {*} oEvent 
              */
-            onSelectTypeChange: function (oEvent) {
-                this.getView().getModel("ui").setProperty("/bPdfFlag", false)
-                this.getView().getModel("ui").setProperty("/busyFlag", true)
-                // 조직 데이터 세팅
-                const oTopOrgData = this.getView().getModel("topOrgModel").getData();
-                const oCloudOrgData = this.getView().getModel("cloudOrgModel").getData();
+            onSelectOrg: function (oEvent) {
 
-                const oData = { org_id: oTopOrgData.org_id, org_tp: '', org_name: oTopOrgData.org_name };
-                const oDeliveryData = { org_id: oTopOrgData.org_id, org_tp: 'delivery', org_name: oTopOrgData.org_name };
-                const oAccountData = { org_id: oTopOrgData.org_id, org_tp: 'account', org_name: oTopOrgData.org_name };
-                const oCloudData = { org_id: oCloudOrgData.org_id, org_tp: '', org_name: oCloudOrgData.org_name };
-
-                // 날짜 데이터 세팅
-                const oDateData = this.getView().getModel("ui").getData();
-                const sYear = String(oDateData.date.getFullYear());
-                const sMonth = String(oDateData.date.getMonth() + 1).padStart(2, "0");
-
-                let sPageId = oEvent.getParameter("selectedItem")?.getKey() || "all";
-                let oPage = this.byId(sPageId);
-
-                if (oPage) {
-                    let bFlag = (sPageId === 'account' || sPageId === 'delivery') ? true : false;
-                    this.getView().getModel("ui").setProperty("/bFlag", bFlag);
-
-                    switch (sPageId) {
-                        case "all":
-                            {
-                                const { first, second, third } = this._changeApiPath(oData, sYear, sMonth);
-                                this._requestData(first, second, third)
-                                this._setSessionItem(oData, sYear, sMonth);
-                                break;
-                            }
-                        case "cloud":
-                            {
-                                const { first, second } = this._changeApiPath(oCloudData, sYear, sMonth);
-                                this._requestData(first, second)
-                                this._setSessionItem(oCloudData, sYear, sMonth);
-                                break;
-                            }
-                        case "account":
-                            {
-                                const { first, second, third } = this._changeApiPath(oAccountData, sYear, sMonth);
-                                this._requestData(first, second, third)
-                                this._setSessionItem(oAccountData, sYear, sMonth);
-                                this._setSelectModel(sPageId);
-                                break;
-                            }
-                        case "delivery":
-                            {
-                                const { first, second } = this._changeApiPath(oDeliveryData, sYear, sMonth);
-                                this._requestData(first, second)
-                                this._setSessionItem(oDeliveryData, sYear, sMonth);
-                                this._setSelectModel(sPageId);
-                                break;
-                            }
-                    }
-                    const sSelectedView = this.byId(sPageId);
-                    const oCarousel = sSelectedView.byId("carousel");
-                    const sFirstPageId = oCarousel.getPages()[0].getId()
-                    const navCon = this.byId("navCon");
-                    // select 선택 시 첫페이지로 이동
-                    oCarousel.setActivePage(sFirstPageId);
-                    navCon.to(oPage); // container page 이동
-                }
-            },
-
-            /**
-              * Account Or Delivery 선택 시 부문 조직 선택 Select
-              * @param {*} oEvent 
-              */
-            onSelectChange: function (oEvent) {
                 const oData = this.getView().getModel("selectModel").getData();
                 const sSelectedKey = oEvent.getParameter("selectedItem").getProperty("key");
+                const sPageId = this._extractViewId(sSelectedKey);
+                this._allSelectUiChange(sPageId);
+                this._oEventBus.publish("aireport", "setBusy");
+
                 const oSelectData = oData.filter(o => o.org_id === sSelectedKey);
                 const oSelectedDate = this.getView().getModel("ui").getData();
 
                 const sYear = String(oSelectedDate.date.getFullYear());
                 const sMonth = String(oSelectedDate.date.getMonth() + 1).padStart(2, "0");
 
-                // API 요청
-                const { first, second, third } = this._changeApiPath(oSelectData[0], sYear, sMonth);
-                this._requestData(first, second, third)
+                const sSelectedView = this.byId(sPageId);
+                const oCarousel = sSelectedView.byId("carousel");
+                const sFirstPageId = oCarousel.getPages()[0].getId()
+                const navCon = this.byId("navCon");
+                // select 선택 시 첫페이지로 이동
+                oCarousel.setActivePage(sFirstPageId);
+                let oPage = this.byId(sPageId);
 
-                //세션 스토리지 업데이트
-                this._setSessionItem(oSelectData[0], sYear, sMonth);
+                const bSame = oPage.getId() === navCon.getCurrentPage().getId();
+                const bNotSame = oPage.getId() != navCon.getCurrentPage().getId();
+                const bInstanceExist = !!this._bInstanceFlag;
 
-                this.getView().getModel("selectModel").setProperty("/selectedKey", oSelectData[0].org_id);
-                this._oEventBus.subscribe("CardChannel", "CardFullLoad", this._onCardReady, this)
-                this._oEventBus.publish("aireport", "uiModel", oSelectData[0])
+                // if (bSame && !this._bUpdateFlag) {
+                //     this._bUpdateFlag = true;
+                //     this._bInstanceFlag = false;
+                // } else if (bNotSame) {
+                //     this._bUpdateFlag = false;
+                //     this._bInstanceFlag = true;
+                // } else if (bNotSame && this._bInstanceFlag) {
+                //     this._bUpdateFlag = true;
+                // } else if (bSame && this._bUpdateFlag) {
+                //     this._bUpdateFlag = true;
+                // }
+                if (bSame) {
+                    this._bUpdateFlag = true;
+                } else if (!bInstanceExist) {
+                    this._bInstanceFlag = true;
+                    this._bUpdateFlag = false;
+                } else {
+                    this._bUpdateFlag = true;
+                }
+
+
+                navCon.to(oPage)
+
+                if (oPage) {
+                    switch (sPageId) {
+                        case "all":
+                            {
+                                const { first, second, third } = this._changeApiPath(oSelectData[0], sYear, sMonth);
+                                this._requestData(first, second, third)
+                                this._setSessionItem(oSelectData[0], sYear, sMonth);
+                                break;
+                            }
+                        case "account":
+                            {
+                                const { first, second, third } = this._changeApiPath(oSelectData[0], sYear, sMonth);
+                                this._requestData(first, second, third)
+                                this._setSessionItem(oSelectData[0], sYear, sMonth);
+                                this._oEventBus.publish("aireport", "uiModel", oSelectData[0])
+                                break;
+                            }
+                        case "delivery":
+                            {
+                                const { first, second } = this._changeApiPath(oSelectData[0], sYear, sMonth);
+                                this._requestData(first, second)
+                                this._setSessionItem(oSelectData[0], sYear, sMonth);
+                                this._oEventBus.publish("aireport", "uiModel", oSelectData[0])
+                                break;
+                            }
+                    }
+                }
             },
 
             /**
-             * 하드코딩 되어있음 변경해야함
-             * 각 카드에 사용할 세션값 저장
+              * DatePicker , Change 이벤트
+              * @param {*} oEvent 
+              * @returns 
+              */
+            onDateChange: function (oEvent) {
+                let oSource = oEvent.getSource();
+
+                this._allSelectUiChange();
+
+                this._oEventBus.publish("aireport", "setBusy");
+
+                let isValidValue1 = /** @type {sap.m.Input} */ (oSource).isValidValue();
+                let isValidValue2 = oSource.getDateValue();
+                if (!isValidValue1 || !isValidValue2) {
+                    oEvent.getSource().setValueState("Error");
+                    return;
+                } else {
+                    oEvent.getSource().setValueState("None");
+                    let orgData;
+
+                    // 검색 조건 변경 EventBus Publish
+                    let oSelectedDate = this.getView().getModel("ui").getData();
+                    let sYear = String(oSelectedDate.date.getFullYear());
+                    let sMonth = String(oSelectedDate.date.getMonth() + 1).padStart(2, '0');
+                    const orgTopData = this.getView().getModel("topOrgModel").getData();
+                    const oCloudOrgData = this.getView().getModel("cloudOrgModel").getData();
+
+                    const sSelectedId = this.byId("selectType").getSelectedKey();
+                    const oData = this.getView().getModel("selectModel").getData()
+                    const oSelectedData = oData.filter((d) => d.org_id === sSelectedId)
+
+                    const { first, second, third } = this._changeApiPath(oSelectedData[0], sYear, sMonth);
+                    this._requestData(first, second, third);
+
+                    // 세션 스토리지 데이터 가져오기
+                    let oSessionData = JSON.parse(sessionStorage.getItem("aiReport"))
+
+                    // 세션 스토리지 업데이트
+                    sessionStorage.setItem("aiReport", JSON.stringify({
+                        orgId: oSessionData.orgId,
+                        type: oSessionData.type,
+                        title: oSessionData.title,
+                        year: oSelectedDate.date.getFullYear(),
+                        month: String(oSelectedDate.date.getMonth() + 1).padStart(2, "0"),
+                    }));
+                    this._oEventBus.publish("aireport", "infoSet");
+
+                    this.getView().getModel("ui").setProperty("/month", oSelectedDate.date.getMonth() + 1)
+                };
+            },
+
+            /**
+             *  각 select, datePicker ui 제어 모듈함수
+             */
+            _allSelectUiChange: function (sPageId) {
+                // 조직 재 선택했을 시 pdf 버튼 ui 제어
+                if (!this._bPdfLoaded) {
+                    this.getView().getModel("ui").setProperty("/bPdfFlag", false)
+                    this.getView().getModel("ui").setProperty("/busyFlag", true)
+                }
+                // 조직 재 선택했을 시 해당 view 카드 카운트
+                if (this._isCardLoaded) {
+                    this._countViewContainCard(sPageId);
+                    this._oEventBus.subscribe("CardChannel", "CardFullLoad", this._onCardReady, this);
+                }
+            },
+
+            /**
              * @param {*} oData  조직 데이터
              * @param {*} year 
              * @param {*} month 
@@ -358,6 +420,7 @@ sap.ui.define([
                     bPdfFlag: false //, pdf버튼 enable
                 }), "ui");
 
+                this._setSelectModel();
                 await this._setTopOrgModel();
                 await this._setCloudOrgModel();
 
@@ -366,12 +429,38 @@ sap.ui.define([
             },
 
             /**
+             *  Select 조직 list model 설정
+             */
+            _setSelectModel: async function () {
+                const filter = new Filter([
+                    new Filter("org_parent", FilterOperator.EQ, null),
+                    new Filter([
+                        new Filter([
+                            new Filter("org_tp", FilterOperator.EQ, "delivery"),
+                            new Filter("org_tp", FilterOperator.EQ, "account")
+                        ], false),
+                        new Filter("org_level", FilterOperator.EQ, "div")
+                    ], true)
+                ], false)
+
+                const oModel = this.getOwnerComponent().getModel();
+                const oBinding = oModel.bindList("/org_full_level", undefined, undefined, filter)
+                await oBinding.requestContexts().then((aContext) => {
+                    const aData = aContext.map(ctx => ctx.getObject());
+                    this.getView().setModel(new JSONModel(aData), "selectModel");
+                })
+            },
+
+            /**
              * 최상위 조직 값 모델 설정
              */
             _setTopOrgModel: async function () {
                 const andFilter = new Filter([
                     new Filter("org_id", FilterOperator.NE, null),
-                    new Filter("org_parent", FilterOperator.EQ, null),
+                    new Filter([
+                        new Filter("org_parent", FilterOperator.EQ, null),
+                        new Filter("org_parent", FilterOperator.EQ, ''),
+                    ], false)
                 ], true)
 
                 // 전사조직 모델 세팅
@@ -380,14 +469,12 @@ sap.ui.define([
                 await oBinding.requestContexts().then((aContext) => {
                     const aData = aContext.map(ctx => ctx.getObject());
                     this.getView().setModel(new JSONModel(aData[0]), "topOrgModel");
-
                 })
             },
             /**
              *  Cloud 부문 조직 값 모델 설정
              */
             _setCloudOrgModel: async function () {
-                // 전사조직 모델 세팅
                 const oModel = this.getOwnerComponent().getModel();
                 const oBinding = oModel.bindList("/org_full_level", undefined, undefined, new Filter("org_ccorg_cd", FilterOperator.EQ, "195200"))
                 await oBinding.requestContexts().then((aContext) => {
@@ -396,117 +483,54 @@ sap.ui.define([
                 })
             },
             /**
-             * Account , Delivery 부문 선택 select model 설정
-             * @param {*} type  'account', 'delivery'
-             * @returns 
+             *  Delivery 부문 조직 값 모델 설정
              */
-            _setSelectModel: async function (type) {
-                // account 별 부문 필터링
-                function getAccountFilter() {
-                    const andFilter = new Filter([
-                        new Filter("org_tp", FilterOperator.EQ, "account"),
-                        new Filter("org_level", FilterOperator.EQ, "div"),
-                    ], true) // true : And 조건
-
-                    const ccorgFilter = new Filter("org_ccorg_cd", FilterOperator.EQ, "237100");
-                    const lv1Filter = new Filter("org_level", FilterOperator.EQ, "lv1");
-                    const notCCOFilter = new Filter("org_name", FilterOperator.NE, "CCO");
-
-                    const orFilter = new Filter([
-                        andFilter,
-                        ccorgFilter,
-                        lv1Filter
-                    ], false)// false : OR 조건
-
-                    return new Filter([
-                        orFilter,
-                        notCCOFilter
-                    ], true)
-                }
-                // delivery 별 부문 필터링
-                function getDeliveryFilter() {
-                    const andFilter = new Filter([
-                        new Filter("org_tp", FilterOperator.EQ, "delivery"),
-                        new Filter("org_level", FilterOperator.EQ, "div")
-                    ], true) // true : And 조건
-                    const lv1Filter = new Filter("org_level", FilterOperator.EQ, "lv1");
-
-                    return new Filter([
-                        andFilter,
-                        lv1Filter
-                    ], false) // false : OR 조건
-                }
-
-                let finalFilter; // 최종 필터 변수
-                if (type === 'account') {
-                    finalFilter = getAccountFilter();
-                } else if (type === 'delivery') {
-                    finalFilter = getDeliveryFilter();
-                } else {
-                    return;
-                }
+            _setDeliveryOrgModel: async function () {
                 const oModel = this.getOwnerComponent().getModel();
-                const oBinding = oModel.bindList("/org_full_level", undefined, undefined, finalFilter)
+                const aFilter = new Filter([
+                    new Filter("org_tp", FilterOperator.EQ, "delivery"),
+                    new Filter("org_level", FilterOperator.EQ, "div"),
+                    new Filter("org_level", FilterOperator.NE, "195200"),
+                ], true)
+                const oBinding = oModel.bindList("/org_full_level", undefined, undefined, aFilter)
                 await oBinding.requestContexts().then((aContext) => {
-                    const oData = aContext.map(ctx => ctx.getObject());
-                    this.getView().setModel(new JSONModel(oData), "selectModel");
+                    const aData = aContext.map(ctx => ctx.getObject());
+                    this.getView().setModel(new JSONModel(aData[0]), "deliveryOrgModel");
+                })
+            },
+            /**
+             *  Account 부문 조직 값 모델 설정
+             */
+            _setAccountOrgModel: async function () {
+                const oModel = this.getOwnerComponent().getModel();
+                const aFilter = new Filter([
+                    new Filter("org_tp", FilterOperator.EQ, "account"),
+                    new Filter("org_level", FilterOperator.EQ, "div"),
+                ], true)
+                const oBinding = oModel.bindList("/org_full_level", undefined, undefined, aFilter)
+                await oBinding.requestContexts().then((aContext) => {
+                    const aData = aContext.map(ctx => ctx.getObject());
+                    this.getView().setModel(new JSONModel(aData[0]), "accountOrgModel");
                 })
             },
 
-            /**
-             * DatePicker , Change 이벤트
-             * @param {*} oEvent 
-             * @returns 
-             */
-            onDateChange: function (oEvent) {
-                let oSource = oEvent.getSource();
+            _extractViewId: function (sKey) {
+                const oSelectModel = this.getView().getModel("selectModel").getData();
+                const oTopOrgId = this.getView().getModel("topOrgModel").getData()['org_id'];
 
-                let isValidValue1 = /** @type {sap.m.Input} */ (oSource).isValidValue();
-                let isValidValue2 = oSource.getDateValue();
-                if (!isValidValue1 || !isValidValue2) {
-                    oEvent.getSource().setValueState("Error");
-                    return;
+                let viewId;
+                const aSelectedData = oSelectModel.filter((data) => data.org_id === sKey);
+                const bFlag = aSelectedData.some((data) => data.org_id === oTopOrgId);
+                if (bFlag) {
+                    viewId = "all"
                 } else {
-                    oEvent.getSource().setValueState("None");
-                    let orgData;
-
-                    // 검색 조건 변경 EventBus Publish
-                    let oSelectedDate = this.getView().getModel("ui").getData();
-                    let sYear = String(oSelectedDate.date.getFullYear());
-                    let sMonth = String(oSelectedDate.date.getMonth() + 1).padStart(2, '0');
-                    const orgTopData = this.getView().getModel("topOrgModel").getData();
-                    const oCloudOrgData = this.getView().getModel("cloudOrgModel").getData();
-
-                    const sCurrPage = this.byId("selectType").getSelectedKey();
-                    switch (sCurrPage) {
-                        case 'all': orgData = { org_id: orgTopData.org_id, org_tp: '' }
-                            break;
-                        case 'cloud': orgData = { org_id: oCloudOrgData.org_id, org_tp: '' }
-                            break;
-                        case 'account': orgData = { org_id: orgTopData.org_id, org_tp: 'account' }
-                            break;
-                        case 'delivery': orgData = { org_id: orgTopData.org_id, org_tp: 'delivery' }
-                            break;
+                    if (aSelectedData[0].org_tp === 'account') {
+                        viewId = 'account'
+                    } else if (aSelectedData[0].org_tp === 'delivery') {
+                        viewId = 'delivery'
                     }
-
-                    const { first, second, third } = this._changeApiPath(orgData, sYear, sMonth);
-                    this._requestData(first, second, third);
-
-                    // 세션 스토리지 데이터 가져오기
-                    let oSessionData = JSON.parse(sessionStorage.getItem("aiReport"))
-
-                    // 세션 스토리지 업데이트
-                    sessionStorage.setItem("aiReport", JSON.stringify({
-                        orgId: oSessionData.orgId,
-                        type: oSessionData.type,
-                        title: oSessionData.title,
-                        year: oSelectedDate.date.getFullYear(),
-                        month: String(oSelectedDate.date.getMonth() + 1).padStart(2, "0"),
-                    }));
-                    this._oEventBus.publish("aireport", "infoSet");
-
-                    this.getView().getModel("ui").setProperty("/month", oSelectedDate.date.getMonth() + 1)
-                };
+                }
+                return viewId;
             },
 
             /**
@@ -519,14 +543,9 @@ sap.ui.define([
                 const pageId = oCarousel.getPages().map(page => page.getId());
                 const currentPageId = oCarousel.getActivePage();
                 const oCardGroup = sSelectedView.getControlsByFieldGroupId("cardGroup");
-                // const oWidgetCard = oCardGroup.filter((oCard) => oCard.isA("sap.ui.integration.widgets.Card"))
 
-                const viewId = this.byId("selectType").getSelectedKey() || "ax";
+                const viewId = this.byId("selectType").getSelectedKey() || "all";
                 this.byId(viewId).byId("carousel").setBusy(true);
-
-                // await oWidgetCard.forEach((oCard) => {
-                //     oCard.refresh()
-                // })
 
                 try {
                     const pdf = new window.jspdf.jsPDF({
@@ -555,11 +574,9 @@ sap.ui.define([
                     const iYear = oSessionData.year;
                     const sMonth = oSessionData.month;
 
-
                     const pdfFileName = iYear + "년" + "\n" + sMonth + "월" + "\n" + sTitle + "\n" + "AI 리포트.pdf"
                     // const pdfFileName = "2025년" + "\n" + "6월" + "\n" + "SK주식회사 AX" + "\n" + "AI 리포트.pdf"
                     pdf.save(pdfFileName);
-
 
                     let activeIdx = pageId.indexOf(currentPageId);
                     if (activeIdx === -1) activeIdx = 0;
@@ -585,19 +602,18 @@ sap.ui.define([
                         break;
                 }
             },
+
             /**
              * @param {Array} aData  각 카드로 보낼 데이터를 모은 배열
              */
             _eventBusToCard: function (aData) {
-                aData.forEach((oData) => {
-                    this._oEventBus.publish("aireport", oData.eventId, oData);
+                aData.forEach((oResult) => {
+                    this._oEventBus.publish("aireport", oResult.eventId, oResult);
                 })
             },
             onCancel: function () {
                 this.getOwnerComponent().getRouter().navTo("RouteMain")
             },
-
-
 
         });
     });

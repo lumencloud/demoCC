@@ -6,12 +6,14 @@
     width="100%"
     displayBlock="true"
     controllerName="bix.card.deliveryMonthlyContent1_2.Main"
+    busyIndicatorDelay="0"
+    busy="{ui>/bBusyFlag}"
 >
-    <VBox class="custom-ai-report-test-delivery-content1_2-container">
+    <VBox class="custom-ai-report-test-delivery-content1_2-container" busyIndicatorDelay="0" id="cardContent">
         <HBox class="title">
             <Title text="당월 누계 실적"/>
         </HBox>
-        <VBox id="cardContent" class="table-wrapper">
+        <VBox  class="table-wrapper">
             <HBox class="table-header" alignItems="Center">
                 <Text text="" textAlign="Center"/>
                 <Text text="억 (원)/%" width="100%" textAlign="Center"/>

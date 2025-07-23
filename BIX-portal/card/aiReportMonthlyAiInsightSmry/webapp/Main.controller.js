@@ -14,9 +14,7 @@ sap.ui.define([
 				"isLoading": true,
 				"summary": ""
 			}), "LLMModel");
-
-			this.byId("cardContent").setBusy(true);
-
+			this._oEventBus.publish("aireport", "isCardSubscribed");
 			this._oEventBus.subscribe("pl", "aiReportMonthlyAiInsightSmry", this._dataSetting, this);
 		},
 

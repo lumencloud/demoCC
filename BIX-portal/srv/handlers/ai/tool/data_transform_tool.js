@@ -1,5 +1,6 @@
 const { parse } = require('@sap/cds');
 const { createLogger } = require('../util/logger');
+const { numberReturnTypeMapping } = require('@sap-cloud-sdk/core');
 
 class DataTransformTool {
     constructor() {
@@ -248,100 +249,123 @@ class DataTransformTool {
      * @param {Object|Array} data - 변환할 데이터
      * @returns {Object|Array} 정상 변환된 데이터
      */
-    processData(data) { 
+    processData(data) {
 
-        const specialTypes = ['마진율', '마진률', 'BR(MM)', 'BR(Cost)'];
-        
-        const isactual = Object.prototype.hasOwnProperty.call(data[0], 'actual_curr_ym_value');
-        const isactual_2 = Object.prototype.hasOwnProperty.call(data[0], 'curr_value');
-
-        if (isactual || isactual_2) {
-            console.log("실적PL의 정보를 변환합니다.");
-            const columns = Object.keys(data[0]);
-
-            data.forEach(item => {
-                const hasType = Object.prototype.hasOwnProperty.call(item, 'type');
-                const typeVal = item.type;
+        const groupedColumns = {
+            // 실적
+            target: ["target_curr_y_value", "target_last_y_value", "curr_target_value", "last_target_value"],
+            actual_values: ["actual_curr_ym_value", "curr_value"],
+            last_values: ["actual_last_ym_value", "last_value"],
+            gap_values: ["actual_curr_ym_value_gap", "actual_ym_gap"],
+            rate_curr: ["actual_curr_ym_rate", "curr_rate"],
+            rate_last: ["actual_last_ym_rate", "last_rate"],
+            rate_gap: ["actual_curr_ym_rate_gap", "rate_gap"],
             
-                // 조건 A: type 컬럼이 있고, 값이 specialTypes 중 하나인 경우 = type이 마진율, BR
-                if (hasType && specialTypes.includes(typeVal)) {
-                    columns.forEach(col => {
-                        if (col in item && typeof item[col] === 'number') {
+            //추정
+            values: ["forecast", "forecast_value", "plan_value", "secured", "secured_value", "not_secured", "not_secured_value", 
+                    "last_forecast_value", "last_plan_value", "last_secured_value", "last_not_secured_value"],
+            rates: ["plan_ratio", "yoy"]
+        };
+      
+        data.forEach((item) => {
+            const isActual = ("actual_curr_ym_value" in item || "curr_value" in item);
+            const hasType = "type" in item;
+            const type = String(item.type || ""); 
+            
+            // [1] 실적PL
+            if (isActual) {
+                const targetCol = groupedColumns.target.find(col => col in item);
+        
+                // 조건 1: 구분이 있고, "마진율" 또는 BR 포함 -> 마진율 + BR
+                // 조건 2: 구분 없음 & 목표 컬럼 존재 & 목표 값 < 100 -> RoHC
+                const isOne = (hasType && (type === "마진율" || type.includes("BR")));
+                const isTwo = (!hasType && targetCol && item[targetCol] < 10);
+                if (isOne || isTwo) {
+                    console.log(" 1 !!!");
+                    // 모든 number 컬럼 round(4)
+                    Object.keys(item).forEach((col) => {
+                        if (typeof item[col] === "number") {
                             item[col] = Number(item[col].toFixed(4));
                         }
                     });
                 }
-                // 조건 B: type 컬럼이 없고, 컬럼 중 'rate'가 포함된 것이 있는 경우 + target 작음 = RoHC (DT 빼기 위한 목적)
-                else if (!hasType && Object.keys(item).some(k => k.includes('rate')) && item["target_curr_y_value"] < 100 && item["target_curr_y_value"] > 0) {
-                    columns.forEach(col => {
-                        if (col in item && typeof item[col] === 'number') {
-                            item[col] = Number(item[col].toFixed(4));
-                        }
-                    });
-                }
-                // 조건 C: 그 외의 경우
+            
+                // 조건 3: 그 외
                 else {
-                    columns.forEach(col => {
-                        if (col in item && typeof item[col] === 'number') {
-                            if (col.includes('target')) {
-                                item[col] = item[col] * 1e8;
-                            }
-                            else if (col.includes('rate')) {
-                                item[col] = Number(item[col].toFixed(4));
-                            }
-                            else {
+                    console.log(" 2 !!!");
+                    // 목표 컬럼 → * 100,000,000 (0이 8개)
+                    groupedColumns.target.forEach(col => {
+                        if (col in item && typeof item[col] === "number") {
+                            if (col.includes("last")) {
                                 item[col] = Math.round(item[col]);
                             }
+                            else {
+                                item[col] = item[col] * 1e8;
+                            }
+                        }
+                    });
+                
+                    // 당월 누계/전년 동기/GAP 컬럼 → round(0)
+                    [...groupedColumns.actual_values, ...groupedColumns.last_values, ...groupedColumns.gap_values].forEach(col => {
+                        if (col in item && typeof item[col] === "number") {
+                        item[col] = Math.round(item[col]);
+                        }
+                    });
+                
+                    // 진척도 당월 / 진척도 전년 동기 / 진척도 GAP → round(4)
+                    [...groupedColumns.rate_curr, ...groupedColumns.rate_last, ...groupedColumns.rate_gap].forEach(col => {
+                        if (col in item && typeof item[col] === "number") {
+                        item[col] = Number(item[col].toFixed(4));
                         }
                     });
                 }
-            });
-        }
-        else {
-            console.log("추정PL의 정보를 변환합니다.");
-            const columns = Object.keys(data[0]);
-            data.forEach(item => {
-                const hasType = Object.prototype.hasOwnProperty.call(item, 'type');
-                const typeVal = item.type;
-
-                // 조건 A: type 컬럼이 있고, 값이 specialTypes 중 하나인 경우 = type이 BR
-                if (hasType && specialTypes.includes(typeVal)) {
-                    columns.forEach(col => {
-                        if (col in item && typeof item[col] === 'number') {
+            }
+            // 추정PL
+            else {
+                // 조건 1: 구분이 있고, "마진율" 또는 BR 포함 -> 마진율 + BR
+                const isOne = (hasType && (type === "마진율" || type.includes("BR")));
+                if (isOne) {
+                    // 모든 number 컬럼 round(4)
+                    Object.keys(item).forEach((col) => {
+                        if (typeof item[col] === "number") {
                             item[col] = Number(item[col].toFixed(4));
                         }
                     });
+                    return;
                 }
-                // 조건 B: type 컬럼이 있고, 값이 '건수'인 경우
-                else if (hasType && typeVal == '건수') {
-                    columns.forEach(col => {
-                        if (col in item && typeof item[col] === 'number') {
+
+                // 조건 2: 구분이 있고, ["수주", "매출", "건수"] 중 하나인 경우 -> 전사/부문 Pipeline상세, Account상세
+                const isTwo = (hasType && (["수주", "매출", "건수"].includes(type)));
+                if (isTwo) {
+                    // 모든 number 컬럼 round(4)
+                    Object.keys(item).forEach((col) => {
+                        if (typeof item[col] === "number") {
                             item[col] = Math.round(item[col]);
                         }
                     });
+                    return;
                 }
-                // 조건 C: 그 외의 경우
-                else {
-                    columns.forEach(col => {
-                        if (col in item && typeof item[col] === 'number') {
-                            if (col.includes('target')) {
-                                item[col] = item[col] * 1e8;
-                            }
-                            else if (col.includes('ratio')) {
-                                item[col] = Number(item[col].toFixed(4));
-                            }
-                            else {
-                                item[col] = Math.round(item[col]);
-                            }
-                        }
-                    });
-                }
-            });
+
+                // 조건 3: 이외
+                // [합계, 실적, 확보 추정, 미확보, 확보] → round(0)
+                groupedColumns.values.forEach(col => {
+                    if (col in item && typeof item[col] === "number") {
+                    item[col] = Math.round(item[col]);
+                    }
+                });
             
-        }
+                // [계획비, 전년비] → round(4)
+                groupedColumns.rates.forEach(col => {
+                    if (col in item && typeof item[col] === "number") {
+                    item[col] = Number(item[col].toFixed(4));
+                    }
+                });
+            }
+        });
 
         return data;
-      }
+    }
+      
 
     /**
      * 테이블 스키마에서 컬럼 매핑과 도메인 매핑 정보 추출

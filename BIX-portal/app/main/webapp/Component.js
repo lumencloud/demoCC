@@ -109,7 +109,7 @@ sap.ui.define([
 
         getMenuInfo() {
             // 메뉴 엔티티 hierachy 구조로 api 요청 url
-            const sUrl = "/odata/v4/cm/Menus?$expand=Child($expand=i18nTitle;$orderby=sort_order;$filter=use_yn eq true),i18nTitle&orderby=sort_order&$filter=Parent_ID eq null and use_yn eq true&$orderby=sort_order"
+            const sUrl = "/odata/v4/cm/Menus?$expand=Child($orderby=sort_order;$filter=use_yn eq true)&orderby=sort_order&$filter=Parent_ID eq null and use_yn eq true&$orderby=sort_order"
             const oSetting = {
                 type: "get",
                 async: false,

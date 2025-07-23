@@ -49,6 +49,7 @@
                         selectionBehavior="RowOnly" 
                         rowSelectionChange="onRowSelectionChange"
                         visibleRowCountMode="Auto"
+                        noData=" "
                         class="custom-table-container custom-table-header custom-table-body custom-pl-detail-table
                             custom-inherit-height custom-uiTable-selection custom-aireport-card-table" 
                         fieldGroupIds="content">
@@ -361,6 +362,7 @@
                         enableColumnReordering="false"
                         fixedColumnCount="1"
                         busyIndicatorDelay="0"
+                        noData=" "
                         visible="{visibleModel>/visible}"
                         >
                         <table:extension>

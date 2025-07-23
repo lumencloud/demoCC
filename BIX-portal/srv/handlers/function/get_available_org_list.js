@@ -6,7 +6,7 @@ module.exports = async function (req) {
 
     const userInfo = req.user;
     if (userInfo.is("bix-portal-company-viewer") || userInfo.is("bix-portal-sys-admin") || userInfo.is("bix-portal-manage")) {
-        available_org_list = await SELECT.from('common_org_full_level_view');
+        available_org_list = await SELECT.from('common_org_full_level_view').orderBy("org_order");
     } else if (userInfo.is("bix-portal-display")) {
         // [자신이 속한 조직에 대한 조회 권한]
         // IAS > XSUAA JWT 전달받은 사원번호 조회
@@ -18,7 +18,7 @@ module.exports = async function (req) {
 
         // 유저가 할당된 조직정보 조회 - COMMON_ORG_MAP
         const user_org = await SELECT.from('common_org_map')
-            .where({ 'emp_no': emp_no, 'ver': SELECT.one.columns('ver').from('common_version').where({ 'tag': 'C' }) });
+            .where({ 'emp_no': emp_no, 'ver': SELECT.one.columns('ver').from('common_version').where({ 'tag': 'C' })});
 
         // 매핑정보 없을 시 권한없음
         if (!user_org.length) req.reject(403, 'No Auth');
@@ -41,7 +41,7 @@ module.exports = async function (req) {
         }; 
 
         // 임시로 전체 조직
-        available_org_list = await SELECT.from('common_org_full_level_view').where(where);
+        available_org_list = await SELECT.from('common_org_full_level_view').where(where).orderBy("org_order");
         // available_org_list = await SELECT.from('common_org_full_level_view');
     }
 

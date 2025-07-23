@@ -40,6 +40,7 @@
                         fixedColumnCount="1"
                         busyIndicatorDelay="10000000"
                         visibleRowCountMode="Auto"
+                        noData=" "
                         fieldGroupIds="content,org"
                     >
                         <table:extension>
@@ -394,6 +395,7 @@
                         fixedColumnCount="1"
                         busyIndicatorDelay="10000000"
                         visibleRowCountMode="Auto"
+                        noData=" "
                         fieldGroupIds="content,org_delivery"
                     >
                         <table:extension>
@@ -748,6 +750,7 @@
                         fixedColumnCount="1"
                         busyIndicatorDelay="10000000"
                         visibleRowCountMode="Auto"
+                        noData=" "
                         fieldGroupIds="content,org_account"
                     >
                         <table:extension>
@@ -1100,6 +1103,7 @@
                         fixedColumnCount="2"
                         busyIndicatorDelay="0"
                         visibleRowCountMode="Auto"
+                        noData=" "
                         fieldGroupIds="content,account"
                     >
 
@@ -1456,6 +1460,7 @@
                         fixedColumnCount="2"
                         busyIndicatorDelay="0"
                         visibleRowCountMode="Auto"
+                        noData=" "
                         fieldGroupIds="content,relsco"
                     >                   
                         <table:extension>

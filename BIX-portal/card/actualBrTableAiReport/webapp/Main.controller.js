@@ -37,14 +37,17 @@ sap.ui.define([
 
 
         onInit: function () {
-            this._setUiModel();
-            this._bindTable();
+            this._asyncInit();
+            
             this._oEventBus.subscribe("pl", "search", this._bindTable, this);
 
             this._aiPopupManager = new AIPopupManager();
         },
-
-        _setUiModel: function () {
+        _asyncInit: async function () {
+            await this._setUiModel();
+            this._bindTable();
+        },
+        _setUiModel: async function () {
             this.getView().setModel(new JSONModel({
                 tableKind: "org"
             }), "uiModel");
@@ -68,8 +71,8 @@ sap.ui.define([
 
         _bindTable: async function (sChannelId, sEventId, oData) {
             // DOM이 없는 경우 Return
-            let oDom = this.getView().getDomRef();
-            if (!oDom) return;
+            // let oDom = this.getView().getDomRef();
+            // if (!oDom) return;
             
             // 새로운 검색 조건이 같은 경우 return
             oData = JSON.parse(sessionStorage.getItem("initSearchModel"));
@@ -91,6 +94,9 @@ sap.ui.define([
             let oAiData = JSON.parse(sessionStorage.getItem("aiModel"))
             let sOrgId = oAiData.orgId;
 
+            if(!oAiData.orgId){
+                return
+            }
 
             const oModel = new ODataModel({
                 serviceUrl: "../odata/v4/pl_api/",
@@ -132,7 +138,7 @@ sap.ui.define([
 
         },
 
-        _setBusy: async function (bType) {
+        _setBusy: function (bType) {
             const oTable = this.byId(this._sTableId);
             const oBox = oTable.getParent();
             oBox.setBusy(bType);

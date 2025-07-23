@@ -10,9 +10,9 @@ sap.ui.define(
     return BaseController.extend("bix.card.aiInsightBau.card", {
       _oEventBus: EventBus.getInstance(),
       _bFlag: true,
-      
+
       onInit: function () {
-       this.getOwnerComponent().oCard.setBusy(true)
+        this.getOwnerComponent().oCard.setBusy(true)
         this.getView().setModel(new JSONModel([{
           "title": "DT 혁신 가속화: SKT/SKHy 중심 실적 성장, 반도체/제조 자동화 대형 프로젝트 입찰 임박",
           "summary": [
@@ -40,18 +40,26 @@ sap.ui.define(
         this.collectData = {};
         this._oEventBus.subscribe("aiReport", "aiInsight", this._setModel, this)
         this._oEventBus.subscribe("aiReport", "aiDTInsight", this._setModel, this)
+        this._eventArrived = { aiInsight: false, aiDTInsight: false } //도착 확인 플래그
       },
 
       _setModel: function (sChannelId, sEventId, oData) {
         this.getView().setModel(new JSONModel(), "LLMModel");
-       
 
         this.collectData[oData.key] = oData.insight;
-
         this.getView().setModel(new JSONModel(this.collectData), "LLMModel")
-        if(this._bFlag){
-          this.dataLoad();
+
+        if (sEventId === 'aiInsight') {
+          this._eventArrived.aiInsight = true;
+        } else if (sEventId === 'aiDTInsight') {
+          this._eventArrived.aiDTInsight = true;
         }
+        if (this._eventArrived.aiInsight && this._eventArrived.aiDTInsight) {
+          this.dataLoad();
+          this._eventArrived = { aiInsight: false, aiDTInsight: false }
+        }
+
+
         this.getOwnerComponent().oCard.setBusy(false)
       },
       dataLoad: function () {

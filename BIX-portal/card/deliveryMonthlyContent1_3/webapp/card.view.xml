@@ -9,8 +9,10 @@
     width="100%"
     height="100%"
     displayBlock="true"
+    busyIndicatorDelay="0"
+    busy="{ui>/bBusyFlag}"
 >
-    <VBox id="cardContent">
+    <VBox busyIndicatorDelay="0" id="cardContent">
         <FlexBox
             width="100%"
             height="280px"

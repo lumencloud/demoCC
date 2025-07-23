@@ -1,5 +1,4 @@
 using {managed} from '@sap/cds/common';
-using {common.batch_list as batch_list_table} from './batch_list';
 
 namespace common;
 

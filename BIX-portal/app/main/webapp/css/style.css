@@ -20,6 +20,76 @@
         }
     }
 }
+/* 세션팝업 */
+.custom-session-popup {
+    box-shadow: none;
+    .sapMDialogScrollCont {
+        padding: 20px 50px
+    }
+    .session-desc {
+        font-size: 20px;
+        font-weight: 700;
+        .logout-highlight {
+            color:#0064D9;
+        }
+    }
+    .session-sub-desc {
+        font-size: 13px;
+        color: #666;
+    }
+    .sapMDialogFooter {
+        .sapMIBar {
+            border-top-color: transparent !important;
+            padding: 0px 1.5rem;
+        }
+    }
+    .sapMBtn {
+        .sapMBtnInner {
+            &.sapMBtnEmphasized {
+                background-color: #0064D9 !important;
+                border-color: #0064D9 !important;
+                color: #fff !important;
+                height: 2.5rem !important;
+                align-items: center !important;
+    
+                >.sapMBtnIcon {
+                    color: #fff !important;
+                }
+            }
+    
+            &.sapMBtnDefault {
+                color: #212121 !important;
+                border-color: var(--custom_black6) !important;
+                height: 2.5rem !important;
+                align-items: center !important;
+    
+                >.sapMBtnIcon {
+                    color: #212121 !important;
+                }
+            }
+        }
+    
+        &:hover {
+            .sapMBtnInner .sapMBtnContent {
+                >* {
+                    color: inherit !important;
+                }
+            }
+    
+            >.sapMBtnIcon {
+                color: inherit !important;
+            }
+    
+            .sapMBtnDefault {
+                border-color: var(--custom_black6) !important;
+            }
+    
+            .sapMBtnAccept {
+                border-color: #0064D9 !important;
+            }
+        }
+    }
+}
 .custom-side-popover {
     .sapMLnk {
         color: var(--custom_black1) !important;
@@ -1307,7 +1377,7 @@
 .dotted-cross2{
     position: absolute;    
     top: 0%;
-    left: 60%;    
+    left: 50%;    
     height: 100%;
     width: 1px;
     background-image: 
@@ -1321,7 +1391,7 @@
 .cross{
     position: absolute;    
     top: 0%;
-    left: 16.5%;    
+    left: 15%;    
     height: 100%;
     width: 1px;
     background-color: #e4eaf0;    
@@ -1329,7 +1399,8 @@
 
 .marginRate-circle-bar{
     position: absolute;
-    top: 50%;
+    height: 70%;
+    top: 25%;
     transform: translateY(-50%);
     z-index: 999;
     width: 100%;
@@ -1803,8 +1874,23 @@
                 color: var(--custom_black2);
             }
 
+            
+
             .sapUiTableRow:nth-child(2) {
                 .sapUiTableCell:has(.fixed-empty-actual-oi) {
+                    opacity: 0.6;
+                    background-image: url(../resource/image/pattern_nodata.png);
+                    background-repeat: repeat;
+
+                    .sapMText,
+                    .sapTntInfoLabelText {
+                        color: transparent !important
+                    }
+                }
+            }
+
+            .sapUiTableRow:nth-child(n+4) {
+                .sapUiTableCell:has(.fixed-empty-plan-pl) {
                     opacity: 0.6;
                     background-image: url(../resource/image/pattern_nodata.png);
                     background-repeat: repeat;
@@ -4666,7 +4752,10 @@
     background-color: #f7f9fb;
     padding: 0.875rem;
     box-shadow: none;
-
+    .custom-aireport-main-content {
+        padding: 1rem 0;
+        gap: 1rem;
+    }
     .sapMDialogSection,
     .sapMTB {
         background-color: #f7f9fb !important;
@@ -4696,9 +4785,15 @@
     background-color: #f7f9fb !important;
     border: none;
     border-radius: 20px;
+    padding: 1rem 1.5rem;
+    background-color: #ffffff !important;
     overflow: hidden;
+    > .sapMPanelContent {
+        padding: 0;
+    }
     .highlight-title {
-        padding-top:0.625rem;
+        padding-top:0;
+        padding-right: 0.5rem;
         border-bottom: none;
         height: 3rem;
         .sapMFlexItem:has(.sapMImg) {
@@ -5751,6 +5846,19 @@
     color: inherit !important;
     background-color: inherit !important;
 }
+
+/* Table HighLights Custom*/
+.highlight-custom .sapUiTableRowHighlight.sapUiTableRowHighlightError {
+    background-color: orange !important
+}
+.highlight-custom .sapUiTableRowHighlight.sapUiTableRowHighlightInformation {
+    background-color: greenyellow !important
+}
+
+
+
+
+
 
 
 /* ==================== 기타(조정이 필요한 부분) ==================== */

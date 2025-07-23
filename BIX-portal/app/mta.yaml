@@ -24,11 +24,7 @@ modules:
     - artifacts:
       - bixadmincodes.zip
       name: bixadmincodes
-      target-path: resources/      
-    - artifacts:
-      - bixadminmultilingual.zip
-      name: bixadminmultilingual
-      target-path: resources/      
+      target-path: resources/   
     - artifacts:
       - bixsgalabor.zip
       name: bixsgalabor
@@ -56,6 +52,10 @@ modules:
     - artifacts:
       - bixmasterbatch.zip
       name: bixmasterbatch
+      target-path: resources/
+    - artifacts:
+      - bixmasterdelexpense.zip
+      name: bixmasterdelexpense
       target-path: resources/
     - artifacts:
       - bixaicomponent.zip
@@ -178,15 +178,6 @@ modules:
     builder: custom
     commands:
     - npm run build:cf
-    supported-platforms: []    
-- name: bixadminmultilingual
-  type: html5
-  path: ./admin/multilingual
-  build-parameters:
-    build-result: dist
-    builder: custom
-    commands:
-    - npm run build:cf
     supported-platforms: []
 - name: bixsgalabor
   type: html5
@@ -233,6 +224,15 @@ modules:
     commands:
     - npm run build:cf
     supported-platforms: []  
+- name: bixmasterdelexpense
+  type: html5
+  path: ./master/delexpense
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm run build:cf
+    supported-platforms: []      
 - name: bixploverview
   type: html5
   path: ./pl/overview

@@ -11,10 +11,18 @@ sap.ui.define([
 	return Controller.extend("bix.card.deliveryMonthlyContent3_1.Main", {
 		_oEventBus: EventBus.getInstance(),
 		onInit: function () {
+			this._oEventBus.publish("aireport", "isCardSubscribed");
 			// this._dataSetting();
 			this._oEventBus.subscribe("aireport", "deliContent3_1", this._modelSetting, this);
+			this._oEventBus.subscribe("aireport", "setBusy", this._setBusy, this);
+			this._setModel();
 		},
-
+		_setModel: function () {
+			this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+		},
+		_setBusy: function () {
+			this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+		},
 		_dataSetting: async function () {
 			this.byId("cardContent").setBusy(true);
 			let oData = JSON.parse(sessionStorage.getItem("aiReport"));
@@ -65,6 +73,7 @@ sap.ui.define([
 		_modelSetting: function (sChannel, sEventId, oData) {
 			this.getView().setModel(new JSONModel(oData.data), "Model");
 			this.dataLoad();
+			this.getView().getModel("ui").setProperty("/bBusyFlag", false);
 		},
 
 		onFormatPerformance: function (iValue, sType) {

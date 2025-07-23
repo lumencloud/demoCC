@@ -172,16 +172,29 @@ sap.ui.define([
                 }
 
 
+
+
                 // 선택한 행 delete 요청 생성 (reverse를 통해 거꾸로 순회)
                 const aSelectedIndices = oTable.getSelectedIndices();
                 aSelectedIndices.reverse().forEach(function (index) {
                     let oContext = oTable.getContextByIndex(index);
                     // oContext.isTransient()   // 기존에 존재하던 Context인지 확인
-                    oContext.delete("CodesItem");
+                    //oContext.delete("CodesItem");
+                    oContext.setProperty("delete_yn", true);
+                    oContext.delete("Delete");  // 다른 updateGroupId를 사용하여 화면 UI에서만 삭제
+
+
                 }.bind(this));
+
+                // setTimeout(() => {
+                //     const oBinding= oTable.getBinding("rows")
+                //     const oFilter= new Filter("delete_yn",FilterOperator.NE,true);
+                //     oBinding.filter([oFilter]);
+                // }, 0);
 
                 // 필수값이 비었는지 유효성 검사를 한 후 uiModel의 hasEmptyField 속성에 반영
                 this._setEmptyField();
+
 
                 // uiModel에 hasPendingChanges 반영
                 this.getView().getModel("uiModel").setProperty("/hasPendingChanges", true);
@@ -189,7 +202,7 @@ sap.ui.define([
                 // 코드그룹 테이블 행 선택 해제
                 oTable.clearSelection();
 
-                MessageToast.show("삭제가 완료되었습니다.");
+                // MessageToast.show("삭제가 완료되었습니다.");
             }
         },
 
@@ -345,7 +358,22 @@ sap.ui.define([
                 })
 
 
+                // const oTable = this.byId("codeHeaderTitle");
+                // const oBinding = oTable.getBinding("rows");
+                // const aContexts = oBinding.gettAllCurrentContest();
+
+                // aContexts.forEach(ctx=>{
+                //     if(ctx.getProperty("@$ui5.context.isDeleted")){
+                //         ctx.resetChanges();
+                //         ctx.setProperty("delete_yn",true);
+                //     }
+                // })
+
+                oModel.resetChanges("Delete");
+
                 try {
+
+
                     // 코드 헤더, 코드 아이템 submitBatch
                     await Promise.all([
                         oModel.submitBatch("CodesHeader"),
@@ -353,7 +381,7 @@ sap.ui.define([
 
                     ]);
 
-
+                    this._bindCodeHeaderTable();
                     // 코드 아이템 초기화를 위해 코드 아이템 테이블을 다시 바인딩
                     this._bindCodeItemTable();
 
@@ -393,7 +421,8 @@ sap.ui.define([
                 // 변경 취소 및 데이터 모델 새로고침
                 this.refresh = null;
                 oModel.resetChanges("CodesHeader");
-                oModel.resetChanges("CodesItem");
+                oModel.resetChanges("CodesItem");                
+                oModel.resetChanges("Delete");
                 oModel.refresh();
 
 
@@ -423,6 +452,7 @@ sap.ui.define([
          * @param {String} sFlag 같은 값이 있는지 확인할 필드
          */
         onLiveChange: function (oEvent, sTable, sFlag) {
+            
             let oSource = /** @type {Input} */ (oEvent.getSource());
             let oModel = this.getOwnerComponent().getModel();
             let oUiModel = this.getView().getModel("uiModel");
@@ -430,6 +460,7 @@ sap.ui.define([
             let bNew = oEvent.getSource().getBindingContext().getObject();
 
 
+            
             // sTable에 따른 테이블 반환
             let oTable;
             if (sTable === "header") {  // 헤더 테이블
@@ -442,8 +473,6 @@ sap.ui.define([
             let aBindingContexts = oTable.getBinding("rows").getContexts();
             let oBindingContext = /** @type {v4Context} */ (oSource.getBindingContext());
 
-            let sItemId = oSource.getBindingContext().getObject("item_ID");
-            let oUpdateContext = oModel.bindContext(`/CodesItem('${sItemId}')`, null, { $$updateGroupId: "CodesItem" });
 
             // 테이블에 따른 유효성 검사 로직
             if (sTable === "header") {
@@ -464,6 +493,11 @@ sap.ui.define([
                     this.getView().getModel("uiModel").setProperty("/hasError", hasSameValue);
                 }
             } else if (sTable === "item") {
+                    
+                let sItemId = oSource.getBindingContext().getObject("item_ID");
+                let oUpdateContext = oModel.bindContext(`/CodesItem('${sItemId}')`, null, { $$updateGroupId: "CodesItem" });
+
+
                 // 같은 값이 존재하는지 확인 (코드명)
                 if (sFlag === "value") {
                     // 동일한 코드그룹명이 존재할 때
@@ -862,6 +896,15 @@ sap.ui.define([
                 aFilters.push(oFilter);
             }
 
+
+            // aFilters에 삭제 필터 추가
+            let oFilter = new Filter({
+                path: "delete_yn",
+                operator: FilterOperator.EQ,
+                value1: false
+            })
+            aFilters.push(oFilter);
+
             // 코드 헤더 아이템 바인딩
             oTable.bindRows({
                 path: "/CodesHeader",
@@ -955,7 +998,7 @@ sap.ui.define([
             //         }
             //     })
             // })
-            
+
         },
 
         /**

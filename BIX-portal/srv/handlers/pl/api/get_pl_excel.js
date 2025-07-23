@@ -32,7 +32,7 @@ module.exports = (srv) => {
             const sga_view = db.entities('sga').wideview_view;
             const sga_excel_export_view = db.entities('sga').excel_export_view;
             const code_header = db.entities('common').code_header
-            const dt_task = db.entities('common').dt_task
+            const dt_task = db.entities('common').dt_task_view
             
 
             // =================================================================================

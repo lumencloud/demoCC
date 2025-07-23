@@ -162,7 +162,7 @@ module.exports = (srv) => {
                 }
 
                 if(org_level === "lv1_ccorg_cd" || org_level === "lv2_ccorg_cd"){
-                    if(org_data.org_tp !== 'account' && !ackerton_list.includes(temp_data.org_id)){
+                    if(org_data.org_tp !== 'account' && !ackerton_list.includes(temp_data.org_id) && org_data.org_tp === 'delivery'){
                         result_data.push(temp_data);
                     };
                 }else{

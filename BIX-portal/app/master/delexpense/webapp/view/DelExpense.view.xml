@@ -1,0 +1,293 @@
+<mvc:View
+    controllerName="bix.master.delexpense.controller.DelExpense"
+    xmlns:simple="sap.gantt.simple"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:table="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout"
+    xmlns:unified="sap.ui.unified"
+    busyIndicatorDelay="0"
+    width="100%"
+>
+    <Page
+        class="sapUiContentPadding"
+        showFooter="true"
+        showHeader="false"
+    >
+        <content>
+            <form:SimpleForm
+                editable="true"
+                class="custom-search-container"
+            >
+                <HBox
+                    class="custom-search-field-box"
+                    alignItems="Center"
+                >
+                    <Label
+                        text="마감년월"
+                        tooltip="마감년월"
+                        wrapping="false"
+                    >
+                        <layoutData>
+                            <layout:GridData span="XL2 L2 M2 S12" />
+                        </layoutData>
+                    </Label>
+                    <DatePicker
+                        id="searchMonthYear"
+                        class="sapUiSmallarginEnd"
+                        value="{
+                        path: 'searchModel>/yearMonth',
+                        type: 'sap.ui.model.type.Date',
+                        formatOptions: {
+                            format: 'yyyyMM',
+                            pattern: 'yyyy-MM'
+                        }
+                    }"
+                        fieldGroupIds="Search,Required"
+                        change="onChangeSearch($event,'month')"
+                    />
+                    <layoutData>
+                        <layout:GridData span="XL3 L3 M3 S12" />
+                    </layoutData>
+                </HBox>
+
+                <!-- 매출조직명 -->
+                <HBox
+                    class="custom-search-field-box"
+                    alignItems="Center"
+                >
+                    <Label text="매출조직명" />
+                    <Input
+                        width="100%"
+                        showValueHelp="true"
+                        valueHelpRequest=".onOrgSingleSelectDialogOpen($event,'Department')"
+                        showSuggestion="true"
+                        change="onChangeSearch($event,'org')"
+                        valueStateText="입력한 조직이 존재하지 않습니다."
+                        suggestionItems="{ path: 'cm>/latest_org', length: 2000 }"
+                        value="{searchModel>/orgNm}"
+                        name="{searchModel>/orgId}"
+                        fieldGroupIds="Search,Required"
+                        showValueStateMessage="true"
+                        editable="false"
+                    >
+                        <suggestionItems>
+                            <core:Item
+                                key="{cm>id}"
+                                text="{cm>name}"
+                            />
+                        </suggestionItems>
+                    </Input>
+                    <layoutData>
+                        <layout:GridData span="XL3 L3 M3 S12" />
+                    </layoutData>
+                </HBox>
+
+                <!-- GL 계정 -->
+
+                <HBox
+                    class="custom-search-field-box"
+                    alignItems="Center"
+                >
+                    <Label text="GL 계정" />
+
+                    <MultiComboBox
+                        id="GlSelect"
+                        width="100%"
+                        items="{GLModel>/}"
+                    >
+                        <core:Item
+                            key="{GLModel>name}"
+                            text="{GLModel>value}"
+                        />
+                    </MultiComboBox>
+                    <layoutData>
+                        <layout:GridData span="XL3 L3 M3 S12" />
+                    </layoutData>
+                </HBox>
+
+                <HBox
+                    width="100%"
+                    justifyContent="End"
+                    class="custom-search-btn-container sapUiTinyMarginTop"
+                >                   
+                    <Button
+                        id="searchButton"
+                        text="검색"
+                        type="Accept"
+                        icon="sap-icon://search"
+                        press=".onSearch"
+                        class="custom-mg-small-btn"
+                    />
+                    <layoutData>
+                        <layout:GridData span="XL12 L12 M12 S12" />
+                    </layoutData>
+                </HBox>
+
+                
+            </form:SimpleForm>
+
+            <Panel height="78%" class="custom-noPadding" >
+                <table:Table 
+                    id="addTargetTable"
+                    class="custom-table-container custom-mg-table-header custom-table-rounding-border"
+                    rows="{expenseCoModel>/}" selectionMode="None" 
+                    fixedColumnCount="5"
+                    busyIndicatorDelay="0">
+                    
+                    <table:rowMode>
+                        <rowmodes:Auto  />
+                    </table:rowMode>
+
+                    <table:extension>
+                        <OverflowToolbar height="3rem">
+                            <Title
+                                id="projectTitle"
+                                text="{= ${searchModel>/count} ? '총 ' + ${searchModel>/count} + ' 개' : '총 0개'}"
+                                class="custom-text-medium"
+                            />
+                            <ToolbarSpacer />
+                            <Button icon="sap-icon://download" text="엑셀 Export" press="onExcelExport" class="custom-mg-small-btn"/>
+                            <unified:FileUploader
+                                sameFilenameAllowed="true" fileType="XLSX,xlsx" buttonOnly="true" class="custom-uploader-btn"
+                                icon="sap-icon://upload" iconFirst="true" change=".onExcelImport" buttonText="엑셀 Import"/>
+                        </OverflowToolbar>
+                    </table:extension>
+                    
+                    <table:columns>
+                        <table:Column  width="6rem" resizable="false">
+                            <Label text="Seq" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>								
+                                <Text text="{expenseCoModel>seq}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="8rem" resizable="false">
+                            <Label text="회계연도" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>year}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="6rem" resizable="false">
+                            <Label text="마감월" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>month}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="ERP Cost Center" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>ccorg_cd}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="8rem" resizable="false">
+                            <Label text="계정코드" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>gl_account}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="6rem" resizable="false">
+                            <Label text="중계정" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>commitment_item}" wrapping="false" width="100%" textAlign="Center"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="1월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>co_m1_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="2월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>co_m2_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="3월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>co_m3_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+                        
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="4월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>co_m4_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="5월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>co_m5_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="6월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>co_m6_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="7월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>co_m7_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="8월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>co_m8_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="9월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>co_m9_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="10월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>co_m10_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="11월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>co_m11_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column  width="10rem" resizable="false">
+                            <Label text="12월 위임 비용" wrapping="true" width="100%" textAlign="Center"/>
+                            <table:template>
+                                <Text text="{expenseCoModel>co_m12_amt}" wrapping="false" width="100%" textAlign="End"/>
+                            </table:template>
+                        </table:Column>
+                        
+                    </table:columns>
+                </table:Table>
+            </Panel>
+        </content>
+    </Page>
+</mvc:View>

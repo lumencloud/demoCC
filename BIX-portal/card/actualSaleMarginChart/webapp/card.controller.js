@@ -11,7 +11,6 @@ sap.ui.define([
 ], function (Controller, EventBus, JSONModel, AnalyticMap, MessageToast, NumberFormat, ODataModel, Modules) {
     "use strict";
 
-    AnalyticMap.GeoJSONURL = "https://sapui5.hana.ondemand.com/sdk/test-resources/sap/ui/vbm/demokit/media/analyticmap/L0.json";
 
     /**
      * @typedef {sap.m.Select} Select
@@ -245,16 +244,16 @@ sap.ui.define([
 
                     let circleRate;
                     if (data.curr_sale === 0) {
-                        circleRate = 50 + 5
+                        circleRate = 45
                     } else {
-                        circleRate = (data.curr_margin / data.curr_sale * 100 / 2) + 50 + 5
+                        circleRate = (data.curr_margin / data.curr_sale * 100 / 2) + 45
+                        if(circleRate < 8){circleRate = 8}
                     }
 
                     let oModel = {
                         "org_name": data.org_name,
                         "curr_sale": this.onFormatPerformance(data.curr_sale, 'billion'),
                         "curr_margin": this.onFormatPerformance(data.curr_margin, 'billion'),
-                        "margin_rate": data.margin_rate,
                         "sale_contrast": data.yoy_sale_rate,
                         "margin_contrast": data.yoy_margin_rate,
                         "sale_type": sale_type,
@@ -275,7 +274,6 @@ sap.ui.define([
                         "marginRate": this.onFormatPerformance(data.curr_sale === 0 ? 0 : data.curr_margin / data.curr_sale * 100, 'percent2'),
                         "marginRate_type": (data.curr_margin / data.curr_sale) >= 0 ? true : false,
                         "circleRate": this.onFormatPerformance(circleRate, 'percent2'),
-                        "talkingRate": this.onFormatPerformance(circleRate - 8.2, 'percent2'),
                     }
 
                     aTransData.push(oModel)
@@ -383,9 +381,10 @@ sap.ui.define([
 
                     let circleRate;
                     if (data.curr_sale === 0) {
-                        circleRate = 50 + 5
+                        circleRate = 45
                     } else {
-                        circleRate = (data.curr_margin / data.curr_sale * 100 / 2) + 50 + 5
+                        circleRate = (data.curr_margin / data.curr_sale * 100 / 2) + 45
+                        if(circleRate < 8){circleRate = 8}
                     }
 
                     let oModel = {

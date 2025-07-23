@@ -150,7 +150,8 @@
         "transition": "slide",
         "type": "View",
         "viewType": "XML",
-        "path": "bix.master.batch.view"
+        "path": "bix.master.batch.view",
+        "async": true
       },
       "routes": [
         {
@@ -160,15 +161,6 @@
           "target": [
             "TargetMain"
           ]
-        },
-        {
-          "name": "RouteDetail",
-          "pattern": "Detail/ver={ver}/if_step={if_step}/procedure_name={procedure_name}/table_name={table_name}/success_yn={success_yn}",
-          "layout": "TwoColumnsBeginExpanded",
-          "target": [
-            "TargetMain",
-            "TargetDetail"
-          ]
         }
       ],
       "targets": {
@@ -177,12 +169,6 @@
           "name": "Main",
           "clearControlAggregation": false,
           "controlAggregation": "beginColumnPages"
-        },
-        "TargetDetail": {
-          "id": "Detail",
-          "name": "Detail",
-          "clearControlAggregation": false,
-          "controlAggregation": "midColumnPages"
         }
       }
     },

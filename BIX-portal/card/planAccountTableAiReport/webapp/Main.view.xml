@@ -46,6 +46,7 @@
                 busyIndicatorDelay="0"
                 visibleRowCountMode="Auto"
                 fixedColumnCount="1"
+                noData=" "
                 fieldGroupIds="content,deal_stage"
             >
                 <table:extension>
@@ -352,6 +353,7 @@
                 busyIndicatorDelay="0"
                 visibleRowCountMode="Auto"
                 fixedColumnCount="1"
+                noData=" "
                 fieldGroupIds="content,month"
             >
                 <table:extension>
@@ -848,6 +850,7 @@
                 busyIndicatorDelay="0"
                 visibleRowCountMode="Auto"
                 fixedColumnCount="1"
+                noData=" "
                 fieldGroupIds="content,rodr"
             >
                 <table:extension>

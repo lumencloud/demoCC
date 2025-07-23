@@ -70,7 +70,7 @@
                         </HBox>
                         <VBox width="100%" class="custom-ai-report-test-card-container" height="460px">
                             <Title text="그림 4. 당해년도 실적 추정"/>
-                            <w:Card manifest="../bix/card/deliveryMonthlyContent3_3/manifest.json" overflow="Default" height="400px"/>
+                            <w:Card manifest="../bix/card/deliveryMonthlyContent3_3/manifest.json" overflow="Default" height="400px" dataMode="Active" busyIndicatorDelay="0"/>
                         </VBox>
                         <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
                             <Text text="3"/>
@@ -82,10 +82,7 @@
                             <Text text="{ui>/month}월 Monthly Report"/>
                         </HBox>
                         <VBox width="100%" class="custom-ai-report-test-card-container">
-                            <w:Card manifest="../bix/card/aiReportMonthlyAiInsight/manifest.json" width="100%" overflow="Default"  dataMode="Active" />
-                        </VBox>
-                        <VBox width="100%" class="custom-ai-report-test-card-container">
-                            <w:Card manifest="../bix/card/aiReportMonthlyAiInsightSmry/manifest.json" width="100%" overflow="Default"  dataMode="Active" />
+                            <w:Card manifest="../bix/card/aiReportMonthlyAiInsight/manifest.json" width="100%" overflow="Default"  dataMode="Active" busyIndicatorDelay="0"/>
                         </VBox>
                         <HBox class="ai-report-page-footer" justifyContent="SpaceBetween">
                             <Text text="4"/>

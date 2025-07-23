@@ -20,6 +20,7 @@ modules:
       - name: bix-portal-destination-service
       - name: bix-portal-logging
       - name: bix-portal-cloud-logging
+      - name: bix-portal-job-scheduler
     provides:
       - name: srv-api
         properties:
@@ -39,7 +40,7 @@ modules:
         SAP_AI_DEPLOYMENT_ID: dd33a29a406758e1
     # build-parameters:
     #   builder: npm-ci
-  # HANA DB 배포도구 (MTA 배포시 HANA DB 배포실행 후 정지)
+    # HANA DB 배포도구 (MTA 배포시 HANA DB 배포실행 후 정지)
   - name: bix-portal-db-deployer
     type: hdb
     path: gen/db
@@ -65,6 +66,7 @@ modules:
       - name: bix-portal-destination-service
       - name: bix-portal-logging
       - name: bix-portal-cloud-logging
+      - name: bix-portal-job-scheduler
         group: destinations
         properties:
           forwardAuthToken: true
@@ -152,6 +154,11 @@ resources:
       config:
         ingest_otlp:
           enabled: true
+  - name: bix-portal-job-scheduler
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: jobscheduler
+      service-plan: standard
 parameters:
   enable-parallel-deployments: true
   # HANA DB 내의 Schema 명

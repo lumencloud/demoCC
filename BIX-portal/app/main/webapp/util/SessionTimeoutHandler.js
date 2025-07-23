@@ -13,7 +13,7 @@ sap.ui.define(
 					url: '/sessionCheck',
 					type: 'get',
 					success: (res)=> {
-						localStorage.setItem("sessionTimeout" , res.sessionTimeout);
+						localStorage.setItem("sessionTimeout" , JSON.parse(res).sessionTimeout);
 					}
 				});
 

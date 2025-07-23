@@ -118,14 +118,18 @@ sap.ui.define([
 
         _bindTable: async function (sChannelId, sEventId, oData) {
             // DOM이 없는 경우 Return
-            let oDom = this.getView().getDomRef();
-            if (!oDom) return;
+            // let oDom = this.getView().getDomRef();
+            // if (!oDom) return;
             
 
             // 검색 조건
             let oAiData = this.getView().getModel("uiModel").getData();
             let oSearchData = this.getView().getModel("searchModel").getData();
 
+            
+            if(!oAiData.orgId){
+                return
+            }
             // 검색 파라미터
             this._setBusy(true);
 

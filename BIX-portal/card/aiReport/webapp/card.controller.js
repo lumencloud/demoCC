@@ -33,38 +33,38 @@ sap.ui.define([
          * @param {Object} oData - 이벤트 데이터
          * @private
          */
-        _dataSetting: async function (oEvent, sEventId) {
+        _dataSetting: async function (oEvent, sEventId, oData) {
             this.byId("cardContent").setBusy(true);
-            
+
             let { monday, sunday } = this._setDate();
-            let oData = JSON.parse(sessionStorage.getItem("aiWeekReport"));
-            
+            // let oData = JSON.parse(sessionStorage.getItem("aiWeekReport"));
+
             const oModel = new ODataModel({
                 serviceUrl: "../odata/v4/pl_api/",
                 synchronizationMode: "None",
                 operationMode: "Server"
             });
-            
+
             let sPath = oData ?
                 `/get_ai_total_rodr(org_id='${oData.org_id}',start_date='${oData.start_date}',end_date=${oData.end_date},type='dt')` :
                 `/get_ai_total_rodr(org_id='5',start_date='${monday}',end_date=${sunday},type='dt')`;
-            
+
             let start_date = new Date(oData ? oData.start_date : monday);
             let end_date = new Date(oData ? oData.end_date : sunday);
-            
+
             // 전주 날짜 계산
             let last_start_date = new Date(start_date.getFullYear(), start_date.getMonth(), start_date.getDate() - 7);
             let last_end_date = new Date(end_date.getFullYear(), end_date.getMonth(), end_date.getDate() - 7);
-        
+
             try {
                 const aResult = await oModel.bindContext(sPath).requestObject();
-                
+
                 // DT Pipeline 데이터 설정
                 this._modelSetting(aResult.value);
-                
+
                 // DT Pipeline 로딩 완료
                 this.byId("cardContent").setBusy(false);
-                
+
                 // 보고서 컨텐츠 생성 파라미터 구성
                 const reportParams = {
                     start_date: oData ? oData.start_date : monday,
@@ -72,7 +72,7 @@ sap.ui.define([
                     last_start_date: this._formatDate(last_start_date),
                     last_end_date: this._formatDate(last_end_date),
                 };
-        
+
                 // AI 보고서 생성은 별도로 진행 (Summary 부분만 로딩)
                 this._loadReportData(reportParams);
             } catch (oErr) {
@@ -95,7 +95,7 @@ sap.ui.define([
         _loadReportData: function (params) {
             var oModel = this.getView().getModel("LLMModel");
             var sViewid = "aiReportView";
-            
+
             // Summary만 로딩 상태로 설정
             oModel.setProperty("/isLoading", true);
             oModel.setProperty("/summary", []); // 빈 배열로 두면 noDataText가 표시됨
@@ -241,14 +241,12 @@ sap.ui.define([
                 oModel.setProperty("/summary", oReportData.summary || []);
                 oModel.setProperty("/insight", oReportData.insight || "");
                 oModel.setProperty("/isLoading", false);
-                
+
                 // insight 결과 ai Insight 카드로 전달
-                this._oEventBus.publish("aiReport", "aiInsight", { key: "dtSight", insight: oReportData.insight });
+                this._oEventBus.publish("aiReport", "aiDTInsight", { key: "dtSight", insight: oReportData.insight });
                 console.log("보고서 컨텐츠 데이터 로드 완료:", oReportData);
-                
-                if(this._bFlag){
-                    this.dataLoad();
-                  }
+
+                this.dataLoad();
             } catch (error) {
                 console.error("보고서 컨텐츠 결과 처리 오류:", error);
                 this._setFallbackData();
@@ -288,9 +286,8 @@ sap.ui.define([
             } catch (error) {
                 console.error("보고서 컨텐츠 내용 파싱 오류:", error);
                 console.log("파싱 실패한 원본 내용:", content);
-                
+
                 this._setFallbackData();
-                this.dataLoad();
             }
         },
 
@@ -358,7 +355,7 @@ sap.ui.define([
                     reportData.insight = line;
                 }
             }
-            
+
             return reportData;
         },
 

@@ -131,7 +131,8 @@
         "transition": "slide",
         "type": "View",
         "viewType": "XML",
-        "path": "bix.pl.overview.view"
+        "path": "bix.pl.overview.view",
+        "async": true
       },
       "routes": [
         {

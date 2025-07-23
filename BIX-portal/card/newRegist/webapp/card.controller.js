@@ -11,7 +11,7 @@ sap.ui.define(
     "use strict";
     return BaseController.extend("bix.card.newRegist.card", {
       _oEventBus: EventBus.getInstance(),
-      _bflag : true,
+      _bflag: true,
 
       onInit: function () {
         this._dataSetting();
@@ -36,7 +36,7 @@ sap.ui.define(
           function (aResult) {
             Module.displayStatusForEmpty(this.getOwnerComponent().oCard, aResult.value, this.byId("cardContent"));
             this._modelSetting(aResult.value);
-         
+
           }.bind(this))
           .catch((oErr) => {
             Module.displayStatus(this.getOwnerComponent().oCard, oErr.error.code, this.byId("cardContent"));
@@ -106,9 +106,7 @@ sap.ui.define(
         this._oEventBus.publish("aiReport", "newData", oModel)
         this.getOwnerComponent().setModel(new JSONModel(oModel), "Model");
 
-        if(this._bflag){
-          this.dataLoad();
-        }
+        this.dataLoad();
 
         let subTitle = `(총 ${iAmount.toFixed(2)}억원 / ${iCount}건)`
         if (this.getOwnerComponent().oCard.getAggregation("_header")) {

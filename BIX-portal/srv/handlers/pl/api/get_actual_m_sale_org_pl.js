@@ -107,11 +107,12 @@ module.exports = (srv) => {
                         id : data[search_org],
                         name : data[search_org_name],
                         ccorg : data[search_org_ccorg],
-                        org_order : data['org_order']
+                        org_order : data['org_order'],
+                        org_tp : data['org_tp']
                     };
 
                     if(org_col_nm === 'lv1_id' || org_col_nm === 'lv2_id'){
-                        if(!account_list.includes(oTemp.id) && !ackerton_list.includes(oTemp.id)){
+                        if(!account_list.includes(oTemp.id) && !ackerton_list.includes(oTemp.id) && oTemp.org_tp === 'delivery'){
                             org_list.push(oTemp);
                         }
                     }else{

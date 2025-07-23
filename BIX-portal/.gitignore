@@ -44,3 +44,5 @@ app/resources/**
 dist/
 
 package-lock.json
+# auto generated wildcard
+.env

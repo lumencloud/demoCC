@@ -15,7 +15,17 @@ sap.ui.define([
         onInit: function () {
             // this._dataSetting();
             this._oEventBus.subscribe("aireport", "deliContent2_3", this._modelSetting, this);
+            this._oEventBus.subscribe("aireport", "setBusy", this._setBusy, this);
+            this._oEventBus.publish("aireport", "isCardSubscribed");
+			this._setModel();
         },
+        _setModel: function () {
+			this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+		},
+		_setBusy: function () {
+			this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+		},
+
 
         _dataSetting: async function () {
             this.byId("cardContent").setBusy(true);
@@ -39,9 +49,7 @@ sap.ui.define([
                     Module.displayStatusForEmpty(this.byId("table"), aResult.value, this.byId("cardContent"));
                     this._modelSetting(aResult.value);
 
-                    this.byId("table").setVisibleRowCountMode("Fixed");
-                    this.byId("table").setVisibleRowCount(aResult.value.length);
-
+                 
                 }.bind(this))
                 .catch((oErr) => {
                     Module.displayStatus(this.byId("table"), oErr.error.code, this.byId("cardContent"));
@@ -59,7 +67,11 @@ sap.ui.define([
 
         _modelSetting: function (sChannel, sEventId, oData) {
             this.getView().setModel(new JSONModel(oData.data), "Model");
+            this.byId("table").setVisibleRowCountMode("Fixed");
+            this.byId("table").setVisibleRowCount(oData.data.length);
+
             this.dataLoad();
+            this.getView().getModel("ui").setProperty("/bBusyFlag", false);
         },
 
         onFormatPerformance: function (iValue, sType) {

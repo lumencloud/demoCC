@@ -99,21 +99,21 @@ module.exports = (srv) => {
             let s_sum_indirect = a_sum_indirect.join(' + ')
             let s_sum_total = a_sum_total.join(' + ')
             const rsp_column = ['year', org_child_level,
-                'case when sum(total_year_amt) <> 0 then (sum(bill_year_amt) + sum(indirect_cost_year)) / sum(total_year_amt) else 0 end as cost_total_value',
-                `case when sum(total_year_emp) <> 0 then sum(b_mm_amt_sum) / sum(total_year_emp) else 0 end as mm_total_value`,
-                `case when ${s_sum_bun_mm} <> 0 then (${s_sum_b_mm})/(${s_sum_bun_mm}) else 0 end as mm_month_sum_value`,
-                `case when ${s_sum_total} <> 0 then (${s_sum_bill} + ${s_sum_indirect})/(${s_sum_total}) else 0 end as cost_month_sum_value`,
-                `case when (sum(bill_year_amt) + sum(indirect_cost_year) + sum(opp_year_amt) + sum(b_mm_amt_sum) + ${s_sum_b_mm} + ${s_sum_bill} + ${s_sum_indirect}) <> 0 then true else false end as data_flag`
+                'case when ifnull(sum(total_year_amt),0) <> 0 then (ifnull(sum(bill_year_amt),0) + ifnull(sum(indirect_cost_year),0)) / ifnull(sum(total_year_amt),0) else 0 end as cost_total_value',
+                `case when ifnull(sum(bun_mm_amt_sum),0) <> 0 then ifnull(sum(b_mm_amt_sum),0) / ifnull(sum(bun_mm_amt_sum),0) else 0 end as mm_total_value`,
+                `case when ifnull(${s_sum_bun_mm},0) <> 0 then ifnull(${s_sum_b_mm},0)/ifnull(${s_sum_bun_mm},0) else 0 end as mm_month_sum_value`,
+                `case when ifnull(${s_sum_total},0) <> 0 then (ifnull(${s_sum_bill},0) + ifnull(${s_sum_indirect},0))/ifnull(${s_sum_total},0) else 0 end as cost_month_sum_value`,
+                `case when (ifnull(sum(bill_year_amt),0) + ifnull(sum(indirect_cost_year),0) + ifnull(sum(b_mm_amt_sum),0) + ifnull(${s_sum_b_mm},0) + ifnull(${s_sum_bill},0) + ifnull(${s_sum_indirect},0)) <> 0 then true else false end as data_flag`,
             ];
             const rsp_where = { 'year': { in: [year, last_year] }, [org_level]: orgInfo.org_ccorg_cd, is_delivery: true };
             const rsp_groupBy = ['year', org_child_level];
 
             // rsp wideview (m, opp, total)
             const rsp_sum_column = ['year',
-                'case when sum(total_year_amt) <> 0 then (sum(bill_year_amt) + sum(indirect_cost_year)) / sum(total_year_amt) else 0 end as cost_total_value',
-                `case when sum(bun_mm_amt_sum) <> 0 then sum(b_mm_amt_sum) / sum(bun_mm_amt_sum) else 0 end as mm_total_value`,
-                `case when ${s_sum_bun_mm} <> 0 then (${s_sum_b_mm})/(${s_sum_bun_mm}) else 0 end as mm_month_sum_value`,
-                `case when ${s_sum_total} <> 0 then (${s_sum_bill} + ${s_sum_indirect})/(${s_sum_total}) else 0 end as cost_month_sum_value`
+                'case when ifnull(sum(total_year_amt),0) <> 0 then (ifnull(sum(bill_year_amt),0) + ifnull(sum(indirect_cost_year),0)) / ifnull(sum(total_year_amt),0) else 0 end as cost_total_value',
+                `case when ifnull(sum(bun_mm_amt_sum),0) <> 0 then ifnull(sum(b_mm_amt_sum),0) / ifnull(sum(bun_mm_amt_sum),0) else 0 end as mm_total_value`,
+                `case when ifnull(${s_sum_bun_mm},0) <> 0 then ifnull(${s_sum_b_mm},0)/ifnull(${s_sum_bun_mm},0) else 0 end as mm_month_sum_value`,
+                `case when ifnull(${s_sum_total},0) <> 0 then (ifnull(${s_sum_bill},0) + ifnull(${s_sum_indirect},0))/ifnull(${s_sum_total},0) else 0 end as cost_month_sum_value`,
             ];
             const rsp_sum_where = { 'year': { in: [year, last_year] }, [org_level]: orgInfo.org_ccorg_cd, is_delivery: true };
             const rsp_sum_groupBy = ['year'];
@@ -138,15 +138,17 @@ module.exports = (srv) => {
                 get_org_target(year, ['A05', 'A07'])
             ]);
 
-            // return rsp_sum_data
-            let b_data = false
+            let b_data = [];
             rsp_data.forEach(data => {
                 if(data.data_flag){
-                    b_data = data.data_flag
+                    b_data.push(data.data_flag)
                 }
             })
-            if(!b_data){
-                return []
+// console.log(b_data)
+            let chk = b_data.every(item=> item === false);
+// console.log('chk', chk)
+            if(chk){
+                return [];
             }
  
             // if(!rsp_data.length && !rsp_sum_data.length){
@@ -176,12 +178,12 @@ module.exports = (srv) => {
         
                 let rsp_ack_where = { ...rsp_where, 'lv3_ccorg_cd' : '610000' };
 
-                let ackerton_data = await SELECT.from(rsp_view).columns(rsp_column).where(rsp_ack_where).groupBy(...rsp_groupBy);
+                let ackerton_data = await SELECT.from(rsp_view).columns(rsp_sum_column).where(rsp_ack_where).groupBy(...rsp_sum_groupBy);
 
                 // 올해 BR(MM), BR(Cost) 목표값
                 const target = target_data.find(oData => oData["org_ccorg_cd"] === '610000');
-                const target_br_mm = target?.target_br_mm || 0;
-                const target_br_cost = target?.target_br_cost || 0;
+                const target_br_mm = target?.target_br_mm ?? 0;
+                const target_br_cost = target?.target_br_cost ?? 0;
 
                 let ackerton_mm_sum_data = {
                     type: "BR(MM)",
@@ -215,23 +217,23 @@ module.exports = (srv) => {
 
                 ackerton_data.forEach(data=>{
                     if(data.year === year){
-                        ackerton_mm_sum_data.actual_curr_ym_value += data?.mm_month_sum_value ?? 0;
-                        ackerton_cost_sum_data.actual_curr_ym_value += data?.cost_month_sum_value ?? 0;
+                        ackerton_mm_sum_data.actual_curr_ym_value = data?.mm_month_sum_value ?? 0;
+                        ackerton_cost_sum_data.actual_curr_ym_value = data?.cost_month_sum_value ?? 0;
                     }else if(data.year === last_year){
-                        ackerton_mm_sum_data.actual_last_ym_value += data?.mm_month_sum_value ?? 0;
-                        ackerton_mm_sum_data.mm_total_value += data?.mm_total_value ?? 0;
-                        ackerton_cost_sum_data.actual_last_ym_value += data?.cost_month_sum_value ?? 0;
-                        ackerton_cost_sum_data.cost_total_value += data?.cost_total_value ?? 0;
+                        ackerton_mm_sum_data.actual_last_ym_value = data?.mm_month_sum_value ?? 0;
+                        ackerton_mm_sum_data.mm_total_value = data?.mm_total_value ?? 0;
+                        ackerton_cost_sum_data.actual_last_ym_value = data?.cost_month_sum_value ?? 0;
+                        ackerton_cost_sum_data.cost_total_value = data?.cost_total_value ?? 0;
                     }
                 })
-                ackerton_mm_sum_data.actual_curr_ym_value_gap = ackerton_mm_sum_data.actual_curr_ym_value - ackerton_mm_sum_data.actual_last_ym_value;
-                ackerton_mm_sum_data.actual_curr_ym_rate = target_br_mm ? (ackerton_mm_sum_data.actual_curr_ym_value / (target_br_mm / 100)) : 0;
+                ackerton_mm_sum_data.actual_curr_ym_rate = target_br_mm !== 0 ? (ackerton_mm_sum_data.actual_curr_ym_value / (target_br_mm / 100)) : 0;
+                ackerton_mm_sum_data.actual_curr_ym_value_gap = (ackerton_mm_sum_data?.actual_curr_ym_value ?? 0) - (ackerton_mm_sum_data?.actual_last_ym_value ?? 0);
                 ackerton_mm_sum_data.actual_last_ym_rate = (ackerton_mm_sum_data?.mm_total_value ?? 0) === 0 ? 0 : (ackerton_mm_sum_data?.actual_last_ym_value ?? 0) / ackerton_mm_sum_data.mm_total_value;
-                ackerton_mm_sum_data.actual_curr_ym_rate_gap = (target_br_mm ? ((ackerton_mm_sum_data.actual_last_ym_value ?? 0) / (target_br_mm / 100)) : 0) - ((ackerton_mm_sum_data.mm_total_value ?? 0) === 0 ? 0 : (ackerton_mm_sum_data.actual_last_ym_value ?? 0) / ackerton_mm_sum_data.mm_total_value);
+                ackerton_mm_sum_data.actual_curr_ym_rate_gap = (target_br_mm !== 0 ? ((ackerton_mm_sum_data.actual_curr_ym_value ?? 0) / (target_br_mm / 100)) : 0) - ((ackerton_mm_sum_data.mm_total_value ?? 0) === 0 ? 0 : (ackerton_mm_sum_data.actual_last_ym_value ?? 0) / ackerton_mm_sum_data.mm_total_value);
 
                 ackerton_cost_sum_data.actual_curr_ym_value_gap = ackerton_cost_sum_data.actual_curr_ym_value - ackerton_cost_sum_data.actual_last_ym_value;
-                ackerton_cost_sum_data.actual_curr_ym_rate = target_br_cost ? (ackerton_cost_sum_data.actual_curr_ym_value / target_br_cost/100) : 0,
-                ackerton_cost_sum_data.actual_curr_ym_rate_gap = (target_br_cost ? ((ackerton_cost_sum_data.actual_curr_ym_value ?? 0) / target_br_cost/100) : 0) - ((ackerton_cost_sum_data.cost_total_value ?? 0) === 0 ? 0 : (ackerton_cost_sum_data.actual_last_ym_value ?? 0) / ackerton_cost_sum_data.cost_total_value)
+                ackerton_cost_sum_data.actual_curr_ym_rate = target_br_cost !== 0 ? (ackerton_cost_sum_data.actual_curr_ym_value / (target_br_cost/100)) : 0,
+                ackerton_cost_sum_data.actual_curr_ym_rate_gap = (target_br_cost !== 0 ? ((ackerton_cost_sum_data.actual_curr_ym_value ?? 0) / (target_br_cost/100)) : 0) - ((ackerton_cost_sum_data.cost_total_value ?? 0) === 0 ? 0 : (ackerton_cost_sum_data.actual_last_ym_value ?? 0) / ackerton_cost_sum_data.cost_total_value);
                 
                 rsp_data = rsp_data.filter(item=>!ac_map.includes(item[org_child_level]))
                 rsp_data.push(ackerton_mm_sum_data);
@@ -288,9 +290,9 @@ module.exports = (srv) => {
                     actual_curr_ym_value_gap: (curr_rsp_data?.mm_month_sum_value ?? 0) - (last_rsp_data?.mm_month_sum_value ?? 0)
                 }
                 // 진척도 (올해: 당월 누계 / 목표, 작년: 작년 당월 누계 / 작년 총합)
-                oMM["actual_curr_ym_rate"] = target_br_mm ? ((curr_rsp_data?.mm_month_sum_value ?? 0) / (target_br_mm / 100)) : 0;
+                oMM["actual_curr_ym_rate"] = target_br_mm !== 0 ? ((curr_rsp_data?.mm_month_sum_value ?? 0) / (target_br_mm / 100)) : 0;
                 oMM["actual_last_ym_rate"] = (last_rsp_data?.mm_total_value ?? 0) === 0 ? 0 : (last_rsp_data?.mm_month_sum_value ?? 0) / last_rsp_data.mm_total_value;
-                oMM["actual_curr_ym_rate_gap"] = (target_br_mm ? ((curr_rsp_data?.mm_month_sum_value ?? 0) / (target_br_mm / 100)) : 0) - ((last_rsp_data?.mm_total_value ?? 0) === 0 ? 0 : (last_rsp_data?.mm_month_sum_value ?? 0) / last_rsp_data.mm_total_value);
+                oMM["actual_curr_ym_rate_gap"] = (target_br_mm !== 0 ? ((curr_rsp_data?.mm_month_sum_value ?? 0) / (target_br_mm / 100)) : 0) - ((last_rsp_data?.mm_total_value ?? 0) === 0 ? 0 : (last_rsp_data?.mm_month_sum_value ?? 0) / last_rsp_data.mm_total_value);
                 result_data.push(oMM);
 
                 // BR(Cost)
@@ -303,13 +305,13 @@ module.exports = (srv) => {
                     target_curr_y_value: target_br_cost/100,
 
                     actual_curr_ym_value: curr_rsp_data?.cost_month_sum_value ?? 0,
-                    actual_curr_ym_rate: target_br_cost ? ((curr_rsp_data?.cost_month_sum_value ?? 0) / target_br_cost/100) : 0,
+                    actual_curr_ym_rate: target_br_cost !== 0 ? ((curr_rsp_data?.cost_month_sum_value ?? 0) / (target_br_cost/100)) : 0,
 
                     actual_last_ym_value: last_rsp_data?.cost_month_sum_value ?? 0,
                     actual_last_ym_rate: (last_rsp_data?.cost_total_value ?? 0) === 0 ? 0 : (last_rsp_data?.cost_month_sum_value ?? 0) / last_rsp_data.cost_total_value,
                     
                     actual_curr_ym_value_gap: (curr_rsp_data?.cost_month_sum_value ?? 0) - (last_rsp_data?.cost_month_sum_value ?? 0),
-                    actual_curr_ym_rate_gap: (target_br_cost ? ((curr_rsp_data?.cost_month_sum_value ?? 0) / target_br_cost/100) : 0) - ((last_rsp_data?.cost_total_value ?? 0) === 0 ? 0 : (last_rsp_data?.cost_month_sum_value ?? 0) / last_rsp_data.cost_total_value)
+                    actual_curr_ym_rate_gap: (target_br_cost !== 0 ? ((curr_rsp_data?.cost_month_sum_value ?? 0) / (target_br_cost/100)) : 0) - ((last_rsp_data?.cost_total_value ?? 0) === 0 ? 0 : (last_rsp_data?.cost_month_sum_value ?? 0) / last_rsp_data.cost_total_value)
                 }
                 result_data.push(oCost);
             });
@@ -323,10 +325,15 @@ module.exports = (srv) => {
             const curr_target_br_mm = curr_target?.target_br_mm ?? 0;
             const curr_target_br_cost = curr_target?.target_br_cost ?? 0;
 
+            let total_name = '합계';
+            if(orgInfo.org_level === 'hdqt' || orgInfo.org_level === 'team' || orgInfo.org_ccorg_cd === '237100'){
+                total_name = org_name;
+            };
+
             let o_total_mm = {
                 type: "BR(MM)",
                 org_id: 'total',
-                org_name: org_level.includes("hdqt") || org_level.includes("team") ? org_name : '합계',
+                org_name: total_name,
                 display_order: 1,
                 item_order: 1,
                 target_curr_y_value: curr_target_br_mm/100,
@@ -335,29 +342,40 @@ module.exports = (srv) => {
                 actual_curr_ym_value_gap: (curr_rsp_data?.mm_month_sum_value ?? 0) - (last_rsp_data?.mm_month_sum_value ?? 0)
             }
             // 진척도 (올해: 당월 누계 / 목표, 작년: 작년 당월 누계 / 작년 총합)
-            o_total_mm["actual_curr_ym_rate"] = curr_target_br_mm ? ((last_rsp_data?.mm_month_sum_value ?? 0) / (curr_target_br_mm / 100)) : 0;
+            o_total_mm["actual_curr_ym_rate"] = curr_target_br_mm !== 0 ? ((last_rsp_data?.mm_month_sum_value ?? 0) / (curr_target_br_mm / 100)) : 0;
             o_total_mm["actual_last_ym_rate"] = (last_rsp_data?.mm_total_value ?? 0) === 0 ? 0 : (last_rsp_data?.mm_month_sum_value ?? 0) / last_rsp_data.mm_total_value;
-            o_total_mm["actual_curr_ym_rate_gap"] = (curr_target_br_mm ? ((last_rsp_data?.mm_month_sum_value ?? 0) / (curr_target_br_mm / 100)) : 0) - ((last_rsp_data?.mm_total_value ?? 0) === 0 ? 0 : (last_rsp_data?.mm_month_sum_value ?? 0) / last_rsp_data.mm_total_value);
+            o_total_mm["actual_curr_ym_rate_gap"] = (curr_target_br_mm !== 0 ? ((last_rsp_data?.mm_month_sum_value ?? 0) / (curr_target_br_mm / 100)) : 0) - ((last_rsp_data?.mm_total_value ?? 0) === 0 ? 0 : (last_rsp_data?.mm_month_sum_value ?? 0) / last_rsp_data.mm_total_value);
 
             let o_total_cost = {
                 type: "BR(Cost)",
                 org_id: 'total',
-                org_name: org_level.includes("hdqt") || org_level.includes("team") ? org_name : '합계',
+                org_name: total_name,
                 display_order: 1,
                 item_order: 2,
                 target_curr_y_value: curr_target_br_cost/100,
 
                 actual_curr_ym_value: curr_rsp_data?.cost_month_sum_value ?? 0,
-                actual_curr_ym_rate: curr_target_br_cost ? ((curr_rsp_data?.cost_month_sum_value ?? 0) / curr_target_br_cost/100) : 0,
+                actual_curr_ym_rate: curr_target_br_cost !== 0 ? ((curr_rsp_data?.cost_month_sum_value ?? 0) / (curr_target_br_cost/100)) : 0,
 
                 actual_last_ym_value: last_rsp_data?.cost_month_sum_value ?? 0,
                 actual_last_ym_rate: (last_rsp_data?.cost_total_value ?? 0) === 0 ? 0 : (last_rsp_data?.cost_month_sum_value ?? 0) / last_rsp_data.cost_total_value,
                 
                 actual_curr_ym_value_gap: (curr_rsp_data?.cost_month_sum_value ?? 0) - (last_rsp_data?.cost_month_sum_value ?? 0),
-                actual_curr_ym_rate_gap: (curr_target_br_cost ? ((curr_rsp_data?.cost_month_sum_value ?? 0) / curr_target_br_cost/100) : 0) - ((last_rsp_data?.cost_total_value ?? 0) === 0 ? 0 : (last_rsp_data?.cost_month_sum_value ?? 0) / last_rsp_data.cost_total_value)
+                actual_curr_ym_rate_gap: (curr_target_br_cost !== 0 ? ((curr_rsp_data?.cost_month_sum_value ?? 0) / (curr_target_br_cost/100)) : 0) - ((last_rsp_data?.cost_total_value ?? 0) === 0 ? 0 : (last_rsp_data?.cost_month_sum_value ?? 0) / last_rsp_data.cost_total_value)
             }
 
-            // org_name, type 순으로 정렬
+            const oResult = []
+            oResult.push(o_total_mm);
+            oResult.push(o_total_cost);
+            if (!org_level.includes("hdqt") && !org_level.includes("team")) {
+                oResult.push(...result_data)
+            }
+
+            //값이 모두0이면 빈배열 리턴
+            const chk_zero = oResult.every(data=>!data.target_curr_y_value && !data.actual_curr_ym_value && !data.actual_last_ym_value );
+            if(chk_zero){ return []; };
+
+            // 정렬
             let a_sort_field = [
                 { field: "display_order", order: "asc" },
                 { field: "item_order", order: "asc" },
@@ -381,13 +399,6 @@ module.exports = (srv) => {
                 }
                 return 0;
             })
-
-            let oResult = []
-            oResult.push(o_total_mm);
-            oResult.push(o_total_cost);
-            if (!org_level.includes("hdqt") && !org_level.includes("team")) {
-                oResult.push(...result_data)
-            }
 
             return oResult;
         } catch(error) { 

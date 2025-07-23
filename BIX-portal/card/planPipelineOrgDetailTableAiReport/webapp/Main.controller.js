@@ -40,19 +40,20 @@ sap.ui.define([
             // 초기 JSON 모델 설정
             // await this._setModel();
             //this._bindTable();
-            this._asyncInit();
-
+            
             this._oEventBus.subscribe("pl", "search", this._bindTable, this);
-
+            
             this._aiPopupManager = new AIPopupManager();
-
-
+            
+            
             this.byId("pipeDetailTable1").attachCellClick(this.onCellClick, this);
             this.byId("pipeDetailTable1").attachCellContextmenu(this.onCellContextmenu, this);
             this.byId("pipeDetailTable2").attachCellClick(this.onCellClick, this);
             this.byId("pipeDetailTable2").attachCellContextmenu(this.onCellContextmenu, this);
             this.byId("pipeDetailTable3").attachCellClick(this.onCellClick, this);
             this.byId("pipeDetailTable3").attachCellContextmenu(this.onCellContextmenu, this);
+            
+            this._asyncInit();
 
         },
         _asyncInit: async function () {
@@ -131,8 +132,8 @@ sap.ui.define([
 
         _bindTable: async function (sChannelId, sEventId, oData) {
             // DOM이 없는 경우 Return
-            let oDom = this.getView().getDomRef();
-            if (!oDom) return;
+            // let oDom = this.getView().getDomRef();
+            // if (!oDom) return;
 
             // detailSelect 해시에 따른 Select 선택
             // let oSelect = this.byId("detailSelect");
@@ -159,7 +160,7 @@ sap.ui.define([
             this._oSearchData = oData;
 
             // 검색 파라미터
-            this._setBusy(true);
+            await this._setBusy(true);
 
             let dYearMonth = new Date(oData.yearMonth);
             let iYear = dYearMonth.getFullYear();
@@ -168,7 +169,9 @@ sap.ui.define([
 
 
             let sOrgId = oAiData.orgId;
-
+            if(!oAiData.orgId){
+                return
+            }
 
             const oModel = new ODataModel({
                 serviceUrl: "../odata/v4/pl_api/",
@@ -184,10 +187,8 @@ sap.ui.define([
             ]).then(function (aResults) {
 
                 let oData = aResults[0].value[0]
-
-
-
                 let aOrg = oData.org
+                
                 // let aMonth = oData.month
                 // let aDeal = oData.deal
                 // let aRodr = oData.rodr
