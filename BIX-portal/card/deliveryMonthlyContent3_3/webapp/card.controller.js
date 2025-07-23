@@ -21,8 +21,16 @@ sap.ui.define([
 
             // 차트 설정
             // this._setChart();
-
             this._oEventBus.subscribe("aireport", "deliContent3_3", this._setChart, this);
+            this._oEventBus.subscribe("aireport", "setBusy", this._setBusy, this);
+
+            this._setModel();
+        },
+        _setModel: function () {
+            this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
+        },
+        _setBusy: function () {
+            this.getView().setModel(new JSONModel({ bBusyFlag: true }), "ui")
         },
         /**
          * Component별 유일한 ID 생성
@@ -38,14 +46,31 @@ sap.ui.define([
         },
 
         _updateChart: async function (sChannel, sEventId, oDataResult) {
-            this.getOwnerComponent().oCard.setBusy(true);
+
             let aResults = await this._dataSetting(oDataResult.data);
+
+            let maxTotal, iYAxisMax;
+            if (aResults.aTotal && aResults.aTotal.some(val => val && val > 0)) {
+                maxTotal = Math.max(...aResults.aTotal)
+            } else if (aResults.aActual && aResults.aActual.length > 0) {
+                const maxActual = Math.max(...aResults.aActual);
+                maxTotal = maxActual;
+            } else {
+                maxTotal = 10000 //최소값 적용
+            }
+            if (maxTotal < 100) {
+                iYAxisMax = Math.ceil(maxTotal / 200) * 200;
+            } else {
+                // y축 total 값의 따라 동적 변경을 위한 변수
+                iYAxisMax = Math.ceil(maxTotal / 10000) * 10000;
+            }
 
             this._oMyChart[0].data.labels = aResults.aLabel
             this._oMyChart[0].data.datasets[0].data = aResults.aEmpty
             this._oMyChart[0].data.datasets[1].data = aResults.aActual
             this._oMyChart[0].data.datasets[2].data = aResults.aPlan
             this._oMyChart[0].data.datasets[3].data = aResults.aTotal
+            this._oMyChart[0].options.scales.y.max = iYAxisMax
 
             // 파라미터
             let oData = JSON.parse(sessionStorage.getItem("aiReport"));
@@ -96,15 +121,15 @@ sap.ui.define([
                 }
             this.dataLoad();
             this._oMyChart[0].update();
-            setTimeout(() => {
-                this.getOwnerComponent().oCard.setBusy(false);
-            }, 300)
         },
 
         _setChart: async function (sChannel, sEventId, oDataResult) {
             this.byId("cardContent").setBusy(true)
             // 카드
             const oCard = this.getOwnerComponent().oCard;
+
+
+
 
             // Card 높이를 컨테이너 높이와 동일하게 구성
             let sCardId = oCard.getId();
@@ -180,11 +205,24 @@ sap.ui.define([
             for (let i = 0; i < this._aCanvasId.length; i++) {
                 let oHTML = this.byId("html" + i);
                 oHTML.setContent(`<div id='${this._aContainerId[i]}' class='custom-chart-container' style='width:950px; height:380px; min-height:380px'><canvas id='${this._aCanvasId[i]}' /></div>`);
-                oHTML.attachEvent("afterRendering", async function () {
+                oHTML.attachEventOnce("afterRendering", async function () {
                     // 차트 구성
                     const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById(this._aCanvasId[i])).getContext("2d");
                     //데이터 요청
                     let aData = await this._dataSetting(oDataResult.data);
+
+                    let maxTotal;
+                    if (aData.aTotal && aData.aActual.length > 0) {
+                        maxTotal = Math.max(...aData.aTotal)
+                    } else if (aData.aActual && aData.aActual.length > 0) {
+                        const maxActual = Math.max(...aData.aActual);
+                        maxTotal = maxActual + 5000;
+                    } else {
+                        maxTotal = 10000 //최소값 적용
+                    }
+                    // y축 total 값의 따라 동적 변경을 위한 변수
+                    let iYAxisMax = Math.ceil(maxTotal / 10000) * 10000;
+
                     this._oMyChart[i] = new Chart(ctx, {
                         type: "bar",
                         data: {
@@ -228,9 +266,6 @@ sap.ui.define([
                                     yAxisID: "y",
                                     stack: 1,
                                 },
-
-
-
 
                             ]
                         },
@@ -342,12 +377,13 @@ sap.ui.define([
                                                 groupingSize: 3,
                                                 decimals: 0
                                             });
-                                            return oNumberFormat.format(value) + "억";
+                                            let roundedValue = Math.round(value)
+                                            return oNumberFormat.format(roundedValue) + "억";
                                         }
                                     },
                                     beginAtZero: true,
                                     min: 0,
-                                    max: 40000,
+                                    max: iYAxisMax,
                                     title: {
                                         display: false,
                                         text: '금액(억원)',
@@ -364,15 +400,11 @@ sap.ui.define([
                         plugins: [ChartDataLabels, connectorPlugin],
 
                     })
-
-
-
                     //this._ovserveResize(this.byId(this._aContainerId[i]), i)
                 }.bind(this));
-
-
             }
             this.dataLoad();
+            this.getView().getModel("ui").setProperty("/bBusyFlag", false);
             this.byId("cardContent").setBusy(false)
         },
 
